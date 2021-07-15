@@ -1,16 +1,32 @@
 accounts:
   - name: alice
-    coins: ["20000token", "200000000stake"]
+    coins: ["200000000uflix"]
   - name: bob
-    coins: ["10000token", "100000000stake"]
+    coins: ["100000000uflix"]
 validator:
   name: alice
-  staked: "100000000stake"
+  staked: "100000000uflix"
 client:
-  vuex:
-    path: "vue/src/store"
   openapi:
     path: "docs/static/openapi.yml"
 faucet:
   name: bob
-  coins: ["5token", "100000stake"]
+  coins: ["100000uflix"]
+genesis:
+  chain_id: "flixnet-1"
+  app_state:
+    staking:
+      params:
+        bond_denom: "uflix"
+    gov:
+      deposit_params:
+        min_deposit:
+          - amount: "10000000"
+            denom: "uflix"
+    mint:
+      params:
+        mint_denom: "uflix"
+    crisis:
+      constant_fee:
+        amount: "1000"
+        denom: "uflix"
