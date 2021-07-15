@@ -10,7 +10,7 @@
 ```
 git clone https://github.com/omniflix/omniflix.git
 cd omniflix
-git checkout v0.1.0
+git checkout development
 make install
 ```
 
