@@ -1,6 +1,6 @@
 # This is a basic workflow that is manually triggered
 
-name: omniflix
+name: omniflixhub
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -15,7 +15,7 @@ jobs:
       matrix:
         arch: [amd64, arm64]
         targetos: [windows, darwin, linux]
-    name: omniflix ${{ matrix.arch }} for ${{ matrix.targetos }}
+    name: omniflixhub ${{ matrix.arch }} for ${{ matrix.targetos }}
     steps:
       - uses: actions/checkout@v2
       - name: Setup go
@@ -29,11 +29,11 @@ jobs:
       - name: Compile
         run: |
           go mod download
-          cd cmd/omniflixd
+          cd cmd/omniflixhub
           go build .
 
       - uses: actions/upload-artifact@v2
         with:
-          name: omniflixd ${{ matrix.targetos }} ${{ matrix.arch }}
-          path: cmd/omniflixd/omniflixd
+          name: omniflixhubd ${{ matrix.targetos }} ${{ matrix.arch }}
+          path: cmd/omniflixhubd/omniflixhubd
 

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/cosmos/cosmos-sdk/snapshots"
-	"github.com/omniflix/omniflix/app/params"
+	"github.com/Omniflix/omniflixhub/app/params"
 
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
@@ -33,7 +33,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	"github.com/omniflix/omniflix/app"
+	"github.com/Omniflix/omniflixhub/app"
 	// this line is used by starport scaffolding # stargate/root/import
 )
 
@@ -58,7 +58,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 
 	rootCmd := &cobra.Command{
 		Use:   app.Name + "d",
-		Short: "Stargate CosmosHub App",
+		Short: "OmniFlix Hub App",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err

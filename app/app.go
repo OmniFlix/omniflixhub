@@ -80,13 +80,13 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	appparams "github.com/omniflix/omniflix/app/params"
-	"github.com/omniflix/omniflix/docs"
+	appparams "github.com/Omniflix/omniflixhub/app/params"
+	"github.com/Omniflix/omniflixhub/docs"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
-const Name = "omniflix"
+const Name = "omniflixhub"
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
 

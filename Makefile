@@ -1,21 +1,20 @@
-APP_NAME = omniflix
-DEAMON_NAME = omniflixd
+APP_NAME = OmniFlixHub
+DAEMON_NAME = omniflixhubd
 LEDGER_ENABLED ?= true
-PACKAGES=$(shell go list ./... | grep -v '/simulation')
 
+PACKAGES=$(shell go list ./... | grep -v '/simulation')
 VERSION := $(shell echo $(shell git describe --tags --always) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 COSMOS_SDK := $(shell grep -i cosmos-sdk go.mod | awk '{print $$2}')
 
-export GO111MODULE = on
-build_tags = netgo
+build_tags = netgo,
 ifeq ($(LEDGER_ENABLED),true)
   ifeq ($(OS),Windows_NT)
     GCCEXE = $(shell where gcc.exe 2> NUL)
     ifeq ($(GCCEXE),)
       $(error gcc.exe not installed for ledger support, please install or set LEDGER_ENABLED=false)
     else
-      build_tags += ledger
+      build_tags+=ledger
     endif
   else
     UNAME_S = $(shell uname -s)
@@ -26,7 +25,7 @@ ifeq ($(LEDGER_ENABLED),true)
       ifeq ($(GCC),)
         $(error gcc not installed for ledger support, please install or set LEDGER_ENABLED=false)
       else
-        build_tags += ledger
+        build_tags+=ledger
       endif
     endif
   endif
@@ -34,7 +33,7 @@ endif
 build_tags := $(strip $(build_tags))
 
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=${APP_NAME} \
-	-X github.com/cosmos/cosmos-sdk/version.AppName=${DEAMON_NAME} \
+	-X github.com/cosmos/cosmos-sdk/version.AppName=${DAEMON_NAME} \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 	-X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags),cosmos-sdk $(COSMOS_SDK)"
@@ -43,13 +42,10 @@ BUILD_FLAGS := -ldflags '$(ldflags)'
 
 all: go.sum install
 
-create-wallet:
-	omniflixd keys add mywallet
-
 install: go.sum
-		go build $(BUILD_FLAGS) -o ${GOPATH}/bin/omniflixd ./cmd/omniflixd
+		go build $(BUILD_FLAGS) -o ${GOPATH}/bin/${DAEMON_NAME} ./cmd/omniflixhubd/
 build:
-		go build $(BUILD_FLAGS) -o ${GOPATH}/bin/omniflixd ./cmd/omniflixd
+		go build $(BUILD_FLAGS) -o ${GOPATH}/bin/${DAEMON_NAME} ./cmd/omniflixhubd/
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"

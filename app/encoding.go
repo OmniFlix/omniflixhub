@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/cosmos/cosmos-sdk/std"
-	"github.com/omniflix/omniflix/app/params"
+	"github.com/Omniflix/omniflixhub/app/params"
 )
 
 // MakeEncodingConfig creates an EncodingConfig for testing

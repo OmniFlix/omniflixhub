@@ -1,4 +1,4 @@
-module github.com/omniflix/omniflix
+module github.com/Omniflix/omniflixhub
 
 go 1.16
 

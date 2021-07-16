@@ -10,7 +10,7 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	tmdb "github.com/tendermint/tm-db"
 
-	"github.com/omniflix/omniflix/app"
+	"github.com/Omniflix/omniflixhub/app"
 )
 
 // New creates application instance with in-memory database and disabled logging.
