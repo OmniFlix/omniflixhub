@@ -1,1 +1,1 @@
-# omniflix
+# Omniflix Hub
