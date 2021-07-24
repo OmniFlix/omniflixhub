@@ -16,6 +16,9 @@ make install
 
 ### Documentation
 
-  - link to documentation
+  - [flixnet-1 guides](https://github.com/OmniFlix/docs/tree/main/guides/testnets/flixnet-1)
+
+### Testnets
+  - [flixnet-1](https://github.com/OmniFlix/testnets)
 
 
