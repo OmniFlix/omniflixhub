@@ -26,7 +26,6 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	vestingcli "github.com/cosmos/cosmos-sdk/x/auth/vesting/client/cli"
@@ -47,7 +46,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 
 	encodingConfig := app.MakeEncodingConfig()
 	initClientCtx := client.Context{}.
-		WithJSONMarshaler(encodingConfig.Marshaler).
+		WithJSONCodec(encodingConfig.Marshaler).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
 		WithTxConfig(encodingConfig.TxConfig).
 		WithLegacyAmino(encodingConfig.Amino).
@@ -63,8 +62,8 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
-
-			return server.InterceptConfigsPreRunHandler(cmd)
+			appTemplate, appConfig := initAppConfig()
+			return server.InterceptConfigsPreRunHandler(cmd, appTemplate, appConfig)
 		},
 	}
 
@@ -78,7 +77,8 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
-	authclient.Codec = encodingConfig.Marshaler
+	// To-Do Check in gaia new release
+	//authclient.Codec = encodingConfig.Marshaler
 
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
