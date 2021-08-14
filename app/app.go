@@ -86,6 +86,11 @@ import (
 	appparams "github.com/Omniflix/omniflixhub/app/params"
 	"github.com/Omniflix/omniflixhub/docs"
 	tmjson "github.com/tendermint/tendermint/libs/json"
+	// this line is used by starport scaffolding # stargate/app/moduleImport
+	"github.com/OmniFlix/onft"
+	onftkeeper "github.com/OmniFlix/onft/keeper"
+	onfttypes "github.com/OmniFlix/onft/types"
+
 )
 
 const Name = "omniflixhub"
@@ -132,6 +137,8 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		onft.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -193,6 +200,7 @@ type App struct {
 	EvidenceKeeper   evidencekeeper.Keeper
 	TransferKeeper   ibctransferkeeper.Keeper
 	FeeGrantKeeper   feegrantkeeper.Keeper
+	ONFTKeeper onftkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -225,6 +233,9 @@ func New(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,feegrant.StoreKey,
+		// this line is used by starport scaffolding # stargate/app/storeKey
+		onfttypes.StoreKey,
+
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -279,6 +290,13 @@ func New(
 	)
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
+
+	app.ONFTKeeper = onftkeeper.NewKeeper(
+		appCodec,
+		keys[onfttypes.StoreKey],
+	)
+	onftModule := onft.NewAppModule(appCodec, app.ONFTKeeper, app.AccountKeeper, app.BankKeeper)
+
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
@@ -357,6 +375,8 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
+		// this line is used by starport scaffolding # stargate/app/appModule
+		onftModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -390,6 +410,8 @@ func New(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		feegrant.ModuleName,
+		// this line is used by starport scaffolding # stargate/app/initGenesis
+		onfttypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -585,6 +607,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
+	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(onfttypes.ModuleName)
 
 	return paramsKeeper
 }

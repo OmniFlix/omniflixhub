@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/cosmos/cosmos-sdk v0.43.0
 	github.com/cosmos/ibc-go v1.0.0
+	github.com/OmniFlix/onft v0.0.0
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.1.3
@@ -18,3 +19,4 @@ require (
 replace google.golang.org/grpc => google.golang.org/grpc v1.33.2
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+replace github.com/OmniFlix/onft v0.0.0 => ../onft
