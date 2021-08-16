@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cosmos/cosmos-sdk/snapshots"
 	"github.com/Omniflix/omniflixhub/app/params"
+	"github.com/cosmos/cosmos-sdk/snapshots"
 
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
@@ -16,6 +16,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
+	"github.com/Omniflix/omniflixhub/app"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/debug"
@@ -32,7 +33,6 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	"github.com/Omniflix/omniflixhub/app"
 	// this line is used by starport scaffolding # stargate/root/import
 )
 
@@ -54,20 +54,20 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
 		WithHomeDir(app.DefaultNodeHome).
-                WithViper("")
+		WithViper("")
 
 	rootCmd := &cobra.Command{
 		Use:   app.Name + "d",
 		Short: "OmniFlix Hub App",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-                        cmd.SetOut(cmd.OutOrStdout())
-                        cmd.SetErr(cmd.ErrOrStderr())
+			cmd.SetOut(cmd.OutOrStdout())
+			cmd.SetErr(cmd.ErrOrStderr())
 
-                        initClientCtx = client.ReadHomeFlag(initClientCtx, cmd)
-                        initClientCtx, err := config.ReadFromClientConfig(initClientCtx)
-                        if err != nil {
-                                return err
-                        }
+			initClientCtx = client.ReadHomeFlag(initClientCtx, cmd)
+			// initClientCtx, err := config.ReadFromClientConfig(initClientCtx)
+			// if err != nil {
+            //     return err
+            // }
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
