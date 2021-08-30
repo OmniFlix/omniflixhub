@@ -4,7 +4,19 @@ name: omniflixhub
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+      - main
+      - development
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - master
+      - main
+      - development
 
 # This workflow makes x86_64 binaries for mac, windows, and linux.
 
