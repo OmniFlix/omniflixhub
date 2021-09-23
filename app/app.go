@@ -15,6 +15,9 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
+	appparams "github.com/Omniflix/omniflixhub/app/params"
+	customAuthRest "github.com/Omniflix/omniflixhub/custom/auth/client/rest"
+	"github.com/Omniflix/omniflixhub/docs"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -57,14 +60,6 @@ import (
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	transfer "github.com/cosmos/ibc-go/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/modules/core/02-client"
-	porttypes "github.com/cosmos/ibc-go/modules/core/05-port/types"
-	ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/modules/core/keeper"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
@@ -83,14 +78,19 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	appparams "github.com/Omniflix/omniflixhub/app/params"
-	"github.com/Omniflix/omniflixhub/docs"
+	transfer "github.com/cosmos/ibc-go/modules/apps/transfer"
+	ibctransferkeeper "github.com/cosmos/ibc-go/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/modules/core"
+	ibcclient "github.com/cosmos/ibc-go/modules/core/02-client"
+	porttypes "github.com/cosmos/ibc-go/modules/core/05-port/types"
+	ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/modules/core/keeper"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 	"github.com/OmniFlix/onft"
 	onftkeeper "github.com/OmniFlix/onft/keeper"
 	onfttypes "github.com/OmniFlix/onft/types"
-
 )
 
 const Name = "omniflixhub"
@@ -200,7 +200,7 @@ type App struct {
 	EvidenceKeeper   evidencekeeper.Keeper
 	TransferKeeper   ibctransferkeeper.Keeper
 	FeeGrantKeeper   feegrantkeeper.Keeper
-	ONFTKeeper onftkeeper.Keeper
+	ONFTKeeper       onftkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -232,10 +232,9 @@ func New(
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
-		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,feegrant.StoreKey,
+		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey, feegrant.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 		onfttypes.StoreKey,
-
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -296,7 +295,6 @@ func New(
 		keys[onfttypes.StoreKey],
 	)
 	onftModule := onft.NewAppModule(appCodec, app.ONFTKeeper, app.AccountKeeper, app.BankKeeper)
-
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
@@ -428,11 +426,11 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	anteHandler, err := ante.NewAnteHandler(
 		ante.HandlerOptions{
-			AccountKeeper: app.AccountKeeper,
-			BankKeeper: app.BankKeeper,
-			FeegrantKeeper: app.FeeGrantKeeper,
+			AccountKeeper:   app.AccountKeeper,
+			BankKeeper:      app.BankKeeper,
+			FeegrantKeeper:  app.FeeGrantKeeper,
 			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-			SigGasConsumer: ante.DefaultSigVerificationGasConsumer,
+			SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 		},
 	)
 	if err != nil {
@@ -560,6 +558,8 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
 	// Register legacy tx routes.
 	authrest.RegisterTxRoutes(clientCtx, apiSvr.Router)
+	// Register custom tx routes
+	customAuthRest.RegisterTxRoutes(clientCtx, apiSvr.Router)
 	// Register new tx routes from grpc-gateway.
 	authtx.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	// Register new tendermint queries routes from grpc-gateway.
