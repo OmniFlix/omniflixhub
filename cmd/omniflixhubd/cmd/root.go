@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"github.com/cosmos/cosmos-sdk/client/config"
 	"io"
 	"os"
 	"path/filepath"
@@ -64,10 +65,10 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 			cmd.SetErr(cmd.ErrOrStderr())
 
 			initClientCtx = client.ReadHomeFlag(initClientCtx, cmd)
-			// initClientCtx, err := config.ReadFromClientConfig(initClientCtx)
-			// if err != nil {
-            //     return err
-            // }
+			initClientCtx, err := config.ReadFromClientConfig(initClientCtx)
+			 if err != nil {
+                 return err
+            }
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
