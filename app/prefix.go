@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	AccountAddressPrefix = "omniflix"
+	AccountAddressPrefix = "cosmoverse"
 )
 
 var (

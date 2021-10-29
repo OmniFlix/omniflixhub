@@ -1,5 +1,5 @@
-APP_NAME = OmniFlixHub
-DAEMON_NAME = omniflixhubd
+APP_NAME = CosmoVerse
+DAEMON_NAME = cosmoversed
 LEDGER_ENABLED ?= true
 
 PACKAGES=$(shell go list ./... | grep -v '/simulation')

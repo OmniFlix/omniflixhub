@@ -93,7 +93,7 @@ import (
 	onfttypes "github.com/OmniFlix/onft/types"
 )
 
-const Name = "omniflixhub"
+const Name = "cosmoverse"
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
 

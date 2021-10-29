@@ -1,6 +1,6 @@
 # This is a basic workflow that is manually triggered
 
-name: omniflixhub
+name: cosmoverse
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -10,6 +10,7 @@ on:
       - master
       - main
       - development
+      - cosmoverse-chain
     tags:
       - v*
   pull_request:
@@ -27,7 +28,7 @@ jobs:
       matrix:
         arch: [amd64, arm64]
         targetos: [windows, darwin, linux]
-    name: omniflixhub ${{ matrix.arch }} for ${{ matrix.targetos }}
+    name: cosmoverse ${{ matrix.arch }} for ${{ matrix.targetos }}
     steps:
       - uses: actions/checkout@v2
       - name: Setup go
@@ -46,6 +47,6 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: omniflixhubd ${{ matrix.targetos }} ${{ matrix.arch }}
-          path: cmd/omniflixhubd/omniflixhubd
+          name: cosmoversed ${{ matrix.targetos }} ${{ matrix.arch }}
+          path: cmd/omniflixhubd/cosmoversed
 
