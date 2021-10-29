@@ -43,7 +43,7 @@ BUILD_FLAGS := -ldflags '$(ldflags)'
 all: go.sum install
 
 install: go.sum
-		go install $(BUILD_FLAGS) ./cmd/omniflixhubd/
+		go install $(BUILD_FLAGS) ./cmd/omniflixhubd/ -o ${GOPATH}/bin/${DAEMON_NAME}
 build:
 		go build $(BUILD_FLAGS) -o ${GOPATH}/bin/${DAEMON_NAME} ./cmd/omniflixhubd/
 
