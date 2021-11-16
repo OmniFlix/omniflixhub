@@ -45,7 +45,7 @@ all: go.sum install
 install: go.sum
 		go install $(BUILD_FLAGS) ./cmd/omniflixhubd/
 build:
-		go build $(BUILD_FLAGS) -o ${GOPATH}/bin/${DAEMON_NAME} ./cmd/omniflixhubd/
+		go build $(BUILD_FLAGS) -o ./build/omniflixhubd ./cmd/omniflixhubd/
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
