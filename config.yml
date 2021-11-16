@@ -1,8 +1,8 @@
 accounts:
   - name: alice
-    coins: ["200000000uflix"]
+    coins: [ "200000000uflix" ]
   - name: bob
-    coins: ["100000000uflix"]
+    coins: [ "100000000uflix" ]
 validator:
   name: alice
   staked: "100000000uflix"
@@ -11,9 +11,9 @@ client:
     path: "docs/static/openapi.yml"
 faucet:
   name: bob
-  coins: ["100000uflix"]
+  coins: [ "100000uflix" ]
 genesis:
-  chain_id: "flixnet-1"
+  chain_id: "flixnet-3"
   app_state:
     staking:
       params:

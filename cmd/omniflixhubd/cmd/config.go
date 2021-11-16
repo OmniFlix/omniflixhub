@@ -7,13 +7,14 @@ import (
 type AppConfig struct {
 	serverconfig.Config
 }
+
 func initAppConfig() (string, interface{}) {
 	srvCfg := serverconfig.DefaultConfig()
 
-	srvCfg.MinGasPrices = "0stake"
+	srvCfg.MinGasPrices = "0uflix"
 
 	simAppConfig := AppConfig{
-		Config:     *srvCfg,
+		Config: *srvCfg,
 	}
 
 	simAppTemplate := serverconfig.DefaultConfigTemplate

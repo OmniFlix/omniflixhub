@@ -25,8 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [amd64, arm64]
-        targetos: [windows, darwin, linux]
+        arch: [ amd64, arm64 ]
+        targetos: [ windows, darwin, linux ]
     name: omniflixhub ${{ matrix.arch }} for ${{ matrix.targetos }}
     steps:
       - uses: actions/checkout@v2
