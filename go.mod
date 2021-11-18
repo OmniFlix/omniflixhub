@@ -1,6 +1,6 @@
 module github.com/OmniFlix/omniflixhub
 
-go 1.16
+go 1.17
 
 require (
 	github.com/OmniFlix/marketplace v0.1.0-rc4
