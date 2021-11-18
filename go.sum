@@ -88,8 +88,8 @@ github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5/go.mod h1:lmUJ/7eu/Q8
 github.com/OmniFlix/marketplace v0.1.0-rc4 h1:2X/Z2kXQHiRpVTeQuv/6P6ob1/igeysNC5UGSHPSSXU=
 github.com/OmniFlix/marketplace v0.1.0-rc4/go.mod h1:bDpQpHUsOLcS8ggK8jb4KzWxU07zkAQBWiEb/Qth1+k=
 github.com/OmniFlix/onft v0.1.1/go.mod h1:eCqnUDfQkbwuKUgOFpY+uzIc+4tG1X8ygFxXnfd9tWk=
-github.com/OmniFlix/onft v0.2.0-rc3 h1:ezKtgO/BMflDSC093hRvV9rc0eBQW8C2ZEbhmzcDChU=
-github.com/OmniFlix/onft v0.2.0-rc3/go.mod h1:/sjTrZAJioJ1Pi8pjUt4Rli+B0wlw5UohpoM2zoCBYI=
+github.com/OmniFlix/onft v0.2.0-rc4 h1:hXDUbLuB6BB8e2DDZzHCXgybgnozRAgM2FmtmEjgqcY=
+github.com/OmniFlix/onft v0.2.0-rc4/go.mod h1:/sjTrZAJioJ1Pi8pjUt4Rli+B0wlw5UohpoM2zoCBYI=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/OpenPeeDeeP/depguard v1.0.1/go.mod h1:xsIw86fROiiwelg+jB2uM9PiKihMMmUx/1V+TNhjQvM=
