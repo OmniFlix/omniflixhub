@@ -5,7 +5,7 @@ with [Starport](https://github.com/tendermint/starport).
 
 ### Requiremets
 
-- go 1.16 +
+- go 1.17 +
 
 ### Installation
 
@@ -14,7 +14,8 @@ with [Starport](https://github.com/tendermint/starport).
 ```
 git clone https://github.com/Omniflix/omniflixhub.git
 cd omniflixhub
-git checkout v0.2.1
+git checkout v0.3.0-rc1
+go mod tidy
 make install
 ```
 
