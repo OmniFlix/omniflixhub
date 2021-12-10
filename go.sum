@@ -85,10 +85,10 @@ github.com/Microsoft/go-winio v0.5.0 h1:Elr9Wn+sGKPlkaBvwu4mTrxtmOp3F3yV9qhaHbXG
 github.com/Microsoft/go-winio v0.5.0/go.mod h1:JPGBdM1cNvN/6ISo+n8V5iA4v8pBzdOpzfwIujj1a84=
 github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 h1:TngWCqHvy9oXAN6lEVMRuU21PR1EtLVZJmdB18Gu3Rw=
 github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5/go.mod h1:lmUJ/7eu/Q8D7ML55dXQrVaamCz2vxCfdQBasLZfHKk=
-github.com/OmniFlix/marketplace v0.1.0-rc5 h1:QnYvz84l5NjM0nFVETwVPhMqdlOou/jXDtPRhQaaWvk=
-github.com/OmniFlix/marketplace v0.1.0-rc5/go.mod h1:O+G9SUydDDVa7z9hCwnBQ4fwvxmFS3Ja6Gz3BbvOR3s=
-github.com/OmniFlix/onft v0.2.0-rc5 h1:MvJ6XX7lpO82R6BzduauU1yVkNLvEaRAunf9A0pStjU=
-github.com/OmniFlix/onft v0.2.0-rc5/go.mod h1:/FZAAdamM1Q5/PbVLOJ6RdgdpvITikcy+2a1rBW7rJo=
+github.com/OmniFlix/marketplace v0.1.0 h1:F57XzkD53Js24m6ErgDixu08ejyoMm8hdq849QGCH2A=
+github.com/OmniFlix/marketplace v0.1.0/go.mod h1:cQjLwu82rH+KVmPVOGUcISnxSDbg3FKq07F2BMaAcsI=
+github.com/OmniFlix/onft v0.2.0 h1:ekAXyQWPgo3v8Z4fm0CzusFB0YKSZp+5Jj+eQdUKRl4=
+github.com/OmniFlix/onft v0.2.0/go.mod h1:/FZAAdamM1Q5/PbVLOJ6RdgdpvITikcy+2a1rBW7rJo=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/OpenPeeDeeP/depguard v1.0.1/go.mod h1:xsIw86fROiiwelg+jB2uM9PiKihMMmUx/1V+TNhjQvM=
@@ -222,8 +222,9 @@ github.com/cosmos/go-bip39 v1.0.0/go.mod h1:RNJv0H/pOIVgxw6KS7QeX2a0Uo0aKUlfhZ4x
 github.com/cosmos/iavl v0.15.0-rc3.0.20201009144442-230e9bdf52cd/go.mod h1:3xOIaNNX19p0QrX0VqWa6voPRoJRGGYtny+DH8NEPvE=
 github.com/cosmos/iavl v0.15.0-rc5/go.mod h1:WqoPL9yPTQ85QBMT45OOUzPxG/U/JcJoN7uMjgxke/I=
 github.com/cosmos/iavl v0.15.3/go.mod h1:OLjQiAQ4fGD2KDZooyJG9yz+p2ao2IAYSbke8mVvSA4=
-github.com/cosmos/iavl v0.17.1 h1:b/Cl8h1PRMvsu24+TYNlKchIu7W6tmxIBGe6E9u2Ybw=
 github.com/cosmos/iavl v0.17.1/go.mod h1:7aisPZK8yCpQdy3PMvKeO+bhq1NwDjUwjzxwwROUxFk=
+github.com/cosmos/iavl v0.17.3 h1:s2N819a2olOmiauVa0WAhoIJq9EhSXE9HDBAoR9k+8Y=
+github.com/cosmos/iavl v0.17.3/go.mod h1:prJoErZFABYZGDHka1R6Oay4z9PrNeFFiMKHDAMOi4w=
 github.com/cosmos/ibc-go v1.2.2 h1:bs6TZ8Es1kycIu2AHlRZ9dzJ+mveqlLN/0sjWtRH88o=
 github.com/cosmos/ibc-go v1.2.2/go.mod h1:XmYjsRFOs6Q9Cz+CSsX21icNoH27vQKb3squgnCOCbs=
 github.com/cosmos/ibc-go/v2 v2.0.0 h1:BMRg73JcdV9wGPI51j89ihm7VBZQsDLkqQ+tmzdeA9Y=
