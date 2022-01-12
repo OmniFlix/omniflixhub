@@ -205,7 +205,7 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 
 	// this line is used by starport scaffolding # stargate/root/appBeforeInit
 
-	return app.New(
+	return app.NewOmniFlixApp(
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
@@ -239,7 +239,7 @@ func (a appCreator) appExport(
 	}
 
 	if height != -1 {
-		anApp = app.New(
+		anApp = app.NewOmniFlixApp(
 			logger,
 			db,
 			traceStore,
@@ -256,7 +256,7 @@ func (a appCreator) appExport(
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		anApp = app.New(
+		anApp = app.NewOmniFlixApp(
 			logger,
 			db,
 			traceStore,
