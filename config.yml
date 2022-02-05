@@ -13,7 +13,7 @@ faucet:
   name: bob
   coins: [ "100000uflix" ]
 genesis:
-  chain_id: "flixnet-3"
+  chain_id: "omniflix-devnet-3"
   app_state:
     staking:
       params:
