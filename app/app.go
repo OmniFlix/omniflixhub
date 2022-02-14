@@ -30,6 +30,7 @@ import (
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
+	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
@@ -445,7 +446,7 @@ func NewOmniFlixApp(
 		keys[onfttypes.StoreKey],
 	)
 
-	onftModule := onft.NewAppModule(appCodec, app.ONFTKeeper)
+	onftModule := onft.NewAppModule(appCodec, app.ONFTKeeper, app.AccountKeeper, app.BankKeeper)
 
 	app.MarketplaceKeeper = marketplacekeeper.NewKeeper(
 		appCodec,
@@ -453,6 +454,8 @@ func NewOmniFlixApp(
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.ONFTKeeper,
+		app.DistrKeeper,
+		app.GetSubspace(marketplacetypes.ModuleName),
 	)
 
 	marketplaceModule := marketplace.NewAppModule(appCodec, app.MarketplaceKeeper)
@@ -515,15 +518,42 @@ func NewOmniFlixApp(
 		evidencetypes.ModuleName,
 		stakingtypes.ModuleName,
 		ibchost.ModuleName,
+		vestingtypes.ModuleName,
+		banktypes.ModuleName,
+		govtypes.ModuleName,
+		paramstypes.ModuleName,
+		ibctransfertypes.ModuleName,
+		genutiltypes.ModuleName,
+		authz.ModuleName,
+		authtypes.ModuleName,
+		crisistypes.ModuleName,
 		feegrant.ModuleName,
+		onfttypes.ModuleName,
+		marketplacetypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
 		stakingtypes.ModuleName,
+		capabilitytypes.ModuleName,
+		genutiltypes.ModuleName,
+		banktypes.ModuleName,
+		upgradetypes.ModuleName,
+		evidencetypes.ModuleName,
+		authtypes.ModuleName,
+		vestingtypes.ModuleName,
+		paramstypes.ModuleName,
+		ibctransfertypes.ModuleName,
+		minttypes.ModuleName,
+		slashingtypes.ModuleName,
+		distrtypes.ModuleName,
+		ibchost.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
+		alloctypes.ModuleName,
+		onfttypes.ModuleName,
+		marketplacetypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -547,6 +577,9 @@ func NewOmniFlixApp(
 		ibctransfertypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
+		paramstypes.ModuleName,
+		vestingtypes.ModuleName,
+		upgradetypes.ModuleName,
 		alloctypes.ModuleName,
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,
@@ -564,6 +597,7 @@ func NewOmniFlixApp(
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
+		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
 		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper),
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
@@ -572,6 +606,8 @@ func NewOmniFlixApp(
 		params.NewAppModule(app.ParamsKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
+		transferModule,
+		onftModule,
 	)
 
 	app.sm.RegisterStoreDecoders()

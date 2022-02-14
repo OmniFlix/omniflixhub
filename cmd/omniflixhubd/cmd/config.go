@@ -11,7 +11,7 @@ type AppConfig struct {
 func initAppConfig() (string, interface{}) {
 	srvCfg := serverconfig.DefaultConfig()
 
-	srvCfg.MinGasPrices = "0uflix"
+	srvCfg.MinGasPrices = "0.001uflix"
 
 	simAppConfig := AppConfig{
 		Config: *srvCfg,
