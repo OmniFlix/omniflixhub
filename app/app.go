@@ -93,9 +93,15 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
+	"github.com/OmniFlix/marketplace/x/marketplace"
+	marketplacekeeper "github.com/OmniFlix/marketplace/x/marketplace/keeper"
+	marketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
 	"github.com/OmniFlix/omniflixhub/x/alloc"
 	allockeeper "github.com/OmniFlix/omniflixhub/x/alloc/keeper"
 	alloctypes "github.com/OmniFlix/omniflixhub/x/alloc/types"
+	"github.com/OmniFlix/onft"
+	onftkeeper "github.com/OmniFlix/onft/keeper"
+	onfttypes "github.com/OmniFlix/onft/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -148,6 +154,8 @@ var (
 		vesting.AppModuleBasic{},
 
 		alloc.AppModuleBasic{},
+		onft.AppModuleBasic{},
+		marketplace.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -161,6 +169,8 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		onfttypes.ModuleName:           nil,
+		marketplacetypes.ModuleName:    nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -218,7 +228,9 @@ type App struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-	AllocKeeper allockeeper.Keeper
+	AllocKeeper       allockeeper.Keeper
+	ONFTKeeper        onftkeeper.Keeper
+	MarketplaceKeeper marketplacekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// module manager
@@ -254,7 +266,7 @@ func NewOmniFlixApp(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey, feegrant.StoreKey,
-		authzkeeper.StoreKey, alloctypes.StoreKey,
+		authzkeeper.StoreKey, alloctypes.StoreKey, onfttypes.StoreKey, marketplacetypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -428,6 +440,23 @@ func NewOmniFlixApp(
 	)
 	allocModule := alloc.NewAppModule(appCodec, app.AllocKeeper)
 
+	app.ONFTKeeper = onftkeeper.NewKeeper(
+		appCodec,
+		keys[onfttypes.StoreKey],
+	)
+
+	onftModule := onft.NewAppModule(appCodec, app.ONFTKeeper)
+
+	app.MarketplaceKeeper = marketplacekeeper.NewKeeper(
+		appCodec,
+		keys[marketplacetypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.ONFTKeeper,
+	)
+
+	marketplaceModule := marketplace.NewAppModule(appCodec, app.MarketplaceKeeper)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
@@ -466,6 +495,8 @@ func NewOmniFlixApp(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		allocModule,
+		onftModule,
+		marketplaceModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 	)
@@ -517,6 +548,8 @@ func NewOmniFlixApp(
 		feegrant.ModuleName,
 		authz.ModuleName,
 		alloctypes.ModuleName,
+		onfttypes.ModuleName,
+		marketplacetypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -731,6 +764,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(alloctypes.ModuleName)
+	paramsKeeper.Subspace(onfttypes.ModuleName)
+	paramsKeeper.Subspace(marketplacetypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
