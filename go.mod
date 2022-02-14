@@ -110,7 +110,7 @@ require (
 	github.com/tendermint/go-amino v0.16.0 // indirect
 	github.com/zondax/hid v0.9.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
-	golang.org/x/crypto v0.0.0-20210915214749-c084706c2272 // indirect
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/net v0.0.0-20211005001312-d4b1ae081e3b // indirect
 	golang.org/x/sys v0.0.0-20211004093028-2c5d950f24ef // indirect
 	golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1 // indirect
@@ -122,6 +122,15 @@ require (
 	nhooyr.io/websocket v1.8.6 // indirect
 )
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.33.2
-
-replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+replace (
+	// Our cosmos-sdk branch is:  https://github.com/osmosis-labs/cosmos-sdk v0.45.0x-osmo-v7
+	github.com/cosmos/cosmos-sdk => github.com/osmosis-labs/cosmos-sdk v0.43.0-rc3.0.20220213051416-1fab40159cee
+	// Use osmosis fork of iavl
+	github.com/cosmos/iavl => github.com/osmosis-labs/iavl v0.17.3-osmo-v1
+	// use cosmos-compatible protobufs
+	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+	// enable building wihh rocksdb
+	github.com/tecbot/gorocksdb => github.com/cosmos/gorocksdb v1.2.0
+	// use grpc compatible with cosmos protobufs
+	google.golang.org/grpc => google.golang.org/grpc v1.33.2
+)
