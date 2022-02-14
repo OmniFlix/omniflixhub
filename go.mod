@@ -124,7 +124,7 @@ require (
 
 replace (
 	// Our cosmos-sdk branch is:  https://github.com/osmosis-labs/cosmos-sdk v0.45.0x-osmo-v7
-	github.com/cosmos/cosmos-sdk => github.com/osmosis-labs/cosmos-sdk v0.43.0-rc3.0.20220213051416-1fab40159cee
+	github.com/cosmos/cosmos-sdk => github.com/notional-labs/cosmos-sdk v0.45.1-allfast
 	// Use osmosis fork of iavl
 	github.com/cosmos/iavl => github.com/osmosis-labs/iavl v0.17.3-osmo-v1
 	// use cosmos-compatible protobufs
