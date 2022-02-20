@@ -14,7 +14,7 @@ with [Starport](https://github.com/tendermint/starport).
 ```
 git clone https://github.com/Omniflix/omniflixhub.git
 cd omniflixhub
-git checkout v0.3.0
+git checkout v0.4.0
 go mod tidy
 make install
 ```
