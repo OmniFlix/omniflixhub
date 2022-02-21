@@ -7,7 +7,7 @@ VERSION := $(shell echo $(shell git describe --tags --always) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 COSMOS_SDK := $(shell grep -i cosmos-sdk go.mod | awk '{print $$2}')
 
-build_tags = netgo,
+build_tags = netgo
 ifeq ($(LEDGER_ENABLED),true)
   ifeq ($(OS),Windows_NT)
     GCCEXE = $(shell where gcc.exe 2> NUL)
