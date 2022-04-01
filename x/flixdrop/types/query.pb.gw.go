@@ -168,7 +168,7 @@ func request_Query_ClaimableForAction_0(ctx context.Context, marshaler runtime.M
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "action")
 	}
 
-	protoReq.Action, err = runtime.Uint32(val)
+	protoReq.Action, err = runtime.Uint64(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "action", err)
@@ -206,7 +206,7 @@ func local_request_Query_ClaimableForAction_0(ctx context.Context, marshaler run
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "action")
 	}
 
-	protoReq.Action, err = runtime.Uint32(val)
+	protoReq.Action, err = runtime.Uint64(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "action", err)

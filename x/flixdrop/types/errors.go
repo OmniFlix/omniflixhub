@@ -8,9 +8,7 @@ import (
 
 // x/claim module sentinel errors
 var (
-	ErrIncorrectModuleAccountBalance = sdkerrors.Register(
-		ModuleName,
-		1,
-		"flixdrop module account balance != sum of all claim record InitialClaimableAmounts",
-	)
+	ErrFlixDropNotStarted            = sdkerrors.Register(ModuleName, 2, "flixdrop not started")
+	ErrIncorrectModuleAccountBalance = sdkerrors.Register(ModuleName, 3, "claim module account balance != sum of all claim record InitialClaimableAmounts")
+	ErrActionClaimNotStarted         = sdkerrors.Register(ModuleName, 4, "claim not started for this action")
 )

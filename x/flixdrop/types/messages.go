@@ -12,7 +12,7 @@ const (
 	TypeMsgClaim = "claim"
 )
 
-func NewMsgClaim(sender string, address string, action uint32) *MsgClaim {
+func NewMsgClaim(sender string, address string, action uint64) *MsgClaim {
 	return &MsgClaim{
 		Sender:  sender,
 		Address: address,

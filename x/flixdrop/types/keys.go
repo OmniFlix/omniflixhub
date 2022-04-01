@@ -1,5 +1,7 @@
 package types
 
+import sdk "github.com/cosmos/cosmos-sdk/types"
+
 const (
 	// ModuleName defines the module name
 	ModuleName = "flixdrop"
@@ -27,4 +29,9 @@ const (
 var (
 	// ClaimRecordsStorePrefix defines the store prefix for the claim records
 	ClaimRecordsStorePrefix = []byte{0x01}
+	ActionsPrefix           = []byte{0x02}
 )
+
+func KeyActionPrefix(index uint64) []byte {
+	return append(ActionsPrefix, sdk.Uint64ToBigEndian(index)...)
+}

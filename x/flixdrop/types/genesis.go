@@ -19,13 +19,14 @@ func DefaultGenesis() *GenesisState {
 		// this line is used by starport scaffolding # genesis/types/default
 		ModuleAccountBalance: sdk.NewCoin(DefaultClaimDenom, sdk.ZeroInt()),
 		Params:               DefaultParams(),
+		Actions:              []WeightedAction{},
 		ClaimRecords:         make([]ClaimRecord, 0),
 	}
 }
 
 func DefaultParams() Params {
 	return Params{
-		FlixdropStartTime:   time.Time{},
+		FlixdropStartTime:  time.Time{},
 		DurationUntilDecay: DefaultDurationUntilDecay,
 		DurationOfDecay:    DefaultDurationOfDecay,
 		ClaimDenom:         DefaultClaimDenom,
