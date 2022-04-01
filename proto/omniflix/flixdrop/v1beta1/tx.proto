@@ -14,7 +14,7 @@ service Msg {
 message MsgClaim {
   string sender  = 1;
   string address = 2;
-  uint32 action  = 3;
+  uint64 action  = 3;
 }
 
 message MsgClaimResponse {

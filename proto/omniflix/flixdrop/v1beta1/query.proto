@@ -82,7 +82,7 @@ message QueryClaimRecordResponse {
 
 message QueryClaimableForActionRequest {
   string address = 1 [(gogoproto.moretags) = "yaml:\"address\""];
-  uint32 action  = 2 [(gogoproto.moretags) = "yaml:\"action\""];
+  uint64 action  = 2 [(gogoproto.moretags) = "yaml:\"action\""];
 }
 
 message QueryClaimableForActionResponse {

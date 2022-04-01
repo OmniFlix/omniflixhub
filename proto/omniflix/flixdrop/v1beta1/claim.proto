@@ -9,7 +9,7 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/OmniFlix/omniflixhub/x/flixdrop/types";
 
 message WeightedAction {
-  uint32                    index      = 1 [(gogoproto.moretags) = "yaml:\"index\""];
+  uint64                    index      = 1 [(gogoproto.moretags) = "yaml:\"index\""];
   string                    name       = 2 [(gogoproto.moretags) = "yaml:\"name\""];
   google.protobuf.Timestamp start_time = 3 [
     (gogoproto.stdtime)  = true,
@@ -35,8 +35,8 @@ message ClaimRecord {
     (gogoproto.moretags)     = "yaml:\"initial_claimable_amount\""
   ];
 
-  // true if action is completed
+  // true if action is claimed
   // index of bool in array refers to action index #
-  repeated bool                     actions_completed        = 3
-  [(gogoproto.moretags) = "yaml:\"actions_completed\""];
+  repeated bool                     actions_claimed          = 3
+  [(gogoproto.moretags) = "yaml:\"actions_claimed\""];
 }
