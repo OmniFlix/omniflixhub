@@ -1,6 +1,8 @@
 package app
 
 import (
+	"github.com/OmniFlix/omniflixhub/app/decorators"
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -14,6 +16,7 @@ type HandlerOptions struct {
 	ante.HandlerOptions
 
 	IBCChannelkeeper channelkeeper.Keeper
+	Codec            codec.BinaryCodec
 }
 
 func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
@@ -33,6 +36,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	}
 
 	anteDecorators := []sdk.AnteDecorator{
+		decorators.NewMinCommissionDecorator(options.Codec),
 		ante.NewRejectExtensionOptionsDecorator(),
 		ante.NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),
