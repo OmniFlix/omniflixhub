@@ -1,3 +1,6 @@
 .idea
 secret.yml
 .build/*
+._build/*
+.envrc
+
