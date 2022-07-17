@@ -5,21 +5,21 @@ import (
 )
 
 const (
-	// DefaultJunoInstanceCost is initially set the same as in wasmd
-	DefaultJunoInstanceCost uint64 = 60_000
-	// DefaultJunoCompileCost set to a large number for testing
-	DefaultJunoCompileCost uint64 = 100
+	// DefaultOmniFlixInstanceCost is initially set the same as in wasmd
+	DefaultOmniFlixInstanceCost uint64 = 60_000
+	// DefaultOmniFlixCompileCost set to a large number for testing
+	DefaultOmniFlixCompileCost uint64 = 100
 )
 
-// JunoGasRegisterConfig is defaults plus a custom compile amount
-func JunoGasRegisterConfig() wasmkeeper.WasmGasRegisterConfig {
+// OmniFlixGasRegisterConfig is defaults plus a custom compile amount
+func OmniFlixGasRegisterConfig() wasmkeeper.WasmGasRegisterConfig {
 	gasConfig := wasmkeeper.DefaultGasRegisterConfig()
-	gasConfig.InstanceCost = DefaultJunoInstanceCost
-	gasConfig.CompileCost = DefaultJunoCompileCost
+	gasConfig.InstanceCost = DefaultOmniFlixInstanceCost
+	gasConfig.CompileCost = DefaultOmniFlixCompileCost
 
 	return gasConfig
 }
 
-func NewJunoWasmGasRegister() wasmkeeper.WasmGasRegister {
-	return wasmkeeper.NewWasmGasRegister(JunoGasRegisterConfig())
+func NewOmniFlixWasmGasRegister() wasmkeeper.WasmGasRegister {
+	return wasmkeeper.NewWasmGasRegister(OmniFlixGasRegisterConfig())
 }

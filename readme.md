@@ -41,3 +41,6 @@ make install
 ## Mainnet
 - [omniflixhub-1](https://github.com/OmniFlix/mainnet/tree/main/omniflixhub-1)
 
+
+==
+v8.0.0
