@@ -5,3 +5,4 @@ secret.yml
 .envrc
 /build
 /_build
+.vscode
