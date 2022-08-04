@@ -21,8 +21,7 @@ type HandlerOptions struct {
 	IBCKeeper         *ibckeeper.Keeper
 	TxCounterStoreKey sdk.StoreKey
 	WasmConfig        wasmTypes.WasmConfig
-	Cdc               codec.BinaryCodec
-	Codec            codec.BinaryCodec
+	Codec             codec.BinaryCodec
 }
 
 func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
@@ -42,6 +41,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	}
 
 	anteDecorators := []sdk.AnteDecorator{
+		ante.NewSetUpContextDecorator(), // Outermost AnteDecorator, SetUpContext must be called first
 		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit),
 		wasmkeeper.NewCountTXDecorator(options.TxCounterStoreKey),
 		decorators.NewMinCommissionDecorator(options.Codec),

@@ -768,7 +768,7 @@ func NewOmniFlixApp(
 			IBCKeeper:         app.IBCKeeper,
 			TxCounterStoreKey: keys[wasm.StoreKey],
 			WasmConfig:        wasmConfig,
-			Cdc:               appCodec,
+			Codec:             appCodec,
 		},
 	)
 	if err != nil {
