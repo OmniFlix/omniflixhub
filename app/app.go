@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	appparams "github.com/OmniFlix/omniflixhub/app/params"
 	"io"
 	"net/http"
 	"os"
@@ -103,7 +104,6 @@ import (
 	"github.com/OmniFlix/onft"
 	onftkeeper "github.com/OmniFlix/onft/keeper"
 	onfttypes "github.com/OmniFlix/onft/types"
-	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -176,7 +176,7 @@ var (
 )
 
 var (
-	_ cosmoscmd.CosmosApp     = (*App)(nil)
+	_ CosmosApp               = (*App)(nil)
 	_ servertypes.Application = (*App)(nil)
 )
 
@@ -256,11 +256,11 @@ func NewOmniFlixApp(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig cosmoscmd.EncodingConfig,
+	encodingConfig appparams.EncodingConfig,
 	// this line is used by starport scaffolding # stargate/app/newArgument
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
-) cosmoscmd.App {
+) *App {
 
 	appCodec := encodingConfig.Marshaler
 	cdc := encodingConfig.Amino
