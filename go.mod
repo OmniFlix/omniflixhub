@@ -6,7 +6,7 @@ require (
 	github.com/OmniFlix/marketplace v0.3.0-alpha.2
 	github.com/OmniFlix/onft v0.3.0
 	github.com/cosmos/cosmos-sdk v0.45.6
-	github.com/cosmos/ibc-go/v3 v3.0.0
+	github.com/cosmos/ibc-go/v3 v3.1.1
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
@@ -16,7 +16,6 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.0
 	github.com/tendermint/spm v0.1.9
-	github.com/tendermint/starport v0.19.3
 	github.com/tendermint/tendermint v0.34.19
 	github.com/tendermint/tm-db v0.6.7
 	google.golang.org/genproto v0.0.0-20220407144326-9054f6ed7bac
