@@ -106,8 +106,8 @@ github.com/Microsoft/go-winio v0.5.1 h1:aPJp2QD7OOrhO5tQXqQoGSJc+DjDtWTGLOmNyAm6
 github.com/Microsoft/go-winio v0.5.1/go.mod h1:JPGBdM1cNvN/6ISo+n8V5iA4v8pBzdOpzfwIujj1a84=
 github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 h1:TngWCqHvy9oXAN6lEVMRuU21PR1EtLVZJmdB18Gu3Rw=
 github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5/go.mod h1:lmUJ/7eu/Q8D7ML55dXQrVaamCz2vxCfdQBasLZfHKk=
-github.com/OmniFlix/marketplace v0.3.0-alpha.2 h1:cQxIqhScN00rXglwO+yDozk3oU8CPDS9QEok0JUwV0A=
-github.com/OmniFlix/marketplace v0.3.0-alpha.2/go.mod h1:f9oXa8VGOkgrW6kdh1AIXwuzSP1Zy0aG0HEHTIyd/e4=
+github.com/OmniFlix/marketplace v0.3.0-alpha.3 h1:cJGn/PAu56dBd8RiKoCKStM2idG+ychO9Crs+jt2oh8=
+github.com/OmniFlix/marketplace v0.3.0-alpha.3/go.mod h1:f9oXa8VGOkgrW6kdh1AIXwuzSP1Zy0aG0HEHTIyd/e4=
 github.com/OmniFlix/onft v0.3.0 h1:VDMFJuBEI+OyvcPCBXph+sS6OY7i1uQ9H0I0ZpleU8Q=
 github.com/OmniFlix/onft v0.3.0/go.mod h1:y1RknOuWIm2FhShS8Cb03mgyryYu7xZa+PzG5lN3O3A=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
