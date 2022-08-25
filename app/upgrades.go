@@ -19,10 +19,7 @@ func (app *App) RegisterUpgradeHandlers(cfg module.Configurator) {
 		app.MarketplaceKeeper.SetParams(ctx, marketplacetypes.DefaultParams())
 		app.MarketplaceKeeper.SetNextAuctionNumber(ctx, 1)
 
-		fromVM := make(map[string]uint64)
-		for moduleName := range app.mm.Modules {
-			fromVM[moduleName] = 2
-		}
+		fromVM := app.mm.GetVersionMap()
 		ctx.Logger().Info("running migrations ...")
 		return app.mm.RunMigrations(ctx, cfg, fromVM)
 	})
