@@ -1,7 +1,7 @@
 # OmniFlix Hub
 
 **OmniFlix Hub** is a blockchain built using Cosmos SDK and Tendermint and created
-with [Starport](https://github.com/tendermint/starport).
+with [Ignite CLI](https://github.com/ignite/cli).
 
 ### Requiremets
 
@@ -41,6 +41,3 @@ make install
 ## Mainnet
 - [omniflixhub-1](https://github.com/OmniFlix/mainnet/tree/main/omniflixhub-1)
 
-
-==
-v8.0.0
