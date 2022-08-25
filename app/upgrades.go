@@ -3,11 +3,11 @@ package app
 import (
 	"fmt"
 
+	marketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	marketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
 )
 
 // next upgrade name
@@ -15,11 +15,16 @@ const upgradeName = "v2"
 
 // RegisterUpgradeHandlers returns upgrade handlers
 func (app *App) RegisterUpgradeHandlers(cfg module.Configurator) {
-	app.UpgradeKeeper.SetUpgradeHandler(upgradeName, func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
+	app.UpgradeKeeper.SetUpgradeHandler(upgradeName, func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
 		app.MarketplaceKeeper.SetParams(ctx, marketplacetypes.DefaultParams())
 		app.MarketplaceKeeper.SetNextAuctionNumber(ctx, 1)
 
-		return app.mm.RunMigrations(ctx, cfg, vm)
+		fromVM := make(map[string]uint64)
+		for moduleName := range app.mm.Modules {
+			fromVM[moduleName] = 2
+		}
+		ctx.Logger().Info("running migrations ...")
+		return app.mm.RunMigrations(ctx, cfg, fromVM)
 	})
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
