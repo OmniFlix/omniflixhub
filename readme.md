@@ -22,7 +22,7 @@ wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.18
 ```
 git clone https://github.com/Omniflix/omniflixhub.git
 cd omniflixhub
-git checkout v0.5.0
+git checkout v0.6.0
 go mod tidy
 make install
 ```
