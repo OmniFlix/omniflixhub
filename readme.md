@@ -1,11 +1,19 @@
 # OmniFlix Hub
 
 **OmniFlix Hub** is a blockchain built using Cosmos SDK and Tendermint and created
-with [Starport](https://github.com/tendermint/starport).
+with [Ignite CLI](https://github.com/ignite/cli).
 
-### Requiremets
+### Hardware Requirements
+ - Quad Core or larger AMD or Intel (amd64) CPU 
+ - 16GB RAM
+ - 500GB SSD Storage
 
-- go 1.17 +
+### Go Requirement
+- go 1.18 +
+```
+wget -q -O - https://git.io/vQhTU | bash -s -- --remove
+wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.18
+ ```
 
 ### Installation
 
@@ -14,11 +22,33 @@ with [Starport](https://github.com/tendermint/starport).
 ```
 git clone https://github.com/Omniflix/omniflixhub.git
 cd omniflixhub
-git checkout v0.4.0
+git checkout v0.5.0
 go mod tidy
 make install
 ```
 
+### Setup
+
+```
+# Initialize node
+MONIKER=omniflix-node
+CHAIN_ID=omniflixhub-1
+omniflixhubd init $MONIKER --chain-id $CHAIN_ID
+
+# Download Genesis
+curl https://raw.githubusercontent.com/OmniFlix/mainnet/main/omniflixhub-1/genesis.json > ~/.omniflixhub/config/genesis.json
+
+# verify sha256 sum 
+# 3c01dd89ae10f3dc247648831ef9e8168afd020946a13055d92a7fe2f50050a0
+```
+**Update Config** [(omniflixhub-1/config)](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/run-full-node.md#2-update-config)
+- update minimum-gas-price as `0.001uflix` in `app.toml`
+- updates persistent peers and seeds in config.toml 
+
+
+### Snapshots
+ - Check [c29r3/cosmos-snapshots](https://github.com/c29r3/cosmos-snapshots) repository for omniflixhub snapshots
+   
 ### OmniFlix Modules
 - [oNFT](https://github.com/OmniFlix/onft)
 - [Marketplace](https://github.com/OmniFlix/marketplace)

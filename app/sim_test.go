@@ -1,4 +1,4 @@
-package app
+package app_test
 
 import (
 	"encoding/hex"
@@ -68,6 +68,7 @@ func TestFullAppSimulation(t *testing.T) {
 		simapp.PrintStats(db)
 	}
 }
+
 // fauxMerkleModeOpt returns a BaseApp option to use a dbStoreAdapter instead of
 // an IAVLStore for faster simulation speed.
 func fauxMerkleModeOpt(bapp *baseapp.BaseApp) {
