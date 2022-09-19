@@ -3,7 +3,7 @@ module github.com/OmniFlix/omniflixhub
 go 1.18
 
 require (
-	github.com/OmniFlix/marketplace v0.3.0
+	github.com/OmniFlix/marketplace v0.4.0-alpha-1
 	github.com/OmniFlix/onft v0.3.0
 	github.com/cosmos/cosmos-sdk v0.45.6
 	github.com/cosmos/ibc-go/v3 v3.0.1
