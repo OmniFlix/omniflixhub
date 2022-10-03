@@ -1,0 +1,49 @@
+syntax = "proto3";
+package omniflix.itc.v1beta1;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+message Campaign {
+  string                      name = 1;
+  string                      description = 2;
+  time.Time                   start_time = 3;
+  time.Time                   end_time = 4;
+  string                      creator = 5;
+  Action                      action = 6;
+  ClaimableReward             reward = 7;
+  cosmos.base.v1beta1.Coin    total_reward = 8;
+  cosmos.base.v1beta1.Coin    available_reward = 9;
+  cosmos.base.v1beta1.Coin    claimed_reward = 10;
+  repeated ClaimRecord        claim_records = 11;
+}
+
+
+enum Action {
+  burn_nft = 0;
+}
+
+message ClaimableReward {
+  int64                  max_fungible_tokens = 1;
+  int64                  max_non_fungible_tokens = 2;
+  repeated NFTdetails    nfts = 3;
+}
+
+message NFTDetails {
+  string              collection_id = 1;
+  string              name = 2;
+  string              description = 3;
+  string              media_uri = 4;
+  string              preview_uri = 5;
+  string              royalty_share = 6;
+  bool                transferable = 7;
+  bool                extensible = 8;
+  bool                nsfw = 9;
+}
+
+message ClaimRecord {
+  string    address = 1;
+  int64     action = 2;
+  string    status = 3;
+}

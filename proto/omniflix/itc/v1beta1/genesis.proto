@@ -1,0 +1,15 @@
+syntax = "proto3";
+package omniflix.itc.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "omniflix/itc/v1beta1/params.proto";
+import "omniflix/itc/v1beta1/itc.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/x/itc/types";
+
+// GenesisState defines the itc module's genesis state.
+message GenesisState {
+  repeated Campaign campaigns = 1;
+  repeated ClaimRecord claim_records = 2;
+  Params params = 3 [ (gogoproto.nullable) = false ];
+}

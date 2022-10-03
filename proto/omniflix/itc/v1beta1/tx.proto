@@ -1,0 +1,28 @@
+syntax = "proto3";
+package omniflix.itc.v1beta1;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "omniflix/itc/v1beta1/itc.proto";
+
+message MsgCreateCampaign  {
+  string             name = 1;
+  string             description = 2;
+  string             action = 3;
+  string             reward = 4;
+  cosmos.base.v1beta1.Coin           deposit = 5;
+  time.Time          start_time = 6;
+  time.Duration      duration = 7;
+}
+
+message MsgCancelCampaign {
+  string            campaign_id = 1;
+  string            creator = 2;
+}
+
+message MsgClaim  {
+  string           auction_id = 1;
+  string           action = 2;
+  string           from = 3;
+}
