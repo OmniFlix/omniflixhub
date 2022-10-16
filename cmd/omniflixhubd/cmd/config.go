@@ -12,6 +12,7 @@ func initAppConfig() (string, interface{}) {
 	srvCfg := serverconfig.DefaultConfig()
 
 	srvCfg.MinGasPrices = "0.001uflix"
+	srvCfg.IAVLDisableFastNode = false
 
 	simAppConfig := AppConfig{
 		Config: *srvCfg,

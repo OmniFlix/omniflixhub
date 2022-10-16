@@ -5,8 +5,6 @@ const (
 	SimAppChainID = "simapp-1"
 )
 
-
-
 type EmptyAppOptions struct{}
 
 // Get implements AppOptions

@@ -5,21 +5,17 @@ linters:
   disable-all: true
   enable:
     - bodyclose
-    - deadcode
     - errcheck
     - goconst
     - gocritic
     - gocyclo
-    - gofmt
-    - goimports
-    - golint
-    - gomnd
+    - gofumpt
     - goprintffuncname
     - gosec
     - gosimple
     - govet
     - ineffassign
-    - interfacer
-    - lll
     - misspell
     - nakedret
+    - revive
+    - unused

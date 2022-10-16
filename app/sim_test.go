@@ -1,5 +1,8 @@
 package app_test
 
+/*
+
+
 import (
 	"encoding/hex"
 	"encoding/json"
@@ -144,3 +147,4 @@ func TestAppStateDeterminism(t *testing.T) {
 		}
 	}
 }
+*/
