@@ -2,11 +2,12 @@ package app
 
 import (
 	"fmt"
-	appparams "github.com/OmniFlix/omniflixhub/app/params"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	appparams "github.com/OmniFlix/omniflixhub/app/params"
 
 	customAuthRest "github.com/OmniFlix/omniflixhub/custom/auth/client/rest"
 	"github.com/OmniFlix/omniflixhub/docs"
@@ -151,7 +152,6 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		//ica.AppModuleBasic{},
 
 		alloc.AppModuleBasic{},
 		onft.AppModuleBasic{},
@@ -224,11 +224,9 @@ type App struct {
 	FeeGrantKeeper   feegrantkeeper.Keeper
 	AuthzKeeper      authzkeeper.Keeper
 
-	//ICAHostKeeper icahostkeeper.Keeper
-
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper capabilitykeeper.ScopedKeeper
-	//ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
+
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
 	AllocKeeper       allockeeper.Keeper
@@ -261,7 +259,6 @@ func NewOmniFlixApp(
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
-
 	appCodec := encodingConfig.Marshaler
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
@@ -494,7 +491,7 @@ func NewOmniFlixApp(
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
 	// we prefer to be more strict in what arguments the modules expect.
-	var skipGenesisInvariants = cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
+	skipGenesisInvariants := cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
@@ -521,7 +518,7 @@ func NewOmniFlixApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		//icaModule,
+
 		allocModule,
 		onftModule,
 		marketplaceModule,
