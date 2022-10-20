@@ -11,6 +11,7 @@ with [Ignite CLI](https://github.com/ignite/cli).
 ### Go Requirement
 - go 1.18 +
 ```
+sudo rm -rf /usr/local/go
 wget -q -O - https://git.io/vQhTU | bash -s -- --remove
 wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.18.3
  ```
@@ -22,7 +23,7 @@ wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.18.3
 ```
 git clone https://github.com/Omniflix/omniflixhub.git
 cd omniflixhub
-git checkout v0.7.0
+git checkout v0.4.2
 go mod tidy
 make install
 ```
