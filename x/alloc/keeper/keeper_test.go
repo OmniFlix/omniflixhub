@@ -25,7 +25,6 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.app = simapp.New(suite.T().TempDir())
 	suite.ctx = suite.app.BaseApp.NewContext(false, tmproto.Header{Height: 1, ChainID: "omniflixhub-1", Time: time.Now().UTC()})
 	suite.app.AllocKeeper.SetParams(suite.ctx, types.DefaultParams())
-
 }
 
 func TestKeeperTestSuite(t *testing.T) {
