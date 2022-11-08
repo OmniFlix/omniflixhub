@@ -11,15 +11,12 @@ import (
 )
 
 // next upgrade name
-const upgradeName = "upgrade_1"
+const upgradeName = "testnet_upgrade_2"
 
 // RegisterUpgradeHandlers returns upgrade handlers
 func (app *App) RegisterUpgradeHandlers(cfg module.Configurator) {
-	app.UpgradeKeeper.SetUpgradeHandler(upgradeName, func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
-		app.MarketplaceKeeper.SetParams(ctx, marketplacetypes.DefaultParams())
-		app.MarketplaceKeeper.SetNextAuctionNumber(ctx, 1)
+	app.UpgradeKeeper.SetUpgradeHandler(upgradeName, func(ctx sdk.Context, plan upgradetypes.Plan, fromVm module.VersionMap) (module.VersionMap, error) {
 
-		fromVM := app.mm.GetVersionMap()
 		ctx.Logger().Info("running migrations ...")
 		return app.mm.RunMigrations(ctx, cfg, fromVM)
 	})
