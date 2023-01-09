@@ -9,11 +9,11 @@ with [Ignite CLI](https://github.com/ignite/cli).
  - 500GB SSD Storage
 
 ### Go Requirement
-- go 1.18 +
+- go 1.19 +
 ```
 sudo rm -rf /usr/local/go
 wget -q -O - https://git.io/vQhTU | bash -s -- --remove
-wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.18.3
+wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.19.3
  ```
 
 ### Installation
@@ -23,7 +23,7 @@ wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.18.3
 ```
 git clone https://github.com/Omniflix/omniflixhub.git
 cd omniflixhub
-git checkout v0.4.2
+git checkout v0.8.0
 go mod tidy
 make install
 ```
