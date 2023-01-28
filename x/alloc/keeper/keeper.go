@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -15,8 +16,8 @@ import (
 type (
 	Keeper struct {
 		cdc      codec.BinaryCodec
-		storeKey sdk.StoreKey
-		memKey   sdk.StoreKey
+		storeKey storetypes.StoreKey
+		memKey   storetypes.StoreKey
 
 		accountKeeper types.AccountKeeper
 		bankKeeper    types.BankKeeper
@@ -30,7 +31,7 @@ type (
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeKey,
-	memKey sdk.StoreKey,
+	memKey storetypes.StoreKey,
 
 	accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, stakingKeeper types.StakingKeeper, distrKeeper types.DistrKeeper,
 	ps paramtypes.Subspace,
@@ -112,10 +113,10 @@ func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 		}
 	}
 	// calculate staking rewards
-	stakingRewardsCoins := sdk.NewCoins(k.GetProportions(ctx, blockRewards, proportions.StakingRewards))
+	stakingRewardsCoin := k.GetProportions(ctx, blockRewards, proportions.StakingRewards)
 
 	// subtract from original provision to ensure no coins left over after the allocations
-	communityPoolCoins := sdk.NewCoins(blockRewards).Sub(stakingRewardsCoins).Sub(sdk.NewCoins(nftIncentiveCoin)).Sub(sdk.NewCoins(nodeHostsIncentiveCoin)).Sub(sdk.NewCoins(devRewardCoin))
+	communityPoolCoins := sdk.NewCoins(blockRewards).Sub(stakingRewardsCoin).Sub(nftIncentiveCoin).Sub(nodeHostsIncentiveCoin).Sub(devRewardCoin)
 	err = k.distrKeeper.FundCommunityPool(ctx, communityPoolCoins, blockRewardsAddr)
 	if err != nil {
 		return err
@@ -127,5 +128,5 @@ func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 // GetProportions gets the balance of the `MintedDenom` from minted coins
 // and returns coins according to the `AllocationRatio`
 func (k Keeper) GetProportions(ctx sdk.Context, mintedCoin sdk.Coin, ratio sdk.Dec) sdk.Coin {
-	return sdk.NewCoin(mintedCoin.Denom, mintedCoin.Amount.ToDec().Mul(ratio).TruncateInt())
+	return sdk.NewCoin(mintedCoin.Denom, sdk.NewDecCoin(mintedCoin.Denom, mintedCoin.Amount).Amount.Mul(ratio).TruncateInt())
 }
