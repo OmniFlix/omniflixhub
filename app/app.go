@@ -605,6 +605,7 @@ func NewOmniFlixApp(
 		authtypes.ModuleName,
 		crisistypes.ModuleName,
 		feegrant.ModuleName,
+		nft.ModuleName,
 		// onfttypes.ModuleName,
 		// marketplacetypes.ModuleName,
 	)
@@ -629,6 +630,7 @@ func NewOmniFlixApp(
 		feegrant.ModuleName,
 		authz.ModuleName,
 		alloctypes.ModuleName,
+		nft.ModuleName,
 		// onfttypes.ModuleName,
 		// marketplacetypes.ModuleName,
 	)
@@ -656,6 +658,7 @@ func NewOmniFlixApp(
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
 		alloctypes.ModuleName,
+		nft.ModuleName,
 		// onfttypes.ModuleName,
 		// marketplacetypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
