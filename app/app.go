@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	marketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
+	nfttransfer "github.com/bianjieai/nft-transfer"
 
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
@@ -510,6 +511,10 @@ func NewOmniFlixApp(
 		ics721nft.NewICS721NftKeeper(appCodec, app.NFTKeeper, app.AccountKeeper),
 		scopedNFTTransferKeeper,
 	)
+
+	ibcnfttransfermodule := nfttransfer.NewAppModule(app.IBCNFTTransferKeeper)
+	nfttransferIBCModule := nfttransfer.NewIBCModule(app.IBCNFTTransferKeeper)
+
 	app.AllocKeeper = *allockeeper.NewKeeper(
 		appCodec,
 		keys[alloctypes.StoreKey],
@@ -544,7 +549,8 @@ func NewOmniFlixApp(
 	*/
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
+		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule)
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -584,6 +590,7 @@ func NewOmniFlixApp(
 		// onftModule,
 		// marketplaceModule,
 		nftModule,
+		ibcnfttransfermodule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -612,6 +619,7 @@ func NewOmniFlixApp(
 		crisistypes.ModuleName,
 		feegrant.ModuleName,
 		nft.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 		// onfttypes.ModuleName,
 		// marketplacetypes.ModuleName,
 	)
@@ -637,6 +645,7 @@ func NewOmniFlixApp(
 		authz.ModuleName,
 		alloctypes.ModuleName,
 		nft.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 		// onfttypes.ModuleName,
 		// marketplacetypes.ModuleName,
 	)
@@ -670,6 +679,7 @@ func NewOmniFlixApp(
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -693,6 +703,8 @@ func NewOmniFlixApp(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
+		nftModule,
+		ibcnfttransfermodule,
 		// onftModule,
 	)
 
