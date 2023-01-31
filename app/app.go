@@ -178,6 +178,7 @@ var (
 
 		*/
 		nftmodule.AppModuleBasic{},
+		nfttransfer.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -193,7 +194,8 @@ var (
 		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		// onfttypes.ModuleName:           nil,
 		// marketplacetypes.ModuleName: nil,
-		nft.ModuleName: nil,
+		nft.ModuleName:                 nil,
+		ibcnfttransfertypes.ModuleName: nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
