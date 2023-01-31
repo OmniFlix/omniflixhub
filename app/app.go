@@ -746,6 +746,7 @@ func NewOmniFlixApp(
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
+	app.ScopedNFTTransferKeeper = scopedNFTTransferKeeper
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 	return app
 }
