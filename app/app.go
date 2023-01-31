@@ -327,7 +327,13 @@ func NewOmniFlixApp(
 	// grant capabilities for the ibc and ibc-transfer modules
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+
+	scopedNFTTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibcnfttransfertypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/scopedKeeper
+
+	// Applications that wish to enforce statically created ScopedKeepers should call `Seal` after creating
+	// their scoped modules in `NewApp` with `ScopeToModule`
+	app.CapabilityKeeper.Seal()
 
 	// add keepers
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
@@ -502,7 +508,7 @@ func NewOmniFlixApp(
 		&app.IBCKeeper.PortKeeper,
 		app.AccountKeeper,
 		ics721nft.NewICS721NftKeeper(appCodec, app.NFTKeeper, app.AccountKeeper),
-		app.ScopedNFTTransferKeeper,
+		scopedNFTTransferKeeper,
 	)
 	app.AllocKeeper = *allockeeper.NewKeeper(
 		appCodec,
