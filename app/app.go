@@ -2,20 +2,12 @@ package app
 
 import (
 	"fmt"
-	marketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
-	"github.com/OmniFlix/onft"
-	nfttransfer "github.com/bianjieai/nft-transfer"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
-	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
-	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	"github.com/cosmos/cosmos-sdk/x/nft"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 
 	appparams "github.com/OmniFlix/omniflixhub/app/params"
-
 	"github.com/OmniFlix/omniflixhub/docs"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -25,6 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -66,6 +59,8 @@ import (
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
@@ -113,14 +108,15 @@ import (
 	allockeeper "github.com/OmniFlix/omniflixhub/x/alloc/keeper"
 	alloctypes "github.com/OmniFlix/omniflixhub/x/alloc/types"
 
+	"github.com/OmniFlix/onft"
 	onftkeeper "github.com/OmniFlix/onft/keeper"
 	onfttypes "github.com/OmniFlix/onft/types"
 
+	nfttransfer "github.com/bianjieai/nft-transfer"
 	ibcnfttransferkeeper "github.com/bianjieai/nft-transfer/keeper"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
-	ics721nft "github.com/OmniFlix/omniflixhub/x/ics721nft"
-	nftmodule "github.com/cosmos/cosmos-sdk/x/nft/module"
+	"github.com/OmniFlix/omniflixhub/x/ics721nft"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -168,14 +164,9 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-
 		alloc.AppModuleBasic{},
-		/*
-			onft.AppModuleBasic{},
-			marketplace.AppModuleBasic{},
-
-		*/
-		nftmodule.AppModuleBasic{},
+		onft.AppModuleBasic{},
+		// marketplace.AppModuleBasic{},
 		nfttransfer.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
@@ -190,9 +181,9 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
-		// onfttypes.ModuleName:           nil,
+		onfttypes.ModuleName:           nil,
 		// marketplacetypes.ModuleName: nil,
-		nft.ModuleName:                 nil,
+		// nft.ModuleName:                 nil,
 		ibcnfttransfertypes.ModuleName: nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
@@ -312,9 +303,9 @@ func NewOmniFlixApp(
 		feegrant.StoreKey,
 		authzkeeper.StoreKey,
 		alloctypes.StoreKey,
-		nft.StoreKey,
-		ibcnfttransfertypes.StoreKey,
+		// nft.StoreKey,
 		onfttypes.StoreKey,
+		ibcnfttransfertypes.StoreKey,
 		// marketplacetypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
@@ -519,7 +510,7 @@ func NewOmniFlixApp(
 
 	app.ONFTKeeper = onftkeeper.NewKeeper(
 		appCodec,
-		keys[nft.StoreKey],
+		keys[onfttypes.StoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
 	)
@@ -920,8 +911,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(alloctypes.ModuleName)
-	// paramsKeeper.Subspace(onfttypes.ModuleName)
-	paramsKeeper.Subspace(marketplacetypes.ModuleName)
+	paramsKeeper.Subspace(onfttypes.ModuleName)
+	// paramsKeeper.Subspace(marketplacetypes.ModuleName)
 
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
