@@ -3,11 +3,12 @@ package app
 import (
 	"fmt"
 	marketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
+	"github.com/OmniFlix/onft"
 	nfttransfer "github.com/bianjieai/nft-transfer"
-
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	"github.com/cosmos/cosmos-sdk/x/nft"
 	"io"
 	"net/http"
 	"os"
@@ -111,17 +112,14 @@ import (
 	"github.com/OmniFlix/omniflixhub/x/alloc"
 	allockeeper "github.com/OmniFlix/omniflixhub/x/alloc/keeper"
 	alloctypes "github.com/OmniFlix/omniflixhub/x/alloc/types"
-	/*
-		"github.com/OmniFlix/onft"
-		onftkeeper "github.com/OmniFlix/onft/keeper"
-		onfttypes "github.com/OmniFlix/onft/types"
-	*/
+
+	onftkeeper "github.com/OmniFlix/onft/keeper"
+	onfttypes "github.com/OmniFlix/onft/types"
+
 	ibcnfttransferkeeper "github.com/bianjieai/nft-transfer/keeper"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
 	ics721nft "github.com/OmniFlix/omniflixhub/x/ics721nft"
-	"github.com/cosmos/cosmos-sdk/x/nft"
-	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
 	nftmodule "github.com/cosmos/cosmos-sdk/x/nft/module"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
@@ -260,7 +258,7 @@ type App struct {
 	// ONFTKeeper           onftkeeper.Keeper
 	// MarketplaceKeeper    marketplacekeeper.Keeper
 
-	NFTKeeper nftkeeper.Keeper
+	ONFTKeeper onftkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// module manager
@@ -316,7 +314,8 @@ func NewOmniFlixApp(
 		alloctypes.StoreKey,
 		nft.StoreKey,
 		ibcnfttransfertypes.StoreKey,
-		// onfttypes.StoreKey,marketplacetypes.StoreKey,
+		onfttypes.StoreKey,
+		// marketplacetypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -508,13 +507,24 @@ func NewOmniFlixApp(
 	app.GovKeeper = *govKeeper.SetHooks(
 		govtypes.NewMultiGovHooks(),
 	)
-	app.NFTKeeper = nftkeeper.NewKeeper(
-		keys[nft.StoreKey],
+	/*
+		app.NFTKeeper = onftkeeper.NewKeeper(
+			appCodec,
+			keys[nft.StoreKey],
+			app.AccountKeeper,
+			app.BankKeeper,
+		)
+		nftModule := nftmodule.NewAppModule(appCodec, app.ONFTKeeper.NFTkeeper(), app.AccountKeeper, app.BankKeeper, app.InterfaceRegistry())
+	*/
+
+	app.ONFTKeeper = onftkeeper.NewKeeper(
 		appCodec,
+		keys[nft.StoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
 	)
-	nftModule := nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper, app.InterfaceRegistry())
+
+	onftModule := onft.NewAppModule(appCodec, app.ONFTKeeper, app.AccountKeeper, app.BankKeeper)
 
 	// TODO: need to implement separate module to
 	app.IBCNFTTransferKeeper = ibcnfttransferkeeper.NewKeeper(
@@ -524,7 +534,7 @@ func NewOmniFlixApp(
 		app.IBCKeeper.ChannelKeeper,
 		&app.IBCKeeper.PortKeeper,
 		app.AccountKeeper,
-		ics721nft.NewICS721NftKeeper(appCodec, app.NFTKeeper, app.AccountKeeper),
+		ics721nft.NewICS721NftKeeper(appCodec, app.ONFTKeeper.NFTkeeper(), app.AccountKeeper),
 		scopedNFTTransferKeeper,
 	)
 
@@ -543,14 +553,8 @@ func NewOmniFlixApp(
 		app.GetSubspace(alloctypes.ModuleName),
 	)
 	allocModule := alloc.NewAppModule(appCodec, app.AllocKeeper)
+
 	/*
-		app.ONFTKeeper = onftkeeper.NewKeeper(
-			appCodec,
-			keys[onfttypes.StoreKey],
-		)
-
-		onftModule := onft.NewAppModule(appCodec, app.ONFTKeeper, app.AccountKeeper, app.BankKeeper)
-
 		app.MarketplaceKeeper = marketplacekeeper.NewKeeper(
 			appCodec,
 			keys[marketplacetypes.StoreKey],
@@ -603,9 +607,9 @@ func NewOmniFlixApp(
 		transferModule,
 
 		allocModule,
-		// onftModule,
+		onftModule,
 		// marketplaceModule,
-		nftModule,
+		// nftModule,
 		ibcnfttransfermodule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
@@ -634,7 +638,7 @@ func NewOmniFlixApp(
 		authtypes.ModuleName,
 		crisistypes.ModuleName,
 		feegrant.ModuleName,
-		nft.ModuleName,
+		onfttypes.ModuleName,
 		ibcnfttransfertypes.ModuleName,
 		// onfttypes.ModuleName,
 		// marketplacetypes.ModuleName,
@@ -660,7 +664,7 @@ func NewOmniFlixApp(
 		feegrant.ModuleName,
 		authz.ModuleName,
 		alloctypes.ModuleName,
-		nft.ModuleName,
+		onfttypes.ModuleName,
 		ibcnfttransfertypes.ModuleName,
 		// onfttypes.ModuleName,
 		// marketplacetypes.ModuleName,
@@ -689,7 +693,7 @@ func NewOmniFlixApp(
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
 		alloctypes.ModuleName,
-		nft.ModuleName,
+		onfttypes.ModuleName,
 		// onfttypes.ModuleName,
 		// marketplacetypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
@@ -719,7 +723,7 @@ func NewOmniFlixApp(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
-		nftModule,
+		onftModule,
 		ibcnfttransfermodule,
 		// onftModule,
 	)
