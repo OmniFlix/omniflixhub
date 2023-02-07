@@ -95,8 +95,8 @@ func (icsnk ICS721NftKeeper) Transfer(
 	if len(tokenData) == 0 {
 		return nil
 	}
-	nft, _ := icsnk.nk.GetNFT(ctx, classID, tokenID)
-	token, err := icsnk.tb.Build(classID, tokenID, nft.Uri, tokenData)
+	_nft, _ := icsnk.nk.GetNFT(ctx, classID, tokenID)
+	token, err := icsnk.tb.Build(classID, tokenID, _nft.Uri, tokenData)
 	if err != nil {
 		return err
 	}
@@ -125,11 +125,11 @@ func (icsnk ICS721NftKeeper) GetClass(ctx sdk.Context, classID string) (nfttrans
 
 // GetNFT implement the method of ICS721Keeper.GetNFT
 func (icsnk ICS721NftKeeper) GetNFT(ctx sdk.Context, classID, tokenID string) (nfttransfer.NFT, bool) {
-	nft, has := icsnk.nk.GetNFT(ctx, classID, tokenID)
+	_nft, has := icsnk.nk.GetNFT(ctx, classID, tokenID)
 	if !has {
 		return nil, false
 	}
-	metadata, err := icsnk.tb.BuildMetadata(nft)
+	metadata, err := icsnk.tb.BuildMetadata(_nft)
 	if err != nil {
 		icsnk.Logger(ctx).Error("encode nft data failed")
 		return nil, false
@@ -137,7 +137,7 @@ func (icsnk ICS721NftKeeper) GetNFT(ctx sdk.Context, classID, tokenID string) (n
 	return ICS721Token{
 		ClassID: classID,
 		ID:      tokenID,
-		URI:     nft.Uri,
+		URI:     _nft.Uri,
 		Data:    metadata,
 	}, true
 }
