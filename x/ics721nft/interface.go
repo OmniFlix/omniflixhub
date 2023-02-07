@@ -1,6 +1,7 @@
 package ics721nft
 
 import (
+	onftkeeper "github.com/OmniFlix/onft/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -19,6 +20,7 @@ type (
 	}
 	// ICS721NftKeeper defines the ICS721 Keeper
 	ICS721NftKeeper struct {
+		k   onftkeeper.Keeper
 		nk  nftkeeper.Keeper
 		cdc codec.Codec
 		ak  AccountKeeper
