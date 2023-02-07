@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/nft"
 	"github.com/tendermint/tendermint/libs/log"
@@ -19,7 +18,6 @@ func NewICS721NftKeeper(cdc codec.Codec,
 	ak AccountKeeper,
 ) ICS721NftKeeper {
 	return ICS721NftKeeper{
-		k:   k,
 		nk:  k.NFTkeeper(),
 		cdc: cdc,
 		ak:  ak,
@@ -91,22 +89,14 @@ func (icsnk ICS721NftKeeper) Transfer(
 	receiver sdk.AccAddress,
 ) error {
 
-	_nft, err := icsnk.k.GetONFT(ctx, classID, tokenID)
-	if err != nil {
-		return err
-	}
-	if !_nft.IsTransferable() {
-		sdkerrors.Wrapf(onfttypes.ErrNotTransferable, "%s is non transferable", _nft.GetID())
-	}
-
 	if err := icsnk.nk.Transfer(ctx, classID, tokenID, receiver); err != nil {
 		return err
 	}
 	if len(tokenData) == 0 {
 		return nil
 	}
-
-	token, err := icsnk.tb.Build(classID, tokenID, _nft.GetMediaURI(), tokenData)
+	_nft, _ := icsnk.nk.GetNFT(ctx, classID, tokenID)
+	token, err := icsnk.tb.Build(classID, tokenID, _nft.GetUri(), tokenData)
 	if err != nil {
 		return err
 	}
