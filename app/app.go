@@ -525,7 +525,7 @@ func NewOmniFlixApp(
 		app.IBCKeeper.ChannelKeeper,
 		&app.IBCKeeper.PortKeeper,
 		app.AccountKeeper,
-		ics721nft.NewICS721NftKeeper(appCodec, app.ONFTKeeper.NFTkeeper(), app.AccountKeeper),
+		ics721nft.NewICS721NftKeeper(appCodec, app.ONFTKeeper, app.AccountKeeper),
 		scopedNFTTransferKeeper,
 	)
 

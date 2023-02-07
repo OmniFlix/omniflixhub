@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
+	onfttypes "github.com/OmniFlix/onft/types"
 	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
 )
 
@@ -21,6 +22,8 @@ type (
 		nk  nftkeeper.Keeper
 		cdc codec.Codec
 		ak  AccountKeeper
+		cb  onfttypes.ClassBuilder
+		tb  onfttypes.TokenBuilder
 	}
 
 	ICS721Class struct {
