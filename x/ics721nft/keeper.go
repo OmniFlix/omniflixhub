@@ -59,12 +59,6 @@ func (icsnk ICS721NftKeeper) CreateOrUpdateClass(ctx sdk.Context,
 			Data: metadata,
 		}
 	}
-
-	class = nft.Class{
-		Id:  classID,
-		Uri: classURI,
-	}
-
 	if icsnk.nk.HasClass(ctx, classID) {
 		return icsnk.nk.UpdateClass(ctx, class)
 	}
@@ -80,10 +74,9 @@ func (icsnk ICS721NftKeeper) Mint(ctx sdk.Context,
 	receiver sdk.AccAddress,
 ) error {
 
-	token := nft.NFT{
-		ClassId: classID,
-		Id:      tokenID,
-		Uri:     tokenURI,
+	token, err := icsnk.tb.Build(classID, tokenID, tokenURI, tokenData)
+	if err != nil {
+		return err
 	}
 	return icsnk.nk.Mint(ctx, token, receiver)
 }
@@ -117,10 +110,16 @@ func (icsnk ICS721NftKeeper) GetClass(ctx sdk.Context, classID string) (nfttrans
 	if !exist {
 		return nil, false
 	}
+	metadata, err := icsnk.cb.BuildMetadata(class)
+	if err != nil {
+		icsnk.Logger(ctx).Error("encode class data failed")
+		return nil, false
+	}
 
 	return ICS721Class{
-		ID:  classID,
-		URI: class.Uri,
+		ID:   classID,
+		URI:  class.Uri,
+		Data: metadata,
 	}, true
 }
 
@@ -130,10 +129,16 @@ func (icsnk ICS721NftKeeper) GetNFT(ctx sdk.Context, classID, tokenID string) (n
 	if !has {
 		return nil, false
 	}
+	metadata, err := icsnk.tb.BuildMetadata(nft)
+	if err != nil {
+		icsnk.Logger(ctx).Error("encode nft data failed")
+		return nil, false
+	}
 	return ICS721Token{
 		ClassID: classID,
 		ID:      tokenID,
 		URI:     nft.Uri,
+		Data:    metadata,
 	}, true
 }
 
