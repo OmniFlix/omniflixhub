@@ -131,8 +131,8 @@ github.com/Microsoft/go-winio v0.5.0/go.mod h1:JPGBdM1cNvN/6ISo+n8V5iA4v8pBzdOpz
 github.com/Microsoft/go-winio v0.6.0 h1:slsWYD/zyx7lCXoZVlvQrj0hPTM1HI4+v1sIda2yDvg=
 github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 h1:TngWCqHvy9oXAN6lEVMRuU21PR1EtLVZJmdB18Gu3Rw=
 github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5/go.mod h1:lmUJ/7eu/Q8D7ML55dXQrVaamCz2vxCfdQBasLZfHKk=
-github.com/OmniFlix/onft v0.4.0-gon-rc2 h1:G6vq+/rTuavUXA0uwPvCLq4QJmYOEIcaBpY5dBdOoVA=
-github.com/OmniFlix/onft v0.4.0-gon-rc2/go.mod h1:3Z5FXw5sS2yqB4MZ0osCn2uwLBCa80yUWqM9UnEUkhw=
+github.com/OmniFlix/onft v0.4.0-gon-rc4 h1:6GJO/muhCjqPyGcQNb/wBtOGi0MHPHv8GtztLWT+bHs=
+github.com/OmniFlix/onft v0.4.0-gon-rc4/go.mod h1:3Z5FXw5sS2yqB4MZ0osCn2uwLBCa80yUWqM9UnEUkhw=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/OpenPeeDeeP/depguard v1.0.1/go.mod h1:xsIw86fROiiwelg+jB2uM9PiKihMMmUx/1V+TNhjQvM=
