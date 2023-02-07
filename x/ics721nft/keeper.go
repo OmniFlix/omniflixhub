@@ -99,7 +99,16 @@ func (icsnk ICS721NftKeeper) Transfer(
 	if err := icsnk.nk.Transfer(ctx, classID, tokenID, receiver); err != nil {
 		return err
 	}
-	return nil
+	if len(tokenData) == 0 {
+		return nil
+	}
+	nft, _ := icsnk.nk.GetNFT(ctx, classID, tokenID)
+	token, err := icsnk.tb.Build(classID, tokenID, nft.Uri, tokenData)
+	if err != nil {
+		return err
+	}
+
+	return icsnk.nk.Update(ctx, token)
 }
 
 // GetClass implement the method of ICS721Keeper.GetClass
