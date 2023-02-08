@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	cosmossdk.io/math v1.0.0-beta.3
+	github.com/OmniFlix/marketplace v0.5.0-gon-rc1
 	github.com/OmniFlix/onft v0.4.0-gon-rc7
 	github.com/bianjieai/nft-transfer v1.1.0-beta.0.20230207091420-6b8596c47042
 	github.com/cosmos/cosmos-sdk v0.46.5
