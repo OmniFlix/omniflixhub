@@ -39,6 +39,7 @@ func (icsnk ICS721NftKeeper) CreateOrUpdateClass(ctx sdk.Context,
 	if len(classData) != 0 {
 		class, err = icsnk.cb.Build(classID, classURI, classData)
 		if err != nil {
+			icsnk.Logger(ctx).Error("unable to build class from packet data", "error:", err.Error())
 			return err
 		}
 	} else {
@@ -50,6 +51,7 @@ func (icsnk ICS721NftKeeper) CreateOrUpdateClass(ctx sdk.Context,
 
 		metadata, err := codectypes.NewAnyWithValue(denomMetadata)
 		if err != nil {
+			icsnk.Logger(ctx).Error("unable to build class metadata from packet data", "error:", err.Error())
 			return err
 		}
 		class = nft.Class{
@@ -75,6 +77,7 @@ func (icsnk ICS721NftKeeper) Mint(ctx sdk.Context,
 
 	token, err := icsnk.tb.Build(classID, tokenID, tokenURI, tokenData)
 	if err != nil {
+		icsnk.Logger(ctx).Error("unable to build token from packet data", "error:", err.Error())
 		return err
 	}
 	return icsnk.nk.Mint(ctx, token, receiver)
@@ -98,6 +101,7 @@ func (icsnk ICS721NftKeeper) Transfer(
 	_nft, _ := icsnk.nk.GetNFT(ctx, classID, tokenID)
 	token, err := icsnk.tb.Build(classID, tokenID, _nft.GetUri(), tokenData)
 	if err != nil {
+		icsnk.Logger(ctx).Error("unable to build token on transfer from packet data", "error:", err.Error())
 		return err
 	}
 
