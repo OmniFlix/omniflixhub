@@ -95,16 +95,16 @@ func (suite *KeeperTestSuite) TestDistribution() {
 
 	// remaining going to next module should be 100% - 60% = 40%
 	suite.Equal(
-		mintCoin.Amount.ToDec().Mul(sdk.NewDecWithPrec(100, 2).Sub(modulePortion)).RoundInt().String(),
+		sdk.NewDecCoin(mintCoin.Denom, mintCoin.Amount).Amount.Mul(sdk.NewDecWithPrec(100, 2).Sub(modulePortion)).RoundInt().String(),
 		suite.app.BankKeeper.GetAllBalances(suite.ctx, feeCollector).AmountOf(denom).String())
 
 	suite.Equal(
-		mintCoin.Amount.ToDec().Mul(params.DistributionProportions.DeveloperRewards).TruncateInt(),
+		sdk.NewDecCoin(mintCoin.Denom, mintCoin.Amount).Amount.Mul(params.DistributionProportions.DeveloperRewards).TruncateInt(),
 		suite.app.BankKeeper.GetBalance(suite.ctx, devRewardsReceiver, denom).Amount)
 
 	// since the NFT incentives are not setup yet, funds go into the communtiy pool
 	feePool = suite.app.DistrKeeper.GetFeePool(suite.ctx)
 	suite.Equal(
-		mintCoin.Amount.ToDec().Mul(params.DistributionProportions.NftIncentives),
+		sdk.NewDecCoin(mintCoin.Denom, mintCoin.Amount).Amount.Mul(params.DistributionProportions.NftIncentives),
 		feePool.CommunityPool.AmountOf(denom))
 }
