@@ -6,7 +6,7 @@ require (
 	cosmossdk.io/math v1.0.0-beta.3
 	github.com/OmniFlix/marketplace v0.5.0-gon-rc1
 	github.com/OmniFlix/onft v0.4.0-gon-rc9
-	github.com/bianjieai/nft-transfer v1.1.0-beta.0.20230207091420-6b8596c47042
+	github.com/bianjieai/nft-transfer v1.1.1-beta
 	github.com/cosmos/cosmos-sdk v0.46.5
 	github.com/cosmos/ibc-go/v5 v5.0.1
 	github.com/gogo/protobuf v1.3.3
