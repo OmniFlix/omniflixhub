@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/nft"
 	"github.com/tendermint/tendermint/libs/log"
 )
@@ -44,7 +43,7 @@ func (icsnk ICS721NftKeeper) CreateOrUpdateClass(ctx sdk.Context,
 		}
 	} else {
 		var denomMetadata = &onfttypes.DenomMetadata{
-			Creator:    icsnk.ak.GetModuleAddress(types.ModuleName).String(),
+			Creator:    icsnk.ak.GetModuleAddress(onfttypes.ModuleName).String(),
 			PreviewUri: "",
 			Schema:     "",
 		}
