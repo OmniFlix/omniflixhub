@@ -1,0 +1,73 @@
+syntax = "proto3";
+package omniflix.itc.v1;
+
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "omniflix/itc/v1/params.proto";
+import "omniflix/itc/v1/itc.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/x/itc/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/omniflix/itc/v1/params";
+  }
+
+  rpc Claims(QueryClaimsRequest) returns (QueryClaimsResponse) {
+    option (google.api.http).get = "/omniflix/itc/v1/claims";
+  }
+
+  rpc Claim(QueryClaimRequest) returns (QueryClaimResponse) {
+    option (google.api.http).get = "/omniflix/itc/v1/claims/{claim_id}";
+  }
+
+  rpc ClaimRecords(QueryClaimRecordsRequest) returns (QueryClaimRecordsResponse) {
+    option (google.api.http).get = "/omniflix/itc/v1/claim_records";
+  }
+}
+
+// QueryParamsRequest is the request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is the response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params defines the parameters of the module.
+  Params params = 1 [ (gogoproto.nullable) = false ];
+}
+
+
+// QueryClaimsRequest is the request type for the Query/Claims RPC method.
+message QueryClaimsRequest {
+  string creator = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination  = 2;
+}
+
+// QueryClaimsResponse is the response type for the Query/Claims RPC method.
+message QueryClaimsResponse {
+  repeated Claim claims = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryClaimRequest is the request type for the Query/Claim RPC method.
+message QueryClaimRequest {
+  int64 claim_id = 1 [ (gogoproto.moretags) = "yaml:\"claim_id\""];
+}
+
+// QueryClaimResponse is the response type for the Query/Claim RPC method.
+message QueryClaimResponse {
+  Claim Claim = 1 [ (gogoproto.nullable) = false ];
+}
+
+// QueryClaimRecordsRequest is the request type for the Query/ClaimRecords RPC method.
+message QueryClaimRecordsRequest {
+  string claim_id = 1;
+  string address = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination  = 3;
+}
+
+message QueryClaimRecordsResponse {
+  repeated ClaimRecord claim_records = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

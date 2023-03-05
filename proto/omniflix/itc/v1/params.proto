@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package omniflix.itc.v1;
+
+option go_package = "github.com/OmniFlix/omniflixhub/x/itc/types";
+
+import "gogoproto/gogo.proto";
+
+message Params {
+  string itc_param = 1 [ (gogoproto.moretags) = "yaml:\"itc_param\""];
+}
