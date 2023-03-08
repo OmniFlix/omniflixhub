@@ -9,8 +9,8 @@ option go_package = "github.com/OmniFlix/omniflixhub/x/itc/types";
 
 // GenesisState defines the itc module's genesis state.
 message GenesisState {
-  repeated Campaign campaigns = 1;
+  repeated Campaign campaigns = 1 [(gogoproto.nullable) = false];
   uint64 next_campaign_number = 2;
-  repeated Claim claims = 3;
-  Params params = 4 [ (gogoproto.nullable) = false ];
+  repeated Claim claims = 3 [(gogoproto.nullable) = false];
+  Params params = 4 [(gogoproto.nullable) = false];
 }

@@ -166,7 +166,8 @@ func (m *QueryCampaignsRequest) GetPagination() *query.PageRequest {
 	return nil
 }
 
-// QueryCampaignsResponse is the response type for the Query/Campaigns RPC method.
+// QueryCampaignsResponse is the response type for the Query/Campaigns RPC
+// method.
 type QueryCampaignsResponse struct {
 	Campaigns  []Campaign          `protobuf:"bytes,1,rep,name=campaigns,proto3" json:"campaigns"`
 	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`

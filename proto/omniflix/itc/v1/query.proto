@@ -34,40 +34,40 @@ message QueryParamsRequest {}
 // QueryParamsResponse is the response type for the Query/Params RPC method.
 message QueryParamsResponse {
   // params defines the parameters of the module.
-  Params params = 1 [ (gogoproto.nullable) = false ];
+  Params params = 1 [(gogoproto.nullable) = false];
 }
-
 
 // QueryCampaignsRequest is the request type for the Query/Campaigns RPC method.
 message QueryCampaignsRequest {
   string creator = 1;
-  cosmos.base.query.v1beta1.PageRequest pagination  = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
-// QueryCampaignsResponse is the response type for the Query/Campaigns RPC method.
+// QueryCampaignsResponse is the response type for the Query/Campaigns RPC
+// method.
 message QueryCampaignsResponse {
-  repeated Campaign campaigns = 1 [ (gogoproto.nullable) = false ];
+  repeated Campaign campaigns = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // QueryCampaignRequest is the request type for the Query/Campaign RPC method.
 message QueryCampaignRequest {
-  int64 campaign_id = 1 [ (gogoproto.moretags) = "yaml:\"campaign_id\""];
+  int64 campaign_id = 1 [(gogoproto.moretags) = "yaml:\"campaign_id\""];
 }
 
 // QueryCampaignResponse is the response type for the Query/Campaign RPC method.
 message QueryCampaignResponse {
-  Campaign Campaign = 1 [ (gogoproto.nullable) = false ];
+  Campaign Campaign = 1 [(gogoproto.nullable) = false];
 }
 
 // QueryClaimsRequest is the request type for the Query/Claims RPC method.
 message QueryClaimsRequest {
   string campaign_id = 1;
   string address = 2;
-  cosmos.base.query.v1beta1.PageRequest pagination  = 3;
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
 message QueryClaimsResponse {
-  repeated Claim claims = 1 [ (gogoproto.nullable) = false ];
+  repeated Claim claims = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
