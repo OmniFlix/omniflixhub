@@ -1,0 +1,71 @@
+syntax = "proto3";
+package omniflix.itc.v1;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/x/itc/types";
+
+message Campaign {
+  string                      name = 1;
+  string                      description = 2;
+  google.protobuf.Timestamp   start_time = 3 [ (gogoproto.moretags) = "yaml:\"start_time\""];
+  google.protobuf.Timestamp   end_time = 4 [ (gogoproto.moretags) = "yaml:\"end_time\""];
+  string                      creator = 5;
+  InteractionType             interaction = 6;
+  ClaimType                   type = 7;
+  Tokens                      claimable_tokens = 8 [ (gogoproto.moretags) = "yaml:\"claimable_tokens\""];
+  Tokens                      total_tokens = 9 [ (gogoproto.moretags) = "yaml:\"total_tokens\""];
+  Tokens                      available_tokens = 10 [ (gogoproto.moretags) = "yaml:\"available_tokens\""];
+  repeated string             nft_ids = 11 [ (gogoproto.moretags) = "yaml:\"nft_ids\""];
+  NFTDetails                  nft_mint_details = 12 [ (gogoproto.moretags) = "yaml:\"nft_mint_details\""];
+  Distribution                distribution = 13 [ (gogoproto.moretags) = "yaml:\"distribution\""];
+}
+
+message Distribution {
+  DistributionType type = 1;
+  google.protobuf.Duration vested_distribution_epoch_duration = 2;
+  google.protobuf.Duration vesting_duration = 3;
+}
+
+enum DistributionType {
+  DISTRIBUTION_TYPE_INSTANT = 0;
+  DISTRIBUTION_TYPE_VEST = 1;
+}
+
+enum InteractionType {
+  INTERACTION_TYPE_BURN = 0;
+  INTERACTION_TYPE_TRANSFER = 1;
+  INTERACTION_TYPE_HOLD = 2;
+}
+
+message Tokens {
+  cosmos.base.v1beta1.Coin fungible = 1;
+  cosmos.base.v1beta1.Coin non_fungible = 2;
+}
+
+enum ClaimType {
+  CLAIM_TYPE_FT = 0;
+  CLAIM_TYPE_NFT = 1;
+  CLAIM_TYPE_FT_AND_NFT = 2;
+}
+
+message NFTDetails {
+  string              denom = 1;
+  string              name = 2;
+  string              description = 3;
+  string              media_uri = 4;
+  string              preview_uri = 5;
+  string              royalty_share = 6;
+  bool                transferable = 7;
+  bool                extensible = 8;
+  bool                nsfw = 9;
+}
+
+message Claim {
+  uint64              campaign_id = 1;
+  string              address = 2;
+  string              status = 3;
+}

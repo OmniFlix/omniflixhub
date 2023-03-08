@@ -1,0 +1,62 @@
+syntax = "proto3";
+package omniflix.itc.v1;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "omniflix/itc/v1/itc.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/x/itc/types";
+
+option (gogoproto.goproto_getters_all) = false;
+
+service Msg {
+  rpc CreateCampaign(MsgCreateCampaign) returns (MsgCreateCampaignResponse);
+
+  rpc CancelCampaign(MsgCancelCampaign) returns (MsgCancelCampaignResponse);
+
+  rpc Claim(MsgClaim) returns (MsgClaimResponse);
+
+  rpc CampaignDeposit(MsgCampaignDeposit) returns (MsgCampaignDepositResponse);
+}
+
+message MsgCreateCampaign  {
+  string                       name = 1;
+  string                       description = 2;
+  InteractionType              interaction = 3;
+  ClaimType                    claim_type = 4 [ (gogoproto.moretags) = "yaml:\"claim_type\""];
+  Tokens                       claimable_tokens = 5 [ (gogoproto.moretags) = "yaml:\"claimable_tokens\""];
+  Tokens                       total_tokens = 6 [ (gogoproto.moretags) = "yaml:\"total_tokens\""];
+  NFTDetails                   nft_details = 7 [ (gogoproto.moretags) = "yaml:\"nft_details\""];
+  google.protobuf.Timestamp    start_time = 8 [ (gogoproto.moretags) = "yaml:\"start_time\""];
+  google.protobuf.Duration     duration = 9;
+  DistributionType             distribution = 10;
+  string                       creator = 11;
+}
+
+message MsgCreateCampaignResponse {}
+
+message MsgCancelCampaign {
+  string            campaign_id = 1;
+  string            creator = 2;
+}
+
+message MsgCancelCampaignResponse {}
+
+message MsgClaim  {
+  string           campaign_id = 1;
+  string           nft_id   = 2;
+  string           interaction = 3;
+  string           from = 4;
+}
+
+message MsgClaimResponse {}
+
+message MsgCampaignDeposit  {
+  string                    campaign_id = 1;
+  cosmos.base.v1beta1.Coin  deposit   = 2;
+  string           depositor = 3;
+}
+
+message MsgCampaignDepositResponse {}
