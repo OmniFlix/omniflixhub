@@ -7,7 +7,7 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/OmniFlix/omniflixhub/x/itc/types";
 
-message Claim {
+message Campaign {
   string                      name = 1;
   string                      description = 2;
   google.protobuf.Timestamp   start_time = 3 [ (gogoproto.moretags) = "yaml:\"start_time\""];
@@ -20,6 +20,18 @@ message Claim {
   Tokens                      available_tokens = 10 [ (gogoproto.moretags) = "yaml:\"available_tokens\""];
   repeated string             nft_ids = 11 [ (gogoproto.moretags) = "yaml:\"nft_ids\""];
   NFTDetails                  nft_mint_details = 12 [ (gogoproto.moretags) = "yaml:\"nft_mint_details\""];
+  Distribution                distribution = 13 [ (gogoproto.moretags) = "yaml:\"distribution\""];
+}
+
+message Distribution {
+  DistributionType type = 1;
+  google.protobuf.Duration vested_distribution_epoch_duration = 2;
+  google.protobuf.Duration vesting_duration = 3;
+}
+
+enum DistributionType {
+  DISTRIBUTION_TYPE_INSTANT = 0;
+  DISTRIBUTION_TYPE_VEST = 1;
 }
 
 enum InteractionType {
@@ -40,7 +52,7 @@ enum ClaimType {
 }
 
 message NFTDetails {
-  string              collection_id = 1;
+  string              denom = 1;
   string              name = 2;
   string              description = 3;
   string              media_uri = 4;
@@ -51,9 +63,9 @@ message NFTDetails {
   bool                nsfw = 9;
 }
 
-message ClaimRecord {
-  uint64              claim_id = 1;
+message Claim {
+  uint64              campaign_id = 1;
   string              address = 2;
-  InteractionType     interaction = 3;
+  //InteractionType     interaction = 3;
   string              status = 4;
 }

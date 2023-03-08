@@ -15,16 +15,16 @@ service Query {
     option (google.api.http).get = "/omniflix/itc/v1/params";
   }
 
+  rpc Campaigns(QueryCampaignsRequest) returns (QueryCampaignsResponse) {
+    option (google.api.http).get = "/omniflix/itc/v1/campaigns";
+  }
+
+  rpc Campaign(QueryCampaignRequest) returns (QueryCampaignResponse) {
+    option (google.api.http).get = "/omniflix/itc/v1/campaigns/{campaign_id}";
+  }
+
   rpc Claims(QueryClaimsRequest) returns (QueryClaimsResponse) {
     option (google.api.http).get = "/omniflix/itc/v1/claims";
-  }
-
-  rpc Claim(QueryClaimRequest) returns (QueryClaimResponse) {
-    option (google.api.http).get = "/omniflix/itc/v1/claims/{claim_id}";
-  }
-
-  rpc ClaimRecords(QueryClaimRecordsRequest) returns (QueryClaimRecordsResponse) {
-    option (google.api.http).get = "/omniflix/itc/v1/claim_records";
   }
 }
 
@@ -38,36 +38,36 @@ message QueryParamsResponse {
 }
 
 
-// QueryClaimsRequest is the request type for the Query/Claims RPC method.
-message QueryClaimsRequest {
+// QueryCampaignsRequest is the request type for the Query/Campaigns RPC method.
+message QueryCampaignsRequest {
   string creator = 1;
   cosmos.base.query.v1beta1.PageRequest pagination  = 2;
 }
 
-// QueryClaimsResponse is the response type for the Query/Claims RPC method.
-message QueryClaimsResponse {
-  repeated Claim claims = 1 [ (gogoproto.nullable) = false ];
+// QueryCampaignsResponse is the response type for the Query/Campaigns RPC method.
+message QueryCampaignsResponse {
+  repeated Campaign campaigns = 1 [ (gogoproto.nullable) = false ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-// QueryClaimRequest is the request type for the Query/Claim RPC method.
-message QueryClaimRequest {
-  int64 claim_id = 1 [ (gogoproto.moretags) = "yaml:\"claim_id\""];
+// QueryCampaignRequest is the request type for the Query/Campaign RPC method.
+message QueryCampaignRequest {
+  int64 campaign_id = 1 [ (gogoproto.moretags) = "yaml:\"campaign_id\""];
 }
 
-// QueryClaimResponse is the response type for the Query/Claim RPC method.
-message QueryClaimResponse {
-  Claim Claim = 1 [ (gogoproto.nullable) = false ];
+// QueryCampaignResponse is the response type for the Query/Campaign RPC method.
+message QueryCampaignResponse {
+  Campaign Campaign = 1 [ (gogoproto.nullable) = false ];
 }
 
-// QueryClaimRecordsRequest is the request type for the Query/ClaimRecords RPC method.
-message QueryClaimRecordsRequest {
-  string claim_id = 1;
+// QueryClaimsRequest is the request type for the Query/Claims RPC method.
+message QueryClaimsRequest {
+  string campaign_id = 1;
   string address = 2;
   cosmos.base.query.v1beta1.PageRequest pagination  = 3;
 }
 
-message QueryClaimRecordsResponse {
-  repeated ClaimRecord claim_records = 1 [ (gogoproto.nullable) = false ];
+message QueryClaimsResponse {
+  repeated Claim claims = 1 [ (gogoproto.nullable) = false ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

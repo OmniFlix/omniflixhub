@@ -9,7 +9,7 @@ import "omniflix/itc/v1/itc.proto";
 
 option go_package = "github.com/OmniFlix/omniflixhub/x/itc/types";
 
-message MsgCreateClaim  {
+message MsgCreateCampaign  {
   string                       name = 1;
   string                       description = 2;
   InteractionType              interaction = 3;
@@ -22,20 +22,20 @@ message MsgCreateClaim  {
   string                       creator = 10;
 }
 
-message MsgCancelClaim {
-  string            claim_id = 1;
+message MsgCancelCampaign {
+  string            campaign_id = 1;
   string            creator = 2;
 }
 
 message MsgClaim  {
-  string           claim_id = 1;
+  string           campaign_id = 1;
   string           nft_id   = 2;
   string           interaction = 3;
   string           from = 4;
 }
 
-message MsgDepositClaim  {
-  string                    claim_id = 1;
+message MsgCampaignDeposit  {
+  string                    campaign_id = 1;
   cosmos.base.v1beta1.Coin  deposit   = 2;
   string           from = 3;
 }
