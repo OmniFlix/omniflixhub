@@ -20,6 +20,17 @@ message Campaign {
   Tokens                      available_tokens = 10 [ (gogoproto.moretags) = "yaml:\"available_tokens\""];
   repeated string             nft_ids = 11 [ (gogoproto.moretags) = "yaml:\"nft_ids\""];
   NFTDetails                  nft_mint_details = 12 [ (gogoproto.moretags) = "yaml:\"nft_mint_details\""];
+  Distribution                distribution = 13 [ (gogoproto.moretags) = "yaml:\"distribution\""];
+}
+
+message Distribution {
+  DistributionType type = 1;
+  google.protobuf.Duration vested_distribution_epoch_duration = 2;
+}
+
+enum DistributionType {
+  DISTRIBUTION_TYPE_INSTANT = 0;
+  DISTRIBUTION_TYPE_VEST = 1;
 }
 
 enum InteractionType {
