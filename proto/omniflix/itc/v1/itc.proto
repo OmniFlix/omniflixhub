@@ -26,6 +26,7 @@ message Campaign {
 message Distribution {
   DistributionType type = 1;
   google.protobuf.Duration vested_distribution_epoch_duration = 2;
+  google.protobuf.Duration vesting_duration = 3;
 }
 
 enum DistributionType {
