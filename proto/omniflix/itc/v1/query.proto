@@ -8,6 +8,7 @@ import "omniflix/itc/v1/params.proto";
 import "omniflix/itc/v1/itc.proto";
 
 option go_package = "github.com/OmniFlix/omniflixhub/x/itc/types";
+option (gogoproto.goproto_getters_all) = false;
 
 // Query defines the gRPC querier service.
 service Query {

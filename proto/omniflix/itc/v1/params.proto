@@ -3,12 +3,15 @@ syntax = "proto3";
 package omniflix.itc.v1;
 
 option go_package = "github.com/OmniFlix/omniflixhub/x/itc/types";
+option (gogoproto.goproto_getters_all) = false;
+
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 
 message Params {
   google.protobuf.Duration max_campaign_duration = 1 [
+    (gogoproto.nullable) = false,
     (gogoproto.stdduration) = true,
     (gogoproto.moretags) = "yaml:\"max_campaign_duration\""
   ];

@@ -8,7 +8,6 @@ import "google/protobuf/duration.proto";
 import "omniflix/itc/v1/itc.proto";
 
 option go_package = "github.com/OmniFlix/omniflixhub/x/itc/types";
-
 option (gogoproto.goproto_getters_all) = false;
 
 service Msg {
@@ -22,25 +21,45 @@ service Msg {
 }
 
 message MsgCreateCampaign {
-  string name = 1;
-  string description = 2;
-  InteractionType interaction = 3;
-  ClaimType claim_type = 4 [(gogoproto.moretags) = "yaml:\"claim_type\""];
-  Tokens claimable_tokens = 5
-  [(gogoproto.moretags) = "yaml:\"claimable_tokens\""];
-  Tokens total_tokens = 6 [(gogoproto.moretags) = "yaml:\"total_tokens\""];
-  NFTDetails nft_details = 7 [(gogoproto.moretags) = "yaml:\"nft_details\""];
-  google.protobuf.Timestamp start_time = 8 [
+  string                      name = 1;
+  string                      description = 2;
+  InteractionType             interaction = 3 [
+    (gogoproto.nullable) = false
+  ];
+  ClaimType                   claim_type = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"claim_type\""
+  ];
+  string                      nft_denom_id = 5 [
+    (gogoproto.moretags) = "yaml:\"nft_denom_id\""
+  ];
+  Tokens                      claimable_tokens = 6 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"claimable_tokens\""
+  ];
+  uint64                      max_allowed_claims = 7 [
+    (gogoproto.moretags) = "yaml:\"max_allowed_claims\""
+  ];
+  Tokens                      total_tokens = 8 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"total_tokens\""
+  ];
+  NFTDetails                  nft_mint_details = 9 [(gogoproto.moretags) = "yaml:\"nft_details\""];
+  google.protobuf.Timestamp   start_time = 10 [
     (gogoproto.nullable) = false,
     (gogoproto.stdtime) = true,
     (gogoproto.moretags) = "yaml:\"start_time\""
   ];
 
-  google.protobuf.Duration duration = 9
-  [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+  google.protobuf.Duration     duration = 11 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdduration) = true
+  ];
 
-  DistributionType distribution = 10;
-  string creator = 11;
+  DistributionType             distribution = 12 [
+    (gogoproto.nullable) = false
+  ];
+  string                       creator = 13;
 }
 
 message MsgCreateCampaignResponse {}
@@ -62,9 +81,9 @@ message MsgClaim {
 message MsgClaimResponse {}
 
 message MsgCampaignDeposit {
-  string campaign_id = 1;
-  cosmos.base.v1beta1.Coin deposit = 2;
-  string depositor = 3;
+  string                    campaign_id = 1;
+  cosmos.base.v1beta1.Coin  deposit = 2;
+  string                    depositor = 3;
 }
 
 message MsgCampaignDepositResponse {}
