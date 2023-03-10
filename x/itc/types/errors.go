@@ -4,7 +4,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// Listing module errors
+// itc module errors
 var (
 	ErrInvalidTokens     = sdkerrors.Register(ModuleName, 2, "Listing does not exist")
 	ErrInvalidDuration   = sdkerrors.Register(ModuleName, 4, "invalid duration")
