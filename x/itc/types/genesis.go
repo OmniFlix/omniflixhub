@@ -4,7 +4,8 @@ import sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 func NewGenesisState(campaigns []Campaign,
 	params Params, claims []Claim,
-	nextCampaignNumber uint64) *GenesisState {
+	nextCampaignNumber uint64,
+) *GenesisState {
 	return &GenesisState{
 		Campaigns:          campaigns,
 		Claims:             claims,

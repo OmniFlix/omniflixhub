@@ -1,8 +1,9 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"time"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
@@ -17,9 +18,7 @@ const (
 	DoNotModify = "[do-not-modify]"
 )
 
-var (
-	_ sdk.Msg = &MsgCreateCampaign{}
-)
+var _ sdk.Msg = &MsgCreateCampaign{}
 
 // TODO: update CreateCampaign Msg
 
@@ -151,7 +150,8 @@ func (msg MsgCampaignDeposit) GetSigners() []sdk.AccAddress {
 }
 
 func NewMsgClaim(id uint64, nftId string,
-	interaction InteractionType, claimer string) *MsgClaim {
+	interaction InteractionType, claimer string,
+) *MsgClaim {
 	return &MsgClaim{
 		CampaignId:  id,
 		NftId:       nftId,
@@ -180,10 +180,7 @@ func (msg MsgClaim) GetSignBytes() []byte {
 }
 
 // GetSigners Implements Msg.
-func (msg MsgClaim) GetSigners() []sdk.AccAddress {
-	from, err := sdk.AccAddressFromBech32(msg.Claimer)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{from}
+func (msg MsgClaim) GetSigners() []byte {
+	bz := ModuleCdc.MustMarshalJSON(&msg)
+	return sdk.MustSortJSON(bz)
 }

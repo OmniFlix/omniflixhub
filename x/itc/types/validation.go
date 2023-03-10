@@ -1,14 +1,14 @@
 package types
 
 import (
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"time"
 )
 
 // ValidateCampaign checks campaign is valid or not
 func ValidateCampaign(campaign Campaign) error {
-
 	if _, err := sdk.AccAddressFromBech32(campaign.Creator); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}

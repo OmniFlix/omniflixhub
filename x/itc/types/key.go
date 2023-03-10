@@ -34,6 +34,7 @@ func KeyCampaignCreatorPrefix(creator sdk.AccAddress, id string) []byte {
 func KeyClaimPrefix(id uint64) []byte {
 	return append(PrefixClaimByCampaignId, sdk.Uint64ToBigEndian(id)...)
 }
+
 func KeyInActiveCampaignPrefix(id uint64) []byte {
 	return append(PrefixInactiveCampaign, sdk.Uint64ToBigEndian(id)...)
 }

@@ -2,10 +2,11 @@ package types
 
 import "C"
 import (
+	"time"
+
 	"github.com/OmniFlix/omniflixhub/x/itc/exported"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
-	"time"
 )
 
 var (
@@ -20,7 +21,7 @@ func NewCampaign(id uint64,
 	maxAllowedClaims uint64,
 	interaction InteractionType,
 	claimType ClaimType,
-	claimableTokens, totalTokens, availableTokens *Tokens,
+	claimableTokens, totalTokens, availableTokens Tokens,
 	receivedNfts []string,
 	nftMintDetails *NFTDetails,
 	distribution *Distribution,
