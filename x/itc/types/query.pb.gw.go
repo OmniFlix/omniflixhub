@@ -103,7 +103,7 @@ func request_Query_Campaign_0(ctx context.Context, marshaler runtime.Marshaler, 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "campaign_id")
 	}
 
-	protoReq.CampaignId, err = runtime.Int64(val)
+	protoReq.CampaignId, err = runtime.Uint64(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "campaign_id", err)
@@ -130,7 +130,7 @@ func local_request_Query_Campaign_0(ctx context.Context, marshaler runtime.Marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "campaign_id")
 	}
 
-	protoReq.CampaignId, err = runtime.Int64(val)
+	protoReq.CampaignId, err = runtime.Uint64(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "campaign_id", err)
