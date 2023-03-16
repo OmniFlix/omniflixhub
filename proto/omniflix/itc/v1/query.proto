@@ -40,8 +40,9 @@ message QueryParamsResponse {
 
 // QueryCampaignsRequest is the request type for the Query/Campaigns RPC method.
 message QueryCampaignsRequest {
-  string creator = 1;
-  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+  CampaignStatus status = 1;
+  string creator = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
 // QueryCampaignsResponse is the response type for the Query/Campaigns RPC
