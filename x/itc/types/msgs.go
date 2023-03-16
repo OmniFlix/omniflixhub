@@ -3,6 +3,8 @@ package types
 import (
 	"time"
 
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -19,8 +21,6 @@ const (
 )
 
 var _ sdk.Msg = &MsgCreateCampaign{}
-
-// TODO: update CreateCampaign Msg
 
 func NewMsgCreateCampaign(name, description string,
 	interaction InteractionType, claimType ClaimType,
@@ -57,16 +57,16 @@ func (msg MsgCreateCampaign) Type() string { return TypeMsgCreateCampaign }
 // TODO: validations required
 
 func (msg MsgCreateCampaign) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
 	return nil
 }
 
 // GetSignBytes Implements Msg.
-func (msg MsgCreateCampaign) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(&msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
+func (msg *MsgCreateCampaign) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 // GetSigners Implements Msg.
@@ -92,16 +92,16 @@ func (msg MsgCancelCampaign) Type() string { return TypeMsgCancelCampaign }
 // TODO: validations required
 
 func (msg MsgCancelCampaign) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
 	return nil
 }
 
 // GetSignBytes Implements Msg.
-func (msg MsgCancelCampaign) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(&msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
+func (msg *MsgCancelCampaign) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 // GetSigners Implements Msg.
@@ -128,16 +128,16 @@ func (msg MsgCampaignDeposit) Type() string { return TypeMsgCampaignDeposit }
 // TODO: validations required
 
 func (msg MsgCampaignDeposit) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Depositor)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid depositor address (%s)", err)
+	}
 	return nil
 }
 
 // GetSignBytes Implements Msg.
-func (msg MsgCampaignDeposit) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(&msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
+func (msg *MsgCampaignDeposit) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 // GetSigners Implements Msg.
@@ -167,20 +167,23 @@ func (msg MsgClaim) Type() string { return TypeMsgClaim }
 // TODO: validations required
 
 func (msg MsgClaim) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Claimer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid claimer address (%s)", err)
+	}
 	return nil
 }
 
 // GetSignBytes Implements Msg.
-func (msg MsgClaim) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(&msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
+func (msg *MsgClaim) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 // GetSigners Implements Msg.
-func (msg MsgClaim) GetSigners() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
+func (msg MsgClaim) GetSigners() []sdk.AccAddress {
+	from, err := sdk.AccAddressFromBech32(msg.Claimer)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }
