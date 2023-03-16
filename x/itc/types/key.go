@@ -23,12 +23,12 @@ var (
 	PrefixActiveCampaign     = []byte{0x14}
 )
 
-func KeyCampaignIdPrefix(id string) []byte {
-	return append(PrefixCampaignId, []byte(id)...)
+func KeyCampaignIdPrefix(id uint64) []byte {
+	return append(PrefixCampaignId, sdk.Uint64ToBigEndian(id)...)
 }
 
-func KeyCampaignCreatorPrefix(creator sdk.AccAddress, id string) []byte {
-	return append(append(PrefixCampaignCreator, creator.Bytes()...), []byte(id)...)
+func KeyCampaignCreatorPrefix(creator sdk.AccAddress, id uint64) []byte {
+	return append(append(PrefixCampaignCreator, creator.Bytes()...), sdk.Uint64ToBigEndian(id)...)
 }
 
 func KeyClaimPrefix(id uint64) []byte {
