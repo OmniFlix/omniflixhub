@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+
 	"github.com/OmniFlix/omniflixhub/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -22,8 +23,8 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 // CreateCampaign
 
 func (m msgServer) CreateCampaign(goCtx context.Context,
-	msg *types.MsgCreateCampaign) (*types.MsgCreateCampaignResponse, error) {
-
+	msg *types.MsgCreateCampaign,
+) (*types.MsgCreateCampaignResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
@@ -69,8 +70,8 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 // CancelCampaign
 
 func (m msgServer) CancelCampaign(goCtx context.Context,
-	msg *types.MsgCancelCampaign) (*types.MsgCancelCampaignResponse, error) {
-
+	msg *types.MsgCancelCampaign,
+) (*types.MsgCancelCampaignResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
@@ -98,7 +99,6 @@ func (m msgServer) CancelCampaign(goCtx context.Context,
 // Claim
 
 func (m msgServer) Claim(goCtx context.Context, msg *types.MsgClaim) (*types.MsgClaimResponse, error) {
-
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	claimer, err := sdk.AccAddressFromBech32(msg.Claimer)
@@ -130,8 +130,8 @@ func (m msgServer) Claim(goCtx context.Context, msg *types.MsgClaim) (*types.Msg
 }
 
 func (m msgServer) CampaignDeposit(goCtx context.Context,
-	msg *types.MsgCampaignDeposit) (*types.MsgCampaignDepositResponse, error) {
-
+	msg *types.MsgCampaignDeposit,
+) (*types.MsgCampaignDepositResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	_, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {

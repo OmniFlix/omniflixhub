@@ -105,6 +105,10 @@ import (
 	"github.com/OmniFlix/onft"
 	onftkeeper "github.com/OmniFlix/onft/keeper"
 	onfttypes "github.com/OmniFlix/onft/types"
+
+	"github.com/OmniFlix/omniflixhub/x/itc"
+	itckeeper "github.com/OmniFlix/omniflixhub/x/itc/keeper"
+	itctypes "github.com/OmniFlix/omniflixhub/x/itc/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -156,6 +160,7 @@ var (
 		alloc.AppModuleBasic{},
 		onft.AppModuleBasic{},
 		marketplace.AppModuleBasic{},
+		itc.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -171,6 +176,7 @@ var (
 		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		onfttypes.ModuleName:           nil,
 		marketplacetypes.ModuleName:    nil,
+		itctypes.ModuleName:            nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -232,6 +238,7 @@ type App struct {
 	AllocKeeper       allockeeper.Keeper
 	ONFTKeeper        onftkeeper.Keeper
 	MarketplaceKeeper marketplacekeeper.Keeper
+	ItcKeeper         itckeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// module manager
@@ -274,6 +281,7 @@ func NewOmniFlixApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey, feegrant.StoreKey,
 		authzkeeper.StoreKey, alloctypes.StoreKey, onfttypes.StoreKey, marketplacetypes.StoreKey,
+		itctypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -481,6 +489,17 @@ func NewOmniFlixApp(
 
 	marketplaceModule := marketplace.NewAppModule(appCodec, app.MarketplaceKeeper)
 
+	app.ItcKeeper = itckeeper.NewKeeper(
+		appCodec,
+		keys[itctypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.ONFTKeeper,
+		app.GetSubspace(marketplacetypes.ModuleName),
+	)
+
+	itcModule := itc.NewAppModule(appCodec, app.ItcKeeper)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
@@ -522,6 +541,7 @@ func NewOmniFlixApp(
 		allocModule,
 		onftModule,
 		marketplaceModule,
+		itcModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -551,6 +571,7 @@ func NewOmniFlixApp(
 		feegrant.ModuleName,
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,
+		itctypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -575,6 +596,7 @@ func NewOmniFlixApp(
 		alloctypes.ModuleName,
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,
+		itctypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -599,12 +621,13 @@ func NewOmniFlixApp(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
+		ibchost.ModuleName,
+		ibctransfertypes.ModuleName,
 		alloctypes.ModuleName,
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,
+		itctypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
-		ibchost.ModuleName,
-		ibctransfertypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -826,6 +849,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(alloctypes.ModuleName)
 	paramsKeeper.Subspace(onfttypes.ModuleName)
 	paramsKeeper.Subspace(marketplacetypes.ModuleName)
+	paramsKeeper.Subspace(itctypes.ModuleName)
 
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 

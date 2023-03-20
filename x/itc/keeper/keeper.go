@@ -15,10 +15,8 @@ type (
 	Keeper struct {
 		cdc      codec.Codec
 		storeKey sdk.StoreKey
-		memKey   sdk.StoreKey
 
 		accountKeeper types.AccountKeeper
-		vestingkeeper types.VestingKeeper
 		bankKeeper    types.BankKeeper
 		nftKeeper     types.NftKeeper
 		paramSpace    paramtypes.Subspace
@@ -27,15 +25,13 @@ type (
 
 func NewKeeper(
 	cdc codec.Codec,
-	storeKey,
-	memKey sdk.StoreKey,
+	storeKey sdk.StoreKey,
 	accountKeeper types.AccountKeeper,
-	vestingKeeper types.VestingKeeper,
 	bankKeeper types.BankKeeper,
 	nftKeeper types.NftKeeper,
 	ps paramtypes.Subspace,
-) *Keeper {
-	// ensure marketplace module account is set
+) Keeper {
+	// ensure itc module account is set
 	if addr := accountKeeper.GetModuleAddress(types.ModuleName); addr == nil {
 		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
 	}
@@ -45,12 +41,10 @@ func NewKeeper(
 		ps = ps.WithKeyTable(types.ParamKeyTable())
 	}
 
-	return &Keeper{
+	return Keeper{
 		cdc:           cdc,
 		storeKey:      storeKey,
-		memKey:        memKey,
 		accountKeeper: accountKeeper,
-		vestingkeeper: vestingKeeper,
 		bankKeeper:    bankKeeper,
 		nftKeeper:     nftKeeper,
 		paramSpace:    ps,
