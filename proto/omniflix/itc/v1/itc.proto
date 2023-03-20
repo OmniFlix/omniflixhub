@@ -109,4 +109,6 @@ message NFTDetails {
 message Claim {
   uint64     campaign_id = 1;
   string     address = 2;
+  string     nft_id = 3;
+  InteractionType interaction = 4;
 }

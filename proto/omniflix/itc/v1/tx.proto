@@ -49,9 +49,7 @@ message MsgCreateCampaign {
     (gogoproto.stdduration) = true
   ];
 
-  Distribution            distribution = 12 [
-    (gogoproto.nullable) = false
-  ];
+  Distribution            distribution = 12;
   string                       creator = 13;
 }
 
