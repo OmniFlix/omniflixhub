@@ -5,7 +5,6 @@ import (
 	"github.com/OmniFlix/omniflixhub/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"time"
 )
 
 type msgServer struct {
@@ -31,21 +30,22 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	if err := msg.ValidateBasic(); err != nil {
-		return nil, err
+	// StartTime must be after current time
+	if msg.StartTime.Before(ctx.BlockTime()) {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDuration, "start time must be in future")
 	}
-
-	var endTime time.Time
-
-	endAt := msg.StartTime.Add(msg.Duration)
-	endTime = endAt
+	endTime := msg.StartTime.Add(msg.Duration)
 	if endTime.Before(msg.StartTime) || endTime.Equal(msg.StartTime) {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDuration, "duration must be positive or nil")
 	}
+
+	availableTokens := msg.TotalTokens
 	campaignNumber := m.Keeper.GetNextCampaignNumber(ctx)
 	campaign := types.NewCampaign(campaignNumber,
-		msg.Name, msg.Description,
-		msg.StartTime, endTime,
+		msg.Name,
+		msg.Description,
+		msg.StartTime,
+		endTime,
 		creator.String(),
 		msg.NftDenomId,
 		msg.MaxAllowedClaims,
@@ -53,12 +53,11 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 		msg.ClaimType,
 		msg.ClaimableTokens,
 		msg.TotalTokens,
-		msg.TotalTokens,
-		[]string{},
+		availableTokens,
 		msg.NftMintDetails,
-		&msg.Distribution,
+		msg.Distribution,
 	)
-	err = m.Keeper.CreateCampaign(ctx, campaign)
+	err = m.Keeper.CreateCampaign(ctx, creator, campaign)
 	if err != nil {
 		return nil, err
 	}
@@ -114,10 +113,14 @@ func (m msgServer) Claim(goCtx context.Context, msg *types.MsgClaim) (*types.Msg
 	if !campaign.StartTime.Before(ctx.BlockTime()) {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidTokens, "cannot do claim on inactive campaign %d, ", campaign.Id)
 	}
+	if msg.Interaction != campaign.Interaction {
+		return nil, sdkerrors.Wrapf(types.ErrInteractionMismatched,
+			"required interaction %s, got %s. ", campaign.Interaction, msg.Interaction)
+	}
 
-	claim := types.NewClaim(campaign.Id, claimer.String())
+	claim := types.NewClaim(campaign.Id, claimer.String(), msg.NftId, msg.Interaction)
 
-	err = m.Keeper.Claim(ctx, campaign, claim)
+	err = m.Keeper.Claim(ctx, campaign, claimer, claim)
 	if err != nil {
 		return nil, err
 	}

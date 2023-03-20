@@ -97,6 +97,12 @@ func (k Keeper) GetCampaignsByCreator(ctx sdk.Context, creator sdk.AccAddress) (
 	return
 }
 
+func (k Keeper) SetClaim(ctx sdk.Context, claim types.Claim) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixClaimByCampaignId)
+	bz := k.cdc.MustMarshal(&claim)
+	store.Set(types.KeyClaimPrefix(claim.CampaignId), bz)
+}
+
 func (k Keeper) GetClaims(ctx sdk.Context, campaignId uint64) (claims []types.Claim) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.KeyClaimPrefix(campaignId))
@@ -116,11 +122,11 @@ func (k Keeper) HasCampaign(ctx sdk.Context, id uint64) bool {
 	return store.Has(types.KeyCampaignIdPrefix(id))
 }
 
-func (k Keeper) SetCampaignWithCreator(ctx sdk.Context, owner sdk.AccAddress, id uint64) {
+func (k Keeper) SetCampaignWithCreator(ctx sdk.Context, creator sdk.AccAddress, id uint64) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&gogotypes.UInt64Value{Value: id})
 
-	store.Set(types.KeyCampaignCreatorPrefix(owner, id), bz)
+	store.Set(types.KeyCampaignCreatorPrefix(creator, id), bz)
 }
 
 func (k Keeper) UnsetCampaignWithCreator(ctx sdk.Context, owner sdk.AccAddress, id uint64) {
@@ -210,4 +216,15 @@ func (k Keeper) UpdateCampaignStatuses(ctx sdk.Context) error {
 // TODO: implement endCampaign sending remaining amounts or nfts to treasury / creator address
 func (k Keeper) endCampaign(ctx sdk.Context, campaign types.Campaign) {
 	k.RemoveCampaign(ctx, campaign.GetId())
+}
+
+func (k Keeper) HasClaim(ctx sdk.Context, id uint64, nftId string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.KeyClaimByNftIdPrefix(id, nftId))
+}
+
+func (k Keeper) SetClaimWithNft(ctx sdk.Context, id uint64, nftId string) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixClaimByNftId)
+	bz := k.cdc.MustMarshal(&gogotypes.StringValue{Value: nftId})
+	store.Set(types.KeyClaimByNftIdPrefix(id, nftId), bz)
 }
