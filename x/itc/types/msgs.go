@@ -28,7 +28,7 @@ func NewMsgCreateCampaign(name, description string,
 	maxAllowedClaims uint64,
 	claimableTokens, totalTokens Tokens,
 	nftMintDetails *NFTDetails,
-	distribution Distribution,
+	distribution *Distribution,
 	startTime time.Time,
 	duration time.Duration,
 	creator string,
@@ -60,6 +60,32 @@ func (msg MsgCreateCampaign) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+	if err := ValidateClaimType(msg.ClaimType); err != nil {
+		return err
+	}
+	if err := ValidateInteractionType(msg.Interaction); err != nil {
+		return err
+	}
+	if err := ValidateTokensWithClaimType(msg.ClaimType, msg.TotalTokens); err != nil {
+		return err
+	}
+	if err := ValidateTokensWithClaimType(msg.ClaimType, msg.ClaimableTokens); err != nil {
+		return err
+	}
+	if msg.ClaimType == CLAIM_TYPE_NFT {
+		if err := validateNFTMintDetails(msg.NftMintDetails); err != nil {
+			return err
+		}
+	}
+	if msg.ClaimType == CLAIM_TYPE_FT {
+		if err := ValidateDistribution(msg.Distribution); err != nil {
+			return err
+		}
+	}
+	if msg.MaxAllowedClaims == 0 {
+		return sdkerrors.Wrapf(ErrInValidMaxAllowedClaims,
+			"max allowed claims must be a positive number (%s)", msg.MaxAllowedClaims)
 	}
 	return nil
 }

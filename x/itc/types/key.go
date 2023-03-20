@@ -18,7 +18,7 @@ var (
 	PrefixCampaignsCount     = []byte{0x03}
 	PrefixNextCampaignNumber = []byte{0x10}
 	PrefixClaimByCampaignId  = []byte{0x11}
-	PrefixClaimsByClaimer    = []byte{0x12}
+	PrefixClaimByNftId       = []byte{0x12}
 	PrefixInactiveCampaign   = []byte{0x13}
 	PrefixActiveCampaign     = []byte{0x14}
 )
@@ -33,6 +33,9 @@ func KeyCampaignCreatorPrefix(creator sdk.AccAddress, id uint64) []byte {
 
 func KeyClaimPrefix(id uint64) []byte {
 	return append(PrefixClaimByCampaignId, sdk.Uint64ToBigEndian(id)...)
+}
+func KeyClaimByNftIdPrefix(id uint64, nftId string) []byte {
+	return append(append(PrefixClaimByNftId, []byte(nftId)...), sdk.Uint64ToBigEndian(id)...)
 }
 
 func KeyInActiveCampaignPrefix(id uint64) []byte {

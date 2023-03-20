@@ -11,10 +11,12 @@ var (
 	_ exported.ClaimI = &Claim{}
 )
 
-func NewClaim(campaignId uint64, address string) Claim {
+func NewClaim(campaignId uint64, address, nftId string, interactionType InteractionType) Claim {
 	return Claim{
-		CampaignId: campaignId,
-		Address:    address,
+		CampaignId:  campaignId,
+		Address:     address,
+		NftId:       nftId,
+		Interaction: interactionType,
 	}
 }
 

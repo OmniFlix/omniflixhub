@@ -29,6 +29,7 @@ type NftKeeper interface {
 	GetONFT(ctx sdk.Context, denomId, onftId string) (nft nft.ONFT, err error)
 	GetDenom(ctx sdk.Context, denomId string) (nftypes.Denom, error)
 	TransferOwnership(ctx sdk.Context, denomId, nftId string, srcOwner, dstOwner sdk.AccAddress) error
+	BurnONFT(ctx sdk.Context, denomId, nftId string, owner sdk.AccAddress) error
 }
 
 type VestingKeeper interface {
