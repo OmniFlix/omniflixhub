@@ -34,6 +34,7 @@ func KeyCampaignCreatorPrefix(creator sdk.AccAddress, id uint64) []byte {
 func KeyClaimPrefix(id uint64) []byte {
 	return append(PrefixClaimByCampaignId, sdk.Uint64ToBigEndian(id)...)
 }
+
 func KeyClaimByNftIdPrefix(id uint64, nftId string) []byte {
 	return append(append(PrefixClaimByNftId, []byte(nftId)...), sdk.Uint64ToBigEndian(id)...)
 }

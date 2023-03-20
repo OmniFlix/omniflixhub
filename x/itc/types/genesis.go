@@ -3,8 +3,9 @@ package types
 import sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 func NewGenesisState(campaigns []Campaign,
-	params Params, claims []Claim,
+	claims []Claim,
 	nextCampaignNumber uint64,
+	params Params,
 ) *GenesisState {
 	return &GenesisState{
 		Campaigns:          campaigns,

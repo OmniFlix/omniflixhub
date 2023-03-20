@@ -85,7 +85,7 @@ func (msg MsgCreateCampaign) ValidateBasic() error {
 	}
 	if msg.MaxAllowedClaims == 0 {
 		return sdkerrors.Wrapf(ErrInValidMaxAllowedClaims,
-			"max allowed claims must be a positive number (%s)", msg.MaxAllowedClaims)
+			"max allowed claims must be a positive number (%d)", msg.MaxAllowedClaims)
 	}
 	return nil
 }

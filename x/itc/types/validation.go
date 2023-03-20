@@ -36,7 +36,7 @@ func ValidateCampaign(campaign Campaign) error {
 	}
 	if campaign.MaxAllowedClaims == 0 {
 		return sdkerrors.Wrapf(ErrInValidMaxAllowedClaims,
-			"max allowed claims must be a positive number (%s)", campaign.MaxAllowedClaims)
+			"max allowed claims must be a positive number (%d)", campaign.MaxAllowedClaims)
 	}
 	return nil
 }
@@ -73,7 +73,7 @@ func ValidateTimestamp(t interface{}) error {
 	return nil
 }
 
-func ValidateCampaignStatus(status CampaignStatus) bool {
+func ValidCampaignStatus(status CampaignStatus) bool {
 	if status == CAMPAIGN_STATUS_INACTIVE ||
 		status == CAMPAIGN_STATUS_ACTIVE {
 		return true

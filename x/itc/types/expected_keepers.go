@@ -5,7 +5,6 @@ import (
 	nftypes "github.com/OmniFlix/onft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 )
 
 // AccountKeeper defines the expected account keeper
@@ -30,10 +29,4 @@ type NftKeeper interface {
 	GetDenom(ctx sdk.Context, denomId string) (nftypes.Denom, error)
 	TransferOwnership(ctx sdk.Context, denomId, nftId string, srcOwner, dstOwner sdk.AccAddress) error
 	BurnONFT(ctx sdk.Context, denomId, nftId string, owner sdk.AccAddress) error
-}
-
-type VestingKeeper interface {
-	CreateVestingAccount(ctx sdk.Context,
-		msg *vestingtypes.MsgCreateVestingAccount,
-	) (*vestingtypes.MsgCreateVestingAccountResponse, error)
 }
