@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	DefaultMaxCampaignDuration time.Duration = time.Hour * 24 * 90 // 90 days
+	DefaultMaxCampaignDuration = time.Hour * 24 * 90 // 90 days
 )
 
 var ParamStoreKeyMaxCampaignDuration = []byte("MaxCampaignDuration")
