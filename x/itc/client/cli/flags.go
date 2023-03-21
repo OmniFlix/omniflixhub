@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	FlagNftDenomId       = "denom-id"
+	FlagNftDenomId       = "nft-denom-id"
 	FlagNftId            = "nft-id"
 	FlagName             = "name"
 	FlagDescription      = "description"
@@ -39,9 +39,11 @@ func init() {
 	FsCreateCampaign.Uint64(FlagMaxAllowedClaims, 0, "maximum allowed claims for campaign")
 	FsCreateCampaign.String(FlagClaimableTokens, "", "tokens per claim")
 	FsCreateCampaign.String(FlagTotalTokens, "", "tokens to deposit the campaign")
-	FsCreateCampaign.String(FlagStartTime, "", "auction start time")
-	FsCreateCampaign.String(FlagDuration, "", "auction duration")
+	FsCreateCampaign.String(FlagStartTime, "", "campaign start time")
+	FsCreateCampaign.String(FlagDuration, "", "campaign duration")
+	FsCreateCampaign.String(FlagDistributionType, "", "type of distribution")
 
 	FsClaim.String(FlagNftId, "", "nft id")
 	FsClaim.String(FlagInteractionType, "", "type of the interaction")
+	FsClaim.String(FlagClaimer, "", "claimer address")
 }

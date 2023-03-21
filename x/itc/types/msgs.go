@@ -78,7 +78,7 @@ func (msg MsgCreateCampaign) ValidateBasic() error {
 			return err
 		}
 	}
-	if msg.ClaimType == CLAIM_TYPE_FT {
+	if msg.ClaimType == CLAIM_TYPE_FT && msg.Distribution.Type == DISTRIBUTION_TYPE_VEST {
 		if err := ValidateDistribution(msg.Distribution); err != nil {
 			return err
 		}

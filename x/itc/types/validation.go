@@ -29,7 +29,7 @@ func ValidateCampaign(campaign Campaign) error {
 			return err
 		}
 	}
-	if campaign.ClaimType == CLAIM_TYPE_FT {
+	if campaign.ClaimType == CLAIM_TYPE_FT && campaign.Distribution.Type == DISTRIBUTION_TYPE_VEST {
 		if err := ValidateDistribution(campaign.Distribution); err != nil {
 			return err
 		}
@@ -54,7 +54,7 @@ func ValidateTokens(tokens Tokens) error {
 }
 
 func ValidateDuration(t interface{}) error {
-	duration, ok := t.(*time.Duration)
+	duration, ok := t.(time.Duration)
 	if !ok {
 		return sdkerrors.Wrapf(ErrInvalidDuration, "invalid value for duration: %T", t)
 	}
@@ -66,7 +66,7 @@ func ValidateDuration(t interface{}) error {
 }
 
 func ValidateTimestamp(t interface{}) error {
-	_, ok := t.(*time.Time)
+	_, ok := t.(time.Time)
 	if !ok {
 		return sdkerrors.Wrapf(ErrInvalidTimestamp, "invalid timestamp: %T", t)
 	}

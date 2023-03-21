@@ -145,10 +145,15 @@ func GetCmdCreateCampaign() *cobra.Command {
 			} else {
 				return fmt.Errorf("failed to parse start time: %s", startTime)
 			}
-			duration, err := cmd.Flags().GetDuration(FlagDuration)
+			durationStr, err := cmd.Flags().GetString(FlagDuration)
 			if err != nil {
 				return err
 			}
+			duration, err := time.ParseDuration(durationStr)
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgCreateCampaign(name,
 				description,
 				interaction,

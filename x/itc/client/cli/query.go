@@ -202,6 +202,7 @@ func GetCmdQueryClaimsByCampaign() *cobra.Command {
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
+	cmd.Flags().String(FlagClaimer, "", "filter by claimer address")
 	flags.AddPaginationFlagsToCmd(cmd, "campaign claims")
 
 	return cmd
