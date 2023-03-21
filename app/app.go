@@ -495,7 +495,7 @@ func NewOmniFlixApp(
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.ONFTKeeper,
-		app.GetSubspace(marketplacetypes.ModuleName),
+		app.GetSubspace(itctypes.ModuleName),
 	)
 
 	itcModule := itc.NewAppModule(appCodec, app.ItcKeeper)
