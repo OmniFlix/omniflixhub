@@ -26,6 +26,7 @@ func GetTxCmd() *cobra.Command {
 	}
 	itcTxCmd.AddCommand(
 		GetCmdCreateCampaign(),
+		GetCmdCampaignDeposit(),
 		GetCmdClaim(),
 	)
 
@@ -193,6 +194,57 @@ func GetCmdCreateCampaign() *cobra.Command {
 	return cmd
 }
 
+// GetCmdCampaignDeposit implements the bid command
+func GetCmdCampaignDeposit() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "campaign-deposit",
+		Short: "deposits tokens into a campaign",
+		Example: fmt.Sprintf(
+			"$ %s tx itc deposit [campaign-id] "+
+				"--amount=<amount> "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			depositor := clientCtx.GetFromAddress()
+			campaignId, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+			amountStr, err := cmd.Flags().GetString(FlagAmount)
+			if err != nil {
+				return err
+			}
+			amount, err := sdk.ParseCoinNormalized(amountStr)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgCampaignDeposit(campaignId, amount, depositor.String())
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsCampaignDeposit)
+	_ = cmd.MarkFlagRequired(FlagAmount)
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
 // GetCmdClaim implements the bid command
 func GetCmdClaim() *cobra.Command {
 	cmd := &cobra.Command{
@@ -201,7 +253,7 @@ func GetCmdClaim() *cobra.Command {
 		Example: fmt.Sprintf(
 			"$ %s tx itc claim [campaign-id] "+
 				"--nft-id=<nft-id> "+
-				"--interaction=<interaction> "+
+				"--interaction-type=<interaction> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",

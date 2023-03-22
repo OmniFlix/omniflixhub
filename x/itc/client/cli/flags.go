@@ -26,8 +26,9 @@ const (
 )
 
 var (
-	FsCreateCampaign = flag.NewFlagSet("", flag.ContinueOnError)
-	FsClaim          = flag.NewFlagSet("", flag.ContinueOnError)
+	FsCreateCampaign  = flag.NewFlagSet("", flag.ContinueOnError)
+	FsCampaignDeposit = flag.NewFlagSet("", flag.ContinueOnError)
+	FsClaim           = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -42,6 +43,8 @@ func init() {
 	FsCreateCampaign.String(FlagStartTime, "", "campaign start time")
 	FsCreateCampaign.String(FlagDuration, "", "campaign duration")
 	FsCreateCampaign.String(FlagDistributionType, "", "type of distribution")
+
+	FsCampaignDeposit.String(FlagAmount, "", "deposit amount")
 
 	FsClaim.String(FlagNftId, "", "nft id")
 	FsClaim.String(FlagInteractionType, "", "type of the interaction")

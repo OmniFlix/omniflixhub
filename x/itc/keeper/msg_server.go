@@ -39,6 +39,10 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 	if endTime.Before(msg.StartTime) || endTime.Equal(msg.StartTime) {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDuration, "duration must be positive or nil")
 	}
+	if msg.Duration > m.Keeper.GetMaxCampaignDuration(ctx) {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDuration,
+			"duration must be less than max campaign duration (%d)", m.Keeper.GetMaxCampaignDuration(ctx))
+	}
 
 	availableTokens := msg.TotalTokens
 	campaignNumber := m.Keeper.GetNextCampaignNumber(ctx)
@@ -111,10 +115,11 @@ func (m msgServer) Claim(goCtx context.Context, msg *types.MsgClaim) (*types.Msg
 		return nil, sdkerrors.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", msg.CampaignId)
 	}
 	if !campaign.StartTime.Before(ctx.BlockTime()) {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidTokens, "cannot do claim on inactive campaign %d, ", campaign.Id)
+		return nil, sdkerrors.Wrapf(types.ErrInactiveCampaign,
+			"cannot claim on inactive campaign %d, ", campaign.Id)
 	}
 	if msg.Interaction != campaign.Interaction {
-		return nil, sdkerrors.Wrapf(types.ErrInteractionMismatched,
+		return nil, sdkerrors.Wrapf(types.ErrInteractionMismatch,
 			"required interaction %s, got %s. ", campaign.Interaction, msg.Interaction)
 	}
 
@@ -133,17 +138,21 @@ func (m msgServer) CampaignDeposit(goCtx context.Context,
 	msg *types.MsgCampaignDeposit,
 ) (*types.MsgCampaignDepositResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	_, err := sdk.AccAddressFromBech32(msg.Depositor)
+	depositor, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {
 		return nil, err
 	}
-
-	_, found := m.Keeper.GetCampaign(ctx, msg.CampaignId)
+	campaign, found := m.Keeper.GetCampaign(ctx, msg.CampaignId)
 	if !found {
 		return nil, sdkerrors.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", msg.CampaignId)
 	}
-	// TODO: add tokens to total tokens
-
+	if msg.Amount.Denom != campaign.TotalTokens.Fungible.Denom {
+		return nil, sdkerrors.Wrapf(types.ErrTokenDenomMismatch,
+			"token denom mismatch, required %s, got %s", campaign.TotalTokens.Fungible.Denom, msg.Amount.Denom)
+	}
+	if err := m.Keeper.CampaignDeposit(ctx, msg.CampaignId, depositor, msg.Amount); err != nil {
+		return nil, err
+	}
 	// TODO: event
 
 	return &types.MsgCampaignDepositResponse{}, nil

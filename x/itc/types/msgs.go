@@ -158,6 +158,10 @@ func (msg MsgCampaignDeposit) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid depositor address (%s)", err)
 	}
+	if !msg.Amount.IsValid() && msg.Amount.IsZero() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins,
+			"amount must be valid and positive (%s)", msg.Amount.String())
+	}
 	return nil
 }
 

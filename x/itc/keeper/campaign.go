@@ -19,8 +19,12 @@ func (k Keeper) CreateCampaign(ctx sdk.Context, creator sdk.AccAddress, campaign
 			"denom id %s isn't owned by campaign creator %s", collection.Id, campaign.Creator)
 	}
 	if campaign.ClaimType == types.CLAIM_TYPE_FT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, creator, types.ModuleName,
-			sdk.Coins{*campaign.TotalTokens.Fungible}); err != nil {
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(
+			ctx,
+			creator,
+			types.ModuleName,
+			sdk.NewCoins(sdk.NewCoin(campaign.TotalTokens.Fungible.Denom, campaign.TotalTokens.Fungible.Amount)),
+		); err != nil {
 			return err
 		}
 	}
@@ -135,6 +139,29 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 	if campaign.Interaction == types.INTERACTION_TYPE_BURN {
 		_ = k.nftKeeper.BurnONFT(ctx, campaign.NftDenomId, nft.GetID(), k.GetModuleAccountAddress(ctx))
 	}
+
+	return nil
+}
+
+func (k Keeper) CampaignDeposit(ctx sdk.Context, campaignId uint64, depositor sdk.AccAddress, amount sdk.Coin) error {
+	campaign, found := k.GetCampaign(ctx, campaignId)
+	if !found {
+		return sdkerrors.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", campaignId)
+	}
+	// Transfer tokens from depositor to module account
+	if err := k.bankKeeper.SendCoinsFromAccountToModule(
+		ctx,
+		depositor,
+		types.ModuleName,
+		sdk.NewCoins(amount),
+	); err != nil {
+		return err
+	}
+	// Update total tokens and available tokens
+	campaign.TotalTokens.Fungible.Amount = campaign.TotalTokens.Fungible.Amount.Add(amount.Amount)
+	campaign.AvailableTokens.Fungible.Amount = campaign.AvailableTokens.Fungible.Amount.Add(amount.Amount)
+
+	k.SetCampaign(ctx, campaign)
 
 	return nil
 }
