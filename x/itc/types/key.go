@@ -5,18 +5,16 @@ import (
 )
 
 const (
-	ModuleName               = "itc"
-	StoreKey          string = ModuleName
-	QuerierRoute      string = ModuleName
-	RouterKey         string = ModuleName
-	DefaultParamSpace        = ModuleName
+	ModuleName          = "itc"
+	StoreKey     string = ModuleName
+	QuerierRoute string = ModuleName
+	RouterKey    string = ModuleName
 )
 
 var (
 	PrefixCampaignId         = []byte{0x01}
 	PrefixCampaignCreator    = []byte{0x02}
-	PrefixCampaignsCount     = []byte{0x03}
-	PrefixNextCampaignNumber = []byte{0x10}
+	PrefixNextCampaignNumber = []byte{0x03}
 	PrefixClaimByCampaignId  = []byte{0x11}
 	PrefixClaimByNftId       = []byte{0x12}
 	PrefixInactiveCampaign   = []byte{0x13}
@@ -36,7 +34,7 @@ func KeyClaimPrefix(id uint64) []byte {
 }
 
 func KeyClaimByNftIdPrefix(id uint64, nftId string) []byte {
-	return append(append(PrefixClaimByNftId, []byte(nftId)...), sdk.Uint64ToBigEndian(id)...)
+	return append(append(PrefixClaimByNftId, sdk.Uint64ToBigEndian(id)...), []byte(nftId)...)
 }
 
 func KeyInActiveCampaignPrefix(id uint64) []byte {
