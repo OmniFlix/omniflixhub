@@ -39,20 +39,20 @@ func GetCmdCreateCampaign() *cobra.Command {
 		Long: "creates a campaign on itc module",
 		Example: fmt.Sprintf(
 			"$ %s tx itc create-campaign "+
-				"--name=<name>"+
-				"--description=<description>"+
-				"--start-time=<start-time>"+
-				"--duration=<duration>"+
-				"--claim-type=<claim-type>"+
-				"--max-allowed-claims=<max-claims>"+
-				"--claimable-tokens=<claimable-tokens>"+
-				"--total-tokens=<total-tokens>"+
-				"--distribution-type=<distr-type>"+
-				"--interaction-type=<interaction-type>"+
+				"--name=<name> "+
+				"--description=<description> "+
+				"--start-time=<start-time> "+
+				"--duration=<duration> "+
+				"--claim-type=<claim-type> "+
+				"--max-allowed-claims=<max-claims> "+
+				"--claimable-tokens=<claimable-tokens> "+
+				"--total-tokens=<total-tokens> "+
+				"--distribution-type=<distr-type> "+
+				"--interaction-type=<interaction-type> "+
 				"--nft-denom-id=<denom-id> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
-				"--fees=<fee>",
+				"--fees=<fee> ",
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -199,9 +199,9 @@ func GetCmdClaim() *cobra.Command {
 		Use:   "claim",
 		Short: "claim tokens from a campaign",
 		Example: fmt.Sprintf(
-			"$ %s tx itc claim [ campaign-id]"+
-				"--nft-id=<nft-id>"+
-				"--interaction=<interaction>"+
+			"$ %s tx itc claim [campaign-id] "+
+				"--nft-id=<nft-id> "+
+				"--interaction=<interaction> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",

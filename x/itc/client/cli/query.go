@@ -171,12 +171,15 @@ func GetCmdQueryClaimsByCampaign() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			claimer, err := sdk.AccAddressFromBech32(claimerStr)
-			if err != nil {
-				return err
+			var claimer sdk.AccAddress
+			if len(claimerStr) > 0 {
+				claimer, err = sdk.AccAddressFromBech32(claimerStr)
+				if err != nil {
+					return err
+				}
 			}
 
-			campaignId, err := strconv.ParseUint(strings.ToLower(strings.TrimSpace(args[0])), 10, 64)
+			campaignId, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}
