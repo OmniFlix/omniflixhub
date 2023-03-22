@@ -57,9 +57,9 @@ func (k Keeper) Campaigns(goCtx context.Context,
 		req.Pagination, func(key []byte, value []byte, accumulate bool) (bool, error) {
 			var al types.Campaign
 			k.cdc.MustUnmarshal(value, &al)
-			matchCreator, matchStatus := true, false
+			matchCreator, matchStatus := true, true
 			// match status (if supplied/valid)
-			if types.ValidCampaignStatus(req.Status) {
+			if len(req.Status.String()) > 0 && types.ValidCampaignStatus(req.Status) {
 				if req.Status == types.CAMPAIGN_STATUS_ACTIVE {
 					matchStatus = al.StartTime.Before(time.Now())
 				} else if req.Status == types.CAMPAIGN_STATUS_INACTIVE {
