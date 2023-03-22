@@ -39,7 +39,7 @@ func (k Keeper) SetNextCampaignNumber(ctx sdk.Context, number uint64) {
 
 // SetCampaign set a specific campaign in the store
 func (k Keeper) SetCampaign(ctx sdk.Context, campaign types.Campaign) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixCampaignId)
+	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&campaign)
 	store.Set(types.KeyCampaignIdPrefix(campaign.Id), bz)
 }
@@ -63,8 +63,8 @@ func (k Keeper) RemoveCampaign(ctx sdk.Context, id uint64) {
 
 // GetAllCampaigns returns all campaigns
 func (k Keeper) GetAllCampaigns(ctx sdk.Context) (list []types.Campaign) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixCampaignId)
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.PrefixCampaignId)
 
 	defer iterator.Close()
 
@@ -98,7 +98,7 @@ func (k Keeper) GetCampaignsByCreator(ctx sdk.Context, creator sdk.AccAddress) (
 }
 
 func (k Keeper) SetClaim(ctx sdk.Context, claim types.Claim) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixClaimByCampaignId)
+	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&claim)
 	store.Set(types.KeyClaimPrefix(claim.CampaignId), bz)
 }
@@ -159,8 +159,8 @@ func (k Keeper) UnsetActiveCampaign(ctx sdk.Context, campaignId uint64) {
 }
 
 func (k Keeper) IterateInactiveCampaigns(ctx sdk.Context, fn func(index int, item types.Campaign) (stop bool)) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixInactiveCampaign)
-	iter := sdk.KVStorePrefixIterator(store, []byte{})
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(store, types.PrefixInactiveCampaign)
 	defer iter.Close()
 
 	for i := 0; iter.Valid(); iter.Next() {
@@ -176,8 +176,8 @@ func (k Keeper) IterateInactiveCampaigns(ctx sdk.Context, fn func(index int, ite
 }
 
 func (k Keeper) IterateActiveCampaigns(ctx sdk.Context, fn func(index int, item types.Campaign) (stop bool)) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixActiveCampaign)
-	iter := sdk.KVStorePrefixIterator(store, []byte{})
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(store, types.PrefixActiveCampaign)
 	defer iter.Close()
 
 	for i := 0; iter.Valid(); iter.Next() {
@@ -194,8 +194,8 @@ func (k Keeper) IterateActiveCampaigns(ctx sdk.Context, fn func(index int, item 
 
 // UpdateCampaignStatuses update all campaign statuses
 func (k Keeper) UpdateCampaignStatuses(ctx sdk.Context) error {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixCampaignId)
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.PrefixCampaignId)
 
 	defer iterator.Close()
 
@@ -213,9 +213,37 @@ func (k Keeper) UpdateCampaignStatuses(ctx sdk.Context) error {
 	return nil
 }
 
-// TODO: implement endCampaign sending remaining amounts or nfts to treasury / creator address
+// TODO: re-check
 func (k Keeper) endCampaign(ctx sdk.Context, campaign types.Campaign) {
+	// Transfer Remaining funds to creator
+	availableTokens := campaign.AvailableTokens.Fungible
+	if availableTokens.IsValid() && availableTokens.IsPositive() {
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
+			types.ModuleName, campaign.GetCreator(),
+			sdk.NewCoins(sdk.NewCoin(availableTokens.Denom, availableTokens.Amount))); err != nil {
+			panic(err)
+		}
+	}
+	// Transfer Received NFTs to creator if any
+	if len(campaign.GetReceivedNftIds()) > 0 {
+		for _, nft := range campaign.GetReceivedNftIds() {
+			err := k.nftKeeper.TransferOwnership(ctx,
+				campaign.NftDenomId,
+				nft,
+				k.GetModuleAccountAddress(ctx),
+				campaign.GetCreator(),
+			)
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+
 	k.RemoveCampaign(ctx, campaign.GetId())
+	k.UnsetActiveCampaign(ctx, campaign.GetId())
+	k.UnsetCampaignWithCreator(ctx, campaign.GetCreator(), campaign.GetId())
+	k.RemoveClaims(ctx, campaign.GetId())
+	k.UnsetClaims(ctx, campaign.GetId())
 }
 
 func (k Keeper) HasClaim(ctx sdk.Context, id uint64, nftId string) bool {
@@ -224,7 +252,37 @@ func (k Keeper) HasClaim(ctx sdk.Context, id uint64, nftId string) bool {
 }
 
 func (k Keeper) SetClaimWithNft(ctx sdk.Context, id uint64, nftId string) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixClaimByNftId)
+	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&gogotypes.StringValue{Value: nftId})
 	store.Set(types.KeyClaimByNftIdPrefix(id, nftId), bz)
+}
+
+func (k Keeper) UnSetClaimWithNft(ctx sdk.Context, id uint64, nftId string) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(types.KeyClaimByNftIdPrefix(id, nftId))
+}
+
+func (k Keeper) RemoveClaims(ctx sdk.Context, campaignId uint64) {
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(store, types.KeyClaimPrefix(campaignId))
+	defer iter.Close()
+
+	for i := 0; iter.Valid(); iter.Next() {
+		store.Delete(iter.Key())
+		i++
+	}
+}
+
+func (k Keeper) UnsetClaims(ctx sdk.Context, campaignId uint64) {
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(
+		prefix.NewStore(store, types.PrefixClaimByNftId),
+		sdk.Uint64ToBigEndian(campaignId),
+	)
+	defer iter.Close()
+
+	for i := 0; iter.Valid(); iter.Next() {
+		store.Delete(iter.Key())
+		i++
+	}
 }
