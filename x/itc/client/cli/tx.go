@@ -36,8 +36,8 @@ func GetTxCmd() *cobra.Command {
 // GetCmdCreateCampaign implements the create-campaign command
 func GetCmdCreateCampaign() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "create-campaign",
-		Long: "creates a campaign on itc module",
+		Use:   "create-campaign",
+		Short: "creates a campaign on itc module",
 		Example: fmt.Sprintf(
 			"$ %s tx itc create-campaign "+
 				"--name=<name> "+
