@@ -130,9 +130,28 @@ func (k Keeper) SetCampaignWithCreator(ctx sdk.Context, creator sdk.AccAddress, 
 	store.Set(types.KeyCampaignCreatorPrefix(creator, id), bz)
 }
 
-func (k Keeper) UnsetCampaignWithCreator(ctx sdk.Context, owner sdk.AccAddress, id uint64) {
+func (k Keeper) UnsetCampaignWithCreator(ctx sdk.Context, creator sdk.AccAddress, id uint64) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(types.KeyCampaignCreatorPrefix(owner, id))
+	store.Delete(types.KeyCampaignCreatorPrefix(creator, id))
+}
+
+func (k Keeper) HasClaim(ctx sdk.Context, id uint64, nftId string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.KeyClaimByNftIdPrefix(id, nftId))
+}
+
+func (k Keeper) RemoveClaims(ctx sdk.Context, campaignId uint64) {
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(
+		prefix.NewStore(store, types.PrefixClaimByNftId),
+		sdk.Uint64ToBigEndian(campaignId),
+	)
+	defer iter.Close()
+
+	for i := 0; iter.Valid(); iter.Next() {
+		store.Delete(iter.Key())
+		i++
+	}
 }
 
 // FinalizeAndEndCampaigns finalizes and ends and all campaigns that are reached end time
@@ -182,23 +201,4 @@ func (k Keeper) endCampaign(ctx sdk.Context, campaign types.Campaign) {
 	k.RemoveCampaign(ctx, campaign.GetId())
 	k.UnsetCampaignWithCreator(ctx, campaign.GetCreator(), campaign.GetId())
 	k.RemoveClaims(ctx, campaign.GetId())
-}
-
-func (k Keeper) HasClaim(ctx sdk.Context, id uint64, nftId string) bool {
-	store := ctx.KVStore(k.storeKey)
-	return store.Has(types.KeyClaimByNftIdPrefix(id, nftId))
-}
-
-func (k Keeper) RemoveClaims(ctx sdk.Context, campaignId uint64) {
-	store := ctx.KVStore(k.storeKey)
-	iter := sdk.KVStorePrefixIterator(
-		prefix.NewStore(store, types.PrefixClaimByNftId),
-		sdk.Uint64ToBigEndian(campaignId),
-	)
-	defer iter.Close()
-
-	for i := 0; iter.Valid(); iter.Next() {
-		store.Delete(iter.Key())
-		i++
-	}
 }

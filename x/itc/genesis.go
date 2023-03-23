@@ -22,7 +22,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 	for _, cc := range genState.Claims {
 		k.SetClaim(ctx, cc)
-		k.SetClaimWithNft(ctx, cc.CampaignId, cc.NftId)
 	}
 
 	// check if the module account exists

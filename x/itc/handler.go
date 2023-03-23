@@ -21,6 +21,9 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgCreateCampaign:
 			res, err := msgServer.CreateCampaign(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgCancelCampaign:
+			res, err := msgServer.CancelCampaign(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgCampaignDeposit:
 			res, err := msgServer.CampaignDeposit(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)

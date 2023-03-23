@@ -2,7 +2,7 @@ package types
 
 import (
 	nft "github.com/OmniFlix/onft/exported"
-	nftypes "github.com/OmniFlix/onft/types"
+	nfttypes "github.com/OmniFlix/onft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
@@ -26,7 +26,13 @@ type BankKeeper interface {
 // NftKeeper defines the expected nft keeper
 type NftKeeper interface {
 	GetONFT(ctx sdk.Context, denomId, onftId string) (nft nft.ONFT, err error)
-	GetDenom(ctx sdk.Context, denomId string) (nftypes.Denom, error)
+	GetDenom(ctx sdk.Context, denomId string) (nfttypes.Denom, error)
+	MintONFT(ctx sdk.Context,
+		denomID, onftID string,
+		metadata nfttypes.Metadata, data string,
+		transferable, extensible, nsfw bool,
+		royaltyShare sdk.Dec, sender, recipient sdk.AccAddress,
+	) error
 	TransferOwnership(ctx sdk.Context, denomId, nftId string, srcOwner, dstOwner sdk.AccAddress) error
 	BurnONFT(ctx sdk.Context, denomId, nftId string, owner sdk.AccAddress) error
 }

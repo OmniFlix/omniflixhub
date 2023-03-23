@@ -8,7 +8,7 @@ import (
 
 func EndBlock(ctx sdk.Context, k keeper.Keeper) []abcitypes.ValidatorUpdate {
 	log := k.Logger(ctx)
-	err := k.UpdateCampaignStatuses(ctx)
+	err := k.FinalizeAndEndCampaigns(ctx)
 	if err != nil {
 		panic(err)
 	}

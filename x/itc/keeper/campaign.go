@@ -2,11 +2,12 @@ package keeper
 
 import (
 	"github.com/OmniFlix/omniflixhub/x/itc/types"
+	nfttypes "github.com/OmniFlix/onft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// CreateCampaign TODO: NFT claim ownership transfers
+// CreateCampaign ...
 func (k Keeper) CreateCampaign(ctx sdk.Context, creator sdk.AccAddress, campaign types.Campaign) error {
 	// verify collection
 	collection, err := k.nftKeeper.GetDenom(ctx, campaign.NftDenomId)
@@ -16,7 +17,7 @@ func (k Keeper) CreateCampaign(ctx sdk.Context, creator sdk.AccAddress, campaign
 	// Authorize
 	if collection.Creator != campaign.Creator {
 		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
-			"denom id %s isn't owned by campaign creator %s", collection.Id, campaign.Creator)
+			"nft denom id %s isn't owned by campaign creator %s", collection.Id, campaign.Creator)
 	}
 	if campaign.ClaimType == types.CLAIM_TYPE_FT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(
@@ -29,34 +30,57 @@ func (k Keeper) CreateCampaign(ctx sdk.Context, creator sdk.AccAddress, campaign
 		}
 	}
 
-	/*
-		if campaign.ClaimType == types.CLAIM_TYPE_NFT {
-			mintCollection, err := k.nftKeeper.GetDenom(ctx, campaign.NftMintDetails.DenomId)
-			if err != nil {
-				return err
-			}
-			// Authorize
-			if mintCollection.Creator != campaign.Creator {
-				return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
-					"nft mint denom id %s isn't owned by campaign creator %s", mintCollection.Id, campaign.Creator)
-			}
+	if campaign.ClaimType == types.CLAIM_TYPE_NFT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
+		mintCollection, err := k.nftKeeper.GetDenom(ctx, campaign.NftMintDetails.DenomId)
+		if err != nil {
+			return err
 		}
-	*/
+		// Authorize
+		if mintCollection.Creator != campaign.Creator {
+			return sdkerrors.Wrapf(
+				sdkerrors.ErrUnauthorized,
+				"nft mint denom id %s isn't owned by campaign creator %s",
+				mintCollection.Id,
+				campaign.Creator,
+			)
+		}
+	}
 
 	k.SetCampaign(ctx, campaign)
 	k.SetNextCampaignNumber(ctx, campaign.Id+1)
 	k.SetCampaignWithCreator(ctx, creator, campaign.Id)
-	k.SetInactiveCampaign(ctx, campaign.Id)
 
 	return nil
 }
 
-// CancelCampaign TODO: cancel campaign and return back funds/ nfts
-func (k Keeper) CancelCampaign(ctx sdk.Context, campaign types.Campaign) error {
+// CancelCampaign ...
+func (k Keeper) CancelCampaign(ctx sdk.Context, campaignId uint64, creator sdk.AccAddress) error {
+	campaign, found := k.GetCampaign(ctx, campaignId)
+	if !found {
+		return sdkerrors.Wrapf(types.ErrCampaignDoesNotExists, "campaign %d not exists", campaignId)
+	}
+	if creator.String() != campaign.Creator {
+		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", creator.String())
+	}
+	// cancel only if campaign not started
+	if campaign.StartTime.Before(ctx.BlockTime()) {
+		return sdkerrors.Wrapf(types.ErrCancelNotAllowed, "active campaign can not be canceled")
+	}
+	// return funds
+	availableTokens := campaign.AvailableTokens.Fungible
+	if availableTokens.IsValid() && !availableTokens.IsPositive() {
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
+			types.ModuleName, campaign.GetCreator(),
+			sdk.NewCoins(sdk.NewCoin(availableTokens.Denom, availableTokens.Amount))); err != nil {
+			panic(err)
+		}
+	}
+	k.UnsetCampaignWithCreator(ctx, creator, campaignId)
+	k.RemoveCampaign(ctx, campaignId)
 	return nil
 }
 
-// Claim TODO: vesting distribution
+// Claim ...
 func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccAddress, claim types.Claim) error {
 	// check nft with campaign
 	nft, err := k.nftKeeper.GetONFT(ctx, campaign.NftDenomId, claim.NftId)
@@ -108,7 +132,7 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 	}
 
 	// Claim Claimable
-	if campaign.ClaimType == types.CLAIM_TYPE_FT {
+	if campaign.ClaimType == types.CLAIM_TYPE_FT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
 		claimableTokens := campaign.ClaimableTokens.Fungible
 		if campaign.Distribution != nil && campaign.Distribution.Type == types.DISTRIBUTION_TYPE_VEST {
 			// TODO: add vesting based on vesting periods
@@ -126,11 +150,44 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 		}
 		availableTokensAmount := campaign.AvailableTokens.Fungible.Amount.Sub(claimableTokens.Amount)
 		campaign.AvailableTokens.Fungible.Amount = availableTokensAmount
+	} else {
+		if err := k.nftKeeper.MintONFT(
+			ctx,
+			campaign.NftMintDetails.DenomId,
+			nfttypes.GenUniqueID("onft"),
+			nfttypes.Metadata{
+				Name:        campaign.NftMintDetails.Name,
+				Description: campaign.NftMintDetails.Description,
+				MediaURI:    campaign.NftMintDetails.MediaUri,
+				PreviewURI:  campaign.NftMintDetails.PreviewUri,
+			},
+			"",
+			campaign.NftMintDetails.Transferable,
+			campaign.NftMintDetails.Extensible,
+			campaign.NftMintDetails.Nsfw,
+			campaign.NftMintDetails.RoyaltyShare,
+			campaign.GetCreator(),
+			claimer,
+		); err != nil {
+			// Transfer back nft if it's not hold
+			if campaign.Interaction != types.INTERACTION_TYPE_HOLD {
+				err := k.nftKeeper.TransferOwnership(ctx,
+					campaign.NftDenomId,
+					nft.GetID(),
+					k.GetModuleAccountAddress(ctx),
+					claimer,
+				)
+				if err != nil {
+					panic(err)
+				}
+			}
+			return sdkerrors.Wrapf(types.ErrClaimingNFT,
+				"unable to mint nft denomId %s", campaign.NftMintDetails.DenomId)
+		}
 	}
 	// set claim
 
 	k.SetClaim(ctx, claim)
-	k.SetClaimWithNft(ctx, campaign.Id, claim.NftId)
 
 	// set campaign
 	k.SetCampaign(ctx, campaign)

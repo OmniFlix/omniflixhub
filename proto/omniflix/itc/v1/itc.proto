@@ -100,7 +100,11 @@ message NFTDetails {
   string     description = 3;
   string     media_uri = 4;
   string     preview_uri = 5;
-  string     royalty_share = 6;
+  string     royalty_share = 6 [
+    (gogoproto.nullable)   = false,
+    (gogoproto.moretags)   = "yaml:\"royalty_share\"",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
+  ];
   bool       transferable = 7;
   bool       extensible = 8;
   bool       nsfw = 9;

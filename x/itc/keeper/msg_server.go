@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-
 	"github.com/OmniFlix/omniflixhub/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -83,15 +82,7 @@ func (m msgServer) CancelCampaign(goCtx context.Context,
 		return nil, err
 	}
 
-	campaign, found := m.Keeper.GetCampaign(ctx, msg.CampaignId)
-	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrCampaignDoesNotExists, "campaign %d not exists", msg.CampaignId)
-	}
-	if creator.String() != campaign.Creator {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", creator.String())
-	}
-
-	err = m.Keeper.CancelCampaign(ctx, campaign)
+	err = m.Keeper.CancelCampaign(ctx, msg.CampaignId, creator)
 	if err != nil {
 		return nil, err
 	}
