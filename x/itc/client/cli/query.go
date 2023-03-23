@@ -161,6 +161,7 @@ func GetCmdQueryClaimsByCampaign() *cobra.Command {
 		Use:     "claims [campaign-id]",
 		Long:    "Query claims by campaign.",
 		Example: fmt.Sprintf("$ %s query itc claims <campaign-id>", version.AppName),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags())
@@ -178,7 +179,6 @@ func GetCmdQueryClaimsByCampaign() *cobra.Command {
 					return err
 				}
 			}
-
 			campaignId, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
