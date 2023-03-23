@@ -105,7 +105,7 @@ func (k Keeper) Claims(goCtx context.Context,
 	var filteredClaims []types.Claim
 	var pageRes *query.PageResponse
 	store := ctx.KVStore(k.storeKey)
-	claimStore := prefix.NewStore(store, types.PrefixClaimByCampaignId)
+	claimStore := prefix.NewStore(store, types.PrefixClaimByNftId)
 	pageRes, err := query.FilteredPaginate(claimStore,
 		req.Pagination, func(key []byte, value []byte, accumulate bool) (bool, error) {
 			var al types.Claim
