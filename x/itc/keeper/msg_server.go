@@ -65,7 +65,6 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	// Event
 
 	return &types.MsgCreateCampaignResponse{}, nil
 }
@@ -86,7 +85,6 @@ func (m msgServer) CancelCampaign(goCtx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	// TODO: event
 
 	return &types.MsgCancelCampaignResponse{}, nil
 }
@@ -120,7 +118,6 @@ func (m msgServer) Claim(goCtx context.Context, msg *types.MsgClaim) (*types.Msg
 	if err != nil {
 		return nil, err
 	}
-	// TODO: event
 
 	return &types.MsgClaimResponse{}, nil
 }
@@ -144,7 +141,6 @@ func (m msgServer) CampaignDeposit(goCtx context.Context,
 	if err := m.Keeper.CampaignDeposit(ctx, msg.CampaignId, depositor, msg.Amount); err != nil {
 		return nil, err
 	}
-	// TODO: event
 
 	return &types.MsgCampaignDepositResponse{}, nil
 }

@@ -176,7 +176,7 @@ func (k Keeper) FinalizeAndEndCampaigns(ctx sdk.Context) error {
 func (k Keeper) endCampaign(ctx sdk.Context, campaign types.Campaign) {
 	// Transfer Remaining funds to creator
 	availableTokens := campaign.AvailableTokens.Fungible
-	if availableTokens.IsValid() && availableTokens.IsPositive() {
+	if availableTokens != nil && availableTokens.IsValid() && availableTokens.IsPositive() {
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
 			types.ModuleName, campaign.GetCreator(),
 			sdk.NewCoins(sdk.NewCoin(availableTokens.Denom, availableTokens.Amount))); err != nil {
@@ -201,4 +201,11 @@ func (k Keeper) endCampaign(ctx sdk.Context, campaign types.Campaign) {
 	k.RemoveCampaign(ctx, campaign.GetId())
 	k.UnsetCampaignWithCreator(ctx, campaign.GetCreator(), campaign.GetId())
 	k.RemoveClaims(ctx, campaign.GetId())
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeEndCampaign,
+			sdk.NewAttribute(types.AttributeKeyCampaignId, fmt.Sprint(campaign.GetId())),
+		),
+	)
 }

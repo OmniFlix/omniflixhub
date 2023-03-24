@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"github.com/OmniFlix/omniflixhub/x/itc/types"
 	nfttypes "github.com/OmniFlix/onft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -50,6 +51,23 @@ func (k Keeper) CreateCampaign(ctx sdk.Context, creator sdk.AccAddress, campaign
 	k.SetNextCampaignNumber(ctx, campaign.Id+1)
 	k.SetCampaignWithCreator(ctx, creator, campaign.Id)
 
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeCreateCampaign,
+			sdk.NewAttribute(types.AttributeKeyCampaignId, fmt.Sprint(campaign.GetId())),
+			sdk.NewAttribute(types.AttributeKeyCreator, creator.String()),
+		),
+	)
+	if campaign.ClaimType == types.CLAIM_TYPE_FT && campaign.TotalTokens.Fungible != nil {
+		ctx.EventManager().EmitEvent(
+			sdk.NewEvent(
+				types.EventTypeCampaignDeposit,
+				sdk.NewAttribute(types.AttributeKeyCampaignId, fmt.Sprint(campaign.GetId())),
+				sdk.NewAttribute(types.AttributeKeyDepositor, creator.String()),
+			),
+		)
+	}
+
 	return nil
 }
 
@@ -77,6 +95,14 @@ func (k Keeper) CancelCampaign(ctx sdk.Context, campaignId uint64, creator sdk.A
 	}
 	k.UnsetCampaignWithCreator(ctx, creator, campaignId)
 	k.RemoveCampaign(ctx, campaignId)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeCancelCampaign,
+			sdk.NewAttribute(types.AttributeKeyCampaignId, fmt.Sprint(campaign.GetId())),
+			sdk.NewAttribute(types.AttributeKeyCreator, creator.String()),
+		),
+	)
 	return nil
 }
 
@@ -197,6 +223,14 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 		_ = k.nftKeeper.BurnONFT(ctx, campaign.NftDenomId, nft.GetID(), k.GetModuleAccountAddress(ctx))
 	}
 
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeClaim,
+			sdk.NewAttribute(types.AttributeKeyCampaignId, fmt.Sprint(campaign.GetId())),
+			sdk.NewAttribute(types.AttributeKeyClaimer, claimer.String()),
+		),
+	)
+
 	return nil
 }
 
@@ -219,6 +253,15 @@ func (k Keeper) CampaignDeposit(ctx sdk.Context, campaignId uint64, depositor sd
 	campaign.AvailableTokens.Fungible.Amount = campaign.AvailableTokens.Fungible.Amount.Add(amount.Amount)
 
 	k.SetCampaign(ctx, campaign)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeCampaignDeposit,
+			sdk.NewAttribute(types.AttributeKeyCampaignId, fmt.Sprint(campaign.GetId())),
+			sdk.NewAttribute(types.AttributeKeyAmount, amount.String()),
+			sdk.NewAttribute(types.AttributeKeyDepositor, depositor.String()),
+		),
+	)
 
 	return nil
 }
