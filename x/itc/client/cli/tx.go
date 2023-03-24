@@ -47,11 +47,12 @@ func GetCmdCreateCampaign() *cobra.Command {
 				"--duration=<duration> "+
 				"--claim-type=<claim-type> "+
 				"--max-allowed-claims=<max-claims> "+
-				"--claimable-tokens=<claimable-tokens> "+
-				"--total-tokens=<total-tokens> "+
+				"--tokens-per-claim=<tokens-per-claim> "+
+				"--deposit=<token deposit> "+
 				"--distribution-type=<distr-type> "+
 				"--interaction-type=<interaction-type> "+
 				"--nft-denom-id=<denom-id> "+
+				"--nft-details-file=<path/to/nft-details> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee> ",
@@ -105,35 +106,6 @@ func GetCmdCreateCampaign() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			claimableTokensStr, err := cmd.Flags().GetString(FlagClaimableTokens)
-			if err != nil {
-				return err
-			}
-			claimTokens, err := sdk.ParseCoinNormalized(claimableTokensStr)
-			if err != nil {
-				return err
-			}
-			claimableTokens := types.Tokens{
-				Fungible: &claimTokens,
-			}
-			totalTokensStr, err := cmd.Flags().GetString(FlagTotalTokens)
-			if err != nil {
-				return err
-			}
-			tokensDeposit, err := sdk.ParseCoinNormalized(totalTokensStr)
-			if err != nil {
-				return err
-			}
-			totalTokens := types.Tokens{
-				Fungible: &tokensDeposit,
-			}
-			_, err = cmd.Flags().GetString(FlagDistributionType)
-			if err != nil {
-				return err
-			}
-			distribution := &types.Distribution{
-				Type: types.DISTRIBUTION_TYPE_INSTANT,
-			}
 			startTimeStr, err := cmd.Flags().GetString(FlagStartTime)
 			if err != nil {
 				return err
@@ -155,6 +127,47 @@ func GetCmdCreateCampaign() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			var claimTokens, depositTokens types.Tokens
+			var distribution *types.Distribution
+			if claim == types.CLAIM_TYPE_FT {
+				tokensPerClaimStr, err := cmd.Flags().GetString(FlagTokensPerClaim)
+				if err != nil {
+					return err
+				}
+				tokensPerClaim, err := sdk.ParseCoinNormalized(tokensPerClaimStr)
+				if err != nil {
+					return err
+				}
+				claimTokens = types.Tokens{
+					Fungible: &tokensPerClaim,
+				}
+				tokensDepositStr, err := cmd.Flags().GetString(FlagDeposit)
+				if err != nil {
+					return err
+				}
+				tokensDeposit, err := sdk.ParseCoinNormalized(tokensDepositStr)
+				if err != nil {
+					return err
+				}
+				depositTokens = types.Tokens{
+					Fungible: &tokensDeposit,
+				}
+				_, err = cmd.Flags().GetString(FlagDistributionType)
+				if err != nil {
+					return err
+				}
+				distribution = &types.Distribution{
+					Type: types.DISTRIBUTION_TYPE_INSTANT,
+				}
+			}
+
+			var nftDetails *types.NFTDetails
+			if claim == types.CLAIM_TYPE_NFT || claim == types.CLAIM_TYPE_FT_AND_NFT {
+				nftDetails, err = parseNftDetails(cmd.Flags())
+				if err != nil {
+					return err
+				}
+			}
 
 			msg := types.NewMsgCreateCampaign(name,
 				description,
@@ -162,15 +175,15 @@ func GetCmdCreateCampaign() *cobra.Command {
 				claim,
 				nftDenomId,
 				maxAllowedClaims,
-				claimableTokens,
-				totalTokens,
-				nil,
+				claimTokens,
+				depositTokens,
+				nftDetails,
 				distribution,
 				startTime,
 				duration,
 				creator.String(),
 			)
-
+			fmt.Printf("%v", msg)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -187,8 +200,6 @@ func GetCmdCreateCampaign() *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagInteractionType)
 	_ = cmd.MarkFlagRequired(FlagStartTime)
 	_ = cmd.MarkFlagRequired(FlagDuration)
-	_ = cmd.MarkFlagRequired(FlagClaimableTokens)
-	_ = cmd.MarkFlagRequired(FlagTotalTokens)
 	_ = cmd.MarkFlagRequired(FlagMaxAllowedClaims)
 	flags.AddTxFlagsToCmd(cmd)
 

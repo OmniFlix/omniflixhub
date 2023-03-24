@@ -105,15 +105,6 @@ func ValidateTokensWithClaimType(claimType ClaimType, tokens Tokens) error {
 			)
 		}
 	}
-	if claimType == CLAIM_TYPE_NFT {
-		if !(tokens.NonFungible.IsValid() && tokens.NonFungible.IsPositive()) {
-			return sdkerrors.Wrapf(
-				ErrInvalidTokens,
-				"invalid tokens %s, only accepts positive amount",
-				tokens.String(),
-			)
-		}
-	}
 	return nil
 }
 

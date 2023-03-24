@@ -10,19 +10,18 @@ const (
 	FlagName             = "name"
 	FlagDescription      = "description"
 	FlagMaxAllowedClaims = "max-allowed-claims"
-	FlagClaimableTokens  = "claimable-tokens"
-	FlagTotalTokens      = "total-tokens"
+	FlagTokensPerClaim   = "tokens-per-claim"
+	FlagDeposit          = "deposit"
 	FlagCreator          = "creator"
 	FlagStatus           = "status"
 	FlagClaimer          = "claimer"
-	FlagCoinDenom        = "coin-denom"
-	Flag
 	FlagStartTime        = "start-time"
 	FlagDuration         = "duration"
 	FlagAmount           = "amount"
 	FlagInteractionType  = "interaction-type"
 	FlagClaimType        = "claim-type"
 	FlagDistributionType = "distribution-type"
+	FlagNftDetailsFile   = "nft-details-file"
 )
 
 var (
@@ -38,11 +37,12 @@ func init() {
 	FsCreateCampaign.String(FlagClaimType, "", "type of claim")
 	FsCreateCampaign.String(FlagNftDenomId, "", "nft denom id")
 	FsCreateCampaign.Uint64(FlagMaxAllowedClaims, 0, "maximum allowed claims for campaign")
-	FsCreateCampaign.String(FlagClaimableTokens, "", "tokens per claim")
-	FsCreateCampaign.String(FlagTotalTokens, "", "tokens to deposit the campaign")
+	FsCreateCampaign.String(FlagTokensPerClaim, "", "tokens per claim")
+	FsCreateCampaign.String(FlagDeposit, "", "tokens to deposit the campaign")
 	FsCreateCampaign.String(FlagStartTime, "", "campaign start time")
 	FsCreateCampaign.String(FlagDuration, "", "campaign duration")
 	FsCreateCampaign.String(FlagDistributionType, "", "type of distribution")
+	FsCreateCampaign.String(FlagNftDetailsFile, "", "nft details file")
 
 	FsCampaignDeposit.String(FlagAmount, "", "deposit amount")
 
