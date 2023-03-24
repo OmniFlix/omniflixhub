@@ -26,6 +26,7 @@ func GetTxCmd() *cobra.Command {
 	}
 	itcTxCmd.AddCommand(
 		GetCmdCreateCampaign(),
+		GetCmdCancelCampaign(),
 		GetCmdCampaignDeposit(),
 		GetCmdClaim(),
 	)
@@ -189,6 +190,45 @@ func GetCmdCreateCampaign() *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagClaimableTokens)
 	_ = cmd.MarkFlagRequired(FlagTotalTokens)
 	_ = cmd.MarkFlagRequired(FlagMaxAllowedClaims)
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdCancelCampaign implements the campaign cancel command
+func GetCmdCancelCampaign() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "cancel-campaign",
+		Short: "cancels the campaign before start",
+		Example: fmt.Sprintf(
+			"$ %s tx itc cancel-campaign [campaign-id] "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			creator := clientCtx.GetFromAddress()
+			campaignId, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgCancelCampaign(campaignId, creator.String())
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
