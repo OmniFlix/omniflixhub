@@ -24,7 +24,18 @@ func (c Claim) GetCampaignId() uint64 {
 	return c.CampaignId
 }
 
+func (c Claim) GetNftId() string {
+	return c.NftId
+}
+
+func (c Claim) GetInteractionType() string {
+	return c.Interaction.String()
+}
+
 func (c Claim) GetAddress() sdk.AccAddress {
-	address, _ := sdk.AccAddressFromBech32(c.Address)
+	address, err := sdk.AccAddressFromBech32(c.Address)
+	if err != nil {
+		return nil
+	}
 	return address
 }

@@ -1,13 +1,11 @@
 package types
 
 import (
+	"github.com/OmniFlix/omniflixhub/x/itc/exported"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	gogotypes "github.com/gogo/protobuf/types"
-
-	"github.com/OmniFlix/omniflixhub/x/itc/exported"
 )
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
@@ -48,15 +46,4 @@ func init() {
 	RegisterLegacyAminoCodec(amino)
 	cryptocodec.RegisterCrypto(amino)
 	amino.Seal()
-}
-
-func MustMarshalListingID(cdc codec.BinaryCodec, listingId string) []byte {
-	listingIdWrap := gogotypes.StringValue{Value: listingId}
-	return cdc.MustMarshal(&listingIdWrap)
-}
-
-func MustUnMarshalListingID(cdc codec.BinaryCodec, value []byte) string {
-	var listingIdWrap gogotypes.StringValue
-	cdc.MustUnmarshal(value, &listingIdWrap)
-	return listingIdWrap.Value
 }

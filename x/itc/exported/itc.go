@@ -17,7 +17,7 @@ type CampaignI interface {
 	GetClaimType() string
 	GetInteraction() string
 	GetCreator() sdk.AccAddress
-	GetClaimableTokens() interface{}
+	GetTokensPerClaim() interface{}
 	GetTotalTokens() interface{}
 	GetAvailableTokens() interface{}
 	GetReceivedNftIds() []string
@@ -29,4 +29,6 @@ type CampaignI interface {
 type ClaimI interface {
 	GetCampaignId() uint64
 	GetAddress() sdk.AccAddress
+	GetNftId() string
+	GetInteractionType() string
 }

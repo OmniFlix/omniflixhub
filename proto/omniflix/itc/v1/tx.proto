@@ -26,14 +26,14 @@ message MsgCreateCampaign {
   InteractionType             interaction = 3;
   ClaimType                   claim_type = 4 [(gogoproto.moretags) = "yaml:\"claim_type\""];
   string                      nft_denom_id = 5 [(gogoproto.moretags) = "yaml:\"nft_denom_id\""];
-  Tokens                      claimable_tokens = 6 [
+  Tokens                      tokens_per_claim = 6 [
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"claimable_tokens\""
   ];
   uint64                      max_allowed_claims = 7 [
     (gogoproto.moretags) = "yaml:\"max_allowed_claims\""
   ];
-  Tokens                      total_tokens = 8 [
+  Tokens                      deposit = 8 [
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"total_tokens\""
   ];

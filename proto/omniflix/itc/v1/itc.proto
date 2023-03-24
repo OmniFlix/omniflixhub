@@ -33,9 +33,9 @@ message Campaign {
   ];
   InteractionType                   interaction = 9;
   ClaimType                         claim_type = 10;
-  Tokens                            claimable_tokens = 11 [
+  Tokens                            tokens_per_claim = 11 [
     (gogoproto.nullable) = false,
-    (gogoproto.moretags) = "yaml:\"claimable_tokens\""
+    (gogoproto.moretags) = "yaml:\"tokens_per_claim\""
   ];
   Tokens                            total_tokens = 12 [
     (gogoproto.nullable) = false,
@@ -108,6 +108,7 @@ message NFTDetails {
   bool       transferable = 7;
   bool       extensible = 8;
   bool       nsfw = 9;
+  string     data = 10;
 }
 
 message Claim {

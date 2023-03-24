@@ -26,7 +26,7 @@ func NewMsgCreateCampaign(name, description string,
 	interaction InteractionType, claimType ClaimType,
 	nftDenomId string,
 	maxAllowedClaims uint64,
-	claimableTokens, totalTokens Tokens,
+	tokensPerClaim, tokenDeposit Tokens,
 	nftMintDetails *NFTDetails,
 	distribution *Distribution,
 	startTime time.Time,
@@ -40,8 +40,8 @@ func NewMsgCreateCampaign(name, description string,
 		ClaimType:        claimType,
 		NftDenomId:       nftDenomId,
 		MaxAllowedClaims: maxAllowedClaims,
-		ClaimableTokens:  claimableTokens,
-		TotalTokens:      totalTokens,
+		TokensPerClaim:   tokensPerClaim,
+		Deposit:          tokenDeposit,
 		NftMintDetails:   nftMintDetails,
 		Distribution:     distribution,
 		StartTime:        startTime,
@@ -54,8 +54,6 @@ func (msg MsgCreateCampaign) Route() string { return MsgRoute }
 
 func (msg MsgCreateCampaign) Type() string { return TypeMsgCreateCampaign }
 
-// TODO: validations required
-
 func (msg MsgCreateCampaign) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
@@ -67,10 +65,10 @@ func (msg MsgCreateCampaign) ValidateBasic() error {
 	if err := ValidateInteractionType(msg.Interaction); err != nil {
 		return err
 	}
-	if err := ValidateTokensWithClaimType(msg.ClaimType, msg.TotalTokens); err != nil {
+	if err := ValidateTokensWithClaimType(msg.ClaimType, msg.Deposit); err != nil {
 		return err
 	}
-	if err := ValidateTokensWithClaimType(msg.ClaimType, msg.ClaimableTokens); err != nil {
+	if err := ValidateTokensWithClaimType(msg.ClaimType, msg.TokensPerClaim); err != nil {
 		return err
 	}
 	if msg.ClaimType == CLAIM_TYPE_NFT {
@@ -86,6 +84,11 @@ func (msg MsgCreateCampaign) ValidateBasic() error {
 	if msg.MaxAllowedClaims == 0 {
 		return sdkerrors.Wrapf(ErrInValidMaxAllowedClaims,
 			"max allowed claims must be a positive number (%d)", msg.MaxAllowedClaims)
+	}
+	if msg.NftMintDetails != nil {
+		if err := validateNFTMintDetails(msg.NftMintDetails); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -114,8 +117,6 @@ func NewMsgCancelCampaign(id uint64, creator string) *MsgCancelCampaign {
 func (msg MsgCancelCampaign) Route() string { return MsgRoute }
 
 func (msg MsgCancelCampaign) Type() string { return TypeMsgCancelCampaign }
-
-// TODO: validations required
 
 func (msg MsgCancelCampaign) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
@@ -151,14 +152,12 @@ func (msg MsgCampaignDeposit) Route() string { return MsgRoute }
 
 func (msg MsgCampaignDeposit) Type() string { return TypeMsgCampaignDeposit }
 
-// TODO: validations required
-
 func (msg MsgCampaignDeposit) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid depositor address (%s)", err)
 	}
-	if !msg.Amount.IsValid() && msg.Amount.IsZero() {
+	if !msg.Amount.IsValid() && msg.Amount.IsNegative() && msg.Amount.IsZero() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins,
 			"amount must be valid and positive (%s)", msg.Amount.String())
 	}
@@ -194,14 +193,12 @@ func (msg MsgClaim) Route() string { return MsgRoute }
 
 func (msg MsgClaim) Type() string { return TypeMsgClaim }
 
-// TODO: validations required
-
 func (msg MsgClaim) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Claimer)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid claimer address (%s)", err)
 	}
-	return nil
+	return ValidateInteractionType(msg.Interaction)
 }
 
 // GetSignBytes Implements Msg.

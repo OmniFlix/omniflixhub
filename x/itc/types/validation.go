@@ -21,7 +21,7 @@ func ValidateCampaign(campaign Campaign) error {
 	if err := ValidateTokensWithClaimType(campaign.ClaimType, campaign.TotalTokens); err != nil {
 		return err
 	}
-	if err := ValidateTokensWithClaimType(campaign.ClaimType, campaign.ClaimableTokens); err != nil {
+	if err := ValidateTokensWithClaimType(campaign.ClaimType, campaign.TokensPerClaim); err != nil {
 		return err
 	}
 	if campaign.ClaimType == CLAIM_TYPE_NFT {
@@ -118,10 +118,10 @@ func ValidateTokensWithClaimType(claimType ClaimType, tokens Tokens) error {
 }
 
 func validateNFTMintDetails(details *NFTDetails) error {
-	if details == nil || len(details.Name) == 0 {
+	if details == nil || len(details.Name) == 0 || len(details.DenomId) == 0 || len(details.MediaUri) == 0 {
 		return sdkerrors.Wrapf(
-			ErrInvalidTokens,
-			"invalid nft mint details, details should not be nil and name can not be empty.")
+			ErrInvalidNFTMintDetails,
+			"invalid nft mint details, details should not be nil and name, media_uri can not be empty.")
 	}
 	return nil
 }

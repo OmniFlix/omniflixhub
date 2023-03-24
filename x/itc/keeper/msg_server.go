@@ -43,7 +43,7 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 			"duration must be less than max campaign duration (%d)", m.Keeper.GetMaxCampaignDuration(ctx))
 	}
 
-	availableTokens := msg.TotalTokens
+	availableTokens := msg.Deposit
 	campaignNumber := m.Keeper.GetNextCampaignNumber(ctx)
 	campaign := types.NewCampaign(campaignNumber,
 		msg.Name,
@@ -55,8 +55,8 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 		msg.MaxAllowedClaims,
 		msg.Interaction,
 		msg.ClaimType,
-		msg.ClaimableTokens,
-		msg.TotalTokens,
+		msg.TokensPerClaim,
+		msg.Deposit,
 		availableTokens,
 		msg.NftMintDetails,
 		msg.Distribution,

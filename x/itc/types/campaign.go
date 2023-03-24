@@ -21,7 +21,7 @@ func NewCampaign(id uint64,
 	maxAllowedClaims uint64,
 	interaction InteractionType,
 	claimType ClaimType,
-	claimableTokens, totalTokens, availableTokens Tokens,
+	tokensPerClaim, totalTokens, availableTokens Tokens,
 	nftMintDetails *NFTDetails,
 	distribution *Distribution,
 ) Campaign {
@@ -36,7 +36,7 @@ func NewCampaign(id uint64,
 		MaxAllowedClaims: maxAllowedClaims,
 		Interaction:      interaction,
 		ClaimType:        claimType,
-		ClaimableTokens:  claimableTokens,
+		TokensPerClaim:   tokensPerClaim,
 		TotalTokens:      totalTokens,
 		AvailableTokens:  availableTokens,
 		ReceivedNftIds:   []string{},
@@ -86,8 +86,8 @@ func (c Campaign) GetClaimType() string {
 	return c.ClaimType.String()
 }
 
-func (c Campaign) GetClaimableTokens() interface{} {
-	return c.ClaimableTokens
+func (c Campaign) GetTokensPerClaim() interface{} {
+	return c.TokensPerClaim
 }
 
 func (c Campaign) GetTotalTokens() interface{} {

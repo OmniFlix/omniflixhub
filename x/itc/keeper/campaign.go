@@ -102,7 +102,7 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 	}
 
 	if campaign.ClaimType == types.CLAIM_TYPE_FT {
-		if campaign.AvailableTokens.Fungible.IsLT(*campaign.ClaimableTokens.Fungible) {
+		if campaign.AvailableTokens.Fungible.IsLT(*campaign.TokensPerClaim.Fungible) {
 			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
 				"insufficient available tokens, available tokens  %s",
 				campaign.AvailableTokens.Fungible.String(),
@@ -133,22 +133,22 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 
 	// Claim Claimable
 	if campaign.ClaimType == types.CLAIM_TYPE_FT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
-		claimableTokens := campaign.ClaimableTokens.Fungible
+		tokensPerClaim := campaign.TokensPerClaim.Fungible
 		if campaign.Distribution != nil && campaign.Distribution.Type == types.DISTRIBUTION_TYPE_VEST {
-			// TODO: add vesting based on vesting periods
+			// TODO: add vesting based on vesting periods if possible
 			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
 				types.ModuleName, claimer,
-				sdk.NewCoins(sdk.NewCoin(claimableTokens.Denom, claimableTokens.Amount))); err != nil {
+				sdk.NewCoins(sdk.NewCoin(tokensPerClaim.Denom, tokensPerClaim.Amount))); err != nil {
 				return err
 			}
 		} else {
 			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
 				types.ModuleName, claimer,
-				sdk.NewCoins(sdk.NewCoin(claimableTokens.Denom, claimableTokens.Amount))); err != nil {
+				sdk.NewCoins(sdk.NewCoin(tokensPerClaim.Denom, tokensPerClaim.Amount))); err != nil {
 				return err
 			}
 		}
-		availableTokensAmount := campaign.AvailableTokens.Fungible.Amount.Sub(claimableTokens.Amount)
+		availableTokensAmount := campaign.AvailableTokens.Fungible.Amount.Sub(tokensPerClaim.Amount)
 		campaign.AvailableTokens.Fungible.Amount = availableTokensAmount
 	} else {
 		if err := k.nftKeeper.MintONFT(
@@ -161,7 +161,7 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 				MediaURI:    campaign.NftMintDetails.MediaUri,
 				PreviewURI:  campaign.NftMintDetails.PreviewUri,
 			},
-			"",
+			campaign.NftMintDetails.Data,
 			campaign.NftMintDetails.Transferable,
 			campaign.NftMintDetails.Extensible,
 			campaign.NftMintDetails.Nsfw,
