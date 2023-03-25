@@ -35,7 +35,7 @@ message MsgCreateCampaign {
   ];
   Tokens                      deposit = 8 [
     (gogoproto.nullable) = false,
-    (gogoproto.moretags) = "yaml:\"total_tokens\""
+    (gogoproto.moretags) = "yaml:\"deposit\""
   ];
   NFTDetails                  nft_mint_details = 9 [(gogoproto.moretags) = "yaml:\"nft_details\""];
   google.protobuf.Timestamp   start_time = 10 [
