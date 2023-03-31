@@ -176,7 +176,7 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 		}
 		availableTokensAmount := campaign.AvailableTokens.Fungible.Amount.Sub(tokensPerClaim.Amount)
 		campaign.AvailableTokens.Fungible.Amount = availableTokensAmount
-	} else {
+	} else if campaign.ClaimType == types.CLAIM_TYPE_NFT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
 		if err := k.nftKeeper.MintONFT(
 			ctx,
 			campaign.NftMintDetails.DenomId,
