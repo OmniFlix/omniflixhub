@@ -655,6 +655,7 @@ func NewOmniFlixApp(
 				SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 			},
+			GovKeeper: app.GovKeeper,
 			IBCKeeper: app.IBCKeeper,
 			Codec:     appCodec,
 		},
