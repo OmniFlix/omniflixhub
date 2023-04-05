@@ -17,7 +17,8 @@ type MinimumInitialDepositDecorator struct {
 }
 
 func NewMinimumInitialDepositDecorator(
-	cdc codec.BinaryCodec, govKeeper govkeeper.Keeper) MinimumInitialDepositDecorator {
+	cdc codec.BinaryCodec, govKeeper govkeeper.Keeper,
+) MinimumInitialDepositDecorator {
 	return MinimumInitialDepositDecorator{
 		govKeeper: govKeeper,
 		cdc:       cdc,
@@ -69,7 +70,6 @@ func (midd MinimumInitialDepositDecorator) Validate(ctx sdk.Context, msgs []sdk.
 func (midd MinimumInitialDepositDecorator) AnteHandle(
 	ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler,
 ) (newCtx sdk.Context, err error) {
-
 	msgs := tx.GetMsgs()
 	if err := midd.Validate(ctx, msgs); err != nil {
 		return ctx, err
@@ -79,7 +79,8 @@ func (midd MinimumInitialDepositDecorator) AnteHandle(
 }
 
 func (midd MinimumInitialDepositDecorator) calculateMinimumInitialDeposit(
-	minDeposit sdk.Coins) (minimumInitialDeposit sdk.Coins) {
+	minDeposit sdk.Coins,
+) (minimumInitialDeposit sdk.Coins) {
 	for _, coin := range minDeposit {
 		minimumInitialCoin := MinimumInitialDepositRate.MulInt(coin.Amount).RoundInt()
 		minimumInitialDeposit = minimumInitialDeposit.Add(sdk.NewCoin(coin.Denom, minimumInitialCoin))
