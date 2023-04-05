@@ -465,9 +465,13 @@ func NewOmniFlixApp(
 	app.ONFTKeeper = onftkeeper.NewKeeper(
 		appCodec,
 		keys[onfttypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.DistrKeeper,
+		app.GetSubspace(onfttypes.ModuleName),
 	)
 
-	onftModule := onft.NewAppModule(appCodec, app.ONFTKeeper, app.AccountKeeper, app.BankKeeper)
+	onftModule := onft.NewAppModule(appCodec, app.ONFTKeeper, app.AccountKeeper, app.BankKeeper, app.DistrKeeper)
 
 	app.MarketplaceKeeper = marketplacekeeper.NewKeeper(
 		appCodec,
