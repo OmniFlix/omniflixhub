@@ -17,5 +17,4 @@ linters:
     - ineffassign
     - misspell
     - nakedret
-    - revive
     - unused
