@@ -7,8 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/OmniFlix/omniflixhub/app/openapiconsole"
 	appparams "github.com/OmniFlix/omniflixhub/app/params"
-
 	customAuthRest "github.com/OmniFlix/omniflixhub/custom/auth/client/rest"
 	"github.com/OmniFlix/omniflixhub/docs"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -89,7 +89,7 @@ import (
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 	"github.com/spf13/cast"
-	"github.com/tendermint/spm/openapiconsole"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
