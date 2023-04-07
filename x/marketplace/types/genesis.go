@@ -1,6 +1,9 @@
 package types
 
-import sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+import (
+	errorsmod "cosmossdk.io/errors"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+)
 
 func NewGenesisState(listings []Listing, listingCount uint64, params Params,
 	auctions []AuctionListing, bids []Bid, nextAuctionNumber uint64,
