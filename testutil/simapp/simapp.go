@@ -21,7 +21,6 @@ func New(dir string) *app.App {
 	encoding := app.MakeEncodingConfig()
 
 	a := app.NewOmniFlixApp(logger, db, nil, true, map[int64]bool{}, dir, 0, encoding,
-		// this line is used by starport scaffolding # stargate/testutil/appArgument
 		simapp.EmptyAppOptions{})
 	// InitChain updates deliverState which is required when app.NewContext is called
 	a.InitChain(abci.RequestInitChain{

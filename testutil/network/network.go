@@ -28,6 +28,7 @@ type (
 // New creates instance with fully configured cosmos network.
 // Accepts optional config, that will be used in place of the DefaultConfig() if provided.
 func New(t *testing.T, configs ...network.Config) *network.Network {
+	t.Helper()
 	if len(configs) > 1 {
 		panic("at most one config should be provided")
 	}
@@ -56,7 +57,6 @@ func DefaultConfig() network.Config {
 			return app.NewOmniFlixApp(
 				val.Ctx.Logger, tmdb.NewMemDB(), nil, true, map[int64]bool{}, val.Ctx.Config.RootDir, 0,
 				encoding,
-				// this line is used by starport scaffolding # stargate/testutil/appArgument
 				simapp.EmptyAppOptions{},
 				baseapp.SetPruning(storetypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
 				baseapp.SetMinGasPrices(val.AppConfig.MinGasPrices),
