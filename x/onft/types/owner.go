@@ -9,7 +9,7 @@ import (
 // NewIDCollection creates a new IDCollection instance
 func NewIDCollection(denomId string, onftIds []string) IDCollection {
 	return IDCollection{
-		DenomId:  denomId,
+		DenomId: denomId,
 		OnftIds: onftIds,
 	}
 }
@@ -38,7 +38,7 @@ func (idcs IDCollections) Add(denomId, onftId string) IDCollections {
 		}
 	}
 	return append(idcs, IDCollection{
-		DenomId:  denomId,
+		DenomId: denomId,
 		OnftIds: []string{onftId},
 	})
 }

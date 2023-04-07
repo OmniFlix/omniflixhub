@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	errorsmod "cosmossdk.io/errors"
 	abci "github.com/cometbft/cometbft/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -35,7 +36,7 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 		case types.QueryAllBids:
 			return queryAllBids(ctx, req, k, legacyQuerierCdc)
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
+			return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
 		}
 	}
 }
@@ -45,7 +46,7 @@ func queryParams(ctx sdk.Context, _ []string, _ abci.RequestQuery, k Keeper, leg
 
 	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, params)
 	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+		return nil, errorsmod.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
 
 	return res, nil
@@ -56,14 +57,14 @@ func queryListing(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerie
 
 	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+		return nil, errorsmod.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	id := strings.ToLower(strings.TrimSpace(params.Id))
 
 	listing, found := k.GetListing(ctx, id)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrListingDoesNotExists, fmt.Sprintf("listing %s does not exist", id))
+		return nil, errorsmod.Wrap(types.ErrListingDoesNotExists, fmt.Sprintf("listing %s does not exist", id))
 	}
 	return codec.MarshalJSONIndent(legacyQuerierCdc, listing)
 }
@@ -73,7 +74,7 @@ func queryAllListings(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQu
 
 	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+		return nil, errorsmod.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	listings := k.GetAllListings(ctx)
@@ -86,7 +87,7 @@ func queryListingsByOwner(ctx sdk.Context, req abci.RequestQuery, k Keeper, lega
 
 	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+		return nil, errorsmod.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	listings := k.GetListingsByOwner(ctx, params.Owner)
@@ -98,12 +99,12 @@ func queryAuction(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerie
 
 	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+		return nil, errorsmod.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	auction, found := k.GetAuctionListing(ctx, params.Id)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrAuctionDoesNotExists, fmt.Sprintf("auction %d does not exist", params.Id))
+		return nil, errorsmod.Wrap(types.ErrAuctionDoesNotExists, fmt.Sprintf("auction %d does not exist", params.Id))
 	}
 	return codec.MarshalJSONIndent(legacyQuerierCdc, auction)
 }
@@ -113,7 +114,7 @@ func queryAllAuctions(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQu
 
 	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+		return nil, errorsmod.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	auctions := k.GetAllAuctionListings(ctx)
@@ -126,7 +127,7 @@ func queryAuctionsByOwner(ctx sdk.Context, req abci.RequestQuery, k Keeper, lega
 
 	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+		return nil, errorsmod.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	auctions := k.GetAuctionListingsByOwner(ctx, params.Owner)
@@ -138,12 +139,12 @@ func queryBid(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerierCdc
 
 	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+		return nil, errorsmod.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	bid, found := k.GetBid(ctx, params.Id)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrBidDoesNotExists, fmt.Sprintf("auction %d does not have any bid", params.Id))
+		return nil, errorsmod.Wrap(types.ErrBidDoesNotExists, fmt.Sprintf("auction %d does not have any bid", params.Id))
 	}
 	return codec.MarshalJSONIndent(legacyQuerierCdc, bid)
 }
@@ -153,7 +154,7 @@ func queryAllBids(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerie
 
 	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+		return nil, errorsmod.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	bids := k.GetAllBids(ctx)

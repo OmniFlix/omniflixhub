@@ -2,5 +2,5 @@ package types
 
 var (
 	AttributeValueCategory = ModuleName
-	AttributeKeySender      = "sender"
+	AttributeKeySender     = "sender"
 )

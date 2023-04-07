@@ -94,7 +94,7 @@ func (msg MsgEditListing) Type() string { return TypeMsgEditListing }
 func (msg MsgEditListing) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 	return ValidatePrice(msg.Price)
 }
@@ -135,7 +135,7 @@ func (msg MsgDeListNFT) Type() string { return TypeMsgDeListNFT }
 func (msg MsgDeListNFT) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 	return nil
 }
@@ -177,7 +177,7 @@ func (msg MsgBuyNFT) Type() string { return TypeMsgBuyNFT }
 func (msg MsgBuyNFT) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Buyer)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return ValidatePrice(msg.Price)
 }
@@ -203,7 +203,8 @@ func (msg MsgBuyNFT) GetSigners() []sdk.AccAddress {
 // Auction messages
 
 func NewMsgCreateAuction(denomId, nftId string, startTime time.Time, duration *time.Duration, startPrice sdk.Coin, owner sdk.AccAddress,
-	incrementPercentage sdk.Dec, whitelistAccounts []string, splitShares []WeightedAddress) *MsgCreateAuction {
+	incrementPercentage sdk.Dec, whitelistAccounts []string, splitShares []WeightedAddress,
+) *MsgCreateAuction {
 	return &MsgCreateAuction{
 		NftId:               nftId,
 		DenomId:             denomId,
@@ -224,7 +225,7 @@ func (msg MsgCreateAuction) Type() string { return TypeMsgCreateAuction }
 func (msg MsgCreateAuction) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	if err = ValidatePrice(msg.StartPrice); err != nil {
 		return err
@@ -235,7 +236,7 @@ func (msg MsgCreateAuction) ValidateBasic() error {
 		}
 	}
 	if !msg.IncrementPercentage.IsPositive() || !msg.IncrementPercentage.LTE(sdk.NewDec(1)) {
-		return sdkerrors.Wrapf(ErrInvalidPercentage, "invalid percentage value (%s)", msg.IncrementPercentage.String())
+		return errorsmod.Wrapf(ErrInvalidPercentage, "invalid percentage value (%s)", msg.IncrementPercentage.String())
 	}
 	if err = ValidateSplitShares(msg.SplitShares); err != nil {
 		return err
@@ -245,12 +246,13 @@ func (msg MsgCreateAuction) ValidateBasic() error {
 	}
 	return nil
 }
+
 func (msg MsgCreateAuction) Validate(now time.Time) error {
 	if err := msg.ValidateBasic(); err != nil {
 		return err
 	}
 	if msg.StartTime.Before(now) {
-		return sdkerrors.Wrapf(ErrInvalidStartTime, "start time must be after current time %s", now.String())
+		return errorsmod.Wrapf(ErrInvalidStartTime, "start time must be after current time %s", now.String())
 	}
 	return nil
 }
@@ -287,7 +289,7 @@ func (msg MsgCancelAuction) Type() string { return TypeMsgCancelAuction }
 func (msg MsgCancelAuction) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 	return nil
 }
@@ -325,7 +327,7 @@ func (msg MsgPlaceBid) Type() string { return TypeMsgPlaceBid }
 func (msg MsgPlaceBid) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Bidder)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid bidder address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid bidder address (%s)", err)
 	}
 	if err := ValidatePrice(msg.Amount); err != nil {
 		return err

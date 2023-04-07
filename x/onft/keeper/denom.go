@@ -1,8 +1,8 @@
 package keeper
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 )
@@ -35,7 +35,7 @@ func (k Keeper) GetDenom(ctx sdk.Context, id string) (denom types.Denom, err err
 
 	bz := store.Get(types.KeyDenomID(id))
 	if bz == nil || len(bz) == 0 {
-		return denom, sdkerrors.Wrapf(types.ErrInvalidDenom, "not found denomID: %s", id)
+		return denom, errorsmod.Wrapf(types.ErrInvalidDenom, "not found denomID: %s", id)
 	}
 
 	k.cdc.MustUnmarshal(bz, &denom)
@@ -75,7 +75,7 @@ func (k Keeper) AuthorizeDenomCreator(ctx sdk.Context, id string, creator sdk.Ac
 	}
 
 	if creator.String() != denom.Creator {
-		return types.Denom{}, sdkerrors.Wrap(types.ErrUnauthorized, creator.String())
+		return types.Denom{}, errorsmod.Wrap(types.ErrUnauthorized, creator.String())
 	}
 	return denom, nil
 }

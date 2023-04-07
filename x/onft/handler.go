@@ -40,7 +40,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "%s", msg)
+			return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "%s", msg)
 		}
 	}
 }

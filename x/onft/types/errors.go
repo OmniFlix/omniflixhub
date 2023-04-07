@@ -3,7 +3,7 @@ package types
 // DONTCOVER
 
 import (
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	sdkerrors "cosmossdk.io/errors"
 )
 
 // x/nft module sentinel errors
@@ -30,6 +30,6 @@ var (
 	ErrInvalidDenomCreationFee = sdkerrors.Register(ModuleName, 22, "invalid denom creation fee")
 	ErrInvalidFeeDenom         = sdkerrors.Register(ModuleName, 23, "invalid creation fee denom")
 	ErrNotEnoughFeeAmount      = sdkerrors.Register(ModuleName, 24, "invalid creation fee amount")
-	
+
 	// this line is used by starport scaffolding # ibc/errors
 )

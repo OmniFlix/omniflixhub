@@ -1,10 +1,13 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"strings"
 	"unicode/utf8"
+
+	errorsmod "cosmossdk.io/errors"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
@@ -53,14 +56,14 @@ func (msg MsgCreateDenom) ValidateBasic() error {
 	}
 	name := strings.TrimSpace(msg.Name)
 	if len(name) > 0 && !utf8.ValidString(name) {
-		return sdkerrors.Wrap(ErrInvalidName, "denom name is invalid")
+		return errorsmod.Wrap(ErrInvalidName, "denom name is invalid")
 	}
 	if err := ValidateName(name); err != nil {
 		return err
 	}
 	description := strings.TrimSpace(msg.Description)
 	if len(description) > 0 && !utf8.ValidString(description) {
-		return sdkerrors.Wrap(ErrInvalidDescription, "denom description is invalid")
+		return errorsmod.Wrap(ErrInvalidDescription, "denom description is invalid")
 	}
 	if err := ValidateDescription(description); err != nil {
 		return err
@@ -73,7 +76,7 @@ func (msg MsgCreateDenom) ValidateBasic() error {
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
 }
@@ -112,14 +115,14 @@ func (msg MsgUpdateDenom) ValidateBasic() error {
 	}
 	name := msg.Name
 	if len(name) > 0 && !utf8.ValidString(name) {
-		return sdkerrors.Wrap(ErrInvalidName, "denom name is invalid")
+		return errorsmod.Wrap(ErrInvalidName, "denom name is invalid")
 	}
 	if err := ValidateName(name); err != nil {
 		return err
 	}
 	description := strings.TrimSpace(msg.Description)
 	if len(description) > 0 && !utf8.ValidString(description) {
-		return sdkerrors.Wrap(ErrInvalidDescription, "denom description is invalid")
+		return errorsmod.Wrap(ErrInvalidDescription, "denom description is invalid")
 	}
 	if err := ValidateDescription(description); err != nil {
 		return err
@@ -129,7 +132,7 @@ func (msg MsgUpdateDenom) ValidateBasic() error {
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
 }
@@ -162,11 +165,11 @@ func (msg MsgTransferDenom) Type() string { return TypeMsgTransferDenom }
 
 func (msg MsgTransferDenom) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address; %s", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address; %s", err)
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address; %s", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address; %s", err)
 	}
 	return nil
 }
@@ -186,8 +189,8 @@ func (msg MsgTransferDenom) GetSigners() []sdk.AccAddress {
 
 func NewMsgMintONFT(
 	denomId, sender, recipient string, metadata Metadata, data string,
-	transferable, extensible, nsfw bool, royaltyShare sdk.Dec) *MsgMintONFT {
-
+	transferable, extensible, nsfw bool, royaltyShare sdk.Dec,
+) *MsgMintONFT {
 	return &MsgMintONFT{
 		Id:           GenUniqueID(IDPrefix),
 		DenomId:      denomId,
@@ -207,13 +210,12 @@ func (msg MsgMintONFT) Route() string { return RouterKey }
 func (msg MsgMintONFT) Type() string { return TypeMsgMintONFT }
 
 func (msg MsgMintONFT) ValidateBasic() error {
-
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address; %s", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address; %s", err)
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address; %s", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address; %s", err)
 	}
 	if err := ValidateName(msg.Metadata.Name); err != nil {
 		return err
@@ -228,7 +230,7 @@ func (msg MsgMintONFT) ValidateBasic() error {
 		return err
 	}
 	if msg.RoyaltyShare.IsNegative() || msg.RoyaltyShare.GTE(sdk.NewDec(1)) {
-		return sdkerrors.Wrapf(ErrInvalidPercentage, "invalid royalty share percentage decimal value; %d, must be positive and less than 1", msg.RoyaltyShare)
+		return errorsmod.Wrapf(ErrInvalidPercentage, "invalid royalty share percentage decimal value; %d, must be positive and less than 1", msg.RoyaltyShare)
 	}
 
 	return ValidateONFTID(msg.Id)
@@ -248,7 +250,6 @@ func (msg MsgMintONFT) GetSigners() []sdk.AccAddress {
 }
 
 func NewMsgTransferONFT(id, denomId, sender, recipient string) *MsgTransferONFT {
-
 	return &MsgTransferONFT{
 		Id:        strings.ToLower(strings.TrimSpace(id)),
 		DenomId:   strings.TrimSpace(denomId),
@@ -267,11 +268,11 @@ func (msg MsgTransferONFT) ValidateBasic() error {
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address; %s", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address; %s", err)
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address; %s", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address; %s", err)
 	}
 	return ValidateONFTID(msg.Id)
 }
@@ -303,7 +304,7 @@ func (msg MsgBurnONFT) Type() string { return TypeMsgBurnONFT }
 
 func (msg MsgBurnONFT) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address; %s", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address; %s", err)
 	}
 	return ValidateONFTID(msg.Id)
 }

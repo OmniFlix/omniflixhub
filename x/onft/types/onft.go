@@ -4,8 +4,8 @@ import (
 	"strings"
 	"time"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/OmniFlix/omniflixhub/v2/x/onft/exported"
 )
@@ -96,12 +96,12 @@ func NewONFTs(onfts ...exported.ONFT) ONFTs {
 func ValidateONFTID(onftId string) error {
 	onftId = strings.TrimSpace(onftId)
 	if len(onftId) < MinIDLen || len(onftId) > MaxIDLen {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			ErrInvalidONFTID,
 			"invalid onftId %s, length must be between [%d, %d]", onftId, MinIDLen, MaxIDLen)
 	}
 	if !IsBeginWithAlpha(onftId) || !IsAlphaNumeric(onftId) {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			ErrInvalidONFTID,
 			"invalid onftId %s, only accepts alphanumeric characters and begin with an english letter", onftId)
 	}

@@ -1,6 +1,7 @@
 package decorators
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -31,7 +32,7 @@ func (midd MinimumInitialDepositDecorator) checkProposalInitialDeposit(ctx sdk.C
 		depositParams := midd.govKeeper.GetDepositParams(ctx)
 		minimumInitialDeposit := midd.calculateMinimumInitialDeposit(depositParams.MinDeposit)
 		if msg.InitialDeposit.IsAllLT(minimumInitialDeposit) {
-			return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
+			return errorsmod.Wrapf(sdkerrors.ErrUnauthorized,
 				"initial deposit amount is not enough. required: %v", minimumInitialDeposit)
 		}
 	}
@@ -48,7 +49,7 @@ func (midd MinimumInitialDepositDecorator) Validate(ctx sdk.Context, msgs []sdk.
 			for _, v := range msg.Msgs {
 				err := midd.cdc.UnpackAny(v, &innerMsg)
 				if err != nil {
-					return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "cannot unmarshal authz exec msgs")
+					return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "cannot unmarshal authz exec msgs")
 				}
 
 				err = midd.checkProposalInitialDeposit(ctx, innerMsg)

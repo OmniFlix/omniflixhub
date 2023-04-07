@@ -112,7 +112,7 @@ func GetCmdMintONFT() *cobra.Command {
 Example:
 $ %s tx onft mint [denom-id] \ 
 	--name <onft-name> \
-	--description <onft-descritpion> \
+	--description <onft-descriptions> \
 	--media-uri=<uri> \
 	--preview-uri=<uri> \
 	--from=<key-name> \

@@ -4,13 +4,14 @@ import (
 	"context"
 	"strings"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	"github.com/cosmos/cosmos-sdk/types/query"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 )
@@ -114,12 +115,12 @@ func (k Keeper) ONFT(c context.Context, request *types.QueryONFTRequest) (*types
 
 	nft, err := k.GetONFT(ctx, denom, onftID)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrUnknownONFT, "invalid ONFT %s from collection %s", request.Id, request.DenomId)
+		return nil, errorsmod.Wrapf(types.ErrUnknownONFT, "invalid ONFT %s from collection %s", request.Id, request.DenomId)
 	}
 
 	oNFT, ok := nft.(types.ONFT)
 	if !ok {
-		return nil, sdkerrors.Wrapf(types.ErrUnknownONFT, "invalid type ONFT %s from collection %s", request.Id, request.DenomId)
+		return nil, errorsmod.Wrapf(types.ErrUnknownONFT, "invalid type ONFT %s from collection %s", request.Id, request.DenomId)
 	}
 
 	return &types.QueryONFTResponse{

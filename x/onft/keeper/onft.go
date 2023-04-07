@@ -1,10 +1,10 @@
 package keeper
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	"github.com/OmniFlix/omniflixhub/v2/x/onft/exported"
 	"github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (k Keeper) GetONFT(ctx sdk.Context, denomID, onftID string) (nft exported.ONFT, err error) {
@@ -12,7 +12,7 @@ func (k Keeper) GetONFT(ctx sdk.Context, denomID, onftID string) (nft exported.O
 
 	bz := store.Get(types.KeyONFT(denomID, onftID))
 	if bz == nil {
-		return nil, sdkerrors.Wrapf(types.ErrUnknownCollection, "not found oNFT: %s", denomID)
+		return nil, errorsmod.Wrapf(types.ErrUnknownCollection, "not found oNFT: %s", denomID)
 	}
 
 	var oNFT types.ONFT
@@ -56,7 +56,7 @@ func (k Keeper) Authorize(ctx sdk.Context, denomID, onftID string, owner sdk.Acc
 	}
 
 	if !owner.Equals(onft.GetOwner()) {
-		return types.ONFT{}, sdkerrors.Wrap(types.ErrUnauthorized, owner.String())
+		return types.ONFT{}, errorsmod.Wrap(types.ErrUnauthorized, owner.String())
 	}
 	return onft.(types.ONFT), nil
 }

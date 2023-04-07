@@ -1,9 +1,10 @@
 package types
 
 import (
-	"github.com/google/uuid"
 	"regexp"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 var (

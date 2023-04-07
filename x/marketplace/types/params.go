@@ -88,6 +88,7 @@ func validateSaleCommission(i interface{}) error {
 
 	return nil
 }
+
 func validateStakingDistribution(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 	if !ok {
