@@ -1,0 +1,87 @@
+syntax = "proto3";
+package OmniFlix.onft.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/v2/x/onft/types";
+option (gogoproto.goproto_getters_all) = false;
+
+// Collection
+message Collection {
+  option (gogoproto.equal) = true;
+
+  Denom         denom      = 1 [(gogoproto.nullable) = false];
+  repeated ONFT onfts      = 2 [(gogoproto.customname) = "ONFTs", (gogoproto.nullable) = false];
+}
+
+message IDCollection {
+  option (gogoproto.equal) = true;
+
+  string          denom_id = 1 [(gogoproto.moretags) = "yaml:\"denom_id\""];
+  repeated string onft_ids = 2 [(gogoproto.moretags) = "yaml:\"onft_ids\""];
+}
+
+message Denom {
+  option (gogoproto.equal) = true;
+
+  string id                = 1;
+  string symbol            = 2;
+  string name              = 3;
+  string schema            = 4;
+  string creator           = 5;
+  string description       = 6;
+  string preview_uri       = 7 [
+    (gogoproto.moretags)   = "yaml:\"preview_uri\"",
+    (gogoproto.customname) = "PreviewURI"
+  ];
+}
+
+//ASSET or ONFT
+message ONFT {
+  option (gogoproto.equal)                = true;
+
+  string                    id            = 1;
+  Metadata                  metadata      = 2 [(gogoproto.nullable) = false];
+  string                    data          = 3;
+  string                    owner         = 4;
+  bool                      transferable  = 5;
+  bool                      extensible    = 6;
+  google.protobuf.Timestamp created_at    = 7 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdtime)  = true,
+    (gogoproto.moretags) = "yaml:\"created_at\""
+  ];
+  bool                      nsfw          = 8;
+  string                    royalty_share = 9 [
+    (gogoproto.nullable)   = false,
+    (gogoproto.moretags)   = "yaml:\"royalty_share\"",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
+  ];
+}
+
+message Metadata {
+  option (gogoproto.equal) = true;
+
+  string name              = 1 [(gogoproto.moretags) = "yaml:\"name\""];
+  string description       = 2 [(gogoproto.moretags) = "yaml:\"description\""];
+  string media_uri         = 3 [
+    (gogoproto.moretags)   = "yaml:\"media_uri\"",
+    (gogoproto.customname) = "MediaURI"
+  ];
+  string preview_uri       = 4 [
+    (gogoproto.moretags)   = "yaml:\"preview_uri\"",
+    (gogoproto.customname) = "PreviewURI"
+  ];
+}
+
+message Owner {
+  option (gogoproto.equal)             = true;
+
+  string                address        = 1;
+  repeated IDCollection id_collections = 2 [
+    (gogoproto.moretags)   = "yaml:\"idcs\"",
+    (gogoproto.customname) = "IDCollections",
+    (gogoproto.nullable)   = false
+  ];
+}

@@ -1,0 +1,63 @@
+syntax = "proto3";
+package OmniFlix.marketplace.v1beta1;
+
+option go_package = "github.com/OmniFlix/omniflix/v2/x/marketplace/types";
+
+// EventListONFT is emitted on NFT Listing on market
+message EventListNFT {
+  string id       = 1;
+  string nft_id   = 2;
+  string denom_id = 3;
+  string owner    = 4;
+}
+// EventEditListing is emitted on edit Listing on market
+message EventEditListing {
+  string id       = 1;
+  string nft_id   = 2;
+  string denom_id = 3;
+  string owner    = 4;
+}
+
+// EventDeListONFT is emitted on NFT DeListing from market
+message EventDeListNFT {
+  string id       = 1;
+  string nft_id   = 2;
+  string denom_id = 3;
+  string owner    = 4;
+}
+
+// EventBuyONFT is emitted on NFT Buy
+message EventBuyNFT {
+  string id       = 1;
+  string nft_id   = 2;
+  string denom_id = 3;
+  string owner    = 4;
+  string buyer    = 5;
+}
+
+// EventCreateAuction is emitted on creating auction
+message EventCreateAuction {
+  string id        = 1;
+  string nft_id    = 2;
+  string denom_id  = 3;
+  string owner     = 4;
+  string min_price = 5;
+}
+
+// EventCancelAuction is emitted on canceling auction
+message EventCancelAuction {
+  string id       = 1;
+  string nft_id   = 2;
+  string denom_id = 3;
+  string owner    = 4;
+}
+
+// EventPlaceBid is emitted on placing bid for an auction
+message EventPlaceBid {
+  string auction_id = 1;
+  string nft_id     = 2;
+  string denom_id   = 3;
+  string bidder     = 4;
+  string amount     = 5;
+}
+
