@@ -7,9 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	appparams "github.com/OmniFlix/omniflixhub/app/params"
-
 	"github.com/OmniFlix/omniflixhub/app/openapiconsole"
+	appparams "github.com/OmniFlix/omniflixhub/app/params"
 	customAuthRest "github.com/OmniFlix/omniflixhub/custom/auth/client/rest"
 	"github.com/OmniFlix/omniflixhub/docs"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -465,9 +464,13 @@ func NewOmniFlixApp(
 	app.ONFTKeeper = onftkeeper.NewKeeper(
 		appCodec,
 		keys[onfttypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.DistrKeeper,
+		app.GetSubspace(onfttypes.ModuleName),
 	)
 
-	onftModule := onft.NewAppModule(appCodec, app.ONFTKeeper, app.AccountKeeper, app.BankKeeper)
+	onftModule := onft.NewAppModule(appCodec, app.ONFTKeeper, app.AccountKeeper, app.BankKeeper, app.DistrKeeper)
 
 	app.MarketplaceKeeper = marketplacekeeper.NewKeeper(
 		appCodec,
@@ -651,6 +654,7 @@ func NewOmniFlixApp(
 				SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 			},
+			GovKeeper: app.GovKeeper,
 			IBCKeeper: app.IBCKeeper,
 			Codec:     appCodec,
 		},
