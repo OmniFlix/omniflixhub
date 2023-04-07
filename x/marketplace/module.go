@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/OmniFlix/omniflix/v2/x/marketplace/client/cli"
-	"github.com/OmniFlix/omniflix/v2/x/marketplace/client/rest"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/spf13/cobra"
 
@@ -16,6 +15,7 @@ import (
 	abci "github.com/cometbft/cometbft/abci/types"
 
 	"github.com/OmniFlix/omniflix/v2/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/client/rest"
 	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/keeper"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
