@@ -1,6 +1,7 @@
 package simapp
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -22,10 +23,14 @@ func New(dir string) *app.App {
 
 	a := app.NewOmniFlixApp(logger, db, nil, true, map[int64]bool{}, dir, 0, encoding,
 		simapp.EmptyAppOptions{})
+	stateBytes, err := json.MarshalIndent(app.ModuleBasics.DefaultGenesis(encoding.Marshaler), "", " ")
+	if err != nil {
+		panic(err)
+	}
 	// InitChain updates deliverState which is required when app.NewContext is called
 	a.InitChain(abci.RequestInitChain{
 		ConsensusParams: defaultConsensusParams,
-		AppStateBytes:   []byte("{}"),
+		AppStateBytes:   stateBytes,
 	})
 	return a
 }

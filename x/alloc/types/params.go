@@ -33,8 +33,8 @@ func NewParams(
 func DefaultParams() Params {
 	return Params{
 		DistributionProportions: DistributionProportions{
-			StakingRewards:      sdk.NewDecWithPrec(35, 2), // 35%
-			NftIncentives:       sdk.NewDecWithPrec(45, 2), // 40%
+			StakingRewards:      sdk.NewDecWithPrec(60, 2), // 60%
+			NftIncentives:       sdk.NewDecWithPrec(15, 2), // 15%
 			NodeHostsIncentives: sdk.NewDecWithPrec(5, 2),  // 5%
 			DeveloperRewards:    sdk.NewDecWithPrec(15, 2), // 15%
 			CommunityPool:       sdk.NewDecWithPrec(5, 2),  // 5%
