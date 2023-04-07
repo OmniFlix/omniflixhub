@@ -3,6 +3,7 @@ module github.com/OmniFlix/omniflixhub/v2
 go 1.19
 
 require (
+	cosmossdk.io/errors v1.0.0-beta.7
 	cosmossdk.io/simapp v0.0.0-20230224204036-a6adb0821462
 	github.com/cometbft/cometbft v0.37.0
 	github.com/cometbft/cometbft-db v0.7.0
@@ -32,7 +33,6 @@ require (
 	cosmossdk.io/api v0.3.1 // indirect
 	cosmossdk.io/core v0.5.1 // indirect
 	cosmossdk.io/depinject v1.0.0-alpha.3 // indirect
-	cosmossdk.io/errors v1.0.0-beta.7 // indirect
 	cosmossdk.io/math v1.0.0 // indirect
 	cosmossdk.io/tools/rosetta v0.2.1 // indirect
 	filippo.io/edwards25519 v1.0.0 // indirect
