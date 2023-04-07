@@ -3,7 +3,7 @@ package app
 import (
 	"fmt"
 
-	onfttypes "github.com/OmniFlix/onft/types"
+	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 
 	store "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"

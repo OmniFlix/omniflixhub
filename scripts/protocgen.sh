@@ -30,5 +30,5 @@ Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
 done
 
 # move proto files to the right places
-cp -r github.com/OmniFlix/omniflixhub/* ./
+cp -r github.com/OmniFlix/omniflixhub/v2/* ./
 rm -rf github.com

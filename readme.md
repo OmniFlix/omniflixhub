@@ -21,7 +21,7 @@ wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.19.3
 **Linux**
 
 ```
-git clone https://github.com/Omniflix/omniflixhub.git
+git clone https://github.com/OmniFlix/omniflixhub/v2.git
 cd omniflixhub
 git checkout v0.8.0
 go mod tidy

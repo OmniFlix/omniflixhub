@@ -8,16 +8,16 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/config"
 
-	"github.com/OmniFlix/omniflixhub/app/params"
+	"github.com/OmniFlix/omniflixhub/v2/app/params"
 	"github.com/cosmos/cosmos-sdk/snapshots"
 
+	dbm "github.com/cometbft/cometbft-db"
+	tmcli "github.com/cometbft/cometbft/libs/cli"
+	"github.com/cometbft/cometbft/libs/log"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
-	tmcli "github.com/tendermint/tendermint/libs/cli"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 
-	"github.com/OmniFlix/omniflixhub/app"
+	"github.com/OmniFlix/omniflixhub/v2/app"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/debug"

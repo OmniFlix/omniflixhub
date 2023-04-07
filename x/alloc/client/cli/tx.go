@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/OmniFlix/omniflixhub/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
 	"github.com/cosmos/cosmos-sdk/client"
 )
 

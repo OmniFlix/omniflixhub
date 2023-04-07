@@ -9,11 +9,11 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	abci "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/cometbft/cometbft/abci/types"
 
-	"github.com/OmniFlix/omniflixhub/x/alloc/client/cli"
-	"github.com/OmniFlix/omniflixhub/x/alloc/keeper"
-	"github.com/OmniFlix/omniflixhub/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/alloc/client/cli"
+	"github.com/OmniFlix/omniflixhub/v2/x/alloc/keeper"
+	"github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
