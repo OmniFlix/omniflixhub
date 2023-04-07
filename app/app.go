@@ -9,7 +9,6 @@ import (
 
 	"github.com/OmniFlix/omniflixhub/v2/app/openapiconsole"
 	appparams "github.com/OmniFlix/omniflixhub/v2/app/params"
-	customAuthRest "github.com/OmniFlix/omniflixhub/v2/custom/auth/client/rest"
 	"github.com/OmniFlix/omniflixhub/v2/docs"
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -30,7 +29,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
@@ -50,7 +48,6 @@ import (
 	crisiskeeper "github.com/cosmos/cosmos-sdk/x/crisis/keeper"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	distrclient "github.com/cosmos/cosmos-sdk/x/distribution/client"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/evidence"
@@ -95,12 +92,12 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 	"github.com/spf13/cast"
 
-	"github.com/OmniFlix/omniflix/v2/x/marketplace"
-	marketplacetypes "github.com/OmniFlix/omniflix/v2/x/marketplace/types"
 	"github.com/OmniFlix/omniflixhub/v2/x/alloc"
 	allockeeper "github.com/OmniFlix/omniflixhub/v2/x/alloc/keeper"
 	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace"
 	marketplacekeeper "github.com/OmniFlix/omniflixhub/v2/x/marketplace/keeper"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 	"github.com/OmniFlix/omniflixhub/v2/x/onft"
 	onftkeeper "github.com/OmniFlix/omniflixhub/v2/x/onft/keeper"
 	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
@@ -112,7 +109,6 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 	var govProposalHandlers []govclient.ProposalHandler
 	govProposalHandlers = append(govProposalHandlers,
 		paramsclient.ProposalHandler,
-		distrclient.ProposalHandler,
 		upgradeclient.ProposalHandler,
 		upgradeclient.CancelProposalHandler,
 		ibcclientclient.UpdateClientProposalHandler,
@@ -760,16 +756,13 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	clientCtx := apiSvr.ClientCtx
 	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
 	// Register legacy tx routes.
-	authrest.RegisterTxRoutes(clientCtx, apiSvr.Router)
-	// Register custom tx routes
-	customAuthRest.RegisterTxRoutes(clientCtx, apiSvr.Router)
+
 	// Register new tx routes from grpc-gateway.
 	authtx.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	// Register new tendermint queries routes from grpc-gateway.
 	tmservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
 	// Register legacy and grpc-gateway routes for all modules.
-	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
 	// register app's OpenAPI routes.

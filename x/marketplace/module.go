@@ -5,18 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/OmniFlix/omniflix/v2/x/marketplace/client/cli"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/client/cli"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/spf13/cobra"
 
-	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
-	"github.com/OmniFlix/omniflix/v2/x/marketplace/types"
-	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/client/rest"
 	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/keeper"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -67,11 +65,6 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 		return fmt.Errorf("failed to unmarshal %s genesis state: %w", types.ModuleName, err)
 	}
 	return genState.ValidateGenesis()
-}
-
-// RegisterRESTRoutes registers the marketplace module's REST service handlers.
-func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	rest.RegisterHandlers(clientCtx, rtr)
 }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the module.

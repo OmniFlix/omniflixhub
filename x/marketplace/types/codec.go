@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
 
-	"github.com/OmniFlix/omniflix/v2/x/marketplace/exported"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/exported"
 )
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {

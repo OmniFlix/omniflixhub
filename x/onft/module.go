@@ -7,10 +7,8 @@ import (
 	"math/rand"
 
 	"cosmossdk.io/x/feegrant/simulation"
-	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/client/rest"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/gogoproto/grpc"
-	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
@@ -18,7 +16,7 @@ import (
 
 	"github.com/OmniFlix/omniflixhub/v2/x/onft/client/cli"
 	"github.com/OmniFlix/omniflixhub/v2/x/onft/keeper"
-	"github.com/OmniFlix/omniflixhub/v2/x/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -100,18 +98,10 @@ func (AppModule) Name() string { return types.ModuleName }
 func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
 }
 
-func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
-}
-
 func (AppModule) QuerierRoute() string { return types.RouterKey }
 
 func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 	return keeper.NewQuerier(am.keeper, legacyQuerierCdc)
-}
-
-func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	rest.RegisterHandlers(clientCtx, rtr, types.RouterKey)
 }
 
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
