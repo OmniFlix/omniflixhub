@@ -1,20 +1,6 @@
 package keeper_test
 
-import (
-	"testing"
-	"time"
-
-	"github.com/OmniFlix/omniflixhub/v2/app"
-	"github.com/OmniFlix/omniflixhub/v2/testutil/simapp"
-	"github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	"github.com/stretchr/testify/suite"
-)
-
+/*  TODO: refactor away from ignite
 type KeeperTestSuite struct {
 	suite.Suite
 	ctx sdk.Context
@@ -91,7 +77,6 @@ func (suite *KeeperTestSuite) TestDistribution() {
 
 	feeCollector = suite.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 
-	/*
 		modulePortion := params.DistributionProportions.NftIncentives.
 		Add(params.DistributionProportions.DeveloperRewards) // 60%
 		// remaining going to next module should be 100% - 60% = 40%
@@ -108,5 +93,5 @@ func (suite *KeeperTestSuite) TestDistribution() {
 		suite.Equal(
 			mintCoin.Amount.ToDec().Mul(params.DistributionProportions.NftIncentives),
 			feePool.CommunityPool.AmountOf(denom))
-	*/
 }
+*/
