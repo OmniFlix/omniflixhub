@@ -1,0 +1,14 @@
+syntax = "proto3";
+package OmniFlix.onft.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "omniflix/onft/v1beta1/onft.proto";
+import "omniflix/onft/v1beta1/params.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/v2/x/onft/types";
+
+// GenesisState defines the nft module's genesis state.
+message GenesisState {
+  repeated Collection collections = 1 [(gogoproto.nullable) = false];
+  Params params = 2 [(gogoproto.nullable) = false];
+}
