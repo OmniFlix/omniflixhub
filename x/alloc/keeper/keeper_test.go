@@ -90,10 +90,10 @@ func (suite *KeeperTestSuite) TestDistribution() {
 	allocKeeper.DistributeMintedCoins(suite.ctx)
 
 	feeCollector = suite.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
-	modulePortion := params.DistributionProportions.NftIncentives.
-		Add(params.DistributionProportions.DeveloperRewards) // 60%
 
 	/*
+		modulePortion := params.DistributionProportions.NftIncentives.
+		Add(params.DistributionProportions.DeveloperRewards) // 60%
 		// remaining going to next module should be 100% - 60% = 40%
 		suite.Equal(
 			mintCoin.Amount.ToDec().Mul(sdk.NewDecWithPrec(100, 2).Sub(modulePortion)).RoundInt().String(),

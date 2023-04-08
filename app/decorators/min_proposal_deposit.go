@@ -29,7 +29,7 @@ func NewMinimumInitialDepositDecorator(
 // checkProposalInitialDeposit returns error if the initial deposit amount is less than minInitialDeposit amount
 func (midd MinimumInitialDepositDecorator) checkProposalInitialDeposit(ctx sdk.Context, msg sdk.Msg) error {
 	if msg, ok := msg.(*govtypes.MsgSubmitProposal); ok {
-		depositParams := midd.govKeeper.GetDepositParams(ctx)
+		depositParams := midd.govKeeper.GetParams(ctx)
 		minimumInitialDeposit := midd.calculateMinimumInitialDeposit(depositParams.MinDeposit)
 		if msg.InitialDeposit.IsAllLT(minimumInitialDeposit) {
 			return errorsmod.Wrapf(sdkerrors.ErrUnauthorized,

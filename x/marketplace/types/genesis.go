@@ -27,9 +27,7 @@ func (m *GenesisState) ValidateGenesis() error {
 			return err
 		}
 	}
-	if m.ListingCount < 0 {
-		return errorsmod.Wrap(ErrNonPositiveNumber, "must be a positive number")
-	}
+
 	if err := m.Params.ValidateBasic(); err != nil {
 		return err
 	}
