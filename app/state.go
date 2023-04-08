@@ -1,26 +1,6 @@
 package app
 
-import (
-	"encoding/json"
-	"io"
-	"math/rand"
-	"os"
-	"time"
-
-	tmjson "github.com/cometbft/cometbft/libs/json"
-	tmtypes "github.com/cometbft/cometbft/types"
-
-	sdksimapp "cosmossdk.io/simapp"
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/module"
-	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-)
-
+/*
 // StateFn returns the initial application state using a genesis or the simulation parameters.
 // It panics if the user provides files for both of them.
 // If a file is not given for the genesis or the sim params, it creates a randomized one.
@@ -187,3 +167,4 @@ func StateFromGenesisFileFn(r io.Reader, cdc codec.JSONCodec, genesisFile string
 
 	return genesis, newAccs
 }
+*/
