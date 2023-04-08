@@ -2,7 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"math/rand"
 	"os"
@@ -12,7 +11,6 @@ import (
 	tmtypes "github.com/cometbft/cometbft/types"
 
 	sdksimapp "cosmossdk.io/simapp"
-	simappparams "cosmossdk.io/simapp/params"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -137,61 +135,6 @@ func StateFn(cdc codec.JSONCodec, simManager *module.SimulationManager) simtypes
 		}
 		return appState, simAccs, chainID, genesisTimestamp
 	}
-}
-
-// AppStateRandomizedFn creates calls each module's GenesisState generator function
-// and creates the simulation params
-func StateRandomizedFn(
-	simManager *module.SimulationManager, r *rand.Rand, cdc codec.JSONCodec,
-	accs []simtypes.Account, genesisTimestamp time.Time, appParams simtypes.AppParams,
-) (json.RawMessage, []simtypes.Account) {
-	numAccs := int64(len(accs))
-	genesisState := NewDefaultGenesisState(cdc)
-
-	// generate a random amount of initial stake coins and a random initial
-	// number of bonded accounts
-	var initialStake, numInitiallyBonded int64
-	appParams.GetOrGenerate(
-		cdc, simappparams.StakePerAccount, &initialStake, r,
-		func(r *rand.Rand) { initialStake = r.Int63n(1e12) },
-	)
-	appParams.GetOrGenerate(
-		cdc, simappparams.InitiallyBondedValidators, &numInitiallyBonded, r,
-		func(r *rand.Rand) { numInitiallyBonded = int64(r.Intn(300)) },
-	)
-
-	if numInitiallyBonded > numAccs {
-		numInitiallyBonded = numAccs
-	}
-
-	fmt.Printf(
-		`Selected randomly generated parameters for simulated genesis:
-{
-  stake_per_account: "%d",
-  initially_bonded_validators: "%d"
-}
-`, initialStake, numInitiallyBonded,
-	)
-
-	simState := &module.SimulationState{
-		AppParams:    appParams,
-		Cdc:          cdc,
-		Rand:         r,
-		GenState:     genesisState,
-		Accounts:     accs,
-		InitialStake: initialStake,
-		NumBonded:    numInitiallyBonded,
-		GenTimestamp: genesisTimestamp,
-	}
-
-	simManager.GenerateGenesisStates(simState)
-
-	appState, err := json.Marshal(genesisState)
-	if err != nil {
-		panic(err)
-	}
-
-	return appState, accs
 }
 
 // AppStateFromGenesisFileFn util function to generate the genesis AppState

@@ -3,6 +3,8 @@ package alloc
 import (
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
+
 	"github.com/OmniFlix/omniflixhub/v2/x/alloc/keeper"
 	"github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"

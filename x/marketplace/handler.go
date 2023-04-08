@@ -3,6 +3,7 @@ package marketplace
 import (
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/keeper"
 	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 
