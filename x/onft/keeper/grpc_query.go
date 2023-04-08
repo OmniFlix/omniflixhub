@@ -144,7 +144,7 @@ func (k Keeper) OwnerONFTs(c context.Context, request *types.QueryOwnerONFTsRequ
 	idsMap := make(map[string][]string)
 	store := ctx.KVStore(k.storeKey)
 	onftStore := prefix.NewStore(store, types.KeyOwner(address, request.DenomId, ""))
-	pagination, err := query.Paginate(onftStore, request.Pagination, func(key []byte, value []byte) error {
+	pagination, _ := query.Paginate(onftStore, request.Pagination, func(key []byte, value []byte) error {
 		denomId := request.DenomId
 		onftId := string(key)
 		if len(denomId) == 0 {

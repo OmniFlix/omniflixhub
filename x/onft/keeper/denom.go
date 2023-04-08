@@ -34,7 +34,7 @@ func (k Keeper) GetDenom(ctx sdk.Context, id string) (denom types.Denom, err err
 	store := ctx.KVStore(k.storeKey)
 
 	bz := store.Get(types.KeyDenomID(id))
-	if bz == nil || len(bz) == 0 {
+	if len(bz) == 0 {
 		return denom, errorsmod.Wrapf(types.ErrInvalidDenom, "not found denomID: %s", id)
 	}
 

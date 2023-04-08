@@ -2,11 +2,11 @@ syntax = "proto3";
 package OmniFlix.marketplace.v1beta1;
 
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "google/api/annotations.proto";
-import "marketplace/v1beta1/listing.proto";
-import "marketplace/v1beta1/params.proto";
-import "marketplace/v1beta1/auction.proto";
 import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "omniflix/marketplace/v1beta1/auction.proto";
+import "omniflix/marketplace/v1beta1/listing.proto";
+import "omniflix/marketplace/v1beta1/params.proto";
 
 option go_package = "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types";
 
@@ -66,7 +66,6 @@ service Query {
   }
 }
 
-
 // QueryParamsRequest is the request type for the Query/Params RPC method.
 message QueryParamsRequest {}
 
@@ -77,13 +76,13 @@ message QueryParamsResponse {
 }
 
 message QueryListingsRequest {
-  string                                owner       = 1;
-  string                                price_denom = 2 [(gogoproto.moretags) = "yaml:\"price_denom\""];
-  cosmos.base.query.v1beta1.PageRequest pagination  = 3;
+  string owner = 1;
+  string price_denom = 2 [(gogoproto.moretags) = "yaml:\"price_denom\""];
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
 message QueryListingsResponse {
-  repeated Listing                       listings   = 1 [(gogoproto.nullable) = false];
+  repeated Listing listings = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
@@ -96,12 +95,12 @@ message QueryListingResponse {
 }
 
 message QueryListingsByOwnerRequest {
-  string                                owner      = 1;
+  string owner = 1;
   cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 message QueryListingsByOwnerResponse {
-  repeated Listing                       listings   = 1 [(gogoproto.nullable) = false];
+  repeated Listing listings = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
@@ -110,24 +109,24 @@ message QueryListingByNFTIDRequest {
 }
 
 message QueryListingsByPriceDenomRequest {
-  string                                price_denom = 1 [(gogoproto.moretags) = "yaml:\"price_denom\""];
-  cosmos.base.query.v1beta1.PageRequest pagination  = 2;
+  string price_denom = 1 [(gogoproto.moretags) = "yaml:\"price_denom\""];
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 message QueryListingsByPriceDenomResponse {
-  repeated Listing                       listings   = 1 [(gogoproto.nullable) = false];
+  repeated Listing listings = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 message QueryAuctionsRequest {
-  AuctionStatus                                status      = 1;
-  string                                owner       = 2;
-  string                                price_denom = 3 [(gogoproto.moretags) = "yaml:\"price_denom\""];
-  cosmos.base.query.v1beta1.PageRequest pagination  = 4;
+  AuctionStatus status = 1;
+  string owner = 2;
+  string price_denom = 3 [(gogoproto.moretags) = "yaml:\"price_denom\""];
+  cosmos.base.query.v1beta1.PageRequest pagination = 4;
 }
 
 message QueryAuctionsResponse {
-  repeated AuctionListing                auctions   = 1 [(gogoproto.nullable) = false];
+  repeated AuctionListing auctions = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
@@ -140,7 +139,7 @@ message QueryAuctionResponse {
 }
 
 message QueryAuctionsByOwnerRequest {
-  string                                owner      = 1;
+  string owner = 1;
   cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
@@ -149,19 +148,18 @@ message QueryAuctionByNFTIDRequest {
 }
 
 message QueryAuctionsByPriceDenomRequest {
-  string                                price_denom = 1 [(gogoproto.moretags) = "yaml:\"price_denom\""];
-  cosmos.base.query.v1beta1.PageRequest pagination  = 2;
+  string price_denom = 1 [(gogoproto.moretags) = "yaml:\"price_denom\""];
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 message QueryBidsRequest {
-  string                                bidder     = 1;
+  string bidder = 1;
   cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 message QueryBidsResponse {
-  repeated Bid                           bids       = 1 [(gogoproto.nullable) = false];
+  repeated Bid bids = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
-
 }
 
 message QueryBidRequest {
