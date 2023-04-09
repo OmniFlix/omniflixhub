@@ -4,13 +4,11 @@ import (
 	"errors"
 	"io"
 	"os"
-	"path/filepath"
 
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/pruning"
 
 	"github.com/OmniFlix/omniflixhub/v2/app/params"
-	"github.com/cosmos/cosmos-sdk/snapshots"
 
 	"cosmossdk.io/simapp"
 	rosettaCmd "cosmossdk.io/tools/rosetta/cmd"
@@ -18,14 +16,10 @@ import (
 	tmcfg "github.com/cometbft/cometbft/config"
 
 	"github.com/cometbft/cometbft/libs/log"
-	tmtypes "github.com/cometbft/cometbft/types"
-	snapshottypes "github.com/cosmos/cosmos-sdk/snapshots/types"
-	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	"github.com/OmniFlix/omniflixhub/v2/app"
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -34,7 +28,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -137,7 +130,6 @@ func newApp(
 	traceStore io.Writer,
 	appOpts servertypes.AppOptions,
 ) servertypes.Application {
-
 	baseappOptions := server.DefaultBaseappOptions(appOpts)
 
 	return app.NewOmniFlixApp(
@@ -253,96 +245,6 @@ func txCommand() *cobra.Command {
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
-}
-
-type appCreator struct {
-	encCfg params.EncodingConfig
-}
-
-// newApp is an appCreator
-func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
-	var cache sdk.MultiStorePersistentCache
-
-	if cast.ToBool(appOpts.Get(server.FlagInterBlockCache)) {
-		cache = store.NewCommitKVStoreCacheManager()
-	}
-
-	skipUpgradeHeights := make(map[int64]bool)
-	for _, h := range cast.ToIntSlice(appOpts.Get(server.FlagUnsafeSkipUpgrades)) {
-		skipUpgradeHeights[int64(h)] = true
-	}
-
-	pruningOpts, err := server.GetPruningOptionsFromFlags(appOpts)
-	if err != nil {
-		panic(err)
-	}
-
-	homeDir := cast.ToString(appOpts.Get(flags.FlagHome))
-	chainID := cast.ToString(appOpts.Get(flags.FlagChainID))
-	if chainID == "" {
-		// fallback to genesis chain-id
-		appGenesis, err := tmtypes.GenesisDocFromFile(filepath.Join(homeDir, "config", "genesis.json"))
-		if err != nil {
-			panic(err)
-		}
-
-		chainID = appGenesis.ChainID
-	}
-
-	snapshotDir := filepath.Join(cast.ToString(appOpts.Get(flags.FlagHome)), "data", "snapshots")
-	snapshotDB, err := dbm.NewDB("metadata", server.GetAppDBBackend(appOpts), snapshotDir)
-	if err != nil {
-		panic(err)
-	}
-	snapshotStore, err := snapshots.NewStore(snapshotDB, snapshotDir)
-	if err != nil {
-		panic(err)
-	}
-
-	snapshotOptions := snapshottypes.NewSnapshotOptions(
-		cast.ToUint64(appOpts.Get(server.FlagStateSyncSnapshotInterval)),
-		cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent)),
-	)
-
-	return app.NewOmniFlixApp(
-		logger, db, traceStore, true,
-		appOpts,
-		baseapp.SetPruning(pruningOpts),
-		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
-		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
-		baseapp.SetHaltTime(cast.ToUint64(appOpts.Get(server.FlagHaltTime))),
-		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
-		baseapp.SetInterBlockCache(cache),
-		baseapp.SetTrace(cast.ToBool(appOpts.Get(server.FlagTrace))),
-		baseapp.SetIndexEvents(cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents))),
-		baseapp.SetSnapshot(snapshotStore, snapshotOptions),
-		baseapp.SetChainID(chainID),
-	)
-}
-
-// appExport creates a new simapp (optionally at a given height)
-// and exports state.
-func (a appCreator) appExport(
-	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailAllowedAddrs []string,
-	appOpts servertypes.AppOptions, modulesToExport []string,
-) (servertypes.ExportedApp, error) {
-	var simApp *app.App
-	homePath, ok := appOpts.Get(flags.FlagHome).(string)
-	if !ok || homePath == "" {
-		return servertypes.ExportedApp{}, errors.New("application home not set")
-	}
-
-	if height != -1 {
-		simApp = app.NewOmniFlixApp(logger, db, traceStore, false, appOpts)
-
-		if err := simApp.LoadHeight(height); err != nil {
-			return servertypes.ExportedApp{}, err
-		}
-	} else {
-		simApp = app.NewOmniFlixApp(logger, db, traceStore, true, appOpts)
-	}
-
-	return simApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
 }
 
 // initAppConfig helps to override default appConfig template and configs.

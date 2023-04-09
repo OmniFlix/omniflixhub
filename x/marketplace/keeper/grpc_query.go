@@ -33,7 +33,7 @@ func (k Keeper) Listing(goCtx context.Context, req *types.QueryListingRequest) (
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	listing, found := k.GetListing(ctx, req.Id)
 	if !found {
-		return nil, status.Errorf(codes.NotFound, "listing %d not found", req.Id)
+		return nil, status.Errorf(codes.NotFound, "listing %s not found", req.Id)
 	}
 
 	return &types.QueryListingResponse{Listing: &listing}, nil
