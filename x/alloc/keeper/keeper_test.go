@@ -54,12 +54,26 @@ func (suite *KeeperTestSuite) TestDistribution() {
 	denom := suite.app.StakingKeeper.BondDenom(suite.ctx)
 	allocKeeper := suite.app.AllocKeeper
 	params := suite.app.AllocKeeper.GetParams(suite.ctx)
-	devRewardsReceiver := sdk.AccAddress([]byte("addr1---------------"))
+	nftIncentivesReceiver := sdk.AccAddress([]byte("addr1a--------------"))
+	nodeHostIncentivesReceiver := sdk.AccAddress([]byte("addr1b--------------"))
+	devRewardsReceiver := sdk.AccAddress([]byte("addr1c--------------"))
 	params.DistributionProportions.StakingRewards = sdk.NewDecWithPrec(60, 2)
 	params.DistributionProportions.NodeHostsIncentives = sdk.NewDecWithPrec(5, 2)
 	params.DistributionProportions.NftIncentives = sdk.NewDecWithPrec(15, 2)
 	params.DistributionProportions.CommunityPool = sdk.NewDecWithPrec(5, 2)
 	params.DistributionProportions.DeveloperRewards = sdk.NewDecWithPrec(15, 2)
+	params.WeightedNftIncentivesReceivers = []types.WeightedAddress{
+		{
+			Address: nftIncentivesReceiver.String(),
+			Weight:  sdk.NewDec(1),
+		},
+	}
+	params.WeightedNodeHostsIncentivesReceivers = []types.WeightedAddress{
+		{
+			Address: nodeHostIncentivesReceiver.String(),
+			Weight:  sdk.NewDec(1),
+		},
+	}
 	params.WeightedDeveloperRewardsReceivers = []types.WeightedAddress{
 		{
 			Address: devRewardsReceiver.String(),
@@ -93,7 +107,7 @@ func (suite *KeeperTestSuite) TestDistribution() {
 		sdk.NewDec(0),
 		feePool.CommunityPool.AmountOf(denom))
 
-	allocKeeper.DistributeMintedCoins(suite.ctx)
+	_ = allocKeeper.DistributeMintedCoins(suite.ctx)
 
 	feeCollector = suite.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 	modulePortion := params.DistributionProportions.NftIncentives.
@@ -112,9 +126,7 @@ func (suite *KeeperTestSuite) TestDistribution() {
 
 	// since the NFT incentives are not setup yet, funds go into the community pool
 	feePool = suite.app.DistrKeeper.GetFeePool(suite.ctx)
-	communityPoolPortion := params.DistributionProportions.NftIncentives.
-		Add(params.DistributionProportions.NodeHostsIncentives).
-		Add(params.DistributionProportions.CommunityPool) // 40%
+	communityPoolPortion := params.DistributionProportions.CommunityPool // 5%
 
 	suite.Equal(
 		mintCoin.Amount.ToDec().Mul(communityPoolPortion),
