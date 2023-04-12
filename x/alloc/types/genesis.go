@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // DefaultIndex is the default capability global index
@@ -13,16 +12,7 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Params: Params{
-			DistributionProportions: DistributionProportions{
-				StakingRewards:      sdk.NewDecWithPrec(35, 2), // 35%
-				NftIncentives:       sdk.NewDecWithPrec(40, 2), // 40%
-				NodeHostsIncentives: sdk.NewDecWithPrec(5, 2),  // 5%
-				DeveloperRewards:    sdk.NewDecWithPrec(15, 2), // 15%
-				CommunityPool:       sdk.NewDecWithPrec(5, 2),  // 5%
-			},
-			WeightedDeveloperRewardsReceivers: []WeightedAddress{},
-		},
+		Params: DefaultParams(),
 	}
 }
 

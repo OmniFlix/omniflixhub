@@ -50,7 +50,17 @@ message Params {
       [ (gogoproto.nullable) = false ];
   // address to receive developer rewards
   repeated WeightedAddress weighted_developer_rewards_receivers = 2 [
-    (gogoproto.moretags) = "yaml:\"developer_rewards_receivers\"",
+    (gogoproto.moretags) = "yaml:\"weighted_developer_rewards_receivers\"",
+    (gogoproto.nullable) = false
+  ];
+  // address to receive nft incentives
+  repeated WeightedAddress weighted_nft_incentives_receivers = 3 [
+    (gogoproto.moretags) = "yaml:\"weighted_nft_incentives_receivers\"",
+    (gogoproto.nullable) = false
+  ];
+  // address to receive node host incentives
+  repeated WeightedAddress weighted_node_hosts_incentives_receivers = 4 [
+    (gogoproto.moretags) = "yaml:\"weighted_node_hosts_incentives_receivers\"",
     (gogoproto.nullable) = false
   ];
 }
