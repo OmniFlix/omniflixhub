@@ -61,7 +61,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 // GetModuleAccountAddress gets the address of module account
-func (k Keeper) GetModuleAccountAddress(ctx sdk.Context) sdk.AccAddress {
+func (k Keeper) GetModuleAccountAddress() sdk.AccAddress {
 	return k.accountKeeper.GetModuleAddress(types.ModuleName)
 }
 
@@ -69,13 +69,13 @@ func (k Keeper) GetModuleAccountAddress(ctx sdk.Context) sdk.AccAddress {
 func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 	blockRewardsAddr := k.accountKeeper.GetModuleAccount(ctx, authtypes.FeeCollectorName).GetAddress()
 	blockRewards := k.bankKeeper.GetBalance(ctx, blockRewardsAddr, k.stakingKeeper.BondDenom(ctx))
-	blockRewardsDec := sdk.NewDecFromInt(blockRewards.Amount)
+	blockRewardsAmountDec := blockRewards.Amount.ToDec()
 
 	params := k.GetParams(ctx)
 	proportions := params.DistributionProportions
 
-	nftIncentiveAmount := blockRewardsDec.Mul(proportions.NftIncentives)
-	nftIncentiveCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), nftIncentiveAmount.TruncateInt())
+	nftIncentiveAmount := blockRewardsAmountDec.Mul(proportions.NftIncentives).TruncateInt()
+	nftIncentiveCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), nftIncentiveAmount)
 
 	k.Logger(ctx).Debug(
 		"distributing minted coins to nft incentives receivers",
@@ -90,7 +90,7 @@ func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 		return err
 	}
 
-	nodeHostsIncentiveAmount := blockRewardsDec.Mul(proportions.NodeHostsIncentives)
+	nodeHostsIncentiveAmount := blockRewardsAmountDec.Mul(proportions.NodeHostsIncentives)
 	nodeHostsIncentiveCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), nodeHostsIncentiveAmount.TruncateInt())
 
 	k.Logger(ctx).Debug(
@@ -106,7 +106,7 @@ func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 		return err
 	}
 
-	devRewardAmount := blockRewardsDec.Mul(proportions.DeveloperRewards)
+	devRewardAmount := blockRewardsAmountDec.Mul(proportions.DeveloperRewards)
 	devRewardCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), devRewardAmount.TruncateInt())
 
 	k.Logger(ctx).Debug(
@@ -124,26 +124,21 @@ func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 	}
 
 	// calculate staking rewards
-	stakingRewardsCoins := sdk.NewCoins(k.GetProportions(ctx, blockRewards, proportions.StakingRewards))
+	stakingRewardAmount := blockRewardsAmountDec.Mul(proportions.StakingRewards)
+	stakingRewardCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), stakingRewardAmount.TruncateInt())
 
 	// subtract from original provision to ensure no coins left over after the allocations
-	communityPoolCoins := sdk.NewCoins(blockRewards).
-		Sub(stakingRewardsCoins).
-		Sub(sdk.NewCoins(nftIncentiveCoin)).
-		Sub(sdk.NewCoins(nodeHostsIncentiveCoin)).
-		Sub(sdk.NewCoins(devRewardCoin))
+	communityPoolCoin := blockRewards.
+		Sub(stakingRewardCoin).
+		Sub(nftIncentiveCoin).
+		Sub(nodeHostsIncentiveCoin).
+		Sub(devRewardCoin)
 
-	if err := k.distrKeeper.FundCommunityPool(ctx, communityPoolCoins, blockRewardsAddr); err != nil {
+	if err := k.distrKeeper.FundCommunityPool(ctx, sdk.NewCoins(communityPoolCoin), blockRewardsAddr); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-// GetProportions gets the balance of the `MintedDenom` from minted coins
-// and returns coins according to the `AllocationRatio`
-func (k Keeper) GetProportions(ctx sdk.Context, mintedCoin sdk.Coin, ratio sdk.Dec) sdk.Coin {
-	return sdk.NewCoin(mintedCoin.Denom, mintedCoin.Amount.ToDec().Mul(ratio).TruncateInt())
 }
 
 func (k Keeper) distributeCoinToWeightedAddresses(
@@ -152,10 +147,11 @@ func (k Keeper) distributeCoinToWeightedAddresses(
 	totalAmount sdk.Coin,
 	fromAddress sdk.AccAddress,
 ) error {
+	totalAmountDec := totalAmount.Amount.ToDec()
 	for _, w := range weightedAddresses {
-		amount := sdk.NewCoins(k.GetProportions(ctx, totalAmount, w.Weight))
+		amount := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), totalAmountDec.Mul(w.Weight).TruncateInt())
 		if w.Address == "" {
-			err := k.distrKeeper.FundCommunityPool(ctx, amount, fromAddress)
+			err := k.distrKeeper.FundCommunityPool(ctx, sdk.NewCoins(amount), fromAddress)
 			if err != nil {
 				return err
 			}
@@ -164,7 +160,7 @@ func (k Keeper) distributeCoinToWeightedAddresses(
 			if err != nil {
 				return err
 			}
-			err = k.bankKeeper.SendCoins(ctx, fromAddress, toAddress, amount)
+			err = k.bankKeeper.SendCoins(ctx, fromAddress, toAddress, sdk.NewCoins(amount))
 			if err != nil {
 				return err
 			}
