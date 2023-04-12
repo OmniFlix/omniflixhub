@@ -14,7 +14,7 @@ import (
 )
 
 // next upgrade name
-const upgradeName = "v0.10.0"
+const upgradeName = "v0.10.x-part2"
 
 const (
 	developerRewardsAccount    = "omniflix1ftvf4euvdvq95jpeyvgf6r6j78j5rct2a3jnkn"
