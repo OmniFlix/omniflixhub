@@ -90,8 +90,8 @@ func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 		return err
 	}
 
-	nodeHostsIncentiveAmount := blockRewardsAmountDec.Mul(proportions.NodeHostsIncentives)
-	nodeHostsIncentiveCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), nodeHostsIncentiveAmount.TruncateInt())
+	nodeHostsIncentiveAmount := blockRewardsAmountDec.Mul(proportions.NodeHostsIncentives).TruncateInt()
+	nodeHostsIncentiveCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), nodeHostsIncentiveAmount)
 
 	k.Logger(ctx).Debug(
 		"distributing minted coins to node host incentives receivers",
@@ -106,8 +106,8 @@ func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 		return err
 	}
 
-	devRewardAmount := blockRewardsAmountDec.Mul(proportions.DeveloperRewards)
-	devRewardCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), devRewardAmount.TruncateInt())
+	devRewardAmount := blockRewardsAmountDec.Mul(proportions.DeveloperRewards).TruncateInt()
+	devRewardCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), devRewardAmount)
 
 	k.Logger(ctx).Debug(
 		"distributing minted coins to developer rewards receivers",
@@ -124,8 +124,8 @@ func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 	}
 
 	// calculate staking rewards
-	stakingRewardAmount := blockRewardsAmountDec.Mul(proportions.StakingRewards)
-	stakingRewardCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), stakingRewardAmount.TruncateInt())
+	stakingRewardAmount := blockRewardsAmountDec.Mul(proportions.StakingRewards).TruncateInt()
+	stakingRewardCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), stakingRewardAmount)
 
 	// subtract from original provision to ensure no coins left over after the allocations
 	communityPoolCoin := blockRewards.
