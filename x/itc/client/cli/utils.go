@@ -3,9 +3,10 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+
 	"github.com/OmniFlix/omniflixhub/x/itc/types"
 	"github.com/spf13/pflag"
-	"os"
 )
 
 // validate nft details object
