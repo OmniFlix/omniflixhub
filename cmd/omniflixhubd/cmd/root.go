@@ -34,7 +34,6 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	// this line is used by starport scaffolding # stargate/root/import
 )
 
 var ChainID string
@@ -47,7 +46,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	app.SetConfig()
 
 	initClientCtx := client.Context{}.
-		WithJSONCodec(encodingConfig.Marshaler).
+		WithCodec(encodingConfig.Marshaler).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
 		WithTxConfig(encodingConfig.TxConfig).
 		WithLegacyAmino(encodingConfig.Amino).
@@ -99,7 +98,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		tmcli.NewCompletionCmd(rootCmd, true),
 		debug.Cmd(),
 		config.Cmd(),
-		// this line is used by starport scaffolding # stargate/root/commands
 	)
 
 	a := appCreator{encodingConfig}
@@ -116,7 +114,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 
 func addModuleInitFlags(startCmd *cobra.Command) {
 	crisis.AddModuleInitFlags(startCmd)
-	// this line is used by starport scaffolding # stargate/root/initFlags
 }
 
 func queryCommand() *cobra.Command {
@@ -203,14 +200,11 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		panic(err)
 	}
 
-	// this line is used by starport scaffolding # stargate/root/appBeforeInit
-
 	return app.NewOmniFlixApp(
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		a.encCfg,
-		// this line is used by starport scaffolding # stargate/root/appArgument
 		appOpts,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
@@ -250,7 +244,6 @@ func (a appCreator) appExport(
 			homePath,
 			uint(1),
 			a.encCfg,
-			// this line is used by starport scaffolding # stargate/root/exportArgument
 			appOpts,
 		)
 
@@ -267,7 +260,6 @@ func (a appCreator) appExport(
 			homePath,
 			uint(1),
 			a.encCfg,
-			// this line is used by starport scaffolding # stargate/root/noHeightExportArgument
 			appOpts,
 		)
 	}

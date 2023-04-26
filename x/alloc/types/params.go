@@ -10,11 +10,13 @@ import (
 
 // Parameter store keys
 var (
-	KeyDistributionProportions  = []byte("DistributionProportions")
-	KeyDeveloperRewardsReceiver = []byte("DeveloperRewardsReceiver")
+	KeyDistributionProportions    = []byte("DistributionProportions")
+	KeyDeveloperRewardsReceiver   = []byte("DeveloperRewardsReceiver")
+	KeyNftIncentivesReceiver      = []byte("NftIncentivesReceiver")
+	KeyNodeHostIncentivesReceiver = []byte("NodeHostIncentivesReceiver")
 )
 
-// ParamTable for module.
+// ParamKeyTable ParamTable for module.
 func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
@@ -22,42 +24,61 @@ func ParamKeyTable() paramtypes.KeyTable {
 func NewParams(
 	distrProportions DistributionProportions,
 	weightedDevRewardsReceivers []WeightedAddress,
+	weightedNftIncentivesReceivers []WeightedAddress,
+	weightedNodeHostIncentivesReceivers []WeightedAddress,
 ) Params {
 	return Params{
-		DistributionProportions:           distrProportions,
-		WeightedDeveloperRewardsReceivers: weightedDevRewardsReceivers,
+		DistributionProportions:              distrProportions,
+		WeightedDeveloperRewardsReceivers:    weightedDevRewardsReceivers,
+		WeightedNftIncentivesReceivers:       weightedNftIncentivesReceivers,
+		WeightedNodeHostsIncentivesReceivers: weightedNodeHostIncentivesReceivers,
 	}
 }
 
-// default module parameters
+// DefaultParams default module parameters
 func DefaultParams() Params {
 	return Params{
 		DistributionProportions: DistributionProportions{
-			StakingRewards:      sdk.NewDecWithPrec(35, 2), // 35%
-			NftIncentives:       sdk.NewDecWithPrec(45, 2), // 40%
+			StakingRewards:      sdk.NewDecWithPrec(60, 2), // 60%
+			NftIncentives:       sdk.NewDecWithPrec(15, 2), // 15%
 			NodeHostsIncentives: sdk.NewDecWithPrec(5, 2),  // 5%
 			DeveloperRewards:    sdk.NewDecWithPrec(15, 2), // 15%
 			CommunityPool:       sdk.NewDecWithPrec(5, 2),  // 5%
 		},
-		WeightedDeveloperRewardsReceivers: []WeightedAddress{},
+		WeightedDeveloperRewardsReceivers:    []WeightedAddress{},
+		WeightedNftIncentivesReceivers:       []WeightedAddress{},
+		WeightedNodeHostsIncentivesReceivers: []WeightedAddress{},
 	}
 }
 
-// validate params
+// Validate validate params
 func (p Params) Validate() error {
 	if err := validateDistributionProportions(p.DistributionProportions); err != nil {
 		return err
 	}
-	err := validateWeightedDeveloperRewardsReceivers(p.WeightedDeveloperRewardsReceivers)
+	err := validateWeightedAddresses(p.WeightedDeveloperRewardsReceivers)
 	return err
 }
 
-// Implements params.ParamSet
+// ParamSetPairs Implements params.ParamSet
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(KeyDistributionProportions, &p.DistributionProportions, validateDistributionProportions),
 		paramtypes.NewParamSetPair(
-			KeyDeveloperRewardsReceiver, &p.WeightedDeveloperRewardsReceivers, validateWeightedDeveloperRewardsReceivers),
+			KeyDeveloperRewardsReceiver,
+			&p.WeightedDeveloperRewardsReceivers,
+			validateWeightedAddresses,
+		),
+		paramtypes.NewParamSetPair(
+			KeyNftIncentivesReceiver,
+			&p.WeightedNftIncentivesReceivers,
+			validateWeightedAddresses,
+		),
+		paramtypes.NewParamSetPair(
+			KeyNodeHostIncentivesReceiver,
+			&p.WeightedNodeHostsIncentivesReceivers,
+			validateWeightedAddresses,
+		),
 	}
 }
 
@@ -96,7 +117,7 @@ func validateDistributionProportions(i interface{}) error {
 	return nil
 }
 
-func validateWeightedDeveloperRewardsReceivers(i interface{}) error {
+func validateWeightedAddresses(i interface{}) error {
 	v, ok := i.([]WeightedAddress)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)

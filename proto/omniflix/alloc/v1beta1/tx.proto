@@ -3,7 +3,6 @@ package omniflix.alloc.v1beta1;
 
 
 
-// this line is used by starport scaffolding # proto/tx/import
 
 option go_package = "github.com/OmniFlix/omniflixhub/x/alloc/types";
 
