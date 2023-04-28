@@ -29,7 +29,7 @@ func ValidateCampaign(campaign Campaign) error {
 			return err
 		}
 	}
-	if campaign.ClaimType == CLAIM_TYPE_FT && campaign.Distribution.Type == DISTRIBUTION_TYPE_VEST {
+	if campaign.ClaimType == CLAIM_TYPE_FT && campaign.Distribution.Type == DISTRIBUTION_TYPE_STREAM {
 		if err := ValidateDistribution(campaign.Distribution); err != nil {
 			return err
 		}
@@ -118,10 +118,7 @@ func validateNFTMintDetails(details *NFTDetails) error {
 }
 
 func ValidateDistribution(distribution *Distribution) error {
-	if err := ValidateDuration(distribution.VestedDistributionEpochDuration); err != nil {
-		return err
-	}
-	if err := ValidateDuration(distribution.VestingDuration); err != nil {
+	if err := ValidateDuration(distribution.StreamDuration); err != nil {
 		return err
 	}
 	return nil

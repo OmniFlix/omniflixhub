@@ -16,10 +16,11 @@ type (
 		cdc      codec.Codec
 		storeKey sdk.StoreKey
 
-		accountKeeper types.AccountKeeper
-		bankKeeper    types.BankKeeper
-		nftKeeper     types.NftKeeper
-		paramSpace    paramtypes.Subspace
+		accountKeeper   types.AccountKeeper
+		bankKeeper      types.BankKeeper
+		nftKeeper       types.NftKeeper
+		streampayKeeper types.StreamPayKeeper
+		paramSpace      paramtypes.Subspace
 	}
 )
 
@@ -29,6 +30,7 @@ func NewKeeper(
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 	nftKeeper types.NftKeeper,
+	streampayKeeper types.StreamPayKeeper,
 	ps paramtypes.Subspace,
 ) Keeper {
 	// ensure itc module account is set
@@ -42,12 +44,13 @@ func NewKeeper(
 	}
 
 	return Keeper{
-		cdc:           cdc,
-		storeKey:      storeKey,
-		accountKeeper: accountKeeper,
-		bankKeeper:    bankKeeper,
-		nftKeeper:     nftKeeper,
-		paramSpace:    ps,
+		cdc:             cdc,
+		storeKey:        storeKey,
+		accountKeeper:   accountKeeper,
+		bankKeeper:      bankKeeper,
+		nftKeeper:       nftKeeper,
+		streampayKeeper: streampayKeeper,
+		paramSpace:      ps,
 	}
 }
 

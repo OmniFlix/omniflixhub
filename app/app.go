@@ -515,6 +515,7 @@ func NewOmniFlixApp(
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.ONFTKeeper,
+		app.StreamPayKeeper,
 		app.GetSubspace(itctypes.ModuleName),
 	)
 

@@ -58,17 +58,14 @@ message Campaign {
 
 message Distribution {
   DistributionType             type = 1;
-  google.protobuf.Duration     vested_distribution_epoch_duration = 2 [
-    (gogoproto.stdduration) = true
-  ];
-  google.protobuf.Duration     vesting_duration = 3 [
+  google.protobuf.Duration     stream_duration = 2 [
     (gogoproto.stdduration) = true
   ];
 }
 
 enum DistributionType {
   DISTRIBUTION_TYPE_INSTANT = 0;
-  DISTRIBUTION_TYPE_VEST = 1;
+  DISTRIBUTION_TYPE_STREAM = 1;
 }
 
 enum InteractionType {

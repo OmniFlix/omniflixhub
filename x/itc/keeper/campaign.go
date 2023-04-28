@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	streampaytypes "github.com/OmniFlix/streampay/x/streampay/types"
+
 	"github.com/OmniFlix/omniflixhub/x/itc/types"
 	nfttypes "github.com/OmniFlix/onft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -161,11 +163,13 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 	// Claim Claimable
 	if campaign.ClaimType == types.CLAIM_TYPE_FT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
 		tokensPerClaim := campaign.TokensPerClaim.Fungible
-		if campaign.Distribution != nil && campaign.Distribution.Type == types.DISTRIBUTION_TYPE_VEST {
-			// TODO: add vesting based on vesting periods if possible
-			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
-				types.ModuleName, claimer,
-				sdk.NewCoins(sdk.NewCoin(tokensPerClaim.Denom, tokensPerClaim.Amount))); err != nil {
+		if campaign.Distribution != nil && campaign.Distribution.Type == types.DISTRIBUTION_TYPE_STREAM {
+			if err = k.streampayKeeper.CreatePaymentStream(ctx,
+				k.GetModuleAccountAddress(ctx),
+				claimer, sdk.NewCoin(tokensPerClaim.Denom, tokensPerClaim.Amount),
+				streampaytypes.TypeContinuous,
+				ctx.BlockTime().Add(*campaign.Distribution.StreamDuration),
+			); err != nil {
 				return err
 			}
 		} else {

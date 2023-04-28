@@ -1,8 +1,11 @@
 package types
 
 import (
+	"time"
+
 	nft "github.com/OmniFlix/onft/exported"
 	nfttypes "github.com/OmniFlix/onft/types"
+	streampaytypes "github.com/OmniFlix/streampay/x/streampay/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
@@ -35,4 +38,13 @@ type NftKeeper interface {
 	) error
 	TransferOwnership(ctx sdk.Context, denomId, nftId string, srcOwner, dstOwner sdk.AccAddress) error
 	BurnONFT(ctx sdk.Context, denomId, nftId string, owner sdk.AccAddress) error
+}
+
+type StreamPayKeeper interface {
+	CreatePaymentStream(ctx sdk.Context,
+		sender, recipient sdk.AccAddress,
+		amount sdk.Coin,
+		paymentType streampaytypes.PaymentType,
+		endTime time.Time,
+	) error
 }
