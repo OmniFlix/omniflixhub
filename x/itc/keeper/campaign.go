@@ -185,7 +185,7 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 		if err := k.nftKeeper.MintONFT(
 			ctx,
 			campaign.NftMintDetails.DenomId,
-			nfttypes.GenUniqueID("onft"),
+			nfttypes.GenUniqueID(nfttypes.IDPrefix),
 			nfttypes.Metadata{
 				Name:        campaign.NftMintDetails.Name,
 				Description: campaign.NftMintDetails.Description,
