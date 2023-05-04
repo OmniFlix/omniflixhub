@@ -123,9 +123,9 @@ func (m msgServer) Claim(goCtx context.Context, msg *types.MsgClaim) (*types.Msg
 	return &types.MsgClaimResponse{}, nil
 }
 
-func (m msgServer) CampaignDeposit(goCtx context.Context,
-	msg *types.MsgCampaignDeposit,
-) (*types.MsgCampaignDepositResponse, error) {
+func (m msgServer) DepositCampaign(goCtx context.Context,
+	msg *types.MsgDepositCampaign,
+) (*types.MsgDepositCampaignResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	depositor, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {
@@ -139,9 +139,9 @@ func (m msgServer) CampaignDeposit(goCtx context.Context,
 		return nil, sdkerrors.Wrapf(types.ErrTokenDenomMismatch,
 			"token denom mismatch, required %s, got %s", campaign.TotalTokens.Fungible.Denom, msg.Amount.Denom)
 	}
-	if err := m.Keeper.CampaignDeposit(ctx, msg.CampaignId, depositor, msg.Amount); err != nil {
+	if err := m.Keeper.DepositCampaign(ctx, msg.CampaignId, depositor, msg.Amount); err != nil {
 		return nil, err
 	}
 
-	return &types.MsgCampaignDepositResponse{}, nil
+	return &types.MsgDepositCampaignResponse{}, nil
 }

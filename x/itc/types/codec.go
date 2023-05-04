@@ -12,7 +12,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateCampaign{}, "OmniFlix/itc/MsgCreateCampaign", nil)
 	cdc.RegisterConcrete(&MsgCancelCampaign{}, "OmniFlix/itc/MsgCancelCampaign", nil)
 	cdc.RegisterConcrete(&MsgClaim{}, "OmniFlix/itc/MsgClaim", nil)
-	cdc.RegisterConcrete(&MsgCampaignDeposit{}, "OmniFlix/itc/MsgCampaignDeposit", nil)
+	cdc.RegisterConcrete(&MsgDepositCampaign{}, "OmniFlix/itc/MsgDepositCampaign", nil)
 
 	cdc.RegisterInterface((*exported.CampaignI)(nil), nil)
 	cdc.RegisterConcrete(&Campaign{}, "OmniFlix/itc/Campaign", nil)
@@ -25,7 +25,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgCreateCampaign{},
 		&MsgCancelCampaign{},
 		&MsgClaim{},
-		&MsgCampaignDeposit{},
+		&MsgDepositCampaign{},
 	)
 
 	registry.RegisterImplementations((*exported.CampaignI)(nil),

@@ -59,6 +59,7 @@ message Campaign {
 message Distribution {
   DistributionType             type = 1;
   google.protobuf.Duration     stream_duration = 2 [
+    (gogoproto.nullable) = false,
     (gogoproto.stdduration) = true
   ];
 }

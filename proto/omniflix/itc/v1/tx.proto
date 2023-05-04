@@ -17,7 +17,7 @@ service Msg {
 
   rpc Claim(MsgClaim) returns (MsgClaimResponse);
 
-  rpc CampaignDeposit(MsgCampaignDeposit) returns (MsgCampaignDepositResponse);
+  rpc DepositCampaign(MsgDepositCampaign) returns (MsgDepositCampaignResponse);
 }
 
 message MsgCreateCampaign {
@@ -71,10 +71,10 @@ message MsgClaim {
 
 message MsgClaimResponse {}
 
-message MsgCampaignDeposit {
+message MsgDepositCampaign {
   uint64                    campaign_id = 1;
   cosmos.base.v1beta1.Coin  amount = 2 [(gogoproto.nullable) = false];
   string                    depositor = 3;
 }
 
-message MsgCampaignDepositResponse {}
+message MsgDepositCampaignResponse {}

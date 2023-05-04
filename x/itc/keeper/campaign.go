@@ -64,7 +64,7 @@ func (k Keeper) CreateCampaign(ctx sdk.Context, creator sdk.AccAddress, campaign
 	if campaign.ClaimType == types.CLAIM_TYPE_FT && campaign.TotalTokens.Fungible != nil {
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(
-				types.EventTypeCampaignDeposit,
+				types.EventTypeDepositCampaign,
 				sdk.NewAttribute(types.AttributeKeyCampaignId, fmt.Sprint(campaign.GetId())),
 				sdk.NewAttribute(types.AttributeKeyDepositor, creator.String()),
 			),
@@ -164,11 +164,11 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 	if campaign.ClaimType == types.CLAIM_TYPE_FT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
 		tokensPerClaim := campaign.TokensPerClaim.Fungible
 		if campaign.Distribution != nil && campaign.Distribution.Type == types.DISTRIBUTION_TYPE_STREAM {
-			if err = k.streampayKeeper.CreatePaymentStream(ctx,
+			if err := k.streampayKeeper.CreateStreamPayment(ctx,
 				k.GetModuleAccountAddress(ctx),
 				claimer, sdk.NewCoin(tokensPerClaim.Denom, tokensPerClaim.Amount),
 				streampaytypes.TypeContinuous,
-				ctx.BlockTime().Add(*campaign.Distribution.StreamDuration),
+				ctx.BlockTime().Add(campaign.Distribution.StreamDuration),
 			); err != nil {
 				return err
 			}
@@ -239,7 +239,7 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 	return nil
 }
 
-func (k Keeper) CampaignDeposit(ctx sdk.Context, campaignId uint64, depositor sdk.AccAddress, amount sdk.Coin) error {
+func (k Keeper) DepositCampaign(ctx sdk.Context, campaignId uint64, depositor sdk.AccAddress, amount sdk.Coin) error {
 	campaign, found := k.GetCampaign(ctx, campaignId)
 	if !found {
 		return sdkerrors.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", campaignId)
@@ -261,7 +261,7 @@ func (k Keeper) CampaignDeposit(ctx sdk.Context, campaignId uint64, depositor sd
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			types.EventTypeCampaignDeposit,
+			types.EventTypeDepositCampaign,
 			sdk.NewAttribute(types.AttributeKeyCampaignId, fmt.Sprint(campaign.GetId())),
 			sdk.NewAttribute(types.AttributeKeyAmount, amount.String()),
 			sdk.NewAttribute(types.AttributeKeyDepositor, depositor.String()),

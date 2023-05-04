@@ -5,7 +5,7 @@ const (
 	EventTypeCancelCampaign  = "cancel_campaign"
 	EventTypeClaim           = "claim"
 	EventTypeEndCampaign     = "end_campaign"
-	EventTypeCampaignDeposit = "campaign_deposit"
+	EventTypeDepositCampaign = "deposit_campaign"
 
 	AttributeValueCategory      = ModuleName
 	AttributeKeyCampaignId      = "campaign-id"

@@ -13,7 +13,7 @@ const (
 
 	TypeMsgCreateCampaign  = "create_campaign"
 	TypeMsgCancelCampaign  = "cancel_campaign"
-	TypeMsgCampaignDeposit = "deposit_campaign"
+	TypeMsgDepositCampaign = "deposit_campaign"
 	TypeMsgClaim           = "claim"
 
 	// DoNotModify used to indicate that some field should not be updated
@@ -90,7 +90,10 @@ func (msg MsgCreateCampaign) ValidateBasic() error {
 			return err
 		}
 	}
-	return nil
+	if err := ValidateTimestamp(msg.StartTime); err != nil {
+		return err
+	}
+	return ValidateDuration(msg.Duration)
 }
 
 // GetSignBytes Implements Msg.
@@ -140,19 +143,19 @@ func (msg MsgCancelCampaign) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
-func NewMsgCampaignDeposit(id uint64, amount sdk.Coin, depositor string) *MsgCampaignDeposit {
-	return &MsgCampaignDeposit{
+func NewMsgDepositCampaign(id uint64, amount sdk.Coin, depositor string) *MsgDepositCampaign {
+	return &MsgDepositCampaign{
 		CampaignId: id,
 		Amount:     amount,
 		Depositor:  depositor,
 	}
 }
 
-func (msg MsgCampaignDeposit) Route() string { return MsgRoute }
+func (msg MsgDepositCampaign) Route() string { return MsgRoute }
 
-func (msg MsgCampaignDeposit) Type() string { return TypeMsgCampaignDeposit }
+func (msg MsgDepositCampaign) Type() string { return TypeMsgDepositCampaign }
 
-func (msg MsgCampaignDeposit) ValidateBasic() error {
+func (msg MsgDepositCampaign) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid depositor address (%s)", err)
@@ -165,12 +168,12 @@ func (msg MsgCampaignDeposit) ValidateBasic() error {
 }
 
 // GetSignBytes Implements Msg.
-func (msg *MsgCampaignDeposit) GetSignBytes() []byte {
+func (msg *MsgDepositCampaign) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 // GetSigners Implements Msg.
-func (msg MsgCampaignDeposit) GetSigners() []sdk.AccAddress {
+func (msg MsgDepositCampaign) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {
 		panic(err)

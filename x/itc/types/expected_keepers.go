@@ -41,7 +41,7 @@ type NftKeeper interface {
 }
 
 type StreamPayKeeper interface {
-	CreatePaymentStream(ctx sdk.Context,
+	CreateStreamPayment(ctx sdk.Context,
 		sender, recipient sdk.AccAddress,
 		amount sdk.Coin,
 		paymentType streampaytypes.PaymentType,
