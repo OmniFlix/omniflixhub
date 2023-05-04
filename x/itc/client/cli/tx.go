@@ -27,7 +27,7 @@ func GetTxCmd() *cobra.Command {
 	itcTxCmd.AddCommand(
 		GetCmdCreateCampaign(),
 		GetCmdCancelCampaign(),
-		GetCmdCampaignDeposit(),
+		GetCmdDepositCampaign(),
 		GetCmdClaim(),
 	)
 
@@ -152,12 +152,29 @@ func GetCmdCreateCampaign() *cobra.Command {
 				depositTokens = types.Tokens{
 					Fungible: &tokensDeposit,
 				}
-				_, err = cmd.Flags().GetString(FlagDistributionType)
+				distributionType, err := cmd.Flags().GetString(FlagDistributionType)
 				if err != nil {
 					return err
 				}
-				distribution = &types.Distribution{
-					Type: types.DISTRIBUTION_TYPE_INSTANT,
+				if distributionType == "stream" {
+					streamDurationStr, err := cmd.Flags().GetString(FlagStreamDuration)
+					if err != nil {
+						return err
+					}
+					fmt.Println(streamDurationStr)
+					streamDuration, err := time.ParseDuration(streamDurationStr)
+					if err != nil {
+						return err
+					}
+					fmt.Println(streamDuration)
+					distribution = &types.Distribution{
+						Type:           types.DISTRIBUTION_TYPE_STREAM,
+						StreamDuration: streamDuration,
+					}
+				} else {
+					distribution = &types.Distribution{
+						Type: types.DISTRIBUTION_TYPE_INSTANT,
+					}
 				}
 			}
 
@@ -245,8 +262,8 @@ func GetCmdCancelCampaign() *cobra.Command {
 	return cmd
 }
 
-// GetCmdCampaignDeposit implements the bid command
-func GetCmdCampaignDeposit() *cobra.Command {
+// GetCmdDepositCampaign implements the bid command
+func GetCmdDepositCampaign() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "campaign-deposit",
 		Short: "deposits tokens into a campaign",
@@ -279,7 +296,7 @@ func GetCmdCampaignDeposit() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCampaignDeposit(campaignId, amount, depositor.String())
+			msg := types.NewMsgDepositCampaign(campaignId, amount, depositor.String())
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -289,7 +306,7 @@ func GetCmdCampaignDeposit() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FsCampaignDeposit)
+	cmd.Flags().AddFlagSet(FsDepositCampaign)
 	_ = cmd.MarkFlagRequired(FlagAmount)
 	flags.AddTxFlagsToCmd(cmd)
 

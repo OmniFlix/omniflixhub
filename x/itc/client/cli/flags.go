@@ -21,12 +21,13 @@ const (
 	FlagInteractionType  = "interaction-type"
 	FlagClaimType        = "claim-type"
 	FlagDistributionType = "distribution-type"
+	FlagStreamDuration   = "stream-duration"
 	FlagNftDetailsFile   = "nft-details-file"
 )
 
 var (
 	FsCreateCampaign  = flag.NewFlagSet("", flag.ContinueOnError)
-	FsCampaignDeposit = flag.NewFlagSet("", flag.ContinueOnError)
+	FsDepositCampaign = flag.NewFlagSet("", flag.ContinueOnError)
 	FsClaim           = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
@@ -42,9 +43,10 @@ func init() {
 	FsCreateCampaign.String(FlagStartTime, "", "campaign start time")
 	FsCreateCampaign.String(FlagDuration, "", "campaign duration")
 	FsCreateCampaign.String(FlagDistributionType, "", "type of distribution")
+	FsCreateCampaign.String(FlagStreamDuration, "", "claimed amount distribution duration")
 	FsCreateCampaign.String(FlagNftDetailsFile, "", "nft details file")
 
-	FsCampaignDeposit.String(FlagAmount, "", "deposit amount")
+	FsDepositCampaign.String(FlagAmount, "", "deposit amount")
 
 	FsClaim.String(FlagNftId, "", "nft id")
 	FsClaim.String(FlagInteractionType, "", "type of the interaction")
