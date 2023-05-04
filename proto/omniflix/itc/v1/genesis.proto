@@ -1,5 +1,5 @@
 syntax = "proto3";
-package omniflix.itc.v1;
+package OmniFlix.itc.v1;
 
 import "gogoproto/gogo.proto";
 import "omniflix/itc/v1/params.proto";
