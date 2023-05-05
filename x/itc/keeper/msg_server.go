@@ -31,6 +31,9 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 	if err != nil {
 		return nil, err
 	}
+	if msg.Deposit.Denom != msg.TokensPerClaim.Denom {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidTokens, "mismatched token denoms")
+	}
 	// StartTime must be after current time
 	if msg.StartTime.Before(ctx.BlockTime()) {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDuration, "start time must be in future")
@@ -135,9 +138,9 @@ func (m msgServer) DepositCampaign(goCtx context.Context,
 	if !found {
 		return nil, sdkerrors.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", msg.CampaignId)
 	}
-	if msg.Amount.Denom != campaign.TotalTokens.Fungible.Denom {
+	if msg.Amount.Denom != campaign.TotalTokens.Denom {
 		return nil, sdkerrors.Wrapf(types.ErrTokenDenomMismatch,
-			"token denom mismatch, required %s, got %s", campaign.TotalTokens.Fungible.Denom, msg.Amount.Denom)
+			"token denom mismatch, required %s, got %s", campaign.TotalTokens.Denom, msg.Amount.Denom)
 	}
 	if err := m.Keeper.DepositCampaign(ctx, msg.CampaignId, depositor, msg.Amount); err != nil {
 		return nil, err

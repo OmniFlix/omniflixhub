@@ -21,7 +21,7 @@ func NewCampaign(id uint64,
 	maxAllowedClaims uint64,
 	interaction InteractionType,
 	claimType ClaimType,
-	tokensPerClaim, totalTokens, availableTokens Tokens,
+	tokensPerClaim, totalTokens, availableTokens sdk.Coin,
 	nftMintDetails *NFTDetails,
 	distribution *Distribution,
 ) Campaign {
@@ -86,15 +86,15 @@ func (c Campaign) GetClaimType() string {
 	return c.ClaimType.String()
 }
 
-func (c Campaign) GetTokensPerClaim() interface{} {
+func (c Campaign) GetTokensPerClaim() sdk.Coin {
 	return c.TokensPerClaim
 }
 
-func (c Campaign) GetTotalTokens() interface{} {
+func (c Campaign) GetTotalTokens() sdk.Coin {
 	return c.TotalTokens
 }
 
-func (c Campaign) GetAvailableTokens() interface{} {
+func (c Campaign) GetAvailableTokens() sdk.Coin {
 	return c.AvailableTokens
 }
 
@@ -108,11 +108,4 @@ func (c Campaign) GetReceivedNftIds() []string {
 
 func (c Campaign) GetDistribution() interface{} {
 	return c.Distribution
-}
-
-func (c Campaign) GetStatus() string {
-	if c.StartTime.Before(time.Now()) && c.EndTime.After(time.Now()) {
-		return CAMPAIGN_STATUS_ACTIVE.String()
-	}
-	return CAMPAIGN_STATUS_INACTIVE.String()
 }

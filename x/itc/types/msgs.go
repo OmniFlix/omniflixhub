@@ -17,9 +17,6 @@ const (
 	TypeMsgCancelCampaign  = "cancel_campaign"
 	TypeMsgDepositCampaign = "deposit_campaign"
 	TypeMsgClaim           = "claim"
-
-	// DoNotModify used to indicate that some field should not be updated
-	DoNotModify = "[do-not-modify]"
 )
 
 var _ sdk.Msg = &MsgCreateCampaign{}
@@ -28,7 +25,7 @@ func NewMsgCreateCampaign(name, description string,
 	interaction InteractionType, claimType ClaimType,
 	nftDenomId string,
 	maxAllowedClaims uint64,
-	tokensPerClaim, tokenDeposit Tokens,
+	tokensPerClaim, tokenDeposit sdk.Coin,
 	nftMintDetails *NFTDetails,
 	distribution *Distribution,
 	startTime time.Time,
@@ -67,30 +64,22 @@ func (msg MsgCreateCampaign) ValidateBasic() error {
 	if err := ValidateInteractionType(msg.Interaction); err != nil {
 		return err
 	}
-	if err := ValidateTokensWithClaimType(msg.ClaimType, msg.Deposit); err != nil {
-		return err
-	}
-	if err := ValidateTokensWithClaimType(msg.ClaimType, msg.TokensPerClaim); err != nil {
-		return err
-	}
-	if msg.ClaimType == CLAIM_TYPE_NFT {
-		if err := validateNFTMintDetails(msg.NftMintDetails); err != nil {
+	if msg.ClaimType != CLAIM_TYPE_NFT {
+		if err := ValidateTokens(msg.Deposit, msg.TokensPerClaim); err != nil {
+			return err
+		}
+		if err := ValidateDistribution(msg.Distribution); err != nil {
 			return err
 		}
 	}
-	if msg.ClaimType == CLAIM_TYPE_FT && msg.Distribution.Type == DISTRIBUTION_TYPE_STREAM {
-		if err := ValidateDistribution(msg.Distribution); err != nil {
+	if msg.ClaimType != CLAIM_TYPE_FT {
+		if err := validateNFTMintDetails(msg.NftMintDetails); err != nil {
 			return err
 		}
 	}
 	if msg.MaxAllowedClaims == 0 {
 		return sdkerrors.Wrapf(ErrInValidMaxAllowedClaims,
 			"max allowed claims must be a positive number (%d)", msg.MaxAllowedClaims)
-	}
-	if msg.NftMintDetails != nil {
-		if err := validateNFTMintDetails(msg.NftMintDetails); err != nil {
-			return err
-		}
 	}
 	if err := ValidateTimestamp(msg.StartTime); err != nil {
 		return err

@@ -160,7 +160,7 @@ func parseDistribution(fs *pflag.FlagSet, claimType types.ClaimType) (*types.Dis
 func parseCampaignTokens(
 	fs *pflag.FlagSet,
 	claimType types.ClaimType,
-) (tokenPerClaim types.Tokens, tokensDeposited types.Tokens, err error) {
+) (tokenPerClaim sdk.Coin, tokensDeposited sdk.Coin, err error) {
 	if claimType == types.CLAIM_TYPE_NFT {
 		return tokenPerClaim, tokensDeposited, err
 	}
@@ -168,24 +168,20 @@ func parseCampaignTokens(
 	if err != nil {
 		return tokenPerClaim, tokensDeposited, err
 	}
-	fungibleTokensPerClaim, err := sdk.ParseCoinNormalized(tokensPerClaimStr)
+	tokenPerClaim, err = sdk.ParseCoinNormalized(tokensPerClaimStr)
 	if err != nil {
 		return tokenPerClaim, tokensDeposited, err
 	}
-	tokenPerClaim = types.Tokens{
-		Fungible: &fungibleTokensPerClaim,
-	}
+
 	tokensDepositStr, err := fs.GetString(FlagDeposit)
 	if err != nil {
 		return tokenPerClaim, tokensDeposited, err
 	}
-	fungibleTokensDeposit, err := sdk.ParseCoinNormalized(tokensDepositStr)
+	tokensDeposited, err = sdk.ParseCoinNormalized(tokensDepositStr)
 	if err != nil {
 		return tokenPerClaim, tokensDeposited, err
 	}
-	tokensDeposited = types.Tokens{
-		Fungible: &fungibleTokensDeposit,
-	}
+
 	return tokenPerClaim, tokensDeposited, err
 }
 
@@ -200,6 +196,6 @@ func parseCampaignStatus(fs *pflag.FlagSet) (campaignStatus types.CampaignStatus
 	case "inactive":
 		return types.CAMPAIGN_STATUS_INACTIVE, nil
 	default:
-		return campaignStatus, fmt.Errorf("inavalid campaign status")
+		return types.CAMPAIGN_STATUS_UNSPECIFIED, nil
 	}
 }

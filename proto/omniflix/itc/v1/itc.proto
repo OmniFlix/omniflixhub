@@ -33,15 +33,15 @@ message Campaign {
   ];
   InteractionType                   interaction = 9;
   ClaimType                         claim_type = 10;
-  Tokens                            tokens_per_claim = 11 [
+  cosmos.base.v1beta1.Coin          tokens_per_claim = 11 [
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"tokens_per_claim\""
   ];
-  Tokens                            total_tokens = 12 [
+  cosmos.base.v1beta1.Coin          total_tokens = 12 [
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"total_tokens\""
   ];
-  Tokens                            available_tokens = 13 [
+  cosmos.base.v1beta1.Coin          available_tokens = 13 [
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"available_tokens\""
   ];
@@ -81,11 +81,6 @@ enum CampaignStatus {
   CAMPAIGN_STATUS_ACTIVE = 2;
 }
 
-message Tokens {
-  cosmos.base.v1beta1.Coin fungible = 1;
-  cosmos.base.v1beta1.Coin non_fungible = 2;
-}
-
 enum ClaimType {
   CLAIM_TYPE_FT = 0;
   CLAIM_TYPE_NFT = 1;
@@ -99,8 +94,8 @@ message NFTDetails {
   string     media_uri = 4;
   string     preview_uri = 5;
   string     royalty_share = 6 [
-    (gogoproto.nullable)   = false,
-    (gogoproto.moretags)   = "yaml:\"royalty_share\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"royalty_share\"",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
   ];
   bool       transferable = 7;

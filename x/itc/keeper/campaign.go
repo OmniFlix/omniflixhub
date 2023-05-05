@@ -26,7 +26,7 @@ func (k Keeper) CreateCampaign(ctx sdk.Context, creator sdk.AccAddress, campaign
 			ctx,
 			creator,
 			types.ModuleName,
-			sdk.NewCoins(sdk.NewCoin(campaign.TotalTokens.Fungible.Denom, campaign.TotalTokens.Fungible.Amount)),
+			sdk.NewCoins(campaign.TotalTokens),
 		); err != nil {
 			return err
 		}
@@ -70,11 +70,14 @@ func (k Keeper) CancelCampaign(ctx sdk.Context, campaignId uint64, creator sdk.A
 		return sdkerrors.Wrapf(types.ErrCancelNotAllowed, "active campaign can not be canceled")
 	}
 	// return funds
-	availableTokens := campaign.AvailableTokens.Fungible
-	if availableTokens.IsValid() && !availableTokens.IsPositive() {
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
-			types.ModuleName, campaign.GetCreator(),
-			sdk.NewCoins(sdk.NewCoin(availableTokens.Denom, availableTokens.Amount))); err != nil {
+
+	if campaign.AvailableTokens.IsValid() && !campaign.AvailableTokens.IsPositive() {
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(
+			ctx,
+			types.ModuleName,
+			campaign.GetCreator(),
+			sdk.NewCoins(campaign.AvailableTokens),
+		); err != nil {
 			panic(err)
 		}
 	}
@@ -106,11 +109,11 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 		)
 	}
 
-	if campaign.ClaimType == types.CLAIM_TYPE_FT {
-		if campaign.AvailableTokens.Fungible.IsLT(*campaign.TokensPerClaim.Fungible) {
+	if campaign.ClaimType == types.CLAIM_TYPE_FT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
+		if campaign.AvailableTokens.IsLT(campaign.TokensPerClaim) {
 			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
 				"insufficient available tokens, available tokens  %s",
-				campaign.AvailableTokens.Fungible.String(),
+				campaign.AvailableTokens.String(),
 			)
 		}
 	}
@@ -138,25 +141,27 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 
 	// Claim Claimable
 	if campaign.ClaimType == types.CLAIM_TYPE_FT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
-		tokensPerClaim := campaign.TokensPerClaim.Fungible
+		claimAmount := campaign.TokensPerClaim
 		if campaign.Distribution != nil && campaign.Distribution.Type == types.DISTRIBUTION_TYPE_STREAM {
 			if err := k.streampayKeeper.CreateStreamPayment(ctx,
 				k.GetModuleAccountAddress(ctx),
-				claimer, sdk.NewCoin(tokensPerClaim.Denom, tokensPerClaim.Amount),
+				claimer, claimAmount,
 				streampaytypes.TypeContinuous,
 				ctx.BlockTime().Add(campaign.Distribution.StreamDuration),
 			); err != nil {
 				return err
 			}
 		} else {
-			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
-				types.ModuleName, claimer,
-				sdk.NewCoins(sdk.NewCoin(tokensPerClaim.Denom, tokensPerClaim.Amount))); err != nil {
+			if err := k.bankKeeper.SendCoinsFromModuleToAccount(
+				ctx,
+				types.ModuleName,
+				claimer,
+				sdk.NewCoins(claimAmount),
+			); err != nil {
 				return err
 			}
 		}
-		availableTokensAmount := campaign.AvailableTokens.Fungible.Amount.Sub(tokensPerClaim.Amount)
-		campaign.AvailableTokens.Fungible.Amount = availableTokensAmount
+		campaign.AvailableTokens.Amount = campaign.AvailableTokens.Amount.Sub(claimAmount.Amount)
 	}
 
 	if campaign.ClaimType == types.CLAIM_TYPE_NFT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
@@ -206,16 +211,19 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 		_ = k.nftKeeper.BurnONFT(ctx, campaign.NftDenomId, nft.GetID(), k.GetModuleAccountAddress(ctx))
 	}
 	// emit events
-	k.emitClaimEvent(ctx, campaign.Id, claimer.String())
+	k.emitClaimEvent(ctx, campaign.Id, claimer.String(), nft.GetID())
 
 	return nil
 }
 
-// TODO: only creator allowed to deposit ?
 func (k Keeper) DepositCampaign(ctx sdk.Context, campaignId uint64, depositor sdk.AccAddress, amount sdk.Coin) error {
 	campaign, found := k.GetCampaign(ctx, campaignId)
 	if !found {
 		return sdkerrors.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", campaignId)
+	}
+	if depositor.String() != campaign.Creator {
+		return sdkerrors.Wrapf(types.ErrDepositNotAllowed, "deposit not allowed from address %s"+
+			"only creator of the campaign is allowed to deposit", campaignId)
 	}
 	// Transfer tokens from depositor to module account
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(
@@ -227,8 +235,8 @@ func (k Keeper) DepositCampaign(ctx sdk.Context, campaignId uint64, depositor sd
 		return err
 	}
 	// Update total tokens and available tokens
-	campaign.TotalTokens.Fungible.Amount = campaign.TotalTokens.Fungible.Amount.Add(amount.Amount)
-	campaign.AvailableTokens.Fungible.Amount = campaign.AvailableTokens.Fungible.Amount.Add(amount.Amount)
+	campaign.TotalTokens = campaign.TotalTokens.Add(amount)
+	campaign.AvailableTokens = campaign.AvailableTokens.Add(amount)
 
 	k.SetCampaign(ctx, campaign)
 	k.emitDepositCampaignEvent(ctx, campaignId, depositor.String(), amount)

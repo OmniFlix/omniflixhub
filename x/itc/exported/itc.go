@@ -17,13 +17,12 @@ type CampaignI interface {
 	GetClaimType() string
 	GetInteraction() string
 	GetCreator() sdk.AccAddress
-	GetTokensPerClaim() interface{}
-	GetTotalTokens() interface{}
-	GetAvailableTokens() interface{}
+	GetTokensPerClaim() sdk.Coin
+	GetTotalTokens() sdk.Coin
+	GetAvailableTokens() sdk.Coin
 	GetReceivedNftIds() []string
 	GetNftMintDetails() interface{}
 	GetDistribution() interface{}
-	GetStatus() string
 }
 
 type ClaimI interface {
