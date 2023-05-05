@@ -59,7 +59,6 @@ func (k Keeper) emitEndCampaignEvent(ctx sdk.Context, campaignId uint64) {
 		sdk.NewEvent(
 			types.EventTypeEndCampaign,
 			sdk.NewAttribute(types.AttributeKeyCampaignId, fmt.Sprint(campaignId)),
-
 		),
 	)
 }
