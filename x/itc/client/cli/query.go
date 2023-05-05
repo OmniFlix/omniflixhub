@@ -113,18 +113,9 @@ func GetCmdQueryAllCampaigns() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			status, err := cmd.Flags().GetString(FlagStatus)
+			campaignStatus, err := parseCampaignStatus(cmd.Flags())
 			if err != nil {
 				return err
-			}
-			status = strings.ToLower(status)
-			var campaignStatus types.CampaignStatus
-			if status == "active" {
-				campaignStatus = types.CAMPAIGN_STATUS_ACTIVE
-			} else if status == "inactive" {
-				campaignStatus = types.CAMPAIGN_STATUS_INACTIVE
-			} else {
-				campaignStatus = types.CAMPAIGN_STATUS_UNSPECIFIED
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)

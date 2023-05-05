@@ -3,8 +3,6 @@ package cli
 import (
 	"fmt"
 	"strconv"
-	"strings"
-	"time"
 
 	"github.com/OmniFlix/omniflixhub/x/itc/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -63,40 +61,18 @@ func GetCmdCreateCampaign() *cobra.Command {
 			if err != nil {
 				return err
 			}
-
 			creator := clientCtx.GetFromAddress()
-			name, err := cmd.Flags().GetString(FlagName)
+			name, description, err := parseCampaignNameAndDescription(cmd.Flags())
 			if err != nil {
 				return err
 			}
-			description, err := cmd.Flags().GetString(FlagDescription)
+			claimType, err := parseClaimType(cmd.Flags())
 			if err != nil {
 				return err
 			}
-			claimType, err := cmd.Flags().GetString(FlagClaimType)
+			interactionType, err := parseInteractionType(cmd.Flags())
 			if err != nil {
 				return err
-			}
-			var claim types.ClaimType
-			if claimType == "fungible" {
-				claim = types.CLAIM_TYPE_FT
-			} else if claimType == "non-fungible" {
-				claim = types.CLAIM_TYPE_NFT
-			} else if claimType == "fungible-and-non-fungible" {
-				claim = types.CLAIM_TYPE_FT_AND_NFT
-			}
-			interactType, err := cmd.Flags().GetString(FlagInteractionType)
-			if err != nil {
-				return err
-			}
-			interactType = strings.ToLower(interactType)
-			var interaction types.InteractionType
-			if interactType == "hold" {
-				interaction = types.INTERACTION_TYPE_HOLD
-			} else if interactType == "burn" {
-				interaction = types.INTERACTION_TYPE_BURN
-			} else if interactType == "transfer" {
-				interaction = types.INTERACTION_TYPE_TRANSFER
 			}
 			nftDenomId, err := cmd.Flags().GetString(FlagNftDenomId)
 			if err != nil {
@@ -106,94 +82,31 @@ func GetCmdCreateCampaign() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			startTimeStr, err := cmd.Flags().GetString(FlagStartTime)
+			startTime, duration, err := parseStartTimeAndDuration(cmd.Flags())
 			if err != nil {
 				return err
 			}
-			var startTime time.Time
-			if startTimeStr != "" {
-				startTime, err = time.Parse(time.RFC3339, startTimeStr)
-				if err != nil {
-					return err
-				}
-			} else {
-				return fmt.Errorf("failed to parse start time: %s", startTime)
-			}
-			durationStr, err := cmd.Flags().GetString(FlagDuration)
+			tokensPerClaim, tokensDeposited, err := parseCampaignTokens(cmd.Flags(), claimType)
 			if err != nil {
 				return err
 			}
-			duration, err := time.ParseDuration(durationStr)
+			distribution, err := parseDistribution(cmd.Flags())
 			if err != nil {
 				return err
 			}
-			var claimTokens, depositTokens types.Tokens
-			var distribution *types.Distribution
-			if claim == types.CLAIM_TYPE_FT {
-				tokensPerClaimStr, err := cmd.Flags().GetString(FlagTokensPerClaim)
-				if err != nil {
-					return err
-				}
-				tokensPerClaim, err := sdk.ParseCoinNormalized(tokensPerClaimStr)
-				if err != nil {
-					return err
-				}
-				claimTokens = types.Tokens{
-					Fungible: &tokensPerClaim,
-				}
-				tokensDepositStr, err := cmd.Flags().GetString(FlagDeposit)
-				if err != nil {
-					return err
-				}
-				tokensDeposit, err := sdk.ParseCoinNormalized(tokensDepositStr)
-				if err != nil {
-					return err
-				}
-				depositTokens = types.Tokens{
-					Fungible: &tokensDeposit,
-				}
-				distributionType, err := cmd.Flags().GetString(FlagDistributionType)
-				if err != nil {
-					return err
-				}
-				if distributionType == "stream" {
-					streamDurationStr, err := cmd.Flags().GetString(FlagStreamDuration)
-					if err != nil {
-						return err
-					}
-					fmt.Println(streamDurationStr)
-					streamDuration, err := time.ParseDuration(streamDurationStr)
-					if err != nil {
-						return err
-					}
-					fmt.Println(streamDuration)
-					distribution = &types.Distribution{
-						Type:           types.DISTRIBUTION_TYPE_STREAM,
-						StreamDuration: streamDuration,
-					}
-				} else {
-					distribution = &types.Distribution{
-						Type: types.DISTRIBUTION_TYPE_INSTANT,
-					}
-				}
-			}
-
-			var nftDetails *types.NFTDetails
-			if claim == types.CLAIM_TYPE_NFT || claim == types.CLAIM_TYPE_FT_AND_NFT {
-				nftDetails, err = parseNftDetails(cmd.Flags())
-				if err != nil {
-					return err
-				}
+			nftDetails, err := parseNftDetails(cmd.Flags(), claimType)
+			if err != nil {
+				return err
 			}
 
 			msg := types.NewMsgCreateCampaign(name,
 				description,
-				interaction,
-				claim,
+				interactionType,
+				claimType,
 				nftDenomId,
 				maxAllowedClaims,
-				claimTokens,
-				depositTokens,
+				tokensPerClaim,
+				tokensDeposited,
 				nftDetails,
 				distribution,
 				startTime,
@@ -343,19 +256,7 @@ func GetCmdClaim() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			interaction, err := cmd.Flags().GetString(FlagInteractionType)
-			if err != nil {
-				return err
-			}
-			interaction = strings.ToLower(interaction)
-			var interactType types.InteractionType
-			if interaction == "hold" {
-				interactType = types.INTERACTION_TYPE_HOLD
-			} else if interaction == "transfer" {
-				interactType = types.INTERACTION_TYPE_TRANSFER
-			} else if interaction == "burn" {
-				interactType = types.INTERACTION_TYPE_BURN
-			}
+			interactType, err := parseInteractionType(cmd.Flags())
 
 			msg := types.NewMsgClaim(campaignId, nftId, interactType, claimer.String())
 
