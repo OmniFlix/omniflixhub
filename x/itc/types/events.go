@@ -9,13 +9,15 @@ const (
 
 	AttributeValueCategory      = ModuleName
 	AttributeKeyCampaignId      = "campaign-id"
-	AttributeKeyDenomId         = "denom-id"
 	AttributeKeyNftDenomId      = "nft-denom-id"
 	AttributeKeyNftId           = "nft-id"
+	AttributeKeyClaimType       = "claim-type"
+	AttributeKeyInteractionType = "interaction-type"
+	AttributeKeyStartTime       = "start-time"
+	AttributeKeyEndTime         = "end-time"
 	AttributeKeyClaimer         = "claimer"
 	AttributeKeyCreator         = "creator"
+	AttributeKeySender          = "sender"
 	AttributeKeyDepositor       = "depositor"
-	AttributeKeyAvailableTokens = "available-tokens"
-	AttributeKeyTotalTokens     = "total-tokens"
 	AttributeKeyAmount          = "amount"
 )
