@@ -18,18 +18,20 @@ func ValidateCampaign(campaign Campaign) error {
 	if err := ValidateInteractionType(campaign.Interaction); err != nil {
 		return err
 	}
-	if err := ValidateTokensWithClaimType(campaign.ClaimType, campaign.TotalTokens); err != nil {
-		return err
+	if campaign.ClaimType != CLAIM_TYPE_NFT {
+		if err := ValidateTokens(campaign.TotalTokens, campaign.TokensPerClaim); err != nil {
+			return err
+		}
+		if err := ValidateTokens(campaign.TotalTokens, campaign.AvailableTokens); err != nil {
+			return err
+		}
 	}
-	if err := ValidateTokensWithClaimType(campaign.ClaimType, campaign.TokensPerClaim); err != nil {
-		return err
-	}
-	if campaign.ClaimType == CLAIM_TYPE_NFT {
+	if campaign.ClaimType == CLAIM_TYPE_NFT || campaign.ClaimType == CLAIM_TYPE_FT_AND_NFT {
 		if err := validateNFTMintDetails(campaign.NftMintDetails); err != nil {
 			return err
 		}
 	}
-	if campaign.ClaimType == CLAIM_TYPE_FT && campaign.Distribution.Type == DISTRIBUTION_TYPE_STREAM {
+	if campaign.ClaimType == CLAIM_TYPE_FT || campaign.ClaimType == CLAIM_TYPE_FT_AND_NFT {
 		if err := ValidateDistribution(campaign.Distribution); err != nil {
 			return err
 		}
@@ -37,18 +39,6 @@ func ValidateCampaign(campaign Campaign) error {
 	if campaign.MaxAllowedClaims == 0 {
 		return sdkerrors.Wrapf(ErrInValidMaxAllowedClaims,
 			"max allowed claims must be a positive number (%d)", campaign.MaxAllowedClaims)
-	}
-	return nil
-}
-
-// ValidateTokens validates tokens
-func ValidateTokens(tokens Tokens) error {
-	if tokens.Fungible != nil && (tokens.Fungible.IsZero() || tokens.Fungible.IsNegative()) {
-		return sdkerrors.Wrapf(
-			ErrInvalidTokens,
-			"invalid tokens %s, only accepts positive amount",
-			tokens.String(),
-		)
 	}
 	return nil
 }
@@ -75,7 +65,7 @@ func ValidateTimestamp(t interface{}) error {
 
 func ValidCampaignStatus(status CampaignStatus) bool {
 	if status == CAMPAIGN_STATUS_INACTIVE ||
-		status == CAMPAIGN_STATUS_ACTIVE {
+		status == CAMPAIGN_STATUS_ACTIVE || status == CAMPAIGN_STATUS_UNSPECIFIED {
 		return true
 	}
 	return false
@@ -95,15 +85,28 @@ func ValidateClaim(claim Claim) error {
 	return nil
 }
 
-func ValidateTokensWithClaimType(claimType ClaimType, tokens Tokens) error {
-	if claimType == CLAIM_TYPE_FT {
-		if !(tokens.Fungible.IsValid() && tokens.Fungible.IsPositive()) {
-			return sdkerrors.Wrapf(
-				ErrInvalidTokens,
-				"invalid tokens %s, only accepts positive amount",
-				tokens.String(),
-			)
-		}
+func ValidateTokens(tokensA, tokensB sdk.Coin) error {
+	if !tokensA.IsValid() {
+		return sdkerrors.Wrapf(
+			ErrInvalidTokens,
+			"invalid tokens %s, only accepts positive amount",
+			tokensA.String(),
+		)
+	}
+	if !tokensB.IsValid() {
+		return sdkerrors.Wrapf(
+			ErrInvalidTokens,
+			"invalid tokens %s, only accepts positive amount",
+			tokensB.String(),
+		)
+	}
+	if tokensA.Denom != tokensB.Denom {
+		return sdkerrors.Wrapf(
+			ErrInvalidTokens,
+			"mismatched token denoms (%s, %s)",
+			tokensA.Denom,
+			tokensB.Denom,
+		)
 	}
 	return nil
 }
@@ -118,16 +121,21 @@ func validateNFTMintDetails(details *NFTDetails) error {
 }
 
 func ValidateDistribution(distribution *Distribution) error {
-	if err := ValidateDuration(distribution.StreamDuration); err != nil {
-		return err
+	if !(distribution.Type == DISTRIBUTION_TYPE_STREAM || distribution.Type == DISTRIBUTION_TYPE_INSTANT) {
+		return sdkerrors.Wrapf(ErrInvalidClaimType, "invalid distribution type (%s)", distribution.Type)
+	}
+	if distribution.Type == DISTRIBUTION_TYPE_STREAM {
+		if err := ValidateDuration(distribution.StreamDuration); err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
 func ValidateInteractionType(interaction InteractionType) error {
-	if interaction == INTERACTION_TYPE_BURN ||
-		interaction == INTERACTION_TYPE_TRANSFER || interaction == INTERACTION_TYPE_HOLD {
-		return nil
+	if !(interaction == INTERACTION_TYPE_BURN ||
+		interaction == INTERACTION_TYPE_TRANSFER || interaction == INTERACTION_TYPE_HOLD) {
+		return sdkerrors.Wrapf(ErrInvalidClaimType, "unknown interaction type (%s)", interaction)
 	}
-	return sdkerrors.Wrapf(ErrInvalidClaimType, "unknown interaction type (%s)", interaction)
+	return nil
 }
