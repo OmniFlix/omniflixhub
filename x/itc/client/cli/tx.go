@@ -113,7 +113,6 @@ func GetCmdCreateCampaign() *cobra.Command {
 				duration,
 				creator.String(),
 			)
-			fmt.Printf("%v", msg)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
