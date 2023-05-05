@@ -43,12 +43,23 @@ func (k Keeper) emitCancelCampaignEvent(ctx sdk.Context, campaignId uint64, send
 	)
 }
 
-func (k Keeper) emitClaimEvent(ctx sdk.Context, campaign uint64, claimer string) {
+func (k Keeper) emitClaimEvent(ctx sdk.Context, campaign uint64, claimer string, nftId string) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeClaim,
 			sdk.NewAttribute(types.AttributeKeyCampaignId, fmt.Sprint(campaign)),
 			sdk.NewAttribute(types.AttributeKeyClaimer, claimer),
+			sdk.NewAttribute(types.AttributeKeyNftId, nftId),
+		),
+	)
+}
+
+func (k Keeper) emitEndCampaignEvent(ctx sdk.Context, campaignId uint64) {
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeEndCampaign,
+			sdk.NewAttribute(types.AttributeKeyCampaignId, fmt.Sprint(campaignId)),
+
 		),
 	)
 }
