@@ -29,7 +29,7 @@ func validate(nft *types.NFTDetails) error {
 }
 
 func parseNftDetails(fs *pflag.FlagSet, claimType types.ClaimType) (nftDetails *types.NFTDetails, err error) {
-	if claimType != types.CLAIM_TYPE_FT {
+	if claimType == types.CLAIM_TYPE_FT {
 		return nftDetails, nil
 	}
 	nftDetailsFile, err := fs.GetString(FlagNftDetailsFile)
