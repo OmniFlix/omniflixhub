@@ -44,7 +44,7 @@ func parseNftDetails(fs *pflag.FlagSet, claimType types.ClaimType) (nftDetails *
 		return nil, err
 	}
 
-	err = json.Unmarshal(contents, nftDetails)
+	err = json.Unmarshal(contents, &nftDetails)
 	if err != nil {
 		return nil, err
 	}
@@ -123,8 +123,11 @@ func parseStartTimeAndDuration(fs *pflag.FlagSet) (startTime time.Time, duration
 	return startTime, duration, err
 }
 
-func parseDistribution(fs *pflag.FlagSet) (*types.Distribution, error) {
+func parseDistribution(fs *pflag.FlagSet, claimType types.ClaimType) (*types.Distribution, error) {
 	var distribution *types.Distribution
+	if claimType == types.CLAIM_TYPE_NFT {
+		return distribution, nil
+	}
 	distributionTypeStr, err := fs.GetString(FlagDistributionType)
 	if err != nil {
 		return distribution, err

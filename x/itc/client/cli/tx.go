@@ -90,7 +90,7 @@ func GetCmdCreateCampaign() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			distribution, err := parseDistribution(cmd.Flags())
+			distribution, err := parseDistribution(cmd.Flags(), claimType)
 			if err != nil {
 				return err
 			}
