@@ -23,3 +23,9 @@ func (k Keeper) GetMaxCampaignDuration(ctx sdk.Context) (duration time.Duration)
 	k.paramSpace.Get(ctx, types.ParamStoreKeyMaxCampaignDuration, &duration)
 	return duration
 }
+
+// GetCampaignCreationFee returns the creation fee required to create a campaign.
+func (k Keeper) GetCampaignCreationFee(ctx sdk.Context) (creationFee sdk.Coin) {
+	k.paramSpace.Get(ctx, types.ParamStoreKeyCampaignCreationFee, &creationFee)
+	return creationFee
+}

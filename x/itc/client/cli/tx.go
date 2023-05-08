@@ -98,6 +98,14 @@ func GetCmdCreateCampaign() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			creationFeeStr, err := cmd.Flags().GetString(FlagCreationFee)
+			if err != nil {
+				return err
+			}
+			creationFee, err := sdk.ParseCoinNormalized(creationFeeStr)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgCreateCampaign(name,
 				description,
@@ -112,6 +120,7 @@ func GetCmdCreateCampaign() *cobra.Command {
 				startTime,
 				duration,
 				creator.String(),
+				creationFee,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -130,6 +139,7 @@ func GetCmdCreateCampaign() *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagStartTime)
 	_ = cmd.MarkFlagRequired(FlagDuration)
 	_ = cmd.MarkFlagRequired(FlagMaxAllowedClaims)
+	_ = cmd.MarkFlagRequired(FlagCreationFee)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd

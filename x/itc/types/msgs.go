@@ -31,6 +31,7 @@ func NewMsgCreateCampaign(name, description string,
 	startTime time.Time,
 	duration time.Duration,
 	creator string,
+	creationFee sdk.Coin,
 ) *MsgCreateCampaign {
 	return &MsgCreateCampaign{
 		Name:             name,
@@ -46,6 +47,7 @@ func NewMsgCreateCampaign(name, description string,
 		StartTime:        startTime,
 		Duration:         duration,
 		Creator:          creator,
+		CreationFee:      creationFee,
 	}
 }
 
@@ -84,7 +86,10 @@ func (msg MsgCreateCampaign) ValidateBasic() error {
 	if err := ValidateTimestamp(msg.StartTime); err != nil {
 		return err
 	}
-	return ValidateDuration(msg.Duration)
+	if err := ValidateDuration(msg.Duration); err != nil {
+		return err
+	}
+	return msg.CreationFee.Validate()
 }
 
 // GetSignBytes Implements Msg.

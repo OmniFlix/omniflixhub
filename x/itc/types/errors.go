@@ -22,4 +22,7 @@ var (
 	ErrCancelNotAllowed        = sdkerrors.Register(ModuleName, 15, "cancel not allowed")
 	ErrClaimingNFT             = sdkerrors.Register(ModuleName, 16, "claim nft failed")
 	ErrDepositNotAllowed       = sdkerrors.Register(ModuleName, 17, "deposit not allowed")
+	ErrInvalidCreationFee      = sdkerrors.Register(ModuleName, 18, "invalid fee")
+	ErrInvalidFeeDenom         = sdkerrors.Register(ModuleName, 19, "invalid fee denom")
+	ErrNotEnoughFeeAmount      = sdkerrors.Register(ModuleName, 20, "not enough fee")
 )

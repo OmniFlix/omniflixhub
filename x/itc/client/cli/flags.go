@@ -23,6 +23,7 @@ const (
 	FlagDistributionType = "distribution-type"
 	FlagStreamDuration   = "stream-duration"
 	FlagNftDetailsFile   = "nft-details-file"
+	FlagCreationFee      = "creation-fee"
 )
 
 var (
@@ -45,6 +46,7 @@ func init() {
 	FsCreateCampaign.String(FlagDistributionType, "", "type of distribution")
 	FsCreateCampaign.String(FlagStreamDuration, "", "claimed amount distribution duration")
 	FsCreateCampaign.String(FlagNftDetailsFile, "", "nft details file")
+	FsCreateCampaign.String(FlagCreationFee, "", "creation fee")
 
 	FsDepositCampaign.String(FlagAmount, "", "deposit amount")
 

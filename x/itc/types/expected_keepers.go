@@ -48,3 +48,8 @@ type StreamPayKeeper interface {
 		endTime time.Time,
 	) error
 }
+
+// DistributionKeeper defines the expected distribution keeper
+type DistributionKeeper interface {
+	FundCommunityPool(ctx sdk.Context, amount sdk.Coins, sender sdk.AccAddress) error
+}

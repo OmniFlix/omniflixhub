@@ -46,6 +46,21 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDuration,
 			"duration must be less than max campaign duration (%d)", m.Keeper.GetMaxCampaignDuration(ctx))
 	}
+	campaignCreationFee := m.Keeper.GetCampaignCreationFee(ctx)
+	if !msg.CreationFee.Equal(campaignCreationFee) {
+		if msg.CreationFee.Denom != campaignCreationFee.Denom {
+			return nil, sdkerrors.Wrapf(types.ErrInvalidFeeDenom, "invalid creation fee denom %s",
+				msg.CreationFee.Denom)
+		}
+		if msg.CreationFee.Amount.LT(campaignCreationFee.Amount) {
+			return nil, sdkerrors.Wrapf(types.ErrNotEnoughFeeAmount,
+				"%s fee is not enough, to create %s fee is required",
+				msg.CreationFee.String(), campaignCreationFee.String())
+		}
+		return nil, sdkerrors.Wrapf(types.ErrInvalidCreationFee,
+			"given fee (%s) not matched with  campaign creation fee. %s required to create itc campaign",
+			msg.CreationFee.String(), campaignCreationFee.String())
+	}
 
 	availableTokens := msg.Deposit
 	campaignNumber := m.Keeper.GetNextCampaignNumber(ctx)
@@ -65,7 +80,7 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 		msg.NftMintDetails,
 		msg.Distribution,
 	)
-	err = m.Keeper.CreateCampaign(ctx, creator, campaign)
+	err = m.Keeper.CreateCampaign(ctx, creator, campaign, msg.CreationFee)
 	if err != nil {
 		return nil, err
 	}

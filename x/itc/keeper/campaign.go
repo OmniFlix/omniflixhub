@@ -10,7 +10,12 @@ import (
 )
 
 // CreateCampaign ...
-func (k Keeper) CreateCampaign(ctx sdk.Context, creator sdk.AccAddress, campaign types.Campaign) error {
+func (k Keeper) CreateCampaign(
+	ctx sdk.Context,
+	creator sdk.AccAddress,
+	campaign types.Campaign,
+	creationFee sdk.Coin,
+) error {
 	// verify collection
 	collection, err := k.nftKeeper.GetDenom(ctx, campaign.NftDenomId)
 	if err != nil {
@@ -46,6 +51,14 @@ func (k Keeper) CreateCampaign(ctx sdk.Context, creator sdk.AccAddress, campaign
 				campaign.Creator,
 			)
 		}
+	}
+	// cut creation fee amount and fund the community pool
+	if err := k.distributionKeeper.FundCommunityPool(
+		ctx,
+		sdk.NewCoins(creationFee),
+		creator,
+	); err != nil {
+		return err
 	}
 
 	k.SetCampaign(ctx, campaign)
