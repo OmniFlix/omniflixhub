@@ -2,9 +2,10 @@ package types
 
 import (
 	"fmt"
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"time"
 
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
@@ -13,9 +14,7 @@ const (
 	DefaultMaxCampaignDuration = time.Hour * 24 * 90 // 90 days
 )
 
-var (
-	DefaultCampaignCreationFee = sdk.NewInt64Coin("uflix", 10_000_000)
-)
+var DefaultCampaignCreationFee = sdk.NewInt64Coin("uflix", 10_000_000)
 
 var (
 	ParamStoreKeyMaxCampaignDuration = []byte("MaxCampaignDuration")
