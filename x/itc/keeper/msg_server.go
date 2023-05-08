@@ -153,6 +153,9 @@ func (m msgServer) DepositCampaign(goCtx context.Context,
 	if !found {
 		return nil, sdkerrors.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", msg.CampaignId)
 	}
+	if campaign.ClaimType == types.CLAIM_TYPE_NFT {
+		return nil, sdkerrors.Wrapf(types.ErrDepositNotAllowed, "deposit not allowed for this type of campaign")
+	}
 	if msg.Amount.Denom != campaign.TotalTokens.Denom {
 		return nil, sdkerrors.Wrapf(types.ErrTokenDenomMismatch,
 			"token denom mismatch, required %s, got %s", campaign.TotalTokens.Denom, msg.Amount.Denom)
