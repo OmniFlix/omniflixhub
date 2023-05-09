@@ -236,7 +236,7 @@ func (k Keeper) DepositCampaign(ctx sdk.Context, campaignId uint64, depositor sd
 	}
 	if depositor.String() != campaign.Creator {
 		return sdkerrors.Wrapf(types.ErrDepositNotAllowed, "deposit not allowed from address %s"+
-			"only creator of the campaign is allowed to deposit", campaignId)
+			"only creator of the campaign is allowed to deposit", depositor.String())
 	}
 	// Transfer tokens from depositor to module account
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(

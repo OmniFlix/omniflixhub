@@ -266,6 +266,9 @@ func GetCmdClaim() *cobra.Command {
 				return err
 			}
 			interactType, err := parseInteractionType(cmd.Flags())
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgClaim(campaignId, nftId, interactType, claimer.String())
 
