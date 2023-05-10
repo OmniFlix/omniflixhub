@@ -84,7 +84,7 @@ func (k Keeper) CancelCampaign(ctx sdk.Context, campaignId uint64, creator sdk.A
 	}
 	// return funds
 
-	if campaign.AvailableTokens.IsValid() && !campaign.AvailableTokens.IsPositive() {
+	if campaign.AvailableTokens.IsValid() && campaign.AvailableTokens.Amount.GT(sdk.ZeroInt()) {
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(
 			ctx,
 			types.ModuleName,
