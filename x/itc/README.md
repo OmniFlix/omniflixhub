@@ -1,4 +1,5 @@
 # ITC (Interact To Claim)
+## Abstract
 
 The ITC module is designed to enable any account to create campaigns with different types of claims and interactions. Campaigns can be used to distribute fungible tokens or NFTs to users who interact with them using NFTs.
 
@@ -8,7 +9,7 @@ After successfully interacting with a campaign, the claimer will receive the fol
 - If the claim type is `CLAIM_TYPE_NFT`, an NFT will be minted and sent to the claimer address.
 - If the claim type is `CLAIM_TYPE_FT_AND_NFT`, both an amount and an NFT will be sent to the claimer address.
 
-## Campaign Types
+### Campaign Types
 
 There are three campaign types that can be created using the ITC module:
 
@@ -16,7 +17,7 @@ There are three campaign types that can be created using the ITC module:
 - Non-fungible token claim campaign (`CLAIM_TYPE_NFT`): Users can claim NFTs by interacting with the campaign using NFTs.
 - Both fungible and non-fungible token claim campaign (`CLAIM_TYPE_FT_AND_NFT`): Users can claim both fungible tokens and NFTs by interacting with the campaign using NFTs.
 
-## Interaction Types
+### Interaction Types
 
 There are three interaction types that can be used in the ITC module:
 
