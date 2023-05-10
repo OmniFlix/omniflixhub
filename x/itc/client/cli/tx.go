@@ -187,10 +187,10 @@ func GetCmdCancelCampaign() *cobra.Command {
 // GetCmdDepositCampaign implements the bid command
 func GetCmdDepositCampaign() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "campaign-deposit",
+		Use:   "deposit-campaign",
 		Short: "deposits tokens into a campaign",
 		Example: fmt.Sprintf(
-			"$ %s tx itc deposit [campaign-id] "+
+			"$ %s tx itc deposit-campaign [campaign-id] "+
 				"--amount=<amount> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
