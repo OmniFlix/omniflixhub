@@ -2,7 +2,8 @@ package keeper
 
 import (
 	"fmt"
-	"github.com/OmniFlix/marketplace/x/marketplace/types"
+
+	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/gogo/protobuf/types"
@@ -119,6 +120,7 @@ func (k Keeper) SetAuctionListingWithOwner(ctx sdk.Context, owner sdk.AccAddress
 
 	store.Set(types.KeyAuctionOwnerPrefix(owner, id), bz)
 }
+
 func (k Keeper) UnsetAuctionListingWithOwner(ctx sdk.Context, owner sdk.AccAddress, id uint64) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.KeyAuctionOwnerPrefix(owner, id))
@@ -179,9 +181,7 @@ func (k Keeper) IterateInactiveAuctions(ctx sdk.Context, fn func(index int, item
 	for i := 0; iter.Valid(); iter.Next() {
 		var id gogotypes.UInt64Value
 		k.cdc.MustUnmarshal(iter.Value(), &id)
-		var (
-			auction, _ = k.GetAuctionListing(ctx, id.Value)
-		)
+		auction, _ := k.GetAuctionListing(ctx, id.Value)
 
 		if stop := fn(i, auction); stop {
 			break
@@ -198,9 +198,7 @@ func (k Keeper) IterateActiveAuctions(ctx sdk.Context, fn func(index int, item t
 	for i := 0; iter.Valid(); iter.Next() {
 		var id gogotypes.UInt64Value
 		k.cdc.MustUnmarshal(iter.Value(), &id)
-		var (
-			auction, _ = k.GetAuctionListing(ctx, id.Value)
-		)
+		auction, _ := k.GetAuctionListing(ctx, id.Value)
 
 		if stop := fn(i, auction); stop {
 			break

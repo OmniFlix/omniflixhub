@@ -3,9 +3,8 @@ package keeper
 import (
 	"time"
 
-	"github.com/OmniFlix/marketplace/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 )
 
 // GetParams gets the parameters for the marketplace module.

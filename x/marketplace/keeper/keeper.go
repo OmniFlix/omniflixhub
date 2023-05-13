@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -9,7 +10,7 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/OmniFlix/marketplace/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
 )
 
 type Keeper struct {
@@ -69,7 +70,6 @@ func (k Keeper) AddListing(ctx sdk.Context, listing types.Listing) error {
 	err := k.nftKeeper.TransferOwnership(ctx,
 		listing.GetDenomId(), listing.GetNftId(), listing.GetOwner(),
 		k.accountKeeper.GetModuleAddress(types.ModuleName))
-
 	if err != nil {
 		return err
 	}
@@ -225,7 +225,6 @@ func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) 
 
 // CreateAuctionListing creates a auction in the store and set owner to auction and updates the next auction number
 func (k Keeper) CreateAuctionListing(ctx sdk.Context, auction types.AuctionListing) error {
-
 	// check auction already exists or not
 	if k.HasAuctionListing(ctx, auction.GetId()) {
 		return sdkerrors.Wrapf(types.ErrListingAlreadyExists, "auction listing already exists: %s", auction.GetId())
@@ -234,7 +233,6 @@ func (k Keeper) CreateAuctionListing(ctx sdk.Context, auction types.AuctionListi
 	err := k.nftKeeper.TransferOwnership(ctx,
 		auction.GetDenomId(), auction.GetNftId(), auction.GetOwner(),
 		k.accountKeeper.GetModuleAddress(types.ModuleName))
-
 	if err != nil {
 		return err
 	}

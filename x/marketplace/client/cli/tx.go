@@ -2,16 +2,17 @@ package cli
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/spf13/cobra"
-	"strconv"
-	"strings"
-	"time"
 
-	"github.com/OmniFlix/marketplace/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
 	"github.com/cosmos/cosmos-sdk/client"
 )
 
@@ -386,7 +387,6 @@ func GetCmdCreateAuction() *cobra.Command {
 	return cmd
 }
 
-
 // GetCmdCancelAuction implements the cancel-auction command
 func GetCmdCancelAuction() *cobra.Command {
 	cmd := &cobra.Command{
@@ -408,7 +408,7 @@ func GetCmdCancelAuction() *cobra.Command {
 
 			owner := clientCtx.GetFromAddress()
 
-			auctionId, err := strconv.ParseUint(strings.TrimSpace(args[0]),10, 64)
+			auctionId, err := strconv.ParseUint(strings.TrimSpace(args[0]), 10, 64)
 			if err != nil {
 				return err
 			}

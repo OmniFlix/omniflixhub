@@ -1,10 +1,11 @@
 package types
 
 import (
-	"github.com/OmniFlix/marketplace/x/marketplace/exported"
+	"time"
+
+	"github.com/OmniFlix/omniflixhub/x/marketplace/exported"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
-	"time"
 )
 
 var (
@@ -13,7 +14,8 @@ var (
 )
 
 func NewAuctionListing(id uint64, nftId, denomId string, startTime time.Time, endTime *time.Time, startPrice sdk.Coin, incrementPercentage sdk.Dec,
-	owner sdk.AccAddress, whitelistAccounts []string, splitShares []WeightedAddress) AuctionListing {
+	owner sdk.AccAddress, whitelistAccounts []string, splitShares []WeightedAddress,
+) AuctionListing {
 	return AuctionListing{
 		Id:                  id,
 		NftId:               nftId,
@@ -39,6 +41,7 @@ func (al AuctionListing) GetDenomId() string {
 func (al AuctionListing) GetNftId() string {
 	return al.NftId
 }
+
 func (al AuctionListing) GetStartTime() time.Time {
 	return al.StartTime
 }
@@ -64,7 +67,7 @@ func (al AuctionListing) GetStatus() string {
 	if al.StartTime.Before(time.Now()) {
 		return AUCTION_STATUS_ACTIVE.String()
 	}
-	return  AUCTION_STATUS_INACTIVE.String()
+	return AUCTION_STATUS_INACTIVE.String()
 }
 
 func ValidAuctionStatus(status AuctionStatus) bool {

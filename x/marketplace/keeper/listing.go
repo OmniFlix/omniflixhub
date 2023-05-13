@@ -2,7 +2,8 @@ package keeper
 
 import (
 	"encoding/binary"
-	"github.com/OmniFlix/marketplace/x/marketplace/types"
+
+	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/gogo/protobuf/types"
@@ -115,6 +116,7 @@ func (k Keeper) SetWithOwner(ctx sdk.Context, owner sdk.AccAddress, id string) {
 
 	store.Set(types.KeyListingOwnerPrefix(owner, id), bz)
 }
+
 func (k Keeper) UnsetWithOwner(ctx sdk.Context, owner sdk.AccAddress, id string) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.KeyListingOwnerPrefix(owner, id))
@@ -125,6 +127,7 @@ func (k Keeper) SetWithNFTID(ctx sdk.Context, nftId, id string) {
 	bz := k.cdc.MustMarshal(&gogotypes.StringValue{Value: id})
 	store.Set(types.KeyListingNFTIDPrefix(nftId), bz)
 }
+
 func (k Keeper) UnsetWithNFTID(ctx sdk.Context, nftId string) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixListingNFTID)
 	store.Delete(types.KeyListingNFTIDPrefix(nftId))
@@ -136,6 +139,7 @@ func (k Keeper) SetWithPriceDenom(ctx sdk.Context, priceDenom, id string) {
 
 	store.Set(types.KeyListingPriceDenomPrefix(priceDenom, id), bz)
 }
+
 func (k Keeper) UnsetWithPriceDenom(ctx sdk.Context, priceDenom, id string) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.KeyListingPriceDenomPrefix(priceDenom, id))

@@ -3,14 +3,15 @@ package cli
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
-	"strconv"
-	"strings"
 
-	"github.com/OmniFlix/marketplace/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
 	"github.com/spf13/cobra"
 )
 
@@ -75,7 +76,6 @@ func GetCmdQueryListing() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags())
-
 			if err != nil {
 				return err
 			}
@@ -87,7 +87,6 @@ func GetCmdQueryListing() *cobra.Command {
 			res, err := queryClient.Listing(context.Background(), &types.QueryListingRequest{
 				Id: listingId,
 			})
-
 			if err != nil {
 				return err
 			}
@@ -109,7 +108,6 @@ func GetCmdQueryAllListings() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags())
-
 			if err != nil {
 				return err
 			}
@@ -196,7 +194,6 @@ func GetCmdQueryListingsByOwner() *cobra.Command {
 	return cmd
 }
 
-
 // GetCmdQueryAuctionListing implements the query auction command.
 func GetCmdQueryAuction() *cobra.Command {
 	cmd := &cobra.Command{
@@ -207,7 +204,6 @@ func GetCmdQueryAuction() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags())
-
 			if err != nil {
 				return err
 			}
@@ -222,7 +218,6 @@ func GetCmdQueryAuction() *cobra.Command {
 			res, err := queryClient.Auction(context.Background(), &types.QueryAuctionRequest{
 				Id: auctionId,
 			})
-
 			if err != nil {
 				return err
 			}
@@ -244,7 +239,6 @@ func GetCmdQueryAllAuctions() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags())
-
 			if err != nil {
 				return err
 			}
@@ -341,7 +335,6 @@ func GetCmdQueryAuctionBid() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags())
-
 			if err != nil {
 				return err
 			}
@@ -356,7 +349,6 @@ func GetCmdQueryAuctionBid() *cobra.Command {
 			res, err := queryClient.Bid(context.Background(), &types.QueryBidRequest{
 				Id: auctionId,
 			})
-
 			if err != nil {
 				return err
 			}
@@ -378,7 +370,6 @@ func GetCmdQueryAllBids() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags())
-
 			if err != nil {
 				return err
 			}
@@ -395,7 +386,7 @@ func GetCmdQueryAllBids() *cobra.Command {
 			resp, err := queryClient.Bids(
 				context.Background(),
 				&types.QueryBidsRequest{
-					Bidder:      bidder,
+					Bidder:     bidder,
 					Pagination: pageReq,
 				},
 			)

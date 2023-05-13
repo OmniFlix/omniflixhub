@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/OmniFlix/marketplace/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
@@ -135,7 +135,6 @@ func (k Keeper) ListingsByPriceDenom(
 	goCtx context.Context,
 	req *types.QueryListingsByPriceDenomRequest,
 ) (*types.QueryListingsByPriceDenomResponse, error) {
-
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
@@ -168,7 +167,6 @@ func (k Keeper) ListingByNftId(
 	goCtx context.Context,
 	req *types.QueryListingByNFTIDRequest,
 ) (*types.QueryListingResponse, error) {
-
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
@@ -293,6 +291,7 @@ func (k Keeper) AuctionsByOwner(goCtx context.Context, req *types.QueryAuctionsB
 
 	return &types.QueryAuctionsResponse{Auctions: auctions, Pagination: pageRes}, nil
 }
+
 func (k Keeper) AuctionsByPriceDenom(goCtx context.Context, req *types.QueryAuctionsByPriceDenomRequest) (*types.QueryAuctionsResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")

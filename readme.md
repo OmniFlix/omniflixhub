@@ -52,7 +52,7 @@ curl https://raw.githubusercontent.com/OmniFlix/mainnet/main/omniflixhub-1/genes
    
 ### OmniFlix Modules
 - [oNFT](https://github.com/OmniFlix/onft)
-- [Marketplace](https://github.com/OmniFlix/marketplace)
+- [Marketplace](https://github.com/OmniFlix/omniflixhub)
  
 ### Documentation
 

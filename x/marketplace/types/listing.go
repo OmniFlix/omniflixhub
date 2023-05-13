@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/OmniFlix/marketplace/x/marketplace/exported"
+	"github.com/OmniFlix/omniflixhub/x/marketplace/exported"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
 )

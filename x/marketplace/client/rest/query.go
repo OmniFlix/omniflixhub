@@ -13,11 +13,10 @@ import (
 	sdkquery "github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 
-	"github.com/OmniFlix/marketplace/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
 )
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
-
 	r.HandleFunc(fmt.Sprintf("/%s/parameters", types.ModuleName),
 		queryParams(cliCtx),
 	).Methods("GET")
