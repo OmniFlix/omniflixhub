@@ -130,14 +130,12 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 			)
 		}
 	}
+	if !claimer.Equals(nft.GetOwner()) {
+		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
+			"nft %s isn't owned by address  %s", claim.NftId, claimer.String())
+	}
 
-	if campaign.Interaction == types.INTERACTION_TYPE_HOLD {
-		if !claimer.Equals(nft.GetOwner()) {
-			return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
-				"nft %s isn't owned by claimer  %s", claim.NftId, claimer.String())
-		}
-	} else {
-		// TransferOwnership to module account
+	if campaign.Interaction == types.INTERACTION_TYPE_TRANSFER {
 		err := k.nftKeeper.TransferOwnership(ctx,
 			campaign.NftDenomId,
 			nft.GetID(),
@@ -147,8 +145,15 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 		if err != nil {
 			return err
 		}
-		if campaign.Interaction == types.INTERACTION_TYPE_TRANSFER {
-			campaign.ReceivedNftIds = append(campaign.ReceivedNftIds, nft.GetID())
+		campaign.ReceivedNftIds = append(campaign.ReceivedNftIds, nft.GetID())
+	} else if campaign.Interaction == types.INTERACTION_TYPE_BURN {
+		err := k.nftKeeper.BurnONFT(ctx,
+			campaign.NftDenomId,
+			nft.GetID(),
+			claimer,
+		)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -219,10 +224,6 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 	// set campaign
 	k.SetCampaign(ctx, campaign)
 
-	// burn nft
-	if campaign.Interaction == types.INTERACTION_TYPE_BURN {
-		_ = k.nftKeeper.BurnONFT(ctx, campaign.NftDenomId, nft.GetID(), k.GetModuleAccountAddress(ctx))
-	}
 	// emit events
 	k.emitClaimEvent(ctx, campaign.Id, claimer.String(), nft.GetID())
 
