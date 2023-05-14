@@ -5,19 +5,19 @@ import (
 )
 
 const (
-	FlagDenomId     = "denom-id"
-	FlagNftId       = "nft-id"
-	FlagPrice       = "price"
-	FlagOwner       = "owner"
-	FlagBidder      = "bidder"
-	FlagPriceDenom  = "price-denom"
-	FlagSplitShares = "split-shares"
-	FlagWhiteListAccounts = "whitelist-accounts"
-	FlagStartTime   = "start-time"
-	FlagStartPrice  = "start-price"
+	FlagDenomId             = "denom-id"
+	FlagNftId               = "nft-id"
+	FlagPrice               = "price"
+	FlagOwner               = "owner"
+	FlagBidder              = "bidder"
+	FlagPriceDenom          = "price-denom"
+	FlagSplitShares         = "split-shares"
+	FlagWhiteListAccounts   = "whitelist-accounts"
+	FlagStartTime           = "start-time"
+	FlagStartPrice          = "start-price"
 	FlagIncrementPercentage = "increment-percentage"
-	FlagDuration = "duration"
-	FlagAmount = "amount"
+	FlagDuration            = "duration"
+	FlagAmount              = "amount"
 )
 
 var (

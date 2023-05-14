@@ -1,15 +1,14 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"strings"
 	"time"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var (
-	allowedDenoms = []string{}
-)
+var allowedDenoms = []string{}
 
 // ValidateListing checks listing is valid or not
 func ValidateListing(listing Listing) error {
@@ -57,7 +56,6 @@ func ValidateDuration(t interface{}) error {
 func ValidateId(id string) error {
 	id = strings.TrimSpace(id)
 	if len(id) < MinListingIdLength || len(id) > MaxListingIdLength {
-
 		return sdkerrors.Wrapf(
 			ErrInvalidListingId,
 			"invalid id %s, only accepts value [%d, %d]", id, MinListingIdLength, MaxListingIdLength,

@@ -203,7 +203,8 @@ func (msg MsgBuyNFT) GetSigners() []sdk.AccAddress {
 // Auction messages
 
 func NewMsgCreateAuction(denomId, nftId string, startTime time.Time, duration *time.Duration, startPrice sdk.Coin, owner sdk.AccAddress,
-	incrementPercentage sdk.Dec, whitelistAccounts []string, splitShares []WeightedAddress) *MsgCreateAuction {
+	incrementPercentage sdk.Dec, whitelistAccounts []string, splitShares []WeightedAddress,
+) *MsgCreateAuction {
 	return &MsgCreateAuction{
 		NftId:               nftId,
 		DenomId:             denomId,
@@ -245,6 +246,7 @@ func (msg MsgCreateAuction) ValidateBasic() error {
 	}
 	return nil
 }
+
 func (msg MsgCreateAuction) Validate(now time.Time) error {
 	if err := msg.ValidateBasic(); err != nil {
 		return err

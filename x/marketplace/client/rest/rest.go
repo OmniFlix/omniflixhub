@@ -9,7 +9,7 @@ import (
 )
 
 // Rest variable names
-// nolint
+
 const (
 	RestParamListingId = "listing_id"
 	RestParamOwner     = "owner"
