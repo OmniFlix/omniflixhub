@@ -8,8 +8,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var allowedDenoms = []string{}
-
 // ValidateListing checks listing is valid or not
 func ValidateListing(listing Listing) error {
 	if len(listing.Owner) > 0 {
