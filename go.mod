@@ -4,7 +4,8 @@ go 1.19
 
 require (
 	github.com/OmniFlix/onft v0.5.0
-	github.com/cosmos/cosmos-sdk v0.45.15
+	github.com/cosmos/cosmos-sdk v0.45.16
+	github.com/cosmos/gogoproto v1.4.3
 	github.com/cosmos/ibc-go/v3 v3.4.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
