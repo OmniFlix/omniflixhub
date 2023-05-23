@@ -41,11 +41,14 @@ type NftKeeper interface {
 }
 
 type StreamPayKeeper interface {
-	CreateStreamPayment(ctx sdk.Context,
+	CreateStreamPayment(
+		ctx sdk.Context,
 		sender, recipient sdk.AccAddress,
 		amount sdk.Coin,
-		paymentType streampaytypes.PaymentType,
-		endTime time.Time,
+		paymentType streampaytypes.StreamType,
+		duration time.Duration,
+		periods []*streampaytypes.Period,
+		cancellable bool,
 	) error
 }
 

@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/OmniFlix/marketplace v0.4.1
 	github.com/OmniFlix/onft v0.5.0
-	github.com/OmniFlix/streampay v1.0.0-beta.1
+	github.com/OmniFlix/streampay v1.0.0-beta.1.0.20230523105121-2039afe32786
 	github.com/cosmos/cosmos-sdk v0.45.15
 	github.com/cosmos/ibc-go/v3 v3.4.0
 	github.com/gogo/protobuf v1.3.3

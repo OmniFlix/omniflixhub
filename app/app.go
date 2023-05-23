@@ -512,6 +512,8 @@ func NewOmniFlixApp(
 		keys[streampaytypes.MemStoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
+		app.DistrKeeper,
+		app.GetSubspace(streampaytypes.ModuleName),
 	)
 	streamPayModule := streampay.NewAppModule(appCodec, app.StreamPayKeeper)
 

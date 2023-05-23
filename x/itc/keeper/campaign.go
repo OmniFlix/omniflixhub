@@ -161,11 +161,14 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 	if campaign.ClaimType == types.CLAIM_TYPE_FT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
 		claimAmount := campaign.TokensPerClaim
 		if campaign.Distribution != nil && campaign.Distribution.Type == types.DISTRIBUTION_TYPE_STREAM {
-			if err := k.streampayKeeper.CreateStreamPayment(ctx,
+			if err := k.streampayKeeper.CreateStreamPayment(
+				ctx,
 				k.GetModuleAccountAddress(ctx),
 				claimer, claimAmount,
 				streampaytypes.TypeContinuous,
-				ctx.BlockTime().Add(campaign.Distribution.StreamDuration),
+				campaign.Distribution.StreamDuration,
+				nil,
+				false,
 			); err != nil {
 				return err
 			}
