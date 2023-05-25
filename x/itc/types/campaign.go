@@ -14,7 +14,8 @@ var (
 	_ exported.CampaignI = &Campaign{}
 )
 
-func NewCampaign(id uint64,
+func NewCampaign(
+	id uint64,
 	name, description string,
 	startTime, endTime time.Time,
 	creator, nftDenomId string,
@@ -42,6 +43,7 @@ func NewCampaign(id uint64,
 		ReceivedNftIds:   []string{},
 		NftMintDetails:   nftMintDetails,
 		Distribution:     distribution,
+		MintCount:        0,
 	}
 }
 

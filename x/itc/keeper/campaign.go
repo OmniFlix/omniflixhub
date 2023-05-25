@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	streampaytypes "github.com/OmniFlix/streampay/x/streampay/types"
 
 	"github.com/OmniFlix/omniflixhub/x/itc/types"
@@ -78,12 +80,8 @@ func (k Keeper) CancelCampaign(ctx sdk.Context, campaignId uint64, creator sdk.A
 	if creator.String() != campaign.Creator {
 		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", creator.String())
 	}
-	// cancel only if campaign not started
-	if campaign.StartTime.Before(ctx.BlockTime()) {
-		return sdkerrors.Wrapf(types.ErrCancelNotAllowed, "active campaign can not be canceled")
-	}
-	// return funds
 
+	// return funds
 	if campaign.AvailableTokens.IsValid() && campaign.AvailableTokens.Amount.GT(sdk.ZeroInt()) {
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(
 			ctx,
@@ -161,7 +159,7 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 	if campaign.ClaimType == types.CLAIM_TYPE_FT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
 		claimAmount := campaign.TokensPerClaim
 		if campaign.Distribution != nil && campaign.Distribution.Type == types.DISTRIBUTION_TYPE_STREAM {
-			if err := k.streampayKeeper.CreateStreamPayment(
+			if _, err := k.streampayKeeper.CreateStreamPayment(
 				ctx,
 				k.GetModuleAccountAddress(ctx),
 				claimer, claimAmount,
@@ -186,12 +184,13 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 	}
 
 	if campaign.ClaimType == types.CLAIM_TYPE_NFT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
+		campaign.MintCount += 1
 		if err := k.nftKeeper.MintONFT(
 			ctx,
 			campaign.NftMintDetails.DenomId,
 			nfttypes.GenUniqueID(nfttypes.IDPrefix),
 			nfttypes.Metadata{
-				Name:        campaign.NftMintDetails.Name,
+				Name:        campaign.NftMintDetails.Name + fmt.Sprintf(" #%d", campaign.MintCount),
 				Description: campaign.NftMintDetails.Description,
 				MediaURI:    campaign.NftMintDetails.MediaUri,
 				PreviewURI:  campaign.NftMintDetails.PreviewUri,
@@ -204,18 +203,6 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 			campaign.GetCreator(),
 			claimer,
 		); err != nil {
-			// Transfer back nft if it's not hold
-			if campaign.Interaction != types.INTERACTION_TYPE_HOLD {
-				err := k.nftKeeper.TransferOwnership(ctx,
-					campaign.NftDenomId,
-					nft.GetID(),
-					k.GetModuleAccountAddress(ctx),
-					claimer,
-				)
-				if err != nil {
-					panic(err)
-				}
-			}
 			return sdkerrors.Wrapf(types.ErrClaimingNFT,
 				"unable to mint nft denomId %s", campaign.NftMintDetails.DenomId)
 		}
