@@ -84,6 +84,8 @@ github.com/OmniFlix/streampay v1.0.0-beta.1 h1:1hihxPtEn8X6PsIxSBSN/bH9A7wbJzV1U
 github.com/OmniFlix/streampay v1.0.0-beta.1/go.mod h1:7nOLSG60mfPiXGjPJpEWj9UyKwRi4ZbuCxTvGeAO9vw=
 github.com/OmniFlix/streampay v1.0.0-beta.1.0.20230523105121-2039afe32786 h1:4yPxEPsIdZ+aK6nhdyedwayK/vuR4wuEf4m6hbYuFng=
 github.com/OmniFlix/streampay v1.0.0-beta.1.0.20230523105121-2039afe32786/go.mod h1:7nOLSG60mfPiXGjPJpEWj9UyKwRi4ZbuCxTvGeAO9vw=
+github.com/OmniFlix/streampay v1.0.0-beta.1.0.20230524172042-3bc4cd747e78 h1:HOrkxt9yCmBs+XKRBen2KX6oFsrUr0u7QFMV/LSia6c=
+github.com/OmniFlix/streampay v1.0.0-beta.1.0.20230524172042-3bc4cd747e78/go.mod h1:7nOLSG60mfPiXGjPJpEWj9UyKwRi4ZbuCxTvGeAO9vw=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/Shopify/goreferrer v0.0.0-20181106222321-ec9c9a553398/go.mod h1:a1uqRtAwp2Xwc6WNPJEufxJ7fx3npB4UV/JOLmbu5I0=

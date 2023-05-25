@@ -49,7 +49,7 @@ type StreamPayKeeper interface {
 		duration time.Duration,
 		periods []*streampaytypes.Period,
 		cancellable bool,
-	) error
+	) (string, error)
 }
 
 // DistributionKeeper defines the expected distribution keeper
