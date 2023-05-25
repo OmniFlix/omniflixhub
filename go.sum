@@ -80,6 +80,8 @@ github.com/OmniFlix/marketplace v0.4.1 h1:dZ0lhn0ZlLupmnHjA4rw7YCs2Y6nLpSUWl/tfi
 github.com/OmniFlix/marketplace v0.4.1/go.mod h1:l+2kzufaeIOYyGNIXuCSEMUFx7FOL6KayPpJAeOPciY=
 github.com/OmniFlix/onft v0.5.0 h1:FCoYMpIVmP1cq1mOvJbHpSL1bFwV978fwID0rXzLFCA=
 github.com/OmniFlix/onft v0.5.0/go.mod h1:ZvNsefiGp3bqn5fwS2J/AkZdDmwgwg0yukaVDFo1KoE=
+github.com/OmniFlix/onft v0.5.1-0.20230515105258-faf5b0e5ef7e h1:jwW52FTVBJ51E1c3GS7QL5dT4hyQzfdI9w3wkwSMCMM=
+github.com/OmniFlix/onft v0.5.1-0.20230515105258-faf5b0e5ef7e/go.mod h1:ZvNsefiGp3bqn5fwS2J/AkZdDmwgwg0yukaVDFo1KoE=
 github.com/OmniFlix/streampay v1.0.0-beta.1 h1:1hihxPtEn8X6PsIxSBSN/bH9A7wbJzV1U7h5mEuVPV4=
 github.com/OmniFlix/streampay v1.0.0-beta.1/go.mod h1:7nOLSG60mfPiXGjPJpEWj9UyKwRi4ZbuCxTvGeAO9vw=
 github.com/OmniFlix/streampay v1.0.0-beta.1.0.20230523105121-2039afe32786 h1:4yPxEPsIdZ+aK6nhdyedwayK/vuR4wuEf4m6hbYuFng=
