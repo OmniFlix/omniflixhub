@@ -18,15 +18,9 @@ func (k Keeper) CreateCampaign(
 	campaign types.Campaign,
 	creationFee sdk.Coin,
 ) error {
-	// verify collection
-	collection, err := k.nftKeeper.GetDenom(ctx, campaign.NftDenomId)
+	_, err := k.nftKeeper.GetDenom(ctx, campaign.NftDenomId)
 	if err != nil {
 		return err
-	}
-	// Authorize
-	if collection.Creator != campaign.Creator {
-		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
-			"nft denom id %s isn't owned by campaign creator %s", collection.Id, campaign.Creator)
 	}
 	if campaign.ClaimType == types.CLAIM_TYPE_FT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(
