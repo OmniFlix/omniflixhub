@@ -107,9 +107,9 @@ import (
 	"github.com/OmniFlix/onft"
 	onftkeeper "github.com/OmniFlix/onft/keeper"
 	onfttypes "github.com/OmniFlix/onft/types"
-	"github.com/OmniFlix/streampay/x/streampay"
-	streampaykeeper "github.com/OmniFlix/streampay/x/streampay/keeper"
-	streampaytypes "github.com/OmniFlix/streampay/x/streampay/types"
+	"github.com/OmniFlix/streampay/v2/x/streampay"
+	streampaykeeper "github.com/OmniFlix/streampay/v2/x/streampay/keeper"
+	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 )
 
 const Name = "omniflixhub"

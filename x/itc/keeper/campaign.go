@@ -3,7 +3,7 @@ package keeper
 import (
 	"fmt"
 
-	streampaytypes "github.com/OmniFlix/streampay/x/streampay/types"
+	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 
 	"github.com/OmniFlix/omniflixhub/x/itc/types"
 	nfttypes "github.com/OmniFlix/onft/types"

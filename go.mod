@@ -3,9 +3,9 @@ module github.com/OmniFlix/omniflixhub
 go 1.19
 
 require (
-	github.com/OmniFlix/marketplace v0.4.1
-	github.com/OmniFlix/onft v0.5.1-0.20230605140123-e6c4f327ba20
-	github.com/OmniFlix/streampay v1.0.0-beta.1.0.20230524172042-3bc4cd747e78
+	github.com/OmniFlix/marketplace v0.6.0-alpha.1
+	github.com/OmniFlix/onft v0.6.0-alpha.1
+	github.com/OmniFlix/streampay/v2 v2.0.0-alpha.2
 	github.com/cosmos/cosmos-sdk v0.45.16
 	github.com/cosmos/ibc-go/v3 v3.4.0
 	github.com/gogo/protobuf v1.3.3

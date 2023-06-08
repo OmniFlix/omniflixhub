@@ -5,7 +5,7 @@ import (
 
 	nft "github.com/OmniFlix/onft/exported"
 	nfttypes "github.com/OmniFlix/onft/types"
-	streampaytypes "github.com/OmniFlix/streampay/x/streampay/types"
+	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
