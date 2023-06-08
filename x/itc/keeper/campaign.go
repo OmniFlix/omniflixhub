@@ -86,6 +86,19 @@ func (k Keeper) CancelCampaign(ctx sdk.Context, campaignId uint64, creator sdk.A
 			panic(err)
 		}
 	}
+	// return NFTs if received
+	if len(campaign.ReceivedNftIds) > 0 {
+		for _, nftId := range campaign.ReceivedNftIds {
+			if err := k.nftKeeper.TransferOwnership(ctx,
+				campaign.NftDenomId,
+				nftId,
+				k.GetModuleAccountAddress(ctx),
+				campaign.GetCreator(),
+			); err != nil {
+				return err
+			}
+		}
+	}
 	k.UnsetCampaignWithCreator(ctx, creator, campaignId)
 	k.RemoveCampaign(ctx, campaignId)
 	k.emitCancelCampaignEvent(ctx, campaignId, creator.String())
