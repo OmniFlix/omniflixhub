@@ -167,6 +167,7 @@ func TestNewMsgCreateCampaign(t *testing.T) {
 		}
 	}
 }
+
 func TestNewMsgCancelCampaign(t *testing.T) {
 	// generate a private/public key pair and get the respective address
 	pk1 := ed25519.GenPrivKey().PubKey()
@@ -203,7 +204,6 @@ func TestNewMsgCancelCampaign(t *testing.T) {
 			require.Error(t, tc.msg.ValidateBasic(), "test: %v", tc.desc)
 		}
 	}
-
 }
 
 func TestNewMsgClaim(t *testing.T) {
