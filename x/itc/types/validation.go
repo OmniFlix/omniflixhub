@@ -86,6 +86,12 @@ func ValidateClaim(claim Claim) error {
 }
 
 func ValidateTokens(tokensA, tokensB sdk.Coin) error {
+	if tokensA.IsNil() || tokensB.IsNil() {
+		return sdkerrors.Wrapf(
+			ErrInvalidTokens,
+			"invalid tokens, only accepts positive amount",
+		)
+	}
 	if !tokensA.IsValid() {
 		return sdkerrors.Wrapf(
 			ErrInvalidTokens,
@@ -138,7 +144,7 @@ func ValidateDistribution(distribution *Distribution) error {
 func ValidateInteractionType(interaction InteractionType) error {
 	if !(interaction == INTERACTION_TYPE_BURN ||
 		interaction == INTERACTION_TYPE_TRANSFER || interaction == INTERACTION_TYPE_HOLD) {
-		return sdkerrors.Wrapf(ErrInvalidClaimType, "unknown interaction type (%s)", interaction)
+		return sdkerrors.Wrapf(ErrInteractionMismatch, "unknown interaction type (%s)", interaction)
 	}
 	return nil
 }
