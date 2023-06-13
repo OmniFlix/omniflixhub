@@ -172,7 +172,6 @@ func (k Keeper) FinalizeAndEndCampaigns(ctx sdk.Context) error {
 	return nil
 }
 
-// TODO: re-check
 func (k Keeper) endCampaign(ctx sdk.Context, campaign types.Campaign) {
 	// Transfer Remaining funds to creator
 	availableTokens := campaign.AvailableTokens
