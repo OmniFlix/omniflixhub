@@ -37,6 +37,30 @@ func GetCmdCreateCampaign() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-campaign",
 		Short: "creates a campaign on itc module",
+		Long: "Creates a new campaign on itc module. The campaign creator must provide the following parameters:\n" +
+			"1. Campaign name\n" +
+			"2. Campaign description\n" +
+			"3. Campaign start time\n" +
+			"4. Campaign duration\n" +
+			"5. Campaign claim type\n" +
+			"6. Campaign max allowed claims\n" +
+			"7. Campaign tokens per claim\n" +
+			"8. Campaign Initial deposit\n" +
+			"9. Campaign distribution type\n" +
+			"10. Campaign interaction type\n" +
+			"11. Campaign NFT denom id\n" +
+			"12. Campaign NFT mint details file\n" +
+			"13. Campaign creation fees\n" +
+			"\n" +
+			"if claim-type is fungible then tokens-per-claim value must not be nil or empty\n" +
+			"if claim-type is non-fungible then nft-details-file path must be provided\n" +
+			"if claim-type is fungible and non-fungible then both tokens-per-claim" +
+			" and nft-details-file flags are required\n" +
+			"\n" +
+			"default distribution-type is instant if distribution type is stream then" +
+			" stream-duration value should not be nil",
+
+		Args: cobra.ExactArgs(0),
 		Example: fmt.Sprintf(
 			"$ %s tx itc create-campaign "+
 				"--name=<name> "+
@@ -149,7 +173,10 @@ func GetCmdCreateCampaign() *cobra.Command {
 func GetCmdCancelCampaign() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "cancel-campaign",
-		Short: "cancels the campaign before start",
+		Short: "cancels the campaign",
+		Long: "cancel the campaign with the specified campaign-id\n" +
+			"if the campaign is in-progress then it will be cancelled and all the remaining tokens will be refunded to the creator.\n" +
+			"only creator of the campaign can cancel the campaign\n",
 		Example: fmt.Sprintf(
 			"$ %s tx itc cancel-campaign [campaign-id] "+
 				"--from=<key-name> "+
@@ -189,6 +216,9 @@ func GetCmdDepositCampaign() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "deposit-campaign",
 		Short: "deposits tokens into a campaign",
+		Long: "deposits tokens into the campaign with the specified campaign-id\n" +
+			"the tokens will be added to the campaign available and total tokens\n" +
+			"only the creator of the campaign can deposit tokens into the campaign\n",
 		Example: fmt.Sprintf(
 			"$ %s tx itc deposit-campaign [campaign-id] "+
 				"--amount=<amount> "+
@@ -239,11 +269,13 @@ func GetCmdDepositCampaign() *cobra.Command {
 func GetCmdClaim() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "claim",
-		Short: "claim tokens from a campaign",
+		Short: "claim fungible and/or non-fungible tokens  from a campaign",
+		Long: "claim fungible and/or non-fungible tokens from the campaign with the" +
+			" specified campaign-id and interacting (burn, transfer or verify) with eligible nft\n",
 		Example: fmt.Sprintf(
 			"$ %s tx itc claim [campaign-id] "+
 				"--nft-id=<nft-id> "+
-				"--interaction-type=<interaction> "+
+				"--interaction-type=<burn|transfer|hold> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",

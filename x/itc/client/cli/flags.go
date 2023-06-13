@@ -44,7 +44,7 @@ func init() {
 	FsCreateCampaign.String(FlagDeposit, "", "tokens to deposit the campaign")
 	FsCreateCampaign.String(FlagStartTime, "", "campaign start time")
 	FsCreateCampaign.String(FlagDuration, "", "campaign duration")
-	FsCreateCampaign.String(FlagDistributionType, "", "type of distribution")
+	FsCreateCampaign.String(FlagDistributionType, "instant", "type of distribution (default: instant)")
 	FsCreateCampaign.String(FlagStreamDuration, "", "claimed amount distribution duration")
 	FsCreateCampaign.String(FlagNftDetailsFile, "", "nft details file")
 	FsCreateCampaign.String(FlagCreationFee, "", "creation fee")
