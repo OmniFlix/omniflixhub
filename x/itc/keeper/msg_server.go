@@ -134,7 +134,7 @@ func (m msgServer) Claim(goCtx context.Context, msg *types.MsgClaim) (*types.Msg
 	if !found {
 		return nil, sdkerrors.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", msg.CampaignId)
 	}
-	if !campaign.StartTime.Before(ctx.BlockTime()) {
+	if campaign.StartTime.Unix() > ctx.BlockTime().Unix() {
 		return nil, sdkerrors.Wrapf(types.ErrInactiveCampaign,
 			"cannot claim on inactive campaign %d, ", campaign.Id)
 	}

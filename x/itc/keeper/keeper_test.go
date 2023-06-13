@@ -1,10 +1,12 @@
 package keeper_test
 
 import (
-	onftkeeper "github.com/OmniFlix/onft/keeper"
-	onfttypes "github.com/OmniFlix/onft/types"
+	"fmt"
 	"testing"
 	"time"
+
+	onftkeeper "github.com/OmniFlix/onft/keeper"
+	onfttypes "github.com/OmniFlix/onft/types"
 
 	"github.com/OmniFlix/omniflixhub/app/apptesting"
 	"github.com/OmniFlix/omniflixhub/x/itc/keeper"
@@ -31,7 +33,8 @@ var (
 	defaultInteractionType     = types.INTERACTION_TYPE_BURN
 	defaultClaimType           = types.CLAIM_TYPE_FT
 	defaultNftDenomId          = "onftdenomtest001"
-	defaultNftMintDenomId      = "onftdenomtest002"
+	defaultNftId               = "onfttest"
+	defaultNftMintDenomId      = "onftdenomtest010"
 	defaultMaxClaims           = uint64(10)
 	defaultTokensPerClaim      = sdk.NewInt64Coin(types.DefaultCampaignCreationFee.Denom, 10_000_000)
 	defaultDuration            = time.Second * 100
@@ -48,6 +51,12 @@ var (
 		Extensible:   true,
 		Nsfw:         false,
 	}
+
+	secondaryCampaignName        = "test secondary campaign"
+	secondaryCampaignDescription = "test secondary description"
+	secondaryNftDenomId          = "onftdenomtest002"
+	secondaryNftId               = "onfttest2"
+	secondaryCampaignClaimType   = types.CLAIM_TYPE_FT_AND_NFT
 )
 
 func (suite *KeeperTestSuite) SetupTest() {
@@ -66,7 +75,6 @@ func (suite *KeeperTestSuite) SetupTest() {
 
 func (suite *KeeperTestSuite) CreateDefaultCampaign() {
 	suite.createDefaultNftDenom()
-
 	_, _ = suite.msgServer.CreateCampaign(
 		sdk.WrapSDKContext(suite.Ctx),
 		types.NewMsgCreateCampaign(
@@ -82,8 +90,36 @@ func (suite *KeeperTestSuite) CreateDefaultCampaign() {
 				defaultTokensPerClaim.Amount.MulRaw(int64(defaultMaxClaims)).Int64(),
 			),
 			nil,
-			nil,
-			time.Now().Add(time.Second*5),
+			&defaultDistribution,
+			suite.Ctx.BlockTime(),
+			defaultDuration,
+			suite.TestAccs[0].String(),
+			types.DefaultCampaignCreationFee,
+		),
+	)
+}
+
+func (suite *KeeperTestSuite) CreateSecondaryCampaign() {
+	suite.createSecondaryNftDenom()
+	suite.createDefaultMintNftDenom()
+
+	_, _ = suite.msgServer.CreateCampaign(
+		sdk.WrapSDKContext(suite.Ctx),
+		types.NewMsgCreateCampaign(
+			secondaryCampaignName,
+			secondaryCampaignDescription,
+			types.INTERACTION_TYPE_TRANSFER,
+			secondaryCampaignClaimType,
+			secondaryNftDenomId,
+			defaultMaxClaims,
+			defaultTokensPerClaim,
+			sdk.NewInt64Coin(
+				defaultTokensPerClaim.Denom,
+				defaultTokensPerClaim.Amount.MulRaw(int64(defaultMaxClaims)).Int64(),
+			),
+			&defaultNftMintDetails,
+			&defaultDistribution,
+			suite.Ctx.BlockTime(),
 			defaultDuration,
 			suite.TestAccs[0].String(),
 			types.DefaultCampaignCreationFee,
@@ -109,6 +145,24 @@ func (suite *KeeperTestSuite) createDefaultNftDenom() {
 	)
 }
 
+func (suite *KeeperTestSuite) createSecondaryNftDenom() {
+	createDenomMsg := onfttypes.NewMsgCreateDenom(
+		"test12",
+		"test12",
+		"{}",
+		"test description",
+		"ipfs://testpreviewuri",
+		suite.TestAccs[0].String(),
+		onfttypes.DefaultDenomCreationFee,
+	)
+	createDenomMsg.Id = secondaryNftDenomId
+
+	_, _ = suite.nftMsgServer.CreateDenom(
+		sdk.WrapSDKContext(suite.Ctx),
+		createDenomMsg,
+	)
+}
+
 func (suite *KeeperTestSuite) createDefaultMintNftDenom() {
 	createDenomMsg := onfttypes.NewMsgCreateDenom(
 		"test22",
@@ -125,4 +179,35 @@ func (suite *KeeperTestSuite) createDefaultMintNftDenom() {
 		sdk.WrapSDKContext(suite.Ctx),
 		createDenomMsg,
 	)
+}
+
+func (suite *KeeperTestSuite) mintNFT(denomId, nftId string) {
+	mintNftMsg := onfttypes.NewMsgMintONFT(
+		denomId,
+		suite.TestAccs[0].String(),
+		suite.TestAccs[1].String(),
+		onfttypes.Metadata{
+			Name:        "test",
+			Description: "test",
+			MediaURI:    "ipfs://testuri",
+			PreviewURI:  "ipfs://testpreviewuri",
+		},
+		"{}",
+		true,
+		true,
+		false,
+		sdk.NewDecWithPrec(1, 2),
+	)
+	mintNftMsg.Id = nftId
+	_, _ = suite.nftMsgServer.MintONFT(
+		sdk.WrapSDKContext(suite.Ctx),
+		mintNftMsg,
+	)
+}
+
+func (suite *KeeperTestSuite) mintNFTs() {
+	for counter := 1; counter <= 10; counter++ {
+		suite.mintNFT(defaultNftDenomId, fmt.Sprintf("%s%d", defaultNftId, counter))
+		suite.mintNFT(secondaryNftDenomId, fmt.Sprintf("%s%d", secondaryNftId, counter))
+	}
 }
