@@ -121,6 +121,9 @@ func validateNFTMintDetails(details *NFTDetails) error {
 }
 
 func ValidateDistribution(distribution *Distribution) error {
+	if distribution == nil {
+		return sdkerrors.Wrapf(ErrInvalidDistribution, "distribution can not be nil")
+	}
 	if !(distribution.Type == DISTRIBUTION_TYPE_STREAM || distribution.Type == DISTRIBUTION_TYPE_INSTANT) {
 		return sdkerrors.Wrapf(ErrInvalidClaimType, "invalid distribution type (%s)", distribution.Type)
 	}

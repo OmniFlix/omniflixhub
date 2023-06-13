@@ -34,6 +34,7 @@ func (k Keeper) CreateCampaign(
 	}
 
 	if campaign.ClaimType == types.CLAIM_TYPE_NFT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
+		// check if the mint collection exists
 		mintCollection, err := k.nftKeeper.GetDenom(ctx, campaign.NftMintDetails.DenomId)
 		if err != nil {
 			return err

@@ -61,6 +61,18 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 			"given fee (%s) not matched with  campaign creation fee. %s required to create itc campaign",
 			msg.CreationFee.String(), campaignCreationFee.String())
 	}
+	if (msg.ClaimType == types.CLAIM_TYPE_FT || msg.ClaimType == types.CLAIM_TYPE_FT_AND_NFT) && msg.Distribution == nil {
+		return nil, sdkerrors.Wrapf(
+			types.ErrInvalidNFTMintDetails,
+			"distribution config is required for ft claim type",
+		)
+	}
+	if (msg.ClaimType == types.CLAIM_TYPE_NFT || msg.ClaimType == types.CLAIM_TYPE_FT_AND_NFT) && msg.NftMintDetails == nil {
+		return nil, sdkerrors.Wrapf(
+			types.ErrInvalidNFTMintDetails,
+			"nft mint details are required for nft claim type",
+		)
+	}
 
 	availableTokens := msg.Deposit
 	campaignNumber := m.Keeper.GetNextCampaignNumber(ctx)

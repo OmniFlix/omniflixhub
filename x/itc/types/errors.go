@@ -24,4 +24,5 @@ var (
 	ErrInvalidCreationFee      = sdkerrors.Register(ModuleName, 17, "invalid fee")
 	ErrInvalidFeeDenom         = sdkerrors.Register(ModuleName, 18, "invalid fee denom")
 	ErrNotEnoughFeeAmount      = sdkerrors.Register(ModuleName, 19, "not enough fee")
+	ErrInvalidDistribution     = sdkerrors.Register(ModuleName, 20, "invalid distribution")
 )

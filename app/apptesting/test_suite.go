@@ -36,16 +36,10 @@ type KeeperTestHelper struct {
 	TestAccs    []sdk.AccAddress
 }
 
-var (
-	ChainID = "omniflixhub-test"
-	Denom   = "uflix"
-	Amount  = sdk.NewInt(100000000)
-)
-
 // Setup sets up basic environment for suite (App, Ctx, and test accounts)
 func (s *KeeperTestHelper) Setup() {
 	s.App = app.Setup(s.T(), true, 0)
-	s.Ctx = s.App.BaseApp.NewContext(false, tmtypes.Header{Height: 1, ChainID: ChainID, Time: time.Now().UTC()})
+	s.Ctx = s.App.BaseApp.NewContext(false, tmtypes.Header{Height: 1, ChainID: app.SimAppChainID, Time: time.Now().UTC()})
 	s.QueryHelper = &baseapp.QueryServiceTestHelper{
 		GRPCQueryRouter: s.App.GRPCQueryRouter(),
 		Ctx:             s.Ctx,
