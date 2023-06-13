@@ -28,7 +28,7 @@ func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-// DefaultParams returns default marketplace parameters
+// DefaultParams returns default itc parameters
 func DefaultParams() Params {
 	return Params{
 		MaxCampaignDuration: DefaultMaxCampaignDuration,
@@ -44,7 +44,7 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	}
 }
 
-// ValidateBasic performs basic validation on marketplace parameters.
+// ValidateBasic performs basic validation on itc parameters.
 func (p Params) ValidateBasic() error {
 	if err := validateMaxCampaignDuration(p.MaxCampaignDuration); err != nil {
 		return err
