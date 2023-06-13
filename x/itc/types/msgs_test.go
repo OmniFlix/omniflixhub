@@ -75,7 +75,6 @@ func TestNewMsgCreateCampaign(t *testing.T) {
 			}, types.INTERACTION_TYPE_BURN, types.CLAIM_TYPE_FT, nil, &defaultDistribution),
 			valid: true,
 		},
-		// invalid sender
 		{
 			desc: "invalid creator",
 			msg: createCampaignMsg(func(msg types.MsgCreateCampaign) types.MsgCreateCampaign {
