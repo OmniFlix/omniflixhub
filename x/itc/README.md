@@ -29,61 +29,61 @@ There are three interaction types that can be used in the ITC module:
 ## State
 ### Module State
 The initial state of the module. It contains information about all campaigns, claims, and parameters of the module.
-```go
+```protobuf
 message GenesisState {
-  repeated Campaign    campaigns = 1 [(gogoproto.nullable) = false];
-  uint64               next_campaign_number = 2;
-  repeated Claim       claims = 3 [(gogoproto.nullable) = false];
-  Params               params = 4 [(gogoproto.nullable) = false];
+  repeated Campaign campaigns = 1 [(gogoproto.nullable) = false];
+  uint64 next_campaign_number = 2;
+  repeated Claim claims = 3 [(gogoproto.nullable) = false];
+  Params params = 4 [(gogoproto.nullable) = false];
 }
 ```
 ### Campaign
 A campaign created by a user to distribute tokens to other users who perform certain interactions. It has a name, description, start and end time, maximum number of allowed claims, interaction type, claim type, tokens per claim, total tokens, available tokens, received NFT IDs, NFT mint details, distribution, and creator.
-```go
+```protobuf
 message Campaign {
-    uint64 id = 1;
-    string name = 2;
-    string description = 3;
-    google.protobuf.Timestamp start_time = 4 [
-        (gogoproto.nullable) = false,
-        (gogoproto.stdtime) = true,
-        (gogoproto.moretags) = "yaml:\"start_time\""
-    ];
-    google.protobuf.Timestamp end_time = 5 [
-        (gogoproto.nullable) = false,
-        (gogoproto.stdtime) = true,
-        (gogoproto.moretags) = "yaml:\"end_time\""
-    ];
-    string creator = 6;
-    string nft_denom_id = 7 [(gogoproto.moretags) = "yaml:\"nft_denom_id\""];
-    uint64 max_allowed_claims = 8
-        [(gogoproto.moretags) = "yaml:\"max_allowed_claims\""];
-    InteractionType interaction = 9;
-    ClaimType claim_type = 10;
-    cosmos.base.v1beta1.Coin tokens_per_claim = 11 [
-        (gogoproto.nullable) = false,
-        (gogoproto.moretags) = "yaml:\"tokens_per_claim\""
-    ];
-    cosmos.base.v1beta1.Coin total_tokens = 12 [
-        (gogoproto.nullable) = false,
-        (gogoproto.moretags) = "yaml:\"total_tokens\""
-    ];
-    cosmos.base.v1beta1.Coin available_tokens = 13 [
-        (gogoproto.nullable) = false,
-        (gogoproto.moretags) = "yaml:\"available_tokens\""
-    ];
-    repeated string received_nft_ids = 14
-        [(gogoproto.moretags) = "yaml:\"received_nft_ids\""];
-    NFTDetails nft_mint_details = 15
-        [(gogoproto.moretags) = "yaml:\"nft_mint_details\""];
-    Distribution distribution = 16
-        [(gogoproto.moretags) = "yaml:\"distribution\""];
+  uint64 id = 1;
+  string name = 2;
+  string description = 3;
+  google.protobuf.Timestamp start_time = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdtime) = true,
+    (gogoproto.moretags) = "yaml:\"start_time\""
+  ];
+  google.protobuf.Timestamp end_time = 5 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdtime) = true,
+    (gogoproto.moretags) = "yaml:\"end_time\""
+  ];
+  string creator = 6;
+  string nft_denom_id = 7 [(gogoproto.moretags) = "yaml:\"nft_denom_id\""];
+  uint64 max_allowed_claims = 8
+  [(gogoproto.moretags) = "yaml:\"max_allowed_claims\""];
+  InteractionType interaction = 9;
+  ClaimType claim_type = 10;
+  cosmos.base.v1beta1.Coin tokens_per_claim = 11 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"tokens_per_claim\""
+  ];
+  cosmos.base.v1beta1.Coin total_tokens = 12 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"total_tokens\""
+  ];
+  cosmos.base.v1beta1.Coin available_tokens = 13 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"available_tokens\""
+  ];
+  repeated string received_nft_ids = 14
+  [(gogoproto.moretags) = "yaml:\"received_nft_ids\""];
+  NFTDetails nft_mint_details = 15
+  [(gogoproto.moretags) = "yaml:\"nft_mint_details\""];
+  Distribution distribution = 16
+  [(gogoproto.moretags) = "yaml:\"distribution\""];
+  uint64 mint_count = 17 [(gogoproto.moretags) = "yaml:\"mint_count\""];
 }
-
 ```
 ### Claim
 A claim made by a user for a campaign by providing their address, NFT ID, and interaction type.
-```go
+```protobuf
 message Claim {
   uint64     campaign_id = 1;
   string     address = 2;
@@ -93,7 +93,7 @@ message Claim {
 ```
 ### Parameters
 The parameters of the module, which include the maximum campaign duration and creation fee.
-```go
+```protobuf
 message Params {
   google.protobuf.Duration max_campaign_duration = 1 [
     (gogoproto.nullable) = false,
@@ -110,45 +110,47 @@ message Params {
 ## Messages
 ### CreateCampaign
 `MsgCreateCampaign` can be used by any account to create a new `Campaign`
-```go
+```protobuf
 message MsgCreateCampaign {
-    string name = 1;
-    string description = 2;
-    InteractionType interaction = 3;
-    ClaimType claim_type = 4 [(gogoproto.moretags) = "yaml:\"claim_type\""];
-    string nft_denom_id = 5 [(gogoproto.moretags) = "yaml:\"nft_denom_id\""];
-    cosmos.base.v1beta1.Coin tokens_per_claim = 6 [
-        (gogoproto.nullable) = false,
-        (gogoproto.moretags) = "yaml:\"tokens_per_claim\""
-    ];
-    uint64 max_allowed_claims = 7
-        [(gogoproto.moretags) = "yaml:\"max_allowed_claims\""];
-    cosmos.base.v1beta1.Coin deposit = 8 [
-        (gogoproto.nullable) = false,
-        (gogoproto.moretags) = "yaml:\"deposit\""
-    ];
-    NFTDetails nft_mint_details = 9
-        [(gogoproto.moretags) = "yaml:\"nft_details\""];
-    google.protobuf.Timestamp start_time = 10 [
-        (gogoproto.nullable) = false,
-        (gogoproto.stdtime) = true,
-        (gogoproto.moretags) = "yaml:\"start_time\""
-    ];
+  string                      name = 1;
+  string                      description = 2;
+  InteractionType             interaction = 3;
+  ClaimType                   claim_type = 4 [(gogoproto.moretags) = "yaml:\"claim_type\""];
+  string                      nft_denom_id = 5 [(gogoproto.moretags) = "yaml:\"nft_denom_id\""];
+  cosmos.base.v1beta1.Coin                      tokens_per_claim = 6 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"tokens_per_claim\""
+  ];
+  uint64                      max_allowed_claims = 7 [
+    (gogoproto.moretags) = "yaml:\"max_allowed_claims\""
+  ];
+  cosmos.base.v1beta1.Coin                      deposit = 8 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"deposit\""
+  ];
+  NFTDetails                  nft_mint_details = 9 [(gogoproto.moretags) = "yaml:\"nft_details\""];
+  google.protobuf.Timestamp   start_time = 10 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdtime) = true,
+    (gogoproto.moretags) = "yaml:\"start_time\""
+  ];
 
-    google.protobuf.Duration duration = 11
-        [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+  google.protobuf.Duration     duration = 11 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdduration) = true
+  ];
 
-    Distribution distribution = 12;
-    string creator = 13;
-    cosmos.base.v1beta1.Coin creation_fee = 14 [
-        (gogoproto.nullable) = false,
-        (gogoproto.moretags) = "yaml:\"creation_fee\""
-    ];
+  Distribution            distribution = 12;
+  string                       creator = 13;
+  cosmos.base.v1beta1.Coin     creation_fee = 14 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"creation_fee\""
+  ];
 }
 ```
 ### CancelCampaign
 `MsgCancelCampaign` can be used by the creator to cancel the upcoming `Campaign`.
-```go
+```protobuf
 message MsgCancelCampaign {
     uint64 campaign_id = 1;
     string creator = 2;
@@ -196,8 +198,33 @@ omniflixhubd tx itc create-campaign \
   --distribution-type stream \
   --stream-duration "600s" \
   --creation-fee 10000000uflix \
-  --from=wallet
+  --fees=200uflix \
+  --chain-id=omniflixhub-1 \
+  --from=wallet 
+
 ```
+interaction types: `burn`, `transfer` & `hold`
+claim types: `fungible`, `nonfungible` & `fungible-and-non-fungible`
+
+example for nft type claim
+```shell
+omniflixhubd tx itc create-campaign \
+  --name="campaign name" \
+  --description="campaign description" \
+  --start-time="2023-05-10T10:20:00Z" \
+  --duration="3600s" \
+  --claim-type=nonfungible \
+  --max-allowed-claims=10 \
+  --interaction-type=transfer \
+  --nft-denom-id=nftdenomid \
+  --nft-details-file="nft-mint-details-file-path" \
+  --creation-fee 10000000uflix \
+  --fees=200uflix \
+  --chain-id=omniflixhub-1 \
+  --from=wallet 
+  
+```
+
 
 ### Cancel campaign
 
@@ -212,7 +239,11 @@ omniflixhubd tx itc cancel-campaign <campaign-id> --from wallet
 This transaction deposits a specified amount into a campaign with the specified campaign ID:
 
 ```shell
-omniflixhubd tx itc campaign-deposit <campaign-id> --amount 1000000uflix --from wallet
+omniflixhubd tx itc campaign-deposit <campaign-id> \
+  --amount 1000000uflix \
+  --fees=200uflix \
+  --chain-id=omniflixhub-1 \
+  --from=wallet 
 ```
 
 ### Claim from campaign
@@ -223,7 +254,9 @@ This transaction claims a token or NFT from the specified campaign:
 omniflixhubd tx itc claim <campaign-id> \
   --nft-id="nft-id" \
   --interaction-type=<interaction-type> \
-  --from wallet
+  --fees=200uflix \
+  --chain-id=omniflixhub-1 \
+  --from=wallet 
 ```
 
 **Note:** Replace the values enclosed in `<` and `>` with the actual values.
