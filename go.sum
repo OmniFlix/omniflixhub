@@ -76,8 +76,6 @@ github.com/Joker/jade v1.0.1-0.20190614124447-d475f43051e7/go.mod h1:6E6s8o2AE4K
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Microsoft/go-winio v0.6.0 h1:slsWYD/zyx7lCXoZVlvQrj0hPTM1HI4+v1sIda2yDvg=
 github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 h1:TngWCqHvy9oXAN6lEVMRuU21PR1EtLVZJmdB18Gu3Rw=
-github.com/OmniFlix/ibc-go/v3 v3.4.2-huckleberry h1:ihcE13H9dFTLjJCfkyCN0tMHGRoBhYLpomtkx0sVcQ8=
-github.com/OmniFlix/ibc-go/v3 v3.4.2-huckleberry/go.mod h1:VwB/vWu4ysT5DN2aF78d17LYmx3omSAdq6gpKvM7XRA=
 github.com/OmniFlix/marketplace v0.6.0-alpha.1 h1:yluaghxiwjlatRcqM3GosOSuXsHVzqK2ZJFrC2NF1HI=
 github.com/OmniFlix/marketplace v0.6.0-alpha.1/go.mod h1:k3JLhUXCQxjXc7Ro6hvj1cwwnzAMlfdxU/T4v90NzgU=
 github.com/OmniFlix/onft v0.6.0-alpha.1 h1:3FXGd2BcZMg0GhhMLm4Q6MqNG8KYHsof2no/kDcMq7w=
@@ -242,6 +240,7 @@ github.com/cosmos/gorocksdb v1.2.0/go.mod h1:aaKvKItm514hKfNJpUJXnnOWeBnk2GL4+Qw
 github.com/cosmos/iavl v0.19.5 h1:rGA3hOrgNxgRM5wYcSCxgQBap7fW82WZgY78V9po/iY=
 github.com/cosmos/iavl v0.19.5/go.mod h1:X9PKD3J0iFxdmgNLa7b2LYWdsGd90ToV5cAONApkEPw=
 github.com/cosmos/ibc-go/v4 v4.4.2 h1:PG4Yy0/bw6Hvmha3RZbc53KYzaCwuB07Ot4GLyzcBvo=
+github.com/cosmos/ibc-go/v4 v4.4.2/go.mod h1:j/kD2JCIaV5ozvJvaEkWhLxM2zva7/KTM++EtKFYcB8=
 github.com/cosmos/keyring v1.2.0 h1:8C1lBP9xhImmIabyXW4c3vFjjLiBdGCmfLUfeZlV1Yo=
 github.com/cosmos/keyring v1.2.0/go.mod h1:fc+wB5KTk9wQ9sDx0kFXB3A0MaeGHM9AwRStKOQ5vOA=
 github.com/cosmos/ledger-cosmos-go v0.12.2 h1:/XYaBlE2BJxtvpkHiBm97gFGSGmYGKunKyF3nNqAXZA=

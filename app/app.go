@@ -78,16 +78,17 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	transfer "github.com/cosmos/ibc-go/v3/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/v3/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
-	ibcclientclient "github.com/cosmos/ibc-go/v3/modules/core/02-client/client"
-	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
-	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
-	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
+
+	"github.com/cosmos/ibc-go/v4/modules/apps/transfer"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v4/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/v4/modules/core"
+	ibcclient "github.com/cosmos/ibc-go/v4/modules/core/02-client"
+	ibcclientclient "github.com/cosmos/ibc-go/v4/modules/core/02-client/client"
+	ibcclienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
+	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
+	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
 	"github.com/spf13/cast"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -101,15 +102,18 @@ import (
 	"github.com/OmniFlix/omniflixhub/x/alloc"
 	allockeeper "github.com/OmniFlix/omniflixhub/x/alloc/keeper"
 	alloctypes "github.com/OmniFlix/omniflixhub/x/alloc/types"
-	"github.com/OmniFlix/omniflixhub/x/itc"
-	itckeeper "github.com/OmniFlix/omniflixhub/x/itc/keeper"
-	itctypes "github.com/OmniFlix/omniflixhub/x/itc/types"
+
 	"github.com/OmniFlix/onft"
 	onftkeeper "github.com/OmniFlix/onft/keeper"
 	onfttypes "github.com/OmniFlix/onft/types"
+
 	"github.com/OmniFlix/streampay/v2/x/streampay"
 	streampaykeeper "github.com/OmniFlix/streampay/v2/x/streampay/keeper"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
+
+	"github.com/OmniFlix/omniflixhub/x/itc"
+	itckeeper "github.com/OmniFlix/omniflixhub/x/itc/keeper"
+	itctypes "github.com/OmniFlix/omniflixhub/x/itc/types"
 )
 
 const Name = "omniflixhub"
@@ -177,7 +181,6 @@ var (
 		marketplacetypes.ModuleName:    nil,
 		streampaytypes.ModuleName:      nil,
 		itctypes.ModuleName:            nil,
-		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
 
@@ -240,7 +243,6 @@ type App struct {
 	MarketplaceKeeper marketplacekeeper.Keeper
 	StreamPayKeeper   streampaykeeper.Keeper
 	ItcKeeper         itckeeper.Keeper
-	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// module manager
 	mm *module.Manager
@@ -296,7 +298,6 @@ func NewOmniFlixApp(
 		marketplacetypes.StoreKey,
 		streampaytypes.StoreKey,
 		itctypes.StoreKey,
-		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -570,9 +571,8 @@ func NewOmniFlixApp(
 		allocModule,
 		onftModule,
 		marketplaceModule,
-		itcModule,
 		streamPayModule,
-		// this line is used by starport scaffolding # stargate/app/appModule
+		itcModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -660,7 +660,6 @@ func NewOmniFlixApp(
 		marketplacetypes.ModuleName,
 		streampaytypes.ModuleName,
 		itctypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -882,10 +881,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(alloctypes.ModuleName)
 	paramsKeeper.Subspace(onfttypes.ModuleName)
 	paramsKeeper.Subspace(marketplacetypes.ModuleName)
-	paramsKeeper.Subspace(itctypes.ModuleName)
 	paramsKeeper.Subspace(streampaytypes.ModuleName)
-
-	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(itctypes.ModuleName)
 
 	return paramsKeeper
 }

@@ -7,7 +7,7 @@ require (
 	github.com/OmniFlix/onft v0.6.0-alpha.1
 	github.com/OmniFlix/streampay/v2 v2.0.0-alpha.2
 	github.com/cosmos/cosmos-sdk v0.45.16
-	github.com/cosmos/ibc-go/v3 v3.4.0
+	github.com/cosmos/ibc-go/v4 v4.4.2
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
