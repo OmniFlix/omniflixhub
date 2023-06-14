@@ -2,7 +2,7 @@ package app
 
 import (
 	"fmt"
-
+	marketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -17,6 +17,7 @@ func (app *App) RegisterUpgradeHandlers(cfg module.Configurator) {
 	app.UpgradeKeeper.SetUpgradeHandler(
 		upgradeName,
 		func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			app.MarketplaceKeeper.SetParams(ctx, marketplacetypes.DefaultParams())
 			ctx.Logger().Info("running migrations ...")
 			return app.mm.RunMigrations(ctx, cfg, fromVM)
 		})

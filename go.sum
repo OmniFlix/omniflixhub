@@ -76,10 +76,10 @@ github.com/Joker/jade v1.0.1-0.20190614124447-d475f43051e7/go.mod h1:6E6s8o2AE4K
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Microsoft/go-winio v0.6.0 h1:slsWYD/zyx7lCXoZVlvQrj0hPTM1HI4+v1sIda2yDvg=
 github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 h1:TngWCqHvy9oXAN6lEVMRuU21PR1EtLVZJmdB18Gu3Rw=
-github.com/OmniFlix/marketplace v0.4.1 h1:dZ0lhn0ZlLupmnHjA4rw7YCs2Y6nLpSUWl/tfitZqjE=
-github.com/OmniFlix/marketplace v0.4.1/go.mod h1:l+2kzufaeIOYyGNIXuCSEMUFx7FOL6KayPpJAeOPciY=
-github.com/OmniFlix/onft v0.5.0 h1:FCoYMpIVmP1cq1mOvJbHpSL1bFwV978fwID0rXzLFCA=
-github.com/OmniFlix/onft v0.5.0/go.mod h1:ZvNsefiGp3bqn5fwS2J/AkZdDmwgwg0yukaVDFo1KoE=
+github.com/OmniFlix/marketplace v0.6.0-alpha.1 h1:yluaghxiwjlatRcqM3GosOSuXsHVzqK2ZJFrC2NF1HI=
+github.com/OmniFlix/marketplace v0.6.0-alpha.1/go.mod h1:k3JLhUXCQxjXc7Ro6hvj1cwwnzAMlfdxU/T4v90NzgU=
+github.com/OmniFlix/onft v0.6.0-alpha.1 h1:3FXGd2BcZMg0GhhMLm4Q6MqNG8KYHsof2no/kDcMq7w=
+github.com/OmniFlix/onft v0.6.0-alpha.1/go.mod h1:RW0ooCgUtutpMElh38kbYf3Qb05BmDKK18jCRImwinI=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/Shopify/goreferrer v0.0.0-20181106222321-ec9c9a553398/go.mod h1:a1uqRtAwp2Xwc6WNPJEufxJ7fx3npB4UV/JOLmbu5I0=
@@ -237,8 +237,8 @@ github.com/cosmos/gorocksdb v1.2.0 h1:d0l3jJG8M4hBouIZq0mDUHZ+zjOx044J3nGRskwTb4
 github.com/cosmos/gorocksdb v1.2.0/go.mod h1:aaKvKItm514hKfNJpUJXnnOWeBnk2GL4+Qw9NHizILw=
 github.com/cosmos/iavl v0.19.5 h1:rGA3hOrgNxgRM5wYcSCxgQBap7fW82WZgY78V9po/iY=
 github.com/cosmos/iavl v0.19.5/go.mod h1:X9PKD3J0iFxdmgNLa7b2LYWdsGd90ToV5cAONApkEPw=
-github.com/cosmos/ibc-go/v4 v4.4.1 h1:pHPLEpQStGuHZe5J17WvG7w0VGwTmfsoAHrs45+vPfw=
-github.com/cosmos/ibc-go/v4 v4.4.1/go.mod h1:UkKEQAPWckLuomhqG8XzeE5nWQPdiEYF8EIDWXBKSXA=
+github.com/cosmos/ibc-go/v4 v4.4.2 h1:PG4Yy0/bw6Hvmha3RZbc53KYzaCwuB07Ot4GLyzcBvo=
+github.com/cosmos/ibc-go/v4 v4.4.2/go.mod h1:j/kD2JCIaV5ozvJvaEkWhLxM2zva7/KTM++EtKFYcB8=
 github.com/cosmos/keyring v1.2.0 h1:8C1lBP9xhImmIabyXW4c3vFjjLiBdGCmfLUfeZlV1Yo=
 github.com/cosmos/keyring v1.2.0/go.mod h1:fc+wB5KTk9wQ9sDx0kFXB3A0MaeGHM9AwRStKOQ5vOA=
 github.com/cosmos/ledger-cosmos-go v0.12.2 h1:/XYaBlE2BJxtvpkHiBm97gFGSGmYGKunKyF3nNqAXZA=
