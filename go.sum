@@ -80,6 +80,8 @@ github.com/OmniFlix/marketplace v0.6.0-alpha.1 h1:yluaghxiwjlatRcqM3GosOSuXsHVzq
 github.com/OmniFlix/marketplace v0.6.0-alpha.1/go.mod h1:k3JLhUXCQxjXc7Ro6hvj1cwwnzAMlfdxU/T4v90NzgU=
 github.com/OmniFlix/onft v0.6.0-alpha.1 h1:3FXGd2BcZMg0GhhMLm4Q6MqNG8KYHsof2no/kDcMq7w=
 github.com/OmniFlix/onft v0.6.0-alpha.1/go.mod h1:RW0ooCgUtutpMElh38kbYf3Qb05BmDKK18jCRImwinI=
+github.com/OmniFlix/streampay/v2 v2.0.0-alpha.2 h1:ILT1Do+ZRJWwbrWzLfA0hmbi81Pif9ztMvYRrdzuEqI=
+github.com/OmniFlix/streampay/v2 v2.0.0-alpha.2/go.mod h1:PBSVCaNWXBGwZSEIy2TKtNl5oh43QfHqrQ+kF+WcvSc=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/Shopify/goreferrer v0.0.0-20181106222321-ec9c9a553398/go.mod h1:a1uqRtAwp2Xwc6WNPJEufxJ7fx3npB4UV/JOLmbu5I0=
