@@ -78,7 +78,8 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	transfer "github.com/cosmos/ibc-go/v4/modules/apps/transfer"
+
+	"github.com/cosmos/ibc-go/v4/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v4/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v4/modules/core"
@@ -101,6 +102,7 @@ import (
 	"github.com/OmniFlix/omniflixhub/x/alloc"
 	allockeeper "github.com/OmniFlix/omniflixhub/x/alloc/keeper"
 	alloctypes "github.com/OmniFlix/omniflixhub/x/alloc/types"
+
 	"github.com/OmniFlix/onft"
 	onftkeeper "github.com/OmniFlix/onft/keeper"
 	onfttypes "github.com/OmniFlix/onft/types"
@@ -108,6 +110,10 @@ import (
 	"github.com/OmniFlix/streampay/v2/x/streampay"
 	streampaykeeper "github.com/OmniFlix/streampay/v2/x/streampay/keeper"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
+
+	"github.com/OmniFlix/omniflixhub/x/itc"
+	itckeeper "github.com/OmniFlix/omniflixhub/x/itc/keeper"
+	itctypes "github.com/OmniFlix/omniflixhub/x/itc/types"
 )
 
 const Name = "omniflixhub"
@@ -157,6 +163,8 @@ var (
 		onft.AppModuleBasic{},
 		marketplace.AppModuleBasic{},
 		streampay.AppModuleBasic{},
+		itc.AppModuleBasic{},
+		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
 	// module account permissions
@@ -172,6 +180,7 @@ var (
 		onfttypes.ModuleName:           nil,
 		marketplacetypes.ModuleName:    nil,
 		streampaytypes.ModuleName:      nil,
+		itctypes.ModuleName:            nil,
 	}
 )
 
@@ -233,6 +242,7 @@ type App struct {
 	ONFTKeeper        onftkeeper.Keeper
 	MarketplaceKeeper marketplacekeeper.Keeper
 	StreamPayKeeper   streampaykeeper.Keeper
+	ItcKeeper         itckeeper.Keeper
 
 	// module manager
 	mm *module.Manager
@@ -287,6 +297,7 @@ func NewOmniFlixApp(
 		onfttypes.StoreKey,
 		marketplacetypes.StoreKey,
 		streampaytypes.StoreKey,
+		itctypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -507,6 +518,19 @@ func NewOmniFlixApp(
 	)
 	streamPayModule := streampay.NewAppModule(appCodec, app.StreamPayKeeper)
 
+	app.ItcKeeper = itckeeper.NewKeeper(
+		appCodec,
+		keys[itctypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.ONFTKeeper,
+		app.StreamPayKeeper,
+		app.DistrKeeper,
+		app.GetSubspace(itctypes.ModuleName),
+	)
+
+	itcModule := itc.NewAppModule(appCodec, app.ItcKeeper)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
@@ -548,6 +572,7 @@ func NewOmniFlixApp(
 		onftModule,
 		marketplaceModule,
 		streamPayModule,
+		itcModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -577,6 +602,7 @@ func NewOmniFlixApp(
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,
 		streampaytypes.ModuleName,
+		itctypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -602,6 +628,7 @@ func NewOmniFlixApp(
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,
 		streampaytypes.ModuleName,
+		itctypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -626,12 +653,13 @@ func NewOmniFlixApp(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
+		ibchost.ModuleName,
+		ibctransfertypes.ModuleName,
 		alloctypes.ModuleName,
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,
-		ibchost.ModuleName,
-		ibctransfertypes.ModuleName,
 		streampaytypes.ModuleName,
+		itctypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -854,6 +882,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(onfttypes.ModuleName)
 	paramsKeeper.Subspace(marketplacetypes.ModuleName)
 	paramsKeeper.Subspace(streampaytypes.ModuleName)
+	paramsKeeper.Subspace(itctypes.ModuleName)
 
 	return paramsKeeper
 }

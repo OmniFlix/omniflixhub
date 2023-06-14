@@ -3,6 +3,8 @@ package app
 import (
 	"fmt"
 
+	itctypes "github.com/OmniFlix/omniflixhub/x/itc/types"
+
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 
 	marketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
@@ -28,6 +30,9 @@ func (app *App) RegisterUpgradeHandlers(cfg module.Configurator) {
 			streamPayParams.StreamPaymentFee = sdk.NewInt64Coin("uflix", 50_000_000) // 50 FLIX
 			app.StreamPayKeeper.SetParams(ctx, streamPayParams)
 
+			// set itc module params
+			app.ItcKeeper.SetParams(ctx, itctypes.DefaultParams())
+
 			ctx.Logger().Info("running migrations ...")
 			return app.mm.RunMigrations(ctx, cfg, fromVM)
 		})
@@ -39,7 +44,7 @@ func (app *App) RegisterUpgradeHandlers(cfg module.Configurator) {
 
 	if upgradeInfo.Name == upgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := store.StoreUpgrades{
-			Added: []string{streampaytypes.ModuleName},
+			Added: []string{streampaytypes.ModuleName, itctypes.ModuleName},
 		}
 		// configure store loader that checks if height == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
