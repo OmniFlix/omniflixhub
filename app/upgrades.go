@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+
 	marketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
