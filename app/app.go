@@ -104,6 +104,10 @@ import (
 	"github.com/OmniFlix/onft"
 	onftkeeper "github.com/OmniFlix/onft/keeper"
 	onfttypes "github.com/OmniFlix/onft/types"
+
+	"github.com/OmniFlix/streampay/v2/x/streampay"
+	streampaykeeper "github.com/OmniFlix/streampay/v2/x/streampay/keeper"
+	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 )
 
 const Name = "omniflixhub"
@@ -152,6 +156,7 @@ var (
 		alloc.AppModuleBasic{},
 		onft.AppModuleBasic{},
 		marketplace.AppModuleBasic{},
+		streampay.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -166,6 +171,7 @@ var (
 		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		onfttypes.ModuleName:           nil,
 		marketplacetypes.ModuleName:    nil,
+		streampaytypes.ModuleName:      nil,
 	}
 )
 
@@ -226,6 +232,7 @@ type App struct {
 	AllocKeeper       allockeeper.Keeper
 	ONFTKeeper        onftkeeper.Keeper
 	MarketplaceKeeper marketplacekeeper.Keeper
+	StreamPayKeeper   streampaykeeper.Keeper
 
 	// module manager
 	mm *module.Manager
@@ -261,11 +268,25 @@ func NewOmniFlixApp(
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 
 	keys := sdk.NewKVStoreKeys(
-		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
-		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
-		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
-		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey, feegrant.StoreKey,
-		authzkeeper.StoreKey, alloctypes.StoreKey, onfttypes.StoreKey, marketplacetypes.StoreKey,
+		authtypes.StoreKey,
+		banktypes.StoreKey,
+		stakingtypes.StoreKey,
+		minttypes.StoreKey,
+		distrtypes.StoreKey,
+		slashingtypes.StoreKey,
+		govtypes.StoreKey,
+		paramstypes.StoreKey,
+		ibchost.StoreKey,
+		upgradetypes.StoreKey,
+		evidencetypes.StoreKey,
+		ibctransfertypes.StoreKey,
+		capabilitytypes.StoreKey,
+		feegrant.StoreKey,
+		authzkeeper.StoreKey,
+		alloctypes.StoreKey,
+		onfttypes.StoreKey,
+		marketplacetypes.StoreKey,
+		streampaytypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -475,6 +496,17 @@ func NewOmniFlixApp(
 
 	marketplaceModule := marketplace.NewAppModule(appCodec, app.MarketplaceKeeper)
 
+	app.StreamPayKeeper = *streampaykeeper.NewKeeper(
+		appCodec,
+		keys[streampaytypes.StoreKey],
+		keys[streampaytypes.MemStoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.DistrKeeper,
+		app.GetSubspace(streampaytypes.ModuleName),
+	)
+	streamPayModule := streampay.NewAppModule(appCodec, app.StreamPayKeeper)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
@@ -515,6 +547,7 @@ func NewOmniFlixApp(
 		allocModule,
 		onftModule,
 		marketplaceModule,
+		streamPayModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -543,6 +576,7 @@ func NewOmniFlixApp(
 		feegrant.ModuleName,
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,
+		streampaytypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -567,6 +601,7 @@ func NewOmniFlixApp(
 		alloctypes.ModuleName,
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,
+		streampaytypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -596,6 +631,7 @@ func NewOmniFlixApp(
 		marketplacetypes.ModuleName,
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
+		streampaytypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -817,6 +853,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(alloctypes.ModuleName)
 	paramsKeeper.Subspace(onfttypes.ModuleName)
 	paramsKeeper.Subspace(marketplacetypes.ModuleName)
+	paramsKeeper.Subspace(streampaytypes.ModuleName)
 
 	return paramsKeeper
 }
