@@ -198,7 +198,7 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 			campaign.NftMintDetails.DenomId,
 			nfttypes.GenUniqueID(nfttypes.IDPrefix),
 			nfttypes.Metadata{
-				Name:        campaign.NftMintDetails.Name + fmt.Sprintf(" #%d", campaign.MintCount),
+				Name:        campaign.NftMintDetails.Name + fmt.Sprintf("%d", campaign.MintCount),
 				Description: campaign.NftMintDetails.Description,
 				MediaURI:    campaign.NftMintDetails.MediaUri,
 				PreviewURI:  campaign.NftMintDetails.PreviewUri,
