@@ -3,6 +3,8 @@ package app
 import (
 	"fmt"
 
+	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
+
 	marketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -18,7 +20,14 @@ func (app *App) RegisterUpgradeHandlers(cfg module.Configurator) {
 	app.UpgradeKeeper.SetUpgradeHandler(
 		upgradeName,
 		func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			// set marketplace module params
 			app.MarketplaceKeeper.SetParams(ctx, marketplacetypes.DefaultParams())
+
+			// set streampay module params
+			streamPayParams := streampaytypes.DefaultParams()
+			streamPayParams.StreamPaymentFee = sdk.NewInt64Coin("uflix", 50_000_000) // 50 FLIX
+			app.StreamPayKeeper.SetParams(ctx, streamPayParams)
+
 			ctx.Logger().Info("running migrations ...")
 			return app.mm.RunMigrations(ctx, cfg, fromVM)
 		})
@@ -30,7 +39,7 @@ func (app *App) RegisterUpgradeHandlers(cfg module.Configurator) {
 
 	if upgradeInfo.Name == upgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := store.StoreUpgrades{
-			Added: []string{},
+			Added: []string{streampaytypes.ModuleName},
 		}
 		// configure store loader that checks if height == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
