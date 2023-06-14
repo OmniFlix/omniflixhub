@@ -66,6 +66,9 @@ func (msg MsgCreateCampaign) ValidateBasic() error {
 	if err := ValidateInteractionType(msg.Interaction); err != nil {
 		return err
 	}
+	if msg.NftDenomId == "" {
+		return sdkerrors.Wrapf(ErrInvalidNftDenomId, "nft denom id cannot be empty")
+	}
 	if msg.ClaimType != CLAIM_TYPE_NFT {
 		if err := ValidateTokens(msg.Deposit, msg.TokensPerClaim); err != nil {
 			return err
@@ -78,6 +81,11 @@ func (msg MsgCreateCampaign) ValidateBasic() error {
 		if err := validateNFTMintDetails(msg.NftMintDetails); err != nil {
 			return err
 		}
+		if msg.NftMintDetails != nil && msg.NftDenomId == msg.NftMintDetails.DenomId {
+			return sdkerrors.Wrapf(ErrInvalidNFTMintDetails,
+				"nft denom id and nft mint details denom id cannot be same (%s)", msg.NftDenomId)
+		}
+
 	}
 	if msg.MaxAllowedClaims == 0 {
 		return sdkerrors.Wrapf(ErrInValidMaxAllowedClaims,

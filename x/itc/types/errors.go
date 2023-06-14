@@ -25,4 +25,5 @@ var (
 	ErrInvalidFeeDenom         = sdkerrors.Register(ModuleName, 18, "invalid fee denom")
 	ErrNotEnoughFeeAmount      = sdkerrors.Register(ModuleName, 19, "not enough fee")
 	ErrInvalidDistribution     = sdkerrors.Register(ModuleName, 20, "invalid distribution")
+	ErrInvalidNftDenomId       = sdkerrors.Register(ModuleName, 21, "invalid nft denom id")
 )
