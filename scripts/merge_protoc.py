@@ -19,7 +19,7 @@ all_dir = os.path.join(project_root, "tmp-swagger-gen", "_all")
 output: dict
 output = {
     "swagger": "2.0",
-    "info": {"title": "StreamPay", "version": "v0.1.0"},
+    "info": {"title": "OmniFlixHub Rest API Docs", "version": "v0.11.0"},
     "consumes": ["application/json"],
     "produces": ["application/json"],
     "paths": {},

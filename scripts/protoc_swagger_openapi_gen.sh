@@ -63,6 +63,8 @@ for f in $files; do
     cp $f ./tmp-swagger-gen/_all/onft-$counter.json
   elif [[ "$f" =~ "marketplace" ]]; then
     cp $f ./tmp-swagger-gen/_all/marketplace-$counter.json
+  elif [[ "$f" =~ "streampay" ]]; then
+    cp $f ./tmp-swagger-gen/_all/streampay-$counter.json
   else
     cp $f ./tmp-swagger-gen/_all/other-$counter.json
   fi
