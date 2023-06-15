@@ -78,8 +78,8 @@ github.com/Microsoft/go-winio v0.6.0 h1:slsWYD/zyx7lCXoZVlvQrj0hPTM1HI4+v1sIda2y
 github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 h1:TngWCqHvy9oXAN6lEVMRuU21PR1EtLVZJmdB18Gu3Rw=
 github.com/OmniFlix/marketplace v0.6.0-alpha.1 h1:yluaghxiwjlatRcqM3GosOSuXsHVzqK2ZJFrC2NF1HI=
 github.com/OmniFlix/marketplace v0.6.0-alpha.1/go.mod h1:k3JLhUXCQxjXc7Ro6hvj1cwwnzAMlfdxU/T4v90NzgU=
-github.com/OmniFlix/onft v0.6.0-alpha.1 h1:3FXGd2BcZMg0GhhMLm4Q6MqNG8KYHsof2no/kDcMq7w=
-github.com/OmniFlix/onft v0.6.0-alpha.1/go.mod h1:RW0ooCgUtutpMElh38kbYf3Qb05BmDKK18jCRImwinI=
+github.com/OmniFlix/onft v0.6.0-alpha.2 h1:pCc7sXrncUwKv6CV+dmiWE5beypnaleSjjadS4JTyPU=
+github.com/OmniFlix/onft v0.6.0-alpha.2/go.mod h1:RW0ooCgUtutpMElh38kbYf3Qb05BmDKK18jCRImwinI=
 github.com/OmniFlix/streampay/v2 v2.0.0-alpha.2 h1:ILT1Do+ZRJWwbrWzLfA0hmbi81Pif9ztMvYRrdzuEqI=
 github.com/OmniFlix/streampay/v2 v2.0.0-alpha.2/go.mod h1:PBSVCaNWXBGwZSEIy2TKtNl5oh43QfHqrQ+kF+WcvSc=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
