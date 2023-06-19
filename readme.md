@@ -6,10 +6,10 @@ with [Ignite CLI](https://github.com/ignite/cli).
 ### Hardware Requirements
  - Quad Core or larger AMD or Intel (amd64) CPU 
  - 16GB RAM
- - 500GB SSD Storage
+ - 1TB SSD Storage
 
 ### Go Requirement
-- go 1.19 +
+- go 1.19.3 +
 ```
 sudo rm -rf /usr/local/go
 wget -q -O - https://git.io/vQhTU | bash -s -- --remove
@@ -23,7 +23,7 @@ wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.19.3
 ```
 git clone https://github.com/Omniflix/omniflixhub.git
 cd omniflixhub
-git checkout v0.10.0
+git checkout v0.10.1
 go mod tidy
 make install
 ```
@@ -65,6 +65,7 @@ curl https://raw.githubusercontent.com/OmniFlix/mainnet/main/omniflixhub-1/genes
 ## Upgrades
  - [upgrade_1](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/upgrade_1.md) at block 4175400
  - [v0.10.0](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v0.10.0-upgrade.md) at block 6262420
+ - [v0.11.0](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v0.11.0-upgrade.md) at block `TBU`
 
 ### Testnets
 
