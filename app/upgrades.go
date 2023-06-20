@@ -3,11 +3,13 @@ package app
 import (
 	"fmt"
 
+	appparams "github.com/OmniFlix/omniflixhub/app/params"
+
 	itctypes "github.com/OmniFlix/omniflixhub/x/itc/types"
 
+	maketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 
-	marketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -22,19 +24,31 @@ func (app *App) RegisterUpgradeHandlers(cfg module.Configurator) {
 	app.UpgradeKeeper.SetUpgradeHandler(
 		upgradeName,
 		func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			// set marketplace module params
-			app.MarketplaceKeeper.SetParams(ctx, marketplacetypes.DefaultParams())
-
-			// set streampay module params
-			streamPayParams := streampaytypes.DefaultParams()
-			streamPayParams.StreamPaymentFee = sdk.NewInt64Coin("uflix", 50_000_000) // 50 FLIX
-			app.StreamPayKeeper.SetParams(ctx, streamPayParams)
+			ctx.Logger().Info("running migrations ...")
+			// Run migrations before applying any other state changes.
+			versionMap, err := app.mm.RunMigrations(ctx, cfg, fromVM)
+			if err != nil {
+				return nil, err
+			}
+			// update marketplace module new parameters
+			marketplaceParamSubspace, ok := app.ParamsKeeper.GetSubspace(maketplacetypes.ModuleName)
+			if !ok {
+				panic("marketplace params subspace not found")
+			}
+			marketplaceParamSubspace.Set(
+				ctx,
+				maketplacetypes.ParamStoreKeyMaxAuctionDuration,
+				maketplacetypes.DefaultMaxAuctionDuration,
+			)
+			// set streampay params
+			streampayParams := streampaytypes.DefaultParams()
+			streampayParams.StreamPaymentFee = sdk.NewInt64Coin(appparams.BondDenom, 50_000_000)
+			app.StreamPayKeeper.SetParams(ctx, streampayParams)
 
 			// set itc module params
 			app.ItcKeeper.SetParams(ctx, itctypes.DefaultParams())
 
-			ctx.Logger().Info("running migrations ...")
-			return app.mm.RunMigrations(ctx, cfg, fromVM)
+			return versionMap, nil
 		})
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
