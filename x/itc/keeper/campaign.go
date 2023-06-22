@@ -1,12 +1,13 @@
 package keeper
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
-
-	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 
 	"github.com/OmniFlix/omniflixhub/x/itc/types"
 	nfttypes "github.com/OmniFlix/onft/types"
+	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -196,7 +197,7 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 		if err := k.nftKeeper.MintONFT(
 			ctx,
 			campaign.NftMintDetails.DenomId,
-			nfttypes.GenUniqueID(nfttypes.IDPrefix),
+			generateClaimNftId(ctx, campaign.Id, campaign.MintCount),
 			nfttypes.Metadata{
 				Name:        campaign.NftMintDetails.Name + fmt.Sprintf("%d", campaign.MintCount),
 				Description: campaign.NftMintDetails.Description,
@@ -254,4 +255,12 @@ func (k Keeper) DepositCampaign(ctx sdk.Context, campaignId uint64, depositor sd
 	k.emitDepositCampaignEvent(ctx, campaignId, depositor.String(), amount)
 
 	return nil
+}
+
+func generateClaimNftId(ctx sdk.Context, campaignId, mintCount uint64) string {
+	blockHash := ctx.HeaderHash().String()
+	idStr := fmt.Sprintf("%sitc%dmc%d", blockHash, campaignId, mintCount)
+	h := sha256.New()
+	h.Write([]byte(idStr))
+	return nfttypes.IDPrefix + hex.EncodeToString([]byte(idStr))[:32]
 }
