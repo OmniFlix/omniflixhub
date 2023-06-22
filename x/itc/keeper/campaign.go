@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"crypto/sha256"
 	"fmt"
 
 	"github.com/OmniFlix/omniflixhub/x/itc/types"
@@ -195,7 +196,7 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 		if err := k.nftKeeper.MintONFT(
 			ctx,
 			campaign.NftMintDetails.DenomId,
-			generateClaimNftId(campaign.Id, campaign.MintCount),
+			generateClaimNftId(ctx, campaign.Id, campaign.MintCount),
 			nfttypes.Metadata{
 				Name:        campaign.NftMintDetails.Name + fmt.Sprintf("%d", campaign.MintCount),
 				Description: campaign.NftMintDetails.Description,
@@ -255,6 +256,8 @@ func (k Keeper) DepositCampaign(ctx sdk.Context, campaignId uint64, depositor sd
 	return nil
 }
 
-func generateClaimNftId(campaignId, mintCount uint64) string {
-	return fmt.Sprintf("%sitc%dmc%d", nfttypes.IDPrefix, campaignId, mintCount)
+func generateClaimNftId(ctx sdk.Context, campaignId, mintCount uint64) string {
+	bHash := ctx.HeaderHash().String()
+	hash := sha256.Sum256([]byte(fmt.Sprintf("%sitc%dmc%d", bHash, campaignId, mintCount)))
+	return nfttypes.IDPrefix + fmt.Sprintf("%x", hash)[:32]
 }
