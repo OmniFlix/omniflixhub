@@ -257,7 +257,7 @@ func (k Keeper) DepositCampaign(ctx sdk.Context, campaignId uint64, depositor sd
 }
 
 func generateClaimNftId(ctx sdk.Context, campaignId, mintCount uint64) string {
-	bHash := ctx.HeaderHash().String()
-	hash := sha256.Sum256([]byte(fmt.Sprintf("%sitc%dmc%d", bHash, campaignId, mintCount)))
+	lastBlockHash := fmt.Sprintf("%x", ctx.BlockHeader().LastBlockId.Hash)
+	hash := sha256.Sum256([]byte(fmt.Sprintf("%sitc%dmc%d", lastBlockHash, campaignId, mintCount)))
 	return nfttypes.IDPrefix + fmt.Sprintf("%x", hash)[:32]
 }
