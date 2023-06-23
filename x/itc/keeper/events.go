@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/OmniFlix/omniflixhub/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -16,8 +17,8 @@ func (k Keeper) emitCreateCampaignEvent(ctx sdk.Context, campaign types.Campaign
 			sdk.NewAttribute(types.AttributeKeyNftDenomId, campaign.NftDenomId),
 			sdk.NewAttribute(types.AttributeKeyClaimType, campaign.ClaimType.String()),
 			sdk.NewAttribute(types.AttributeKeyInteractionType, campaign.Interaction.String()),
-			sdk.NewAttribute(types.AttributeKeyStartTime, campaign.StartTime.String()),
-			sdk.NewAttribute(types.AttributeKeyEndTime, campaign.EndTime.String()),
+			sdk.NewAttribute(types.AttributeKeyStartTime, campaign.StartTime.Format(time.RFC3339)),
+			sdk.NewAttribute(types.AttributeKeyEndTime, campaign.EndTime.Format(time.RFC3339)),
 		),
 	)
 }
