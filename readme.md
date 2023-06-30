@@ -23,7 +23,7 @@ wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.19.3
 ```
 git clone https://github.com/Omniflix/omniflixhub.git
 cd omniflixhub
-git checkout v0.10.1
+git checkout v0.11.1
 go mod tidy
 make install
 ```
@@ -48,11 +48,14 @@ curl https://raw.githubusercontent.com/OmniFlix/mainnet/main/omniflixhub-1/genes
 
 
 ### Snapshots
- - Check [c29r3/cosmos-snapshots](https://github.com/c29r3/cosmos-snapshots) repository for omniflixhub snapshots
+ - [c29r3/cosmos-snapshots](https://github.com/c29r3/cosmos-snapshots) repository for omniflixhub snapshots
+ - [polkachu snapshot](https://polkachu.com/tendermint_snapshots/omniflix) 
+ - [NodeStake snapshot](https://nodestake.top/omniflix)
    
 ### OmniFlix Modules
 - [oNFT](https://github.com/OmniFlix/onft)
 - [Marketplace](https://github.com/OmniFlix/marketplace)
+- [StreamPay](https://github.com/OmniFlix/streampay)
  
 ### Documentation
 
@@ -65,7 +68,7 @@ curl https://raw.githubusercontent.com/OmniFlix/mainnet/main/omniflixhub-1/genes
 ## Upgrades
  - [upgrade_1](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/upgrade_1.md) at block 4175400
  - [v0.10.0](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v0.10.0-upgrade.md) at block 6262420
- - [v0.11.0](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v0.11.0-upgrade.md) at block `TBU`
+ - [v0.11.0](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v0.11.0-upgrade.md) at block 7339200
 
 ### Testnets
 
