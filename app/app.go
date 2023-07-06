@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
+
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
@@ -156,6 +158,7 @@ func GetEnabledProposals() []wasm.ProposalType {
 
 func getGovProposalHandlers() []govclient.ProposalHandler {
 	var govProposalHandlers []govclient.ProposalHandler
+	govProposalHandlers = append(govProposalHandlers, wasmclient.ProposalHandlers...)
 	govProposalHandlers = append(govProposalHandlers,
 		paramsclient.ProposalHandler,
 		distrclient.ProposalHandler,
