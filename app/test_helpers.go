@@ -134,7 +134,9 @@ func setup(withGenesis bool, invCheckPeriod uint) (*App, GenesisState) {
 		DefaultNodeHome,
 		invCheckPeriod,
 		encCdc,
-		EmptyBaseAppOptions{},
+		EmptyAppOptions{},
+		EmptyWasmOpts,
+		GetEnabledProposals(),
 	)
 	if withGenesis {
 		return app, NewDefaultGenesisState(encCdc.Marshaler)

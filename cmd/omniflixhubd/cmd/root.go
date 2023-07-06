@@ -6,6 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/cosmos/cosmos-sdk/client/config"
 
 	"github.com/OmniFlix/omniflixhub/app/params"
@@ -200,12 +203,19 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		panic(err)
 	}
 
+	var wasmOpts []wasmkeeper.Option
+	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
+		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
+	}
+
 	return app.NewOmniFlixApp(
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		a.encCfg,
 		appOpts,
+		wasmOpts,
+		app.GetEnabledProposals(),
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
 		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
@@ -233,6 +243,7 @@ func (a appCreator) appExport(
 	if !ok || homePath == "" {
 		return servertypes.ExportedApp{}, errors.New("application home not set")
 	}
+	var emptyWasmOpts []wasmkeeper.Option
 
 	if height != -1 {
 		anApp = app.NewOmniFlixApp(
@@ -245,6 +256,8 @@ func (a appCreator) appExport(
 			uint(1),
 			a.encCfg,
 			appOpts,
+			emptyWasmOpts,
+			app.GetEnabledProposals(),
 		)
 
 		if err := anApp.LoadHeight(height); err != nil {
@@ -261,6 +274,8 @@ func (a appCreator) appExport(
 			uint(1),
 			a.encCfg,
 			appOpts,
+			emptyWasmOpts,
+			app.GetEnabledProposals(),
 		)
 	}
 
