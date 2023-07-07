@@ -22,7 +22,7 @@ func New(dir string) *app.App {
 	encoding := app.MakeEncodingConfig()
 
 	a := app.NewOmniFlixApp(logger, db, nil, true, map[int64]bool{}, dir, 0, encoding,
-		simapp.EmptyAppOptions{})
+		simapp.EmptyAppOptions{}, app.EmptyWasmOpts, app.GetEnabledProposals())
 	stateBytes, err := json.MarshalIndent(app.ModuleBasics.DefaultGenesis(encoding.Marshaler), "", " ")
 	if err != nil {
 		panic(err)
