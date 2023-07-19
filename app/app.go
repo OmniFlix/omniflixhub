@@ -149,8 +149,6 @@ func NewOmniFlixApp(
 		appOpts,
 	)
 
-	// Create Transfer Keepers
-
 	/****  Module Options ****/
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -217,6 +215,7 @@ func NewOmniFlixApp(
 	app.SetEndBlocker(app.EndBlocker)
 
 	app.setupUpgradeHandlers()
+	app.setupUpgradeStoreLoaders()
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -339,6 +338,20 @@ func (app *OmniFlixApp) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
 }
 
+func (app *OmniFlixApp) setupUpgradeHandlers() {
+	for _, upgrade := range Upgrades {
+		app.UpgradeKeeper.SetUpgradeHandler(
+			upgrade.UpgradeName,
+			upgrade.CreateUpgradeHandler(
+				app.mm,
+				app.configurator,
+				app.BaseApp,
+				&app.AppKeepers,
+			),
+		)
+	}
+}
+
 // configure store loader that checks if version == upgradeHeight and applies store upgrades
 func (app *OmniFlixApp) setupUpgradeStoreLoaders() {
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
@@ -354,20 +367,6 @@ func (app *OmniFlixApp) setupUpgradeStoreLoaders() {
 		if upgradeInfo.Name == upgrade.UpgradeName {
 			app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &upgrade.StoreUpgrades))
 		}
-	}
-}
-
-func (app *OmniFlixApp) setupUpgradeHandlers() {
-	for _, upgrade := range Upgrades {
-		app.UpgradeKeeper.SetUpgradeHandler(
-			upgrade.UpgradeName,
-			upgrade.CreateUpgradeHandler(
-				app.mm,
-				app.configurator,
-				app.BaseApp,
-				&app.AppKeepers,
-			),
-		)
 	}
 }
 
