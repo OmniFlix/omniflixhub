@@ -15,7 +15,7 @@ import (
 )
 
 // New creates application instance with in-memory database and disabled logging.
-func New(dir string) *app.App {
+func New(dir string) *app.OmniFlixApp {
 	db := tmdb.NewMemDB()
 	logger := log.NewNopLogger()
 

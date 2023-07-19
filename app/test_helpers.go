@@ -59,7 +59,7 @@ type EmptyAppOptions struct{}
 
 func (EmptyAppOptions) Get(_ string) interface{} { return nil }
 
-func Setup(t *testing.T, _ bool, _ uint) *App {
+func Setup(t *testing.T, _ bool, _ uint) *OmniFlixApp {
 	t.Helper()
 
 	privVal := apphelpers.NewPV()
@@ -91,17 +91,17 @@ func SetupWithGenesisValSet(
 	valSet *tmtypes.ValidatorSet,
 	genAccs []authtypes.GenesisAccount,
 	balances ...banktypes.Balance,
-) *App {
+) *OmniFlixApp {
 	t.Helper()
 
-	omniFlixApp, genesisState := setup(true, 5)
-	genesisState = genesisStateWithValSet(t, omniFlixApp, genesisState, valSet, genAccs, balances...)
+	omniflixTestApp, genesisState := setup(true, 5)
+	genesisState = genesisStateWithValSet(t, omniflixTestApp, genesisState, valSet, genAccs, balances...)
 
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 	require.NoError(t, err)
 
 	// init chain will set the validator set and initialize the genesis accounts
-	omniFlixApp.InitChain(
+	omniflixTestApp.InitChain(
 		abci.RequestInitChain{
 			Validators:      []abci.ValidatorUpdate{},
 			ConsensusParams: DefaultConsensusParams,
@@ -110,18 +110,18 @@ func SetupWithGenesisValSet(
 	)
 
 	// commit genesis changes
-	omniFlixApp.Commit()
-	omniFlixApp.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
-		Height:             omniFlixApp.LastBlockHeight() + 1,
-		AppHash:            omniFlixApp.LastCommitID().Hash,
+	omniflixTestApp.Commit()
+	omniflixTestApp.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
+		Height:             omniflixTestApp.LastBlockHeight() + 1,
+		AppHash:            omniflixTestApp.LastCommitID().Hash,
 		ValidatorsHash:     valSet.Hash(),
 		NextValidatorsHash: valSet.Hash(),
 	}})
 
-	return omniFlixApp
+	return omniflixTestApp
 }
 
-func setup(withGenesis bool, invCheckPeriod uint) (*App, GenesisState) {
+func setup(withGenesis bool, invCheckPeriod uint) (*OmniFlixApp, GenesisState) {
 	db := dbm.NewMemDB()
 	encCdc := MakeEncodingConfig()
 
@@ -145,7 +145,7 @@ func setup(withGenesis bool, invCheckPeriod uint) (*App, GenesisState) {
 
 func genesisStateWithValSet(
 	t *testing.T,
-	app *App,
+	app *OmniFlixApp,
 	genesisState GenesisState,
 	valSet *tmtypes.ValidatorSet,
 	genAccs []authtypes.GenesisAccount,

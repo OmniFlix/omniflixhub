@@ -18,7 +18,7 @@ import (
 type KeeperTestSuite struct {
 	suite.Suite
 	ctx sdk.Context
-	app *app.App
+	app *app.OmniFlixApp
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
