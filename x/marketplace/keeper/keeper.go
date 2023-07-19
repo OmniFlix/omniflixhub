@@ -227,7 +227,7 @@ func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) 
 func (k Keeper) CreateAuctionListing(ctx sdk.Context, auction types.AuctionListing) error {
 	// check auction already exists or not
 	if k.HasAuctionListing(ctx, auction.GetId()) {
-		return sdkerrors.Wrapf(types.ErrListingAlreadyExists, "auction listing already exists: %s", auction.GetId())
+		return sdkerrors.Wrapf(types.ErrListingAlreadyExists, "auction listing already exists: %d", auction.GetId())
 	}
 
 	err := k.nftKeeper.TransferOwnership(ctx,

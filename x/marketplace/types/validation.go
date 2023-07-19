@@ -8,8 +8,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var allowedDenoms = []string{}
-
 // ValidateListing checks listing is valid or not
 func ValidateListing(listing Listing) error {
 	if len(listing.Owner) > 0 {
@@ -34,11 +32,6 @@ func ValidatePrice(price sdk.Coin) error {
 	if price.IsZero() || price.IsNegative() {
 		return sdkerrors.Wrapf(ErrInvalidPrice, "invalid price %s, only accepts positive amount", price.String())
 	}
-	/*
-		if !StringInSlice(price.Denom, allowedDenoms) {
-			return sdkerrors.Wrapf(ErrInvalidPriceDenom, "invalid denom %s", price.Denom)
-		}
-	*/
 	return nil
 }
 

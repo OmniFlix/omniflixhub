@@ -9,14 +9,11 @@ import (
 )
 
 // Rest variable names
-// nolint
 const (
 	RestParamListingId = "listing_id"
 	RestParamOwner     = "owner"
-	RestParamBuyer     = "buyer"
 )
 
-// RegisterHandlers
 func RegisterHandlers(cliCtx client.Context, r *mux.Router) {
 	registerQueryRoutes(cliCtx, r)
 	registerTxRoutes(cliCtx, r)
