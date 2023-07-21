@@ -3,7 +3,7 @@ package types
 import (
 	"time"
 
-	"github.com/OmniFlix/marketplace/x/marketplace/types"
+	"github.com/OmniFlix/onft/types"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -206,7 +206,7 @@ func (msg MsgClaim) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid claimer address (%s)", msg.Claimer)
 	}
 	if len(msg.NftId) == 0 {
-		return sdkerrors.Wrapf(types.ErrInvalidNftId, "invalid nft id (%s)", msg.NftId)
+		return sdkerrors.Wrapf(types.ErrInvalidONFTID, "invalid nft id (%s)", msg.NftId)
 	}
 	return ValidateInteractionType(msg.Interaction)
 }

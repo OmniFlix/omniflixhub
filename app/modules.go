@@ -67,8 +67,8 @@ import (
 	"github.com/OmniFlix/onft"
 	onfttypes "github.com/OmniFlix/onft/types"
 
-	"github.com/OmniFlix/marketplace/x/marketplace"
-	marketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/x/marketplace"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/x/marketplace/types"
 
 	"github.com/OmniFlix/omniflixhub/x/itc"
 	itctypes "github.com/OmniFlix/omniflixhub/x/itc/types"

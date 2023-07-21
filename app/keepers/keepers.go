@@ -72,8 +72,8 @@ import (
 	onftkeeper "github.com/OmniFlix/onft/keeper"
 	onfttypes "github.com/OmniFlix/onft/types"
 
-	marketplacekeeper "github.com/OmniFlix/marketplace/x/marketplace/keeper"
-	marketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
+	marketplacekeeper "github.com/OmniFlix/omniflixhub/x/marketplace/keeper"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/x/marketplace/types"
 
 	itckeeper "github.com/OmniFlix/omniflixhub/x/itc/keeper"
 	itctypes "github.com/OmniFlix/omniflixhub/x/itc/types"
