@@ -1,7 +1,7 @@
 syntax = "proto3";
 package OmniFlix.marketplace.v1beta1;
 
-option go_package = "github.com/OmniFlix/omniflixhub/x/marketplace/types";
+option go_package = "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types";
 
 // EventListONFT is emitted on NFT Listing on market
 message EventListNFT {

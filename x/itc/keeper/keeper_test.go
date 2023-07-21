@@ -8,9 +8,9 @@ import (
 	onftkeeper "github.com/OmniFlix/onft/keeper"
 	onfttypes "github.com/OmniFlix/onft/types"
 
-	"github.com/OmniFlix/omniflixhub/app/apptesting"
-	"github.com/OmniFlix/omniflixhub/x/itc/keeper"
-	"github.com/OmniFlix/omniflixhub/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v2/app/apptesting"
+	"github.com/OmniFlix/omniflixhub/v2/x/itc/keeper"
+	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 )

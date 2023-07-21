@@ -1,6 +1,6 @@
-module github.com/OmniFlix/omniflixhub
+module github.com/OmniFlix/omniflixhub/v2
 
-go 1.19
+go 1.20
 
 require (
 	github.com/OmniFlix/onft v0.6.0

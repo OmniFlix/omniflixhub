@@ -11,7 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 
-	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

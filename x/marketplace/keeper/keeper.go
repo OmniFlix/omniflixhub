@@ -10,7 +10,7 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 )
 
 type Keeper struct {

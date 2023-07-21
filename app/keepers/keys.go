@@ -1,9 +1,9 @@
 package keepers
 
 import (
-	alloctypes "github.com/OmniFlix/omniflixhub/x/alloc/types"
-	itctypes "github.com/OmniFlix/omniflixhub/x/itc/types"
-	marketplacetypes "github.com/OmniFlix/omniflixhub/x/marketplace/types"
+	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
+	itctypes "github.com/OmniFlix/omniflixhub/v2/x/itc/types"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 	onfttypes "github.com/OmniFlix/onft/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"

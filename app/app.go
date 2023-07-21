@@ -7,10 +7,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/OmniFlix/omniflixhub/app/openapiconsole"
-	appparams "github.com/OmniFlix/omniflixhub/app/params"
-	customAuthRest "github.com/OmniFlix/omniflixhub/custom/auth/client/rest"
-	"github.com/OmniFlix/omniflixhub/docs"
+	"github.com/OmniFlix/omniflixhub/v2/app/openapiconsole"
+	appparams "github.com/OmniFlix/omniflixhub/v2/app/params"
+	customAuthRest "github.com/OmniFlix/omniflixhub/v2/custom/auth/client/rest"
+	"github.com/OmniFlix/omniflixhub/v2/docs"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
@@ -42,9 +42,9 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/OmniFlix/omniflixhub/app/keepers"
-	"github.com/OmniFlix/omniflixhub/app/upgrades"
-	v2 "github.com/OmniFlix/omniflixhub/app/upgrades/v2"
+	"github.com/OmniFlix/omniflixhub/v2/app/keepers"
+	"github.com/OmniFlix/omniflixhub/v2/app/upgrades"
+	v2 "github.com/OmniFlix/omniflixhub/v2/app/upgrades/v2"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 

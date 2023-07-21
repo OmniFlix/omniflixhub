@@ -3,8 +3,8 @@ package marketplace
 import (
 	"fmt"
 
-	"github.com/OmniFlix/omniflixhub/x/marketplace/keeper"
-	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/keeper"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"

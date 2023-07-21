@@ -3,8 +3,8 @@ package itc
 import (
 	"fmt"
 
-	"github.com/OmniFlix/omniflixhub/x/itc/keeper"
-	"github.com/OmniFlix/omniflixhub/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/itc/keeper"
+	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

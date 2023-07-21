@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/OmniFlix/omniflixhub/app"
 	"github.com/OmniFlix/omniflixhub/testutil/simapp"
-	"github.com/OmniFlix/omniflixhub/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v2/app"
+	"github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"

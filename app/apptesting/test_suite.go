@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/OmniFlix/omniflixhub/app"
+	"github.com/OmniFlix/omniflixhub/v2/app"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"

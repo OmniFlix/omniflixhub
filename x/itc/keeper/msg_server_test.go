@@ -7,7 +7,7 @@ import (
 	onfttypes "github.com/OmniFlix/onft/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/OmniFlix/omniflixhub/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

@@ -1,8 +1,8 @@
 package v2
 
 import (
-	"github.com/OmniFlix/omniflixhub/app/keepers"
-	"github.com/OmniFlix/omniflixhub/app/upgrades"
+	"github.com/OmniFlix/omniflixhub/v2/app/keepers"
+	"github.com/OmniFlix/omniflixhub/v2/app/upgrades"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"

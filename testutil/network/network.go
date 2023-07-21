@@ -17,7 +17,7 @@ import (
 	tmrand "github.com/tendermint/tendermint/libs/rand"
 	tmdb "github.com/tendermint/tm-db"
 
-	"github.com/OmniFlix/omniflixhub/app"
+	"github.com/OmniFlix/omniflixhub/v2/app"
 )
 
 type (

@@ -6,7 +6,7 @@ import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 import "omniflix/marketplace/v1beta1/listing.proto";
 
-option go_package = "github.com/OmniFlix/omniflixhub/x/marketplace/types";
+option go_package = "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types";
 option (gogoproto.goproto_getters_all) = false;
 option (gogoproto.goproto_enum_prefix_all) = false;
 

@@ -8,7 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/config"
 
-	"github.com/OmniFlix/omniflixhub/app/params"
+	"github.com/OmniFlix/omniflixhub/v2/app/params"
 	"github.com/cosmos/cosmos-sdk/snapshots"
 
 	"github.com/spf13/cast"
@@ -17,7 +17,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/OmniFlix/omniflixhub/app"
+	"github.com/OmniFlix/omniflixhub/v2/app"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/debug"

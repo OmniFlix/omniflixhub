@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "omniflix/alloc/v1beta1/params.proto";
 
-option go_package = "github.com/OmniFlix/omniflixhub/x/alloc/types";
+option go_package = "github.com/OmniFlix/omniflixhub/v2/x/alloc/types";
 
 // QueryParamsRequest is the request type for the Query/Params RPC method.
 message QueryParamsRequest {}

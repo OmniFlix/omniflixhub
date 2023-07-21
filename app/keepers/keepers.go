@@ -66,17 +66,17 @@ import (
 	icahostkeeper "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/host/keeper"
 	icahosttypes "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/host/types"
 
-	allockeeper "github.com/OmniFlix/omniflixhub/x/alloc/keeper"
-	alloctypes "github.com/OmniFlix/omniflixhub/x/alloc/types"
+	allockeeper "github.com/OmniFlix/omniflixhub/v2/x/alloc/keeper"
+	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
 
 	onftkeeper "github.com/OmniFlix/onft/keeper"
 	onfttypes "github.com/OmniFlix/onft/types"
 
-	marketplacekeeper "github.com/OmniFlix/omniflixhub/x/marketplace/keeper"
-	marketplacetypes "github.com/OmniFlix/omniflixhub/x/marketplace/types"
+	marketplacekeeper "github.com/OmniFlix/omniflixhub/v2/x/marketplace/keeper"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 
-	itckeeper "github.com/OmniFlix/omniflixhub/x/itc/keeper"
-	itctypes "github.com/OmniFlix/omniflixhub/x/itc/types"
+	itckeeper "github.com/OmniFlix/omniflixhub/v2/x/itc/keeper"
+	itctypes "github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 
 	streampaykeeper "github.com/OmniFlix/streampay/v2/x/streampay/keeper"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"

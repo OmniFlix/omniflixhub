@@ -4,7 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 
-	"github.com/OmniFlix/omniflixhub/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 	nfttypes "github.com/OmniFlix/onft/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"

@@ -7,7 +7,7 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/OmniFlix/omniflixhub/app/keepers"
+	"github.com/OmniFlix/omniflixhub/v2/app/keepers"
 )
 
 // BaseAppParamManager defines an interface that BaseApp is expected to full-fill,

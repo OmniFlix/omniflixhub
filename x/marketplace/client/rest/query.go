@@ -13,7 +13,7 @@ import (
 	sdkquery "github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 
-	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 )
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {

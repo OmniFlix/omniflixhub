@@ -1,7 +1,7 @@
 package app
 
 import (
-	appparams "github.com/OmniFlix/omniflixhub/app/params"
+	appparams "github.com/OmniFlix/omniflixhub/v2/app/params"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -61,17 +61,17 @@ import (
 	icatypes "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/types"
 	"github.com/cosmos/ibc-go/v4/modules/apps/transfer"
 
-	"github.com/OmniFlix/omniflixhub/x/alloc"
-	alloctypes "github.com/OmniFlix/omniflixhub/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/alloc"
+	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
 
 	"github.com/OmniFlix/onft"
 	onfttypes "github.com/OmniFlix/onft/types"
 
-	"github.com/OmniFlix/omniflixhub/x/marketplace"
-	marketplacetypes "github.com/OmniFlix/omniflixhub/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 
-	"github.com/OmniFlix/omniflixhub/x/itc"
-	itctypes "github.com/OmniFlix/omniflixhub/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/itc"
+	itctypes "github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 
 	"github.com/OmniFlix/streampay/v2/x/streampay"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"

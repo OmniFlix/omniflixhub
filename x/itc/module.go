@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/OmniFlix/omniflixhub/x/itc/client/cli"
+	"github.com/OmniFlix/omniflixhub/v2/x/itc/client/cli"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/spf13/cobra"
 
@@ -14,8 +14,8 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/OmniFlix/omniflixhub/x/itc/keeper"
-	"github.com/OmniFlix/omniflixhub/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/itc/keeper"
+	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"

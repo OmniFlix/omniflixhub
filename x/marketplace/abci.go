@@ -1,7 +1,7 @@
 package marketplace
 
 import (
-	"github.com/OmniFlix/omniflixhub/x/marketplace/keeper"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abcitypes "github.com/tendermint/tendermint/abci/types"
 )

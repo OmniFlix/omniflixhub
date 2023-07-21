@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	apphelpers "github.com/OmniFlix/omniflixhub/app/helpers"
-	appparams "github.com/OmniFlix/omniflixhub/app/params"
+	apphelpers "github.com/OmniFlix/omniflixhub/v2/app/helpers"
+	appparams "github.com/OmniFlix/omniflixhub/v2/app/params"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
