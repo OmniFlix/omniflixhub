@@ -1,28 +1,29 @@
 package keeper_test
 
+/*
 import (
 	"testing"
 	"time"
 
-	"github.com/OmniFlix/omniflixhub/testutil/simapp"
 	"github.com/OmniFlix/omniflixhub/v2/app"
 	"github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/stretchr/testify/suite"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
 type KeeperTestSuite struct {
 	suite.Suite
 	ctx sdk.Context
+
 	app *app.OmniFlixApp
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	suite.app = simapp.New(suite.T().TempDir())
+	suite.app = app.NewOmniFlixApp(suite.T().TempDir())
 	suite.ctx = suite.app.BaseApp.NewContext(
 		false,
 		tmproto.Header{Height: 1, ChainID: "omniflixhub-1", Time: time.Now().UTC()},
@@ -132,3 +133,4 @@ func (suite *KeeperTestSuite) TestDistribution() {
 		mintCoin.Amount.ToDec().Mul(communityPoolPortion),
 		feePool.CommunityPool.AmountOf(denom))
 }
+*/

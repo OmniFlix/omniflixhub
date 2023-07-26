@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
-	abci "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/cometbft/cometbft/abci/types"
 
 	"github.com/OmniFlix/omniflixhub/v2/x/itc/keeper"
 	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
