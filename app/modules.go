@@ -3,10 +3,11 @@ package app
 import (
 	appparams "github.com/OmniFlix/omniflixhub/v2/app/params"
 	"github.com/cosmos/cosmos-sdk/types/module"
-
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/cosmos/cosmos-sdk/x/consensus"
+	consensusparamtypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
@@ -91,6 +92,7 @@ var (
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(getGovProposalHandlers()),
 		params.AppModuleBasic{},
+		consensus.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		ibc.AppModuleBasic{},
@@ -181,6 +183,7 @@ func appModules(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
+		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
 		ica.NewAppModule(nil, &app.ICAHostKeeper),
 		alloc.NewAppModule(appCodec, app.AllocKeeper),
@@ -248,6 +251,7 @@ func orderBeginBlockers() []string {
 		banktypes.ModuleName,
 		govtypes.ModuleName,
 		paramstypes.ModuleName,
+		consensusparamtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
 		genutiltypes.ModuleName,
@@ -275,6 +279,7 @@ func orderEndBlockers() []string {
 		authtypes.ModuleName,
 		vestingtypes.ModuleName,
 		paramstypes.ModuleName,
+		consensusparamtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
 		minttypes.ModuleName,
@@ -315,6 +320,7 @@ func orderInitGenesis() []string {
 		evidencetypes.ModuleName,
 		authz.ModuleName,
 		paramstypes.ModuleName,
+		consensusparamtypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,

@@ -6,7 +6,7 @@ import (
 	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	gogotypes "github.com/gogo/protobuf/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 )
 
 // GetNextCampaignNumber get the next campaign number

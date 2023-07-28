@@ -5,7 +5,7 @@ import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
-import "omniflix/itc/v1/itc.proto";
+import "OmniFlix/itc/v1/itc.proto";
 
 option go_package = "github.com/OmniFlix/omniflixhub/v2/x/itc/types";
 option (gogoproto.goproto_getters_all) = false;

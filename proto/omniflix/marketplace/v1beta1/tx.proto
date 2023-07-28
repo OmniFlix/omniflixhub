@@ -2,8 +2,8 @@ syntax = "proto3";
 package OmniFlix.marketplace.v1beta1;
 
 import "cosmos/base/v1beta1/coin.proto";
-import "omniflix/marketplace/v1beta1/listing.proto";
-import "omniflix/marketplace/v1beta1/auction.proto";
+import "OmniFlix/marketplace/v1beta1/listing.proto";
+import "OmniFlix/marketplace/v1beta1/auction.proto";
 import "gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";

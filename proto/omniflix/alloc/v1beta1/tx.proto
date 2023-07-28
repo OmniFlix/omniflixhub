@@ -1,8 +1,5 @@
 syntax = "proto3";
-package omniflix.alloc.v1beta1;
-
-
-
+package OmniFlix.alloc.v1beta1;
 
 option go_package = "github.com/OmniFlix/omniflixhub/v2/x/alloc/types";
 

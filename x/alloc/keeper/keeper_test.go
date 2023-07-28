@@ -1,13 +1,12 @@
 package keeper_test
 
-/*
 import (
 	"testing"
-	"time"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/OmniFlix/omniflixhub/v2/app"
+	"github.com/OmniFlix/omniflixhub/v2/app/apptesting"
 	"github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -16,6 +15,7 @@ import (
 )
 
 type KeeperTestSuite struct {
+	apptesting.KeeperTestHelper
 	suite.Suite
 	ctx sdk.Context
 
@@ -23,23 +23,13 @@ type KeeperTestSuite struct {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	suite.app = app.NewOmniFlixApp(suite.T().TempDir())
-	suite.ctx = suite.app.BaseApp.NewContext(
-		false,
-		tmproto.Header{Height: 1, ChainID: "omniflixhub-1", Time: time.Now().UTC()},
-	)
+	suite.Setup()
+
 	suite.app.AllocKeeper.SetParams(suite.ctx, types.DefaultParams())
 }
 
 func TestKeeperTestSuite(t *testing.T) {
 	suite.Run(t, new(KeeperTestSuite))
-}
-
-func FundAccount(bankKeeper bankkeeper.Keeper, ctx sdk.Context, addr sdk.AccAddress, amounts sdk.Coins) error {
-	if err := bankKeeper.MintCoins(ctx, minttypes.ModuleName, amounts); err != nil {
-		return err
-	}
-	return bankKeeper.SendCoinsFromModuleToAccount(ctx, minttypes.ModuleName, addr, amounts)
 }
 
 func FundModuleAccount(bankKeeper bankkeeper.Keeper, ctx sdk.Context, recipientMod string, amounts sdk.Coins) error {
@@ -118,11 +108,11 @@ func (suite *KeeperTestSuite) TestDistribution() {
 
 	// remaining going to next module should be 100% - 40% = 60%
 	suite.Equal(
-		mintCoin.Amount.ToDec().Mul(sdk.NewDecWithPrec(100, 2).Sub(modulePortion)).RoundInt().String(),
+		sdkmath.LegacyNewDecFromInt(mintCoin.Amount).Mul(sdk.NewDecWithPrec(100, 2).Sub(modulePortion)).RoundInt().String(),
 		suite.app.BankKeeper.GetAllBalances(suite.ctx, feeCollector).AmountOf(denom).String())
 
 	suite.Equal(
-		mintCoin.Amount.ToDec().Mul(params.DistributionProportions.DeveloperRewards).TruncateInt(),
+		sdkmath.LegacyNewDecFromInt(mintCoin.Amount).Mul(params.DistributionProportions.DeveloperRewards).TruncateInt(),
 		suite.app.BankKeeper.GetBalance(suite.ctx, devRewardsReceiver, denom).Amount)
 
 	// since the NFT incentives are not setup yet, funds go into the community pool
@@ -130,7 +120,6 @@ func (suite *KeeperTestSuite) TestDistribution() {
 	communityPoolPortion := params.DistributionProportions.CommunityPool // 5%
 
 	suite.Equal(
-		mintCoin.Amount.ToDec().Mul(communityPoolPortion),
+		sdkmath.LegacyNewDecFromInt(mintCoin.Amount).Mul(communityPoolPortion),
 		feePool.CommunityPool.AmountOf(denom))
 }
-*/

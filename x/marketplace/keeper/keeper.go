@@ -3,6 +3,10 @@ package keeper
 import (
 	"fmt"
 
+	sdkmath "cosmossdk.io/math"
+
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+
 	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -14,7 +18,7 @@ import (
 )
 
 type Keeper struct {
-	storeKey sdk.StoreKey
+	storeKey storetypes.StoreKey
 	cdc      codec.BinaryCodec
 
 	accountKeeper      types.AccountKeeper
@@ -26,7 +30,7 @@ type Keeper struct {
 
 func NewKeeper(
 	cdc codec.BinaryCodec,
-	key sdk.StoreKey,
+	key storetypes.StoreKey,
 
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
@@ -186,7 +190,7 @@ func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress
 }
 
 func (k Keeper) GetProportions(totalCoin sdk.Coin, ratio sdk.Dec) sdk.Coin {
-	return sdk.NewCoin(totalCoin.Denom, totalCoin.Amount.ToDec().Mul(ratio).TruncateInt())
+	return sdk.NewCoin(totalCoin.Denom, sdkmath.LegacyNewDecFromInt(totalCoin.Amount).Mul(ratio).TruncateInt())
 }
 
 func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) error {
@@ -303,5 +307,5 @@ func (k Keeper) PlaceBid(ctx sdk.Context, auction types.AuctionListing, newBid t
 }
 
 func (k Keeper) GetNewBidPrice(denom string, amount sdk.Coin, increment sdk.Dec) sdk.Coin {
-	return sdk.NewCoin(denom, amount.Amount.Add(amount.Amount.ToDec().Mul(increment).TruncateInt()))
+	return sdk.NewCoin(denom, amount.Amount.Add(sdkmath.LegacyNewDecFromInt(amount.Amount).Mul(increment).TruncateInt()))
 }

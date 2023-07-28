@@ -5,7 +5,7 @@ import (
 
 	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/exported"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/gogo/protobuf/proto"
+	"github.com/cosmos/gogoproto/proto"
 )
 
 var (

@@ -4,8 +4,8 @@ package OmniFlix.itc.v1;
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "omniflix/itc/v1/params.proto";
-import "omniflix/itc/v1/itc.proto";
+import "OmniFlix/itc/v1/params.proto";
+import "OmniFlix/itc/v1/itc.proto";
 
 option go_package = "github.com/OmniFlix/omniflixhub/v2/x/itc/types";
 option (gogoproto.goproto_getters_all) = false;

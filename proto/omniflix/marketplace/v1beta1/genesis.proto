@@ -2,9 +2,9 @@ syntax = "proto3";
 package OmniFlix.marketplace.v1beta1;
 
 import "gogoproto/gogo.proto";
-import "omniflix/marketplace/v1beta1/listing.proto";
-import "omniflix/marketplace/v1beta1/auction.proto";
-import "omniflix/marketplace/v1beta1/params.proto";
+import "OmniFlix/marketplace/v1beta1/listing.proto";
+import "OmniFlix/marketplace/v1beta1/auction.proto";
+import "OmniFlix/marketplace/v1beta1/params.proto";
 
 option go_package = "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types";
 
