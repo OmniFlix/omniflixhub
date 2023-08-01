@@ -119,15 +119,13 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 		return sdkerrors.Wrapf(types.ErrClaimExists,
 			"claim exists with given nft  %s", nft.GetID())
 	}
-	/*
-		claims := k.GetClaims(ctx, campaign.GetId())
-		if uint64(len(claims)) >= campaign.MaxAllowedClaims {
-			return sdkerrors.Wrapf(types.ErrClaimNotAllowed,
-				"max allowed claims reached for this campaign (campaign: %d, maxAllowedClaims: %d).",
-				campaign.GetId(),
-				campaign.GetMaxAllowedClaims(),
-			)
-		} */
+	if (campaign.MaxAllowedClaims - campaign.ClaimCount) <= 0 {
+		return sdkerrors.Wrapf(types.ErrClaimNotAllowed,
+			"max allowed claims reached for this campaign (campaign: %d, maxAllowedClaims: %d).",
+			campaign.GetId(),
+			campaign.GetMaxAllowedClaims(),
+		)
+	}
 
 	if campaign.ClaimType == types.CLAIM_TYPE_FT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
 		if campaign.AvailableTokens.IsLT(campaign.TokensPerClaim) {
@@ -217,10 +215,10 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 		}
 	}
 	// set claim
-
 	k.SetClaim(ctx, claim)
 
 	// set campaign
+	campaign.ClaimCount += 1
 	k.SetCampaign(ctx, campaign)
 
 	// emit events
