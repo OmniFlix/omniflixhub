@@ -167,6 +167,9 @@ func (k Keeper) FinalizeAndEndCampaigns(ctx sdk.Context) error {
 		if campaign.EndTime.Before(ctx.BlockTime()) {
 			// finalize campaign after endtime
 			k.endCampaign(ctx, campaign)
+		} else if campaign.ClaimCount == campaign.MaxAllowedClaims {
+			// finalize campaign after reaching max allowed claims
+			k.endCampaign(ctx, campaign)
 		}
 	}
 	return nil
