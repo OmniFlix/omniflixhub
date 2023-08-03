@@ -3,8 +3,11 @@ package app
 import (
 	"fmt"
 
+	appparams "github.com/OmniFlix/omniflixhub/app/params"
+
 	itctypes "github.com/OmniFlix/omniflixhub/x/itc/types"
 
+	maketplacetypes "github.com/OmniFlix/marketplace/x/marketplace/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 
 	store "github.com/cosmos/cosmos-sdk/store/types"
@@ -14,7 +17,7 @@ import (
 )
 
 // next upgrade name
-const upgradeName = "v0.11.2-itc-patch"
+const upgradeName = "v0.11.0"
 
 // RegisterUpgradeHandlers returns upgrade handlers
 func (app *App) RegisterUpgradeHandlers(cfg module.Configurator) {
@@ -27,14 +30,23 @@ func (app *App) RegisterUpgradeHandlers(cfg module.Configurator) {
 			if err != nil {
 				return nil, err
 			}
-
-			// campaign migrations
-			campaigns := app.ItcKeeper.GetAllCampaigns(ctx)
-			for _, campaign := range campaigns {
-				claims := app.ItcKeeper.GetClaims(ctx, campaign.Id)
-				campaign.ClaimCount = uint64(len(claims))
-				app.ItcKeeper.SetCampaign(ctx, campaign)
+			// update marketplace module new parameters
+			marketplaceParamSubspace, ok := app.ParamsKeeper.GetSubspace(maketplacetypes.ModuleName)
+			if !ok {
+				panic("marketplace params subspace not found")
 			}
+			marketplaceParamSubspace.Set(
+				ctx,
+				maketplacetypes.ParamStoreKeyMaxAuctionDuration,
+				maketplacetypes.DefaultMaxAuctionDuration,
+			)
+			// set streampay params
+			streampayParams := streampaytypes.DefaultParams()
+			streampayParams.StreamPaymentFee = sdk.NewInt64Coin(appparams.BondDenom, 50_000_000)
+			app.StreamPayKeeper.SetParams(ctx, streampayParams)
+
+			// set itc module params
+			app.ItcKeeper.SetParams(ctx, itctypes.DefaultParams())
 
 			return versionMap, nil
 		})
