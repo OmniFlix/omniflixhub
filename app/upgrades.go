@@ -14,7 +14,7 @@ import (
 )
 
 // next upgrade name
-const upgradeName = "v0.11.2-itc-patch"
+const upgradeName = "v0.12.0"
 
 // RegisterUpgradeHandlers returns upgrade handlers
 func (app *App) RegisterUpgradeHandlers(cfg module.Configurator) {
