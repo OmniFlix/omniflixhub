@@ -61,6 +61,9 @@ import (
 	icatypes "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/types"
 	"github.com/cosmos/ibc-go/v4/modules/apps/transfer"
 
+	packetforward "github.com/strangelove-ventures/packet-forward-middleware/v4/router"
+	packetforwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
+
 	"github.com/OmniFlix/omniflixhub/x/alloc"
 	alloctypes "github.com/OmniFlix/omniflixhub/x/alloc/types"
 
@@ -95,6 +98,7 @@ var (
 		slashing.AppModuleBasic{},
 		ibc.AppModuleBasic{},
 		ica.AppModuleBasic{},
+		packetforward.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
@@ -157,6 +161,7 @@ func appModules(
 		params.NewAppModule(app.ParamsKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
 		ica.NewAppModule(nil, &app.ICAHostKeeper),
+		packetforward.NewAppModule(app.PacketForwardKeeper),
 		alloc.NewAppModule(appCodec, app.AllocKeeper),
 		onft.NewAppModule(appCodec, app.ONFTKeeper, app.AccountKeeper, app.BankKeeper, app.DistrKeeper),
 		marketplace.NewAppModule(appCodec, app.MarketplaceKeeper),
@@ -219,6 +224,7 @@ func orderBeginBlockers() []string {
 		paramstypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
+		packetforwardtypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
 		authtypes.ModuleName,
@@ -246,6 +252,7 @@ func orderEndBlockers() []string {
 		paramstypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
+		packetforwardtypes.ModuleName,
 		minttypes.ModuleName,
 		slashingtypes.ModuleName,
 		distrtypes.ModuleName,
@@ -290,6 +297,7 @@ func orderInitGenesis() []string {
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
+		packetforwardtypes.ModuleName,
 		alloctypes.ModuleName,
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,

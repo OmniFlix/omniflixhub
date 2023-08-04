@@ -1,4 +1,4 @@
-package v2
+package v012
 
 import (
 	"github.com/OmniFlix/omniflixhub/app/keepers"
@@ -11,6 +11,7 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	icahosttypes "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/host/types"
+	packetforwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
 )
 
 func CreateUpgradeHandler(
@@ -48,7 +49,10 @@ func CreateUpgradeHandler(
 
 		keepers.ICAHostKeeper.SetParams(ctx, hostParams)
 
-		// campaign migrations
+		// Packet Forward middleware initial params
+		keepers.PacketForwardKeeper.SetParams(ctx, packetforwardtypes.DefaultParams())
+
+		// itc campaigns migrations
 		campaigns := keepers.ItcKeeper.GetAllCampaigns(ctx)
 		for _, campaign := range campaigns {
 			claims := keepers.ItcKeeper.GetClaims(ctx, campaign.Id)
