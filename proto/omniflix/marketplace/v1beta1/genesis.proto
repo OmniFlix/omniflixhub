@@ -1,0 +1,19 @@
+syntax = "proto3";
+package OmniFlix.marketplace.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "omniflix/marketplace/v1beta1/listing.proto";
+import "omniflix/marketplace/v1beta1/auction.proto";
+import "omniflix/marketplace/v1beta1/params.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/x/marketplace/types";
+
+message GenesisState {
+  // NFTs that are listed in marketplace
+  repeated Listing        listings            = 1 [(gogoproto.nullable) = false];
+  uint64                  ListingCount        = 2;
+  Params                  params              = 3 [(gogoproto.nullable) = false];
+  repeated AuctionListing auctions            = 4 [(gogoproto.nullable) = false];
+  repeated Bid            bids                = 5 [(gogoproto.nullable) = false];
+  uint64                  next_auction_number = 6;
+}

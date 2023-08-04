@@ -30,7 +30,7 @@ import (
 type KeeperTestHelper struct {
 	suite.Suite
 
-	App         *app.App
+	App         *app.OmniFlixApp
 	Ctx         sdk.Context
 	QueryHelper *baseapp.QueryServiceTestHelper
 	TestAccs    []sdk.AccAddress
