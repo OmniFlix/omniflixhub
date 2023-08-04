@@ -66,6 +66,10 @@ import (
 	icahostkeeper "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/host/keeper"
 	icahosttypes "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/host/types"
 
+	packetforward "github.com/strangelove-ventures/packet-forward-middleware/v4/router"
+	packetforwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v4/router/keeper"
+	packetforwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
+
 	allockeeper "github.com/OmniFlix/omniflixhub/x/alloc/keeper"
 	alloctypes "github.com/OmniFlix/omniflixhub/x/alloc/types"
 
@@ -89,23 +93,24 @@ type AppKeepers struct {
 	memKeys map[string]*sdk.MemoryStoreKey
 
 	// keepers
-	AccountKeeper    authkeeper.AccountKeeper
-	BankKeeper       bankkeeper.Keeper
-	CapabilityKeeper *capabilitykeeper.Keeper
-	StakingKeeper    stakingkeeper.Keeper
-	SlashingKeeper   slashingkeeper.Keeper
-	MintKeeper       mintkeeper.Keeper
-	DistrKeeper      distrkeeper.Keeper
-	GovKeeper        govkeeper.Keeper
-	CrisisKeeper     crisiskeeper.Keeper
-	UpgradeKeeper    upgradekeeper.Keeper
-	ParamsKeeper     paramskeeper.Keeper
-	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	ICAHostKeeper    icahostkeeper.Keeper
-	EvidenceKeeper   evidencekeeper.Keeper
-	TransferKeeper   ibctransferkeeper.Keeper
-	FeeGrantKeeper   feegrantkeeper.Keeper
-	AuthzKeeper      authzkeeper.Keeper
+	AccountKeeper       authkeeper.AccountKeeper
+	BankKeeper          bankkeeper.Keeper
+	CapabilityKeeper    *capabilitykeeper.Keeper
+	StakingKeeper       stakingkeeper.Keeper
+	SlashingKeeper      slashingkeeper.Keeper
+	MintKeeper          mintkeeper.Keeper
+	DistrKeeper         distrkeeper.Keeper
+	GovKeeper           govkeeper.Keeper
+	CrisisKeeper        crisiskeeper.Keeper
+	UpgradeKeeper       upgradekeeper.Keeper
+	ParamsKeeper        paramskeeper.Keeper
+	IBCKeeper           *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	ICAHostKeeper       icahostkeeper.Keeper
+	EvidenceKeeper      evidencekeeper.Keeper
+	TransferKeeper      ibctransferkeeper.Keeper
+	PacketForwardKeeper *packetforwardkeeper.Keeper
+	FeeGrantKeeper      feegrantkeeper.Keeper
+	AuthzKeeper         authzkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -261,19 +266,31 @@ func NewAppKeeper(
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(appKeepers.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper))
 
+	// initialize ibc packet forwarding middleware router
+	appKeepers.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
+		appCodec, appKeepers.keys[packetforwardtypes.StoreKey],
+		appKeepers.GetSubspace(packetforwardtypes.ModuleName),
+		appKeepers.TransferKeeper, // Will be zero-value here. Reference is set later on with SetTransferKeeper.
+		appKeepers.IBCKeeper.ChannelKeeper,
+		appKeepers.DistrKeeper,
+		appKeepers.BankKeeper,
+		appKeepers.IBCKeeper.ChannelKeeper,
+	)
+
 	// Create Transfer Keepers
 	appKeepers.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[ibctransfertypes.StoreKey],
 		appKeepers.GetSubspace(ibctransfertypes.ModuleName),
-		appKeepers.IBCKeeper.ChannelKeeper,
+		appKeepers.PacketForwardKeeper,
 		appKeepers.IBCKeeper.ChannelKeeper,
 		&appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		appKeepers.ScopedTransferKeeper,
 	)
-	transferIBCModule := transfer.NewIBCModule(appKeepers.TransferKeeper)
+	// Set TransferKeeper reference in PacketForwardKeeper
+	appKeepers.PacketForwardKeeper.SetTransferKeeper(appKeepers.TransferKeeper)
 
 	appKeepers.ICAHostKeeper = icahostkeeper.NewKeeper(
 		appCodec,
@@ -356,11 +373,21 @@ func NewAppKeeper(
 		appKeepers.GetSubspace(itctypes.ModuleName),
 	)
 
+	var ibcStack porttypes.IBCModule
+	ibcStack = transfer.NewIBCModule(appKeepers.TransferKeeper)
+	ibcStack = packetforward.NewIBCMiddleware(
+		ibcStack,
+		appKeepers.PacketForwardKeeper,
+		0,
+		packetforwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp,
+		packetforwardkeeper.DefaultRefundTransferPacketTimeoutTimestamp,
+	)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.
 		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
-		AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+		AddRoute(ibctransfertypes.ModuleName, ibcStack)
 
 	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 
