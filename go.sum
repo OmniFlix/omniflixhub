@@ -76,8 +76,6 @@ github.com/Joker/jade v1.0.1-0.20190614124447-d475f43051e7/go.mod h1:6E6s8o2AE4K
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Microsoft/go-winio v0.6.0 h1:slsWYD/zyx7lCXoZVlvQrj0hPTM1HI4+v1sIda2yDvg=
 github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 h1:TngWCqHvy9oXAN6lEVMRuU21PR1EtLVZJmdB18Gu3Rw=
-github.com/OmniFlix/marketplace v0.6.0 h1:LF39FBWdjp6ZaNJUIeDGp6c0FVCsbv/KM46GqD19G1g=
-github.com/OmniFlix/marketplace v0.6.0/go.mod h1:k3JLhUXCQxjXc7Ro6hvj1cwwnzAMlfdxU/T4v90NzgU=
 github.com/OmniFlix/onft v0.6.0 h1:RS2ACs1owt5khqURu+x1f5ahV1wbs5eMJZaMmbq3++4=
 github.com/OmniFlix/onft v0.6.0/go.mod h1:RW0ooCgUtutpMElh38kbYf3Qb05BmDKK18jCRImwinI=
 github.com/OmniFlix/streampay/v2 v2.1.0 h1:jdoWcAQe4RuD5o82w4tLtkVQyzLmStz4IYo2hYHOeII=

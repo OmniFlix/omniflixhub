@@ -3,13 +3,13 @@ module github.com/OmniFlix/omniflixhub
 go 1.19
 
 require (
-	github.com/OmniFlix/marketplace v0.6.0
 	github.com/OmniFlix/onft v0.6.0
 	github.com/OmniFlix/streampay/v2 v2.1.0
 	github.com/cosmos/cosmos-sdk v0.45.16
 	github.com/cosmos/ibc-go/v4 v4.4.2
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
+	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/spf13/cast v1.5.0
@@ -18,6 +18,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	github.com/tendermint/tendermint v0.34.28
 	github.com/tendermint/tm-db v0.6.7
+	golang.org/x/exp v0.0.0-20221019170559-20944726eadf
 	google.golang.org/genproto v0.0.0-20230125152338-dcaf20b6aeaa
 	google.golang.org/grpc v1.52.3
 	google.golang.org/protobuf v1.28.2-0.20220831092852-f930b1dc76e8
@@ -76,7 +77,6 @@ require (
 	github.com/google/btree v1.1.2 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/orderedcode v0.0.1 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
@@ -132,7 +132,6 @@ require (
 	github.com/zondax/ledger-go v0.14.1 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
-	golang.org/x/exp v0.0.0-20221019170559-20944726eadf // indirect
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/term v0.5.0 // indirect
