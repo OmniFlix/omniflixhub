@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	v2 "github.com/OmniFlix/omniflixhub/v2/app/upgrades/v2"
 	"io"
 	"net/http"
 	"os"
@@ -66,7 +67,7 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 var (
 	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome string
-	Upgrades        = []upgrades.Upgrade{v012.Upgrade}
+	Upgrades        = []upgrades.Upgrade{v012.Upgrade, v2.Upgrade}
 	Forks           []upgrades.Fork
 )
 

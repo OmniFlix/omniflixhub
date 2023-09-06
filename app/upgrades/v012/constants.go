@@ -11,7 +11,7 @@ const UpgradeName = "v0.12.x"
 
 var Upgrade = upgrades.Upgrade{
 	UpgradeName:          UpgradeName,
-	CreateUpgradeHandler: CreateUpgradeHandler,
+	CreateUpgradeHandler: CreateV012UpgradeHandler,
 	StoreUpgrades: store.StoreUpgrades{
 		Added: []string{icahosttypes.StoreKey, packetforwardtypes.StoreKey},
 	},
