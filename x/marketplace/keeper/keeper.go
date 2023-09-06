@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
+
 	sdkmath "cosmossdk.io/math"
 
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -10,7 +12,6 @@ import (
 	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
@@ -68,7 +69,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 func (k Keeper) AddListing(ctx sdk.Context, listing types.Listing) error {
 	// check listing already exists
 	if k.HasListing(ctx, listing.GetId()) {
-		return sdkerrors.Wrapf(types.ErrListingAlreadyExists, "listing already exists: %s", listing.GetId())
+		return errorsmod.Wrapf(types.ErrListingAlreadyExists, "listing already exists: %s", listing.GetId())
 	}
 
 	err := k.nftKeeper.TransferOwnership(ctx,
@@ -231,7 +232,7 @@ func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) 
 func (k Keeper) CreateAuctionListing(ctx sdk.Context, auction types.AuctionListing) error {
 	// check auction already exists or not
 	if k.HasAuctionListing(ctx, auction.GetId()) {
-		return sdkerrors.Wrapf(types.ErrListingAlreadyExists, "auction listing already exists: %d", auction.GetId())
+		return errorsmod.Wrapf(types.ErrListingAlreadyExists, "auction listing already exists: %d", auction.GetId())
 	}
 
 	err := k.nftKeeper.TransferOwnership(ctx,
@@ -261,7 +262,7 @@ func (k Keeper) CreateAuctionListing(ctx sdk.Context, auction types.AuctionListi
 func (k Keeper) CancelAuctionListing(ctx sdk.Context, auction types.AuctionListing) error {
 	// Check bid Exists or Not
 	if k.HasBid(ctx, auction.Id) {
-		return sdkerrors.Wrapf(types.ErrBidExists, "cannot cancel auction %d, bid exists ", auction.Id)
+		return errorsmod.Wrapf(types.ErrBidExists, "cannot cancel auction %d, bid exists ", auction.Id)
 	}
 
 	// Transfer Back NFT ownership to auction owner
@@ -286,7 +287,7 @@ func (k Keeper) PlaceBid(ctx sdk.Context, auction types.AuctionListing, newBid t
 		newBidPrice = k.GetNewBidPrice(auction.StartPrice.Denom, prevBid.Amount, auction.IncrementPercentage)
 	}
 	if newBid.Amount.IsLT(newBidPrice) {
-		return sdkerrors.Wrapf(types.ErrBidAmountNotEnough,
+		return errorsmod.Wrapf(types.ErrBidAmountNotEnough,
 			"cannot place bid for given auction %d, required amount to bid is %s", auction.Id, newBidPrice.String())
 	}
 

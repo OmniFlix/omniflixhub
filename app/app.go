@@ -2,11 +2,12 @@ package app
 
 import (
 	"fmt"
-	v2 "github.com/OmniFlix/omniflixhub/v2/app/upgrades/v2"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	v2 "github.com/OmniFlix/omniflixhub/v2/app/upgrades/v2"
 
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"

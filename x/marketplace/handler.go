@@ -3,6 +3,8 @@ package marketplace
 import (
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
+
 	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/keeper"
 	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 
@@ -44,7 +46,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
+			return nil, errorsmod.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 	}
 }
