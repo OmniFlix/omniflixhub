@@ -71,6 +71,10 @@ import (
 	icahostkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/keeper"
 	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
 
+	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router"
+	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/keeper"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
+
 	allockeeper "github.com/OmniFlix/omniflixhub/v2/x/alloc/keeper"
 	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
 
@@ -109,6 +113,7 @@ type AppKeepers struct {
 	ICAHostKeeper         icahostkeeper.Keeper
 	EvidenceKeeper        evidencekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
+	PacketForwardKeeper   *packetforwardkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
@@ -314,20 +319,31 @@ func NewAppKeeper(
 		// register the governance hooks
 		),
 	)
+	// initialize ibc packet forwarding middleware router
+	appKeepers.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
+		appCodec, appKeepers.keys[packetforwardtypes.StoreKey],
+		appKeepers.GetSubspace(packetforwardtypes.ModuleName),
+		appKeepers.TransferKeeper, // Will be zero-value here. Reference is set later on with SetTransferKeeper.
+		appKeepers.IBCKeeper.ChannelKeeper,
+		appKeepers.DistrKeeper,
+		appKeepers.BankKeeper,
+		appKeepers.IBCKeeper.ChannelKeeper,
+	)
 
 	// Create Transfer Keepers
 	appKeepers.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[ibctransfertypes.StoreKey],
 		appKeepers.GetSubspace(ibctransfertypes.ModuleName),
-		appKeepers.IBCKeeper.ChannelKeeper,
+		appKeepers.PacketForwardKeeper,
 		appKeepers.IBCKeeper.ChannelKeeper,
 		&appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		appKeepers.ScopedTransferKeeper,
 	)
-	transferIBCModule := transfer.NewIBCModule(appKeepers.TransferKeeper)
+	// Set TransferKeeper reference in PacketForwardKeeper
+	appKeepers.PacketForwardKeeper.SetTransferKeeper(appKeepers.TransferKeeper)
 
 	appKeepers.ICAHostKeeper = icahostkeeper.NewKeeper(
 		appCodec,
@@ -392,11 +408,21 @@ func NewAppKeeper(
 		appKeepers.GetSubspace(itctypes.ModuleName),
 	)
 
+	var ibcStack porttypes.IBCModule
+	ibcStack = transfer.NewIBCModule(appKeepers.TransferKeeper)
+	ibcStack = packetforward.NewIBCMiddleware(
+		ibcStack,
+		appKeepers.PacketForwardKeeper,
+		0,
+		packetforwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp,
+		packetforwardkeeper.DefaultRefundTransferPacketTimeoutTimestamp,
+	)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.
 		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
-		AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+		AddRoute(ibctransfertypes.ModuleName, ibcStack)
 
 	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 
@@ -424,11 +450,12 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName).WithKeyTable(crisistypes.ParamKeyTable())
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
-	paramsKeeper.Subspace(alloctypes.ModuleName).WithKeyTable(alloctypes.ParamKeyTable())
-	paramsKeeper.Subspace(onfttypes.ModuleName).WithKeyTable(onfttypes.ParamKeyTable())
-	paramsKeeper.Subspace(marketplacetypes.ModuleName).WithKeyTable(marketplacetypes.ParamKeyTable())
-	paramsKeeper.Subspace(streampaytypes.ModuleName).WithKeyTable(streampaytypes.ParamKeyTable())
-	paramsKeeper.Subspace(itctypes.ModuleName).WithKeyTable(itctypes.ParamKeyTable())
+	paramsKeeper.Subspace(packetforwardtypes.ModuleName).WithKeyTable(packetforwardtypes.ParamKeyTable())
+	paramsKeeper.Subspace(alloctypes.ModuleName)
+	paramsKeeper.Subspace(onfttypes.ModuleName)
+	paramsKeeper.Subspace(marketplacetypes.ModuleName)
+	paramsKeeper.Subspace(streampaytypes.ModuleName)
+	paramsKeeper.Subspace(itctypes.ModuleName)
 
 	return paramsKeeper
 }

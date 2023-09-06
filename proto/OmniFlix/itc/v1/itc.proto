@@ -57,6 +57,9 @@ message Campaign {
   uint64 mint_count  = 17 [
     (gogoproto.moretags) = "yaml:\"mint_count\""
   ];
+  uint64 claim_count = 18 [
+    (gogoproto.moretags) = "yaml:\"claim_count\""
+  ];
 }
 
 message Distribution {
