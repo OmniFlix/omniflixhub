@@ -7,8 +7,6 @@ import (
 	"os"
 	"path/filepath"
 
-	v2 "github.com/OmniFlix/omniflixhub/v2/app/upgrades/v2"
-
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
 	"github.com/OmniFlix/omniflixhub/v2/app/openapiconsole"
@@ -47,6 +45,7 @@ import (
 	"github.com/OmniFlix/omniflixhub/v2/app/keepers"
 	"github.com/OmniFlix/omniflixhub/v2/app/upgrades"
 	v012 "github.com/OmniFlix/omniflixhub/v2/app/upgrades/v012"
+	v2 "github.com/OmniFlix/omniflixhub/v2/app/upgrades/v2"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
