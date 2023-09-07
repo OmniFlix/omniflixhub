@@ -8,7 +8,6 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/store/streaming"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
-	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -439,18 +438,17 @@ func (appKeepers *AppKeepers) GetSubspace(moduleName string) paramstypes.Subspac
 func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey storetypes.StoreKey) paramskeeper.Keeper {
 	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
 
-	//nolint: staticcheck // SA1019: moduletypes.ParamKeyTable is deprecated
-	paramsKeeper.Subspace(authtypes.ModuleName).WithKeyTable(authtypes.ParamKeyTable())
-	paramsKeeper.Subspace(banktypes.ModuleName).WithKeyTable(banktypes.ParamKeyTable())
-	paramsKeeper.Subspace(stakingtypes.ModuleName).WithKeyTable(stakingtypes.ParamKeyTable())  //nolint: staticcheck // SA1019
-	paramsKeeper.Subspace(minttypes.ModuleName).WithKeyTable(minttypes.ParamKeyTable())        //nolint: staticcheck // SA1019
-	paramsKeeper.Subspace(distrtypes.ModuleName).WithKeyTable(distrtypes.ParamKeyTable())      //nolint: staticcheck // SA1019
-	paramsKeeper.Subspace(slashingtypes.ModuleName).WithKeyTable(stakingtypes.ParamKeyTable()) //nolint: staticcheck // SA1019
-	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())             //nolint: staticcheck // SA1019
-	paramsKeeper.Subspace(crisistypes.ModuleName).WithKeyTable(crisistypes.ParamKeyTable())
+	paramsKeeper.Subspace(authtypes.ModuleName)
+	paramsKeeper.Subspace(banktypes.ModuleName)
+	paramsKeeper.Subspace(stakingtypes.ModuleName)
+	paramsKeeper.Subspace(minttypes.ModuleName)
+	paramsKeeper.Subspace(distrtypes.ModuleName)
+	paramsKeeper.Subspace(slashingtypes.ModuleName)
+	paramsKeeper.Subspace(govtypes.ModuleName)
+	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
-	paramsKeeper.Subspace(packetforwardtypes.ModuleName).WithKeyTable(packetforwardtypes.ParamKeyTable())
+	paramsKeeper.Subspace(packetforwardtypes.ModuleName)
 	paramsKeeper.Subspace(alloctypes.ModuleName)
 	paramsKeeper.Subspace(onfttypes.ModuleName)
 	paramsKeeper.Subspace(marketplacetypes.ModuleName)

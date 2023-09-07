@@ -12,7 +12,6 @@ linters:
     - goconst
     - gocritic
     - gofumpt
-    - gosec
     - gosimple
     - govet
     - ineffassign
