@@ -3,9 +3,11 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 
-	"github.com/OmniFlix/omniflixhub/x/itc/types"
+	"github.com/cometbft/cometbft/libs/log"
+
+	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -14,7 +16,7 @@ import (
 type (
 	Keeper struct {
 		cdc      codec.Codec
-		storeKey sdk.StoreKey
+		storeKey storetypes.StoreKey
 
 		accountKeeper      types.AccountKeeper
 		bankKeeper         types.BankKeeper
@@ -27,7 +29,7 @@ type (
 
 func NewKeeper(
 	cdc codec.Codec,
-	storeKey sdk.StoreKey,
+	storeKey storetypes.StoreKey,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 	nftKeeper types.NftKeeper,

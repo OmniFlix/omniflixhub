@@ -4,7 +4,9 @@ import (
 	"crypto/sha256"
 	"fmt"
 
-	"github.com/OmniFlix/omniflixhub/x/itc/types"
+	errorsmod "cosmossdk.io/errors"
+
+	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 	nfttypes "github.com/OmniFlix/onft/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -41,7 +43,7 @@ func (k Keeper) CreateCampaign(
 		}
 		// Authorize
 		if mintCollection.Creator != campaign.Creator {
-			return sdkerrors.Wrapf(
+			return errorsmod.Wrapf(
 				sdkerrors.ErrUnauthorized,
 				"nft mint denom id %s isn't owned by campaign creator %s",
 				mintCollection.Id,
@@ -70,10 +72,10 @@ func (k Keeper) CreateCampaign(
 func (k Keeper) CancelCampaign(ctx sdk.Context, campaignId uint64, creator sdk.AccAddress) error {
 	campaign, found := k.GetCampaign(ctx, campaignId)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrCampaignDoesNotExists, "campaign %d not exists", campaignId)
+		return errorsmod.Wrapf(types.ErrCampaignDoesNotExists, "campaign %d not exists", campaignId)
 	}
 	if creator.String() != campaign.Creator {
-		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", creator.String())
+		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", creator.String())
 	}
 
 	// return funds
@@ -116,11 +118,11 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 	}
 	// check if claim exists with given nft
 	if k.HasClaim(ctx, campaign.GetId(), nft.GetID()) {
-		return sdkerrors.Wrapf(types.ErrClaimExists,
+		return errorsmod.Wrapf(types.ErrClaimExists,
 			"claim exists with given nft  %s", nft.GetID())
 	}
 	if (campaign.MaxAllowedClaims - campaign.ClaimCount) <= 0 {
-		return sdkerrors.Wrapf(types.ErrClaimNotAllowed,
+		return errorsmod.Wrapf(types.ErrClaimNotAllowed,
 			"max allowed claims reached for this campaign (campaign: %d, maxAllowedClaims: %d).",
 			campaign.GetId(),
 			campaign.GetMaxAllowedClaims(),
@@ -129,14 +131,14 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 
 	if campaign.ClaimType == types.CLAIM_TYPE_FT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
 		if campaign.AvailableTokens.IsLT(campaign.TokensPerClaim) {
-			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
+			return errorsmod.Wrapf(sdkerrors.ErrInsufficientFunds,
 				"insufficient available tokens, available tokens  %s",
 				campaign.AvailableTokens.String(),
 			)
 		}
 	}
 	if !claimer.Equals(nft.GetOwner()) {
-		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
+		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized,
 			"nft %s isn't owned by address  %s", claim.NftId, claimer.String())
 	}
 
@@ -210,7 +212,7 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 			campaign.GetCreator(),
 			claimer,
 		); err != nil {
-			return sdkerrors.Wrapf(types.ErrClaimingNFT,
+			return errorsmod.Wrapf(types.ErrClaimingNFT,
 				"unable to mint nft denomId %s", campaign.NftMintDetails.DenomId)
 		}
 	}
@@ -230,10 +232,10 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 func (k Keeper) DepositCampaign(ctx sdk.Context, campaignId uint64, depositor sdk.AccAddress, amount sdk.Coin) error {
 	campaign, found := k.GetCampaign(ctx, campaignId)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", campaignId)
+		return errorsmod.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", campaignId)
 	}
 	if depositor.String() != campaign.Creator {
-		return sdkerrors.Wrapf(types.ErrDepositNotAllowed, "deposit not allowed from address %s"+
+		return errorsmod.Wrapf(types.ErrDepositNotAllowed, "deposit not allowed from address %s"+
 			"only creator of the campaign is allowed to deposit", depositor.String())
 	}
 	// Transfer tokens from depositor to module account

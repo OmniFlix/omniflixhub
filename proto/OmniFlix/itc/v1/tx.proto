@@ -1,0 +1,84 @@
+syntax = "proto3";
+package OmniFlix.itc.v1;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "OmniFlix/itc/v1/itc.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/v2/x/itc/types";
+option (gogoproto.goproto_getters_all) = false;
+
+service Msg {
+  rpc CreateCampaign(MsgCreateCampaign) returns (MsgCreateCampaignResponse);
+
+  rpc CancelCampaign(MsgCancelCampaign) returns (MsgCancelCampaignResponse);
+
+  rpc Claim(MsgClaim) returns (MsgClaimResponse);
+
+  rpc DepositCampaign(MsgDepositCampaign) returns (MsgDepositCampaignResponse);
+}
+
+message MsgCreateCampaign {
+  string                      name = 1;
+  string                      description = 2;
+  InteractionType             interaction = 3;
+  ClaimType                   claim_type = 4 [(gogoproto.moretags) = "yaml:\"claim_type\""];
+  string                      nft_denom_id = 5 [(gogoproto.moretags) = "yaml:\"nft_denom_id\""];
+  cosmos.base.v1beta1.Coin                      tokens_per_claim = 6 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"tokens_per_claim\""
+  ];
+  uint64                      max_allowed_claims = 7 [
+    (gogoproto.moretags) = "yaml:\"max_allowed_claims\""
+  ];
+  cosmos.base.v1beta1.Coin                      deposit = 8 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"deposit\""
+  ];
+  NFTDetails                  nft_mint_details = 9 [(gogoproto.moretags) = "yaml:\"nft_details\""];
+  google.protobuf.Timestamp   start_time = 10 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdtime) = true,
+    (gogoproto.moretags) = "yaml:\"start_time\""
+  ];
+
+  google.protobuf.Duration     duration = 11 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdduration) = true
+  ];
+
+  Distribution            distribution = 12;
+  string                       creator = 13;
+  cosmos.base.v1beta1.Coin     creation_fee = 14 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"creation_fee\""
+  ];
+}
+
+message MsgCreateCampaignResponse {}
+
+message MsgCancelCampaign {
+  uint64 campaign_id = 1;
+  string creator = 2;
+}
+
+message MsgCancelCampaignResponse {}
+
+message MsgClaim {
+  uint64 campaign_id = 1;
+  string nft_id = 2;
+  InteractionType interaction = 3;
+  string claimer = 4;
+}
+
+message MsgClaimResponse {}
+
+message MsgDepositCampaign {
+  uint64                    campaign_id = 1;
+  cosmos.base.v1beta1.Coin  amount = 2 [(gogoproto.nullable) = false];
+  string                    depositor = 3;
+}
+
+message MsgDepositCampaignResponse {}

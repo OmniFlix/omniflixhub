@@ -1,0 +1,9 @@
+syntax = "proto3";
+package OmniFlix.alloc.v1beta1;
+
+option go_package = "github.com/OmniFlix/omniflixhub/v2/x/alloc/types";
+
+// Msg defines the alloc Msg service.
+service Msg {
+
+}

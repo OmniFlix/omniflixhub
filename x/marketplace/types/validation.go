@@ -4,6 +4,8 @@ import (
 	"strings"
 	"time"
 
+	errorsmod "cosmossdk.io/errors"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -12,7 +14,7 @@ import (
 func ValidateListing(listing Listing) error {
 	if len(listing.Owner) > 0 {
 		if _, err := sdk.AccAddressFromBech32(listing.Owner); err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 		}
 	}
 	if err := ValidateId(listing.Id); err != nil {
@@ -30,7 +32,7 @@ func ValidateListing(listing Listing) error {
 // ValidatePrice
 func ValidatePrice(price sdk.Coin) error {
 	if price.IsZero() || price.IsNegative() {
-		return sdkerrors.Wrapf(ErrInvalidPrice, "invalid price %s, only accepts positive amount", price.String())
+		return errorsmod.Wrapf(ErrInvalidPrice, "invalid price %s, only accepts positive amount", price.String())
 	}
 	return nil
 }
@@ -38,10 +40,10 @@ func ValidatePrice(price sdk.Coin) error {
 func ValidateDuration(t interface{}) error {
 	duration, ok := t.(*time.Duration)
 	if !ok {
-		return sdkerrors.Wrapf(ErrInvalidDuration, "invalid value for duration: %T", t)
+		return errorsmod.Wrapf(ErrInvalidDuration, "invalid value for duration: %T", t)
 	}
 	if duration.Nanoseconds() <= 0 {
-		return sdkerrors.Wrapf(ErrInvalidDuration, "invalid duration %s, only accepts positive value", duration.String())
+		return errorsmod.Wrapf(ErrInvalidDuration, "invalid duration %s, only accepts positive value", duration.String())
 	}
 	return nil
 }
@@ -49,20 +51,20 @@ func ValidateDuration(t interface{}) error {
 func ValidateId(id string) error {
 	id = strings.TrimSpace(id)
 	if len(id) < MinListingIdLength || len(id) > MaxListingIdLength {
-		return sdkerrors.Wrapf(
+		return errorsmod.Wrapf(
 			ErrInvalidListingId,
 			"invalid id %s, only accepts value [%d, %d]", id, MinListingIdLength, MaxListingIdLength,
 		)
 	}
 	if !IsBeginWithAlpha(id) || !IsAlphaNumeric(id) {
-		return sdkerrors.Wrapf(ErrInvalidListingId, "invalid id %s, only accepts alphanumeric characters,and begin with an english letter", id)
+		return errorsmod.Wrapf(ErrInvalidListingId, "invalid id %s, only accepts alphanumeric characters,and begin with an english letter", id)
 	}
 	return nil
 }
 
 func ValidateSplitShares(splitShares []WeightedAddress) error {
 	if len(splitShares) > MaxSplits {
-		return sdkerrors.Wrapf(ErrInvalidSplits, "number of splits are more than the limit, len must be less than or equal to %d ", MaxSplits)
+		return errorsmod.Wrapf(ErrInvalidSplits, "number of splits are more than the limit, len must be less than or equal to %d ", MaxSplits)
 	}
 	totalWeight := sdk.NewDec(0)
 	for _, share := range splitShares {
@@ -73,14 +75,14 @@ func ValidateSplitShares(splitShares []WeightedAddress) error {
 		totalWeight = totalWeight.Add(share.Weight)
 	}
 	if !totalWeight.LTE(sdk.OneDec()) {
-		return sdkerrors.Wrapf(ErrInvalidSplits, "invalid weights, total sum of weights must be less than %d", 1)
+		return errorsmod.Wrapf(ErrInvalidSplits, "invalid weights, total sum of weights must be less than %d", 1)
 	}
 	return nil
 }
 
 func ValidateWhiteListAccounts(whitelistAccounts []string) error {
 	if len(whitelistAccounts) > MaxWhitelistAccounts {
-		return sdkerrors.Wrapf(ErrInvalidWhitelistAccounts,
+		return errorsmod.Wrapf(ErrInvalidWhitelistAccounts,
 			"number of whitelist accounts are more than the limit, len must be less than or equal to %d ", MaxWhitelistAccounts)
 	}
 	for _, address := range whitelistAccounts {
@@ -94,14 +96,14 @@ func ValidateWhiteListAccounts(whitelistAccounts []string) error {
 
 func validateIncrementPercentage(increment sdk.Dec) error {
 	if !increment.IsPositive() || !increment.LTE(sdk.NewDec(1)) {
-		return sdkerrors.Wrapf(ErrInvalidPercentage, "invalid percentage value (%s)", increment.String())
+		return errorsmod.Wrapf(ErrInvalidPercentage, "invalid percentage value (%s)", increment.String())
 	}
 	return nil
 }
 
 func validateAuctionId(id uint64) error {
 	if id <= 0 {
-		return sdkerrors.Wrapf(ErrInvalidAuctionId, "invalid auction id (%d)", id)
+		return errorsmod.Wrapf(ErrInvalidAuctionId, "invalid auction id (%d)", id)
 	}
 	return nil
 }
@@ -110,7 +112,7 @@ func validateAuctionId(id uint64) error {
 func ValidateAuctionListing(auction AuctionListing) error {
 	if len(auction.Owner) > 0 {
 		if _, err := sdk.AccAddressFromBech32(auction.Owner); err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 		}
 	}
 	if err := validateAuctionId(auction.Id); err != nil {
@@ -135,14 +137,14 @@ func ValidateAuctionListing(auction AuctionListing) error {
 func ValidateBid(bid Bid) error {
 	if len(bid.Bidder) > 0 {
 		if _, err := sdk.AccAddressFromBech32(bid.Bidder); err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid bidder address (%s)", bid.Bidder)
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid bidder address (%s)", bid.Bidder)
 		}
 	}
 	if err := ValidatePrice(bid.Amount); err != nil {
 		return err
 	}
 	if bid.Time.IsZero() {
-		return sdkerrors.Wrapf(ErrInvalidTime, "invalid time (%s)", bid.Time.String())
+		return errorsmod.Wrapf(ErrInvalidTime, "invalid time (%s)", bid.Time.String())
 	}
 	return nil
 }

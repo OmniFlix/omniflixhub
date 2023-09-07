@@ -1,0 +1,27 @@
+syntax = "proto3";
+package OmniFlix.alloc.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "OmniFlix/alloc/v1beta1/params.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/v2/x/alloc/types";
+
+// QueryParamsRequest is the request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is the response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params defines the parameters of the module.
+  Params params = 1 [ (gogoproto.nullable) = false ];
+}
+
+
+
+// Query defines the gRPC querier service.
+service Query {
+    rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+        option (google.api.http).get = "/omniflix/alloc/v1beta1/params";
+      }
+}
+

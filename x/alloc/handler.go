@@ -3,8 +3,10 @@ package alloc
 import (
 	"fmt"
 
-	"github.com/OmniFlix/omniflixhub/x/alloc/keeper"
-	"github.com/OmniFlix/omniflixhub/x/alloc/types"
+	errorsmod "cosmossdk.io/errors"
+
+	"github.com/OmniFlix/omniflixhub/v2/x/alloc/keeper"
+	"github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -17,7 +19,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		switch msg := msg.(type) { //nolint:gocritic
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
+			return nil, errorsmod.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 	}
 }

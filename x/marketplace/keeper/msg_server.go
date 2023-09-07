@@ -4,9 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
+	errorsmod "cosmossdk.io/errors"
+
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"golang.org/x/exp/slices"
 )
 
@@ -32,14 +33,14 @@ func (m msgServer) ListNFT(goCtx context.Context, msg *types.MsgListNFT) (*types
 
 	nft, err := m.nftKeeper.GetONFT(ctx, msg.DenomId, msg.NftId)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrNftNotExists,
+		return nil, errorsmod.Wrapf(types.ErrNftNotExists,
 			"invalid nft and or denomId, nftId %s, denomId %s", msg.NftId, msg.DenomId)
 	}
 	if owner.String() != nft.GetOwner().String() {
-		return nil, sdkerrors.Wrapf(types.ErrUnauthorized, "unauthorized address %s", owner)
+		return nil, errorsmod.Wrapf(types.ErrUnauthorized, "unauthorized address %s", owner)
 	}
 	if !nft.IsTransferable() {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrNftNonTransferable, "non-transferable nfts not allowed to list in marketplace")
 	}
 
@@ -66,10 +67,10 @@ func (m msgServer) EditListing(goCtx context.Context,
 
 	listing, found := m.Keeper.GetListing(ctx, msg.Id)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrListingDoesNotExists, "listing id %s not exists", msg.Id)
+		return nil, errorsmod.Wrapf(types.ErrListingDoesNotExists, "listing id %s not exists", msg.Id)
 	}
 	if owner.String() != listing.Owner {
-		return nil, sdkerrors.Wrapf(types.ErrUnauthorized, "unauthorized address %s", owner)
+		return nil, errorsmod.Wrapf(types.ErrUnauthorized, "unauthorized address %s", owner)
 	}
 	if err := types.ValidatePrice(msg.Price); err != nil {
 		return nil, err
@@ -93,10 +94,10 @@ func (m msgServer) DeListNFT(goCtx context.Context,
 	}
 	listing, found := m.Keeper.GetListing(ctx, msg.Id)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrListingDoesNotExists, "listing id %s not exists", msg.Id)
+		return nil, errorsmod.Wrapf(types.ErrListingDoesNotExists, "listing id %s not exists", msg.Id)
 	}
 	if owner.String() != listing.Owner {
-		return nil, sdkerrors.Wrapf(types.ErrUnauthorized, "unauthorized address %s", owner)
+		return nil, errorsmod.Wrapf(types.ErrUnauthorized, "unauthorized address %s", owner)
 	}
 	err = m.nftKeeper.TransferOwnership(ctx, listing.GetDenomId(), listing.GetNftId(),
 		m.accountKeeper.GetModuleAddress(types.ModuleName), listing.GetOwner())
@@ -120,20 +121,20 @@ func (m msgServer) BuyNFT(goCtx context.Context, msg *types.MsgBuyNFT) (*types.M
 
 	listing, found := m.Keeper.GetListing(ctx, msg.Id)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrListingDoesNotExists, "listing id %s not exists", msg.Id)
+		return nil, errorsmod.Wrapf(types.ErrListingDoesNotExists, "listing id %s not exists", msg.Id)
 	}
 	if err := types.ValidatePrice(msg.Price); err != nil {
 		return nil, err
 	}
 	if !msg.Price.Equal(listing.Price) {
 		if msg.Price.Denom != listing.Price.Denom {
-			return nil, sdkerrors.Wrapf(types.ErrInvalidPriceDenom, "invalid price denom %s", msg.Price.Denom)
+			return nil, errorsmod.Wrapf(types.ErrInvalidPriceDenom, "invalid price denom %s", msg.Price.Denom)
 		}
 		if msg.Price.Amount.LT(listing.Price.Amount) {
-			return nil, sdkerrors.Wrapf(types.ErrNotEnoughAmount,
+			return nil, errorsmod.Wrapf(types.ErrNotEnoughAmount,
 				"%s is not enough, to buy %s required", msg.Price.String(), listing.Price.String())
 		}
-		return nil, sdkerrors.Wrapf(types.ErrInvalidPrice,
+		return nil, errorsmod.Wrapf(types.ErrInvalidPrice,
 			"price %s not matched with listing price", msg.Price.String())
 	}
 	err = m.Keeper.Buy(ctx, listing, buyer)
@@ -160,27 +161,27 @@ func (m msgServer) CreateAuction(goCtx context.Context, msg *types.MsgCreateAuct
 
 	nft, err := m.nftKeeper.GetONFT(ctx, msg.DenomId, msg.NftId)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrNftNotExists,
+		return nil, errorsmod.Wrapf(types.ErrNftNotExists,
 			"invalid nft and or denomId, nftId %s, denomId %s", msg.NftId, msg.DenomId)
 	}
 	if owner.String() != nft.GetOwner().String() {
-		return nil, sdkerrors.Wrapf(types.ErrUnauthorized, "unauthorized address %s", owner)
+		return nil, errorsmod.Wrapf(types.ErrUnauthorized, "unauthorized address %s", owner)
 	}
 	if !nft.IsTransferable() {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrNftNonTransferable, "non-transferable nfts not allowed to list in marketplace")
 	}
 	var endTime *time.Time
 	if msg.Duration != nil {
 		maxAuctionDuration := m.Keeper.GetMaxAuctionDuration(ctx)
 		if msg.Duration.Seconds() > maxAuctionDuration.Seconds() {
-			return nil, sdkerrors.Wrapf(types.ErrInvalidDuration,
+			return nil, errorsmod.Wrapf(types.ErrInvalidDuration,
 				"duration %s exceeds max auction duration %s", msg.Duration.String(), maxAuctionDuration.String())
 		}
 		endAt := msg.StartTime.Add(*msg.Duration)
 		endTime = &endAt
 		if endTime.Before(msg.StartTime) || endTime.Equal(msg.StartTime) {
-			return nil, sdkerrors.Wrapf(types.ErrInvalidDuration, "duration must be positive or nil")
+			return nil, errorsmod.Wrapf(types.ErrInvalidDuration, "duration must be positive or nil")
 		}
 	}
 	auctionNumber := m.Keeper.GetNextAuctionNumber(ctx)
@@ -210,10 +211,10 @@ func (m msgServer) CancelAuction(goCtx context.Context, msg *types.MsgCancelAuct
 
 	auction, found := m.Keeper.GetAuctionListing(ctx, msg.AuctionId)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrAuctionDoesNotExists, "auction id %d not exists", msg.AuctionId)
+		return nil, errorsmod.Wrapf(types.ErrAuctionDoesNotExists, "auction id %d not exists", msg.AuctionId)
 	}
 	if owner.String() != auction.Owner {
-		return nil, sdkerrors.Wrapf(types.ErrUnauthorized, "unauthorized address %s", owner.String())
+		return nil, errorsmod.Wrapf(types.ErrUnauthorized, "unauthorized address %s", owner.String())
 	}
 
 	err = m.Keeper.CancelAuctionListing(ctx, auction)
@@ -237,16 +238,16 @@ func (m msgServer) PlaceBid(goCtx context.Context, msg *types.MsgPlaceBid) (*typ
 
 	auction, found := m.Keeper.GetAuctionListing(ctx, msg.AuctionId)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrAuctionDoesNotExists, "auction id %d not exists", msg.AuctionId)
+		return nil, errorsmod.Wrapf(types.ErrAuctionDoesNotExists, "auction id %d not exists", msg.AuctionId)
 	}
 	if !auction.StartTime.Before(ctx.BlockTime()) {
-		return nil, sdkerrors.Wrapf(types.ErrInActiveAuction, "cannot place a bid for inactive auction %d, ", auction.Id)
+		return nil, errorsmod.Wrapf(types.ErrInActiveAuction, "cannot place a bid for inactive auction %d, ", auction.Id)
 	}
 	if len(auction.WhitelistAccounts) > 0 && !slices.Contains(auction.WhitelistAccounts, bidder.String()) {
-		return nil, sdkerrors.Wrapf(types.ErrUnauthorized, "cannot place a bid for this auction %d, only whitelisted accounts allowed to bid", auction.Id)
+		return nil, errorsmod.Wrapf(types.ErrUnauthorized, "cannot place a bid for this auction %d, only whitelisted accounts allowed to bid", auction.Id)
 	}
 	if msg.Amount.GetDenom() != auction.StartPrice.GetDenom() {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidPriceDenom, "given auction only accepts bids in %s, ", auction.StartPrice.GetDenom())
+		return nil, errorsmod.Wrapf(types.ErrInvalidPriceDenom, "given auction only accepts bids in %s, ", auction.StartPrice.GetDenom())
 	}
 
 	bid := types.NewBid(auction.Id, msg.Amount, ctx.BlockTime(), bidder)

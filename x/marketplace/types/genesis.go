@@ -1,6 +1,9 @@
 package types
 
-import sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+import (
+	errorsmod "cosmossdk.io/errors"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+)
 
 func NewGenesisState(listings []Listing, listingCount uint64, params Params,
 	auctions []AuctionListing, bids []Bid, nextAuctionNumber uint64,
@@ -18,7 +21,7 @@ func NewGenesisState(listings []Listing, listingCount uint64, params Params,
 func (m *GenesisState) ValidateGenesis() error {
 	for _, l := range m.Listings {
 		if l.GetOwner().Empty() {
-			return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing nft owner")
+			return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "missing nft owner")
 		}
 		if err := ValidateListing(l); err != nil {
 			return err
@@ -38,7 +41,7 @@ func (m *GenesisState) ValidateGenesis() error {
 		}
 	}
 	if m.NextAuctionNumber <= 0 {
-		return sdkerrors.Wrap(ErrNonPositiveNumber, "must be a number and greater than 0.")
+		return errorsmod.Wrap(ErrNonPositiveNumber, "must be a number and greater than 0.")
 	}
 	return nil
 }

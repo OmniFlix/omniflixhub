@@ -12,7 +12,7 @@ mkdir -p ./tmp-swagger-gen
 
 # Get the paths used repos from go/pkg/mod
 cosmos_sdk_dir=$(go list -f '{{ .Dir }}' -m github.com/cosmos/cosmos-sdk)
-ibc_go=$(go list -f '{{ .Dir }}' -m github.com/cosmos/ibc-go/v4)
+ibc_go=$(go list -f '{{ .Dir }}' -m github.com/cosmos/ibc-go/v7)
 onft=$(go list -f '{{ .Dir }}' -m github.com/OmniFlix/onft)
 marketplace=$(go list -f '{{ .Dir }}' -m github.com/OmniFlix/marketplace)
 streampay=$(go list -f '{{ .Dir }}' -m github.com/OmniFlix/streampay)

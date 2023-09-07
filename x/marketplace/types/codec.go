@@ -5,9 +5,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	gogotypes "github.com/gogo/protobuf/types"
+	"github.com/cosmos/cosmos-sdk/types/msgservice"
+	gogotypes "github.com/cosmos/gogoproto/types"
 
-	"github.com/OmniFlix/omniflixhub/x/marketplace/exported"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/exported"
 )
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
@@ -42,6 +43,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations((*exported.AuctionListingI)(nil),
 		&AuctionListing{},
 	)
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
 
 var (
