@@ -1,10 +1,11 @@
 package keeper_test
 
 import (
-	"testing"
-
 	sdkmath "cosmossdk.io/math"
-	"github.com/OmniFlix/omniflixhub/v2/app"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	"testing"
+	"time"
+
 	"github.com/OmniFlix/omniflixhub/v2/app/apptesting"
 	"github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,6 +13,8 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/OmniFlix/omniflixhub/v2/app"
 )
 
 type KeeperTestSuite struct {
@@ -23,9 +26,17 @@ type KeeperTestSuite struct {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	suite.Setup()
+	isCheckTx := false
+	suite.app = app.Setup(suite.T())
+	suite.ctx = suite.app.BaseApp.NewContext(isCheckTx, tmproto.Header{
+		ChainID: app.SimAppChainID,
+		Height:  5,
+		Time:    time.Now().UTC(),
+	})
 
-	suite.app.AllocKeeper.SetParams(suite.ctx, types.DefaultParams())
+	params := types.DefaultParams()
+	suite.app.AllocKeeper.SetParams(suite.ctx, params)
+
 }
 
 func TestKeeperTestSuite(t *testing.T) {

@@ -2,6 +2,9 @@ package app
 
 import (
 	"encoding/json"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/snapshots"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -14,9 +17,12 @@ import (
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
+	baseApp "github.com/cosmos/cosmos-sdk/baseapp"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	snapshottypes "github.com/cosmos/cosmos-sdk/snapshots/types"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -59,7 +65,7 @@ type EmptyAppOptions struct{}
 
 func (EmptyAppOptions) Get(_ string) interface{} { return nil }
 
-func Setup(t *testing.T, _ bool, _ uint) *OmniFlixApp {
+func Setup(t *testing.T) *OmniFlixApp {
 	t.Helper()
 
 	privVal := apphelpers.NewPV()
@@ -94,7 +100,7 @@ func SetupWithGenesisValSet(
 ) *OmniFlixApp {
 	t.Helper()
 
-	omniflixTestApp, genesisState := setup(true, 5)
+	omniflixTestApp, genesisState := setup(t, true)
 	genesisState = genesisStateWithValSet(t, omniflixTestApp, genesisState, valSet, genAccs, balances...)
 
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
@@ -103,27 +109,43 @@ func SetupWithGenesisValSet(
 	// init chain will set the validator set and initialize the genesis accounts
 	omniflixTestApp.InitChain(
 		abci.RequestInitChain{
+			ChainId:         SimAppChainID,
 			Validators:      []abci.ValidatorUpdate{},
 			ConsensusParams: DefaultConsensusParams,
 			AppStateBytes:   stateBytes,
+			Time:            time.Now().UTC(),
+			InitialHeight:   1,
 		},
 	)
 
 	// commit genesis changes
 	omniflixTestApp.Commit()
 	omniflixTestApp.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
+		ChainID:            SimAppChainID,
 		Height:             omniflixTestApp.LastBlockHeight() + 1,
 		AppHash:            omniflixTestApp.LastCommitID().Hash,
 		ValidatorsHash:     valSet.Hash(),
 		NextValidatorsHash: valSet.Hash(),
+		Time:               time.Now().UTC(),
 	}})
 
 	return omniflixTestApp
 }
 
-func setup(withGenesis bool, invCheckPeriod uint) (*OmniFlixApp, GenesisState) {
+func setup(t *testing.T, withGenesis bool) (*OmniFlixApp, GenesisState) {
 	db := dbm.NewMemDB()
+	nodeHome := t.TempDir()
 	encCdc := MakeEncodingConfig()
+	snapshotDir := filepath.Join(nodeHome, "data", "snapshots")
+
+	snapshotDB, err := dbm.NewDB("metadata", dbm.GoLevelDBBackend, snapshotDir)
+	require.NoError(t, err)
+	t.Cleanup(func() { snapshotDB.Close() })
+	snapshotStore, err := snapshots.NewStore(snapshotDB, snapshotDir)
+	require.NoError(t, err)
+
+	appOptions := make(simtestutil.AppOptionsMap, 0)
+	appOptions[flags.FlagHome] = nodeHome // ensure unique folder
 
 	app := NewOmniFlixApp(
 		log.NewNopLogger(),
@@ -132,9 +154,11 @@ func setup(withGenesis bool, invCheckPeriod uint) (*OmniFlixApp, GenesisState) {
 		true,
 		map[int64]bool{},
 		DefaultNodeHome,
-		invCheckPeriod,
+		0,
 		encCdc,
-		EmptyBaseAppOptions{},
+		appOptions,
+		baseApp.SetChainID(SimAppChainID),
+		baseApp.SetSnapshot(snapshotStore, snapshottypes.SnapshotOptions{KeepRecent: 2}),
 	)
 	if withGenesis {
 		return app, NewDefaultGenesisState(encCdc.Marshaler)
