@@ -134,6 +134,8 @@ func SetupWithGenesisValSet(
 }
 
 func setup(t *testing.T, withGenesis bool) (*OmniFlixApp, GenesisState) {
+	t.Helper()
+
 	db := dbm.NewMemDB()
 	nodeHome := t.TempDir()
 	encCdc := MakeEncodingConfig()
