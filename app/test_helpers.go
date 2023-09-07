@@ -2,11 +2,12 @@ package app
 
 import (
 	"encoding/json"
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/snapshots"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/snapshots"
 
 	apphelpers "github.com/OmniFlix/omniflixhub/v2/app/helpers"
 	appparams "github.com/OmniFlix/omniflixhub/v2/app/params"

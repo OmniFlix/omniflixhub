@@ -1,10 +1,11 @@
 package keeper_test
 
 import (
-	sdkmath "cosmossdk.io/math"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"testing"
 	"time"
+
+	sdkmath "cosmossdk.io/math"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/OmniFlix/omniflixhub/v2/app/apptesting"
 	"github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
@@ -36,7 +37,6 @@ func (suite *KeeperTestSuite) SetupTest() {
 
 	params := types.DefaultParams()
 	suite.app.AllocKeeper.SetParams(suite.ctx, params)
-
 }
 
 func TestKeeperTestSuite(t *testing.T) {
