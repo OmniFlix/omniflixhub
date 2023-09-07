@@ -366,7 +366,7 @@ func NewAppKeeper(
 		appKeepers.BankKeeper,
 		appKeepers.StakingKeeper,
 		appKeepers.DistrKeeper,
-		appKeepers.GetSubspace(alloctypes.ModuleName),
+		govModAddress,
 	)
 
 	appKeepers.ONFTKeeper = onftkeeper.NewKeeper(
