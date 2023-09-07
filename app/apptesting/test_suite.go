@@ -1,9 +1,10 @@
 package apptesting
 
 import (
-	"cosmossdk.io/math"
 	"fmt"
 	"time"
+
+	"cosmossdk.io/math"
 
 	"github.com/OmniFlix/omniflixhub/v2/app"
 
