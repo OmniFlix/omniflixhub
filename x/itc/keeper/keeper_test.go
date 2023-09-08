@@ -283,3 +283,17 @@ func (suite *KeeperTestSuite) TestGetClaims() {
 		suite.Require().Equal(claimToSet, got[0])
 	}
 }
+
+func (suite *KeeperTestSuite) TestFinalizeAndEndCampaigns() {
+	suite.SetupTest()
+	sdkCtx := suite.Ctx.WithBlockTime(suite.Ctx.BlockTime().Add(defaultDuration * 2))
+	keeper := suite.App.ItcKeeper
+
+	suite.CreateDefaultCampaign()
+	suite.CreateSecondaryCampaign()
+
+	keeper.FinalizeAndEndCampaigns(sdkCtx)
+
+	campaigns := keeper.GetAllCampaigns(sdkCtx)
+	suite.Require().Empty(campaigns)
+}
