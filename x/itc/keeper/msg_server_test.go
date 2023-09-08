@@ -476,6 +476,15 @@ func (suite *KeeperTestSuite) TestDepositCampaign() {
 			expectedMessageEvents:  0,
 			expectedTransferEvents: 0,
 		},
+		{
+			desc:                   "invalid case - non-existent campaignId",
+			campaignId:             10,
+			deposit:                sdk.NewInt64Coin(defaultTokensPerClaim.Denom, 10_000_000),
+			depositor:              suite.TestAccs[0].String(),
+			valid:                  false,
+			expectedMessageEvents:  0,
+			expectedTransferEvents: 0,
+		},
 	} {
 		suite.Run(fmt.Sprintf("Case %s", tc.desc), func() {
 			ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
