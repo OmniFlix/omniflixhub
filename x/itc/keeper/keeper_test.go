@@ -211,3 +211,21 @@ func (suite *KeeperTestSuite) mintNFTs() {
 		suite.mintNFT(secondaryNftDenomId, fmt.Sprintf("%s%d", secondaryNftId, counter))
 	}
 }
+
+func (suite *KeeperTestSuite) TestGetAllCampaigns() {
+	suite.SetupTest()
+
+	sdkCtx := suite.Ctx
+	campaigns := suite.App.ItcKeeper.GetAllCampaigns(sdkCtx)
+	suite.Require().Empty(campaigns)
+
+	suite.CreateDefaultCampaign()
+
+	campaigns = suite.App.ItcKeeper.GetAllCampaigns(sdkCtx)
+	suite.Require().Equal(len(campaigns), 1)
+
+	suite.CreateSecondaryCampaign()
+
+	campaigns = suite.App.ItcKeeper.GetAllCampaigns(sdkCtx)
+	suite.Require().Equal(len(campaigns), 2)
+}
