@@ -75,7 +75,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 
 func (suite *KeeperTestSuite) CreateDefaultCampaign() {
 	suite.createDefaultNftDenom()
-	_, _ = suite.msgServer.CreateCampaign(
+	_, err := suite.msgServer.CreateCampaign(
 		sdk.WrapSDKContext(suite.Ctx),
 		types.NewMsgCreateCampaign(
 			defaultCampaignName,
@@ -97,6 +97,8 @@ func (suite *KeeperTestSuite) CreateDefaultCampaign() {
 			types.DefaultCampaignCreationFee,
 		),
 	)
+
+	suite.Require().NoError(err)
 }
 
 func (suite *KeeperTestSuite) CreateSecondaryCampaign() {
@@ -227,5 +229,20 @@ func (suite *KeeperTestSuite) TestGetAllCampaigns() {
 	suite.CreateSecondaryCampaign()
 
 	campaigns = suite.App.ItcKeeper.GetAllCampaigns(sdkCtx)
+	suite.Require().Equal(len(campaigns), 2)
+}
+func (suite *KeeperTestSuite) TestGetCampaignByCreator() {
+	suite.SetupTest()
+	sdkCtx := suite.Ctx
+	defaultCreator := suite.TestAccs[0]
+
+	suite.CreateDefaultCampaign()
+
+	campaigns := suite.App.ItcKeeper.GetCampaignsByCreator(sdkCtx, defaultCreator)
+	suite.Require().Equal(len(campaigns), 1)
+
+	suite.CreateSecondaryCampaign()
+
+	campaigns = suite.App.ItcKeeper.GetCampaignsByCreator(sdkCtx, defaultCreator)
 	suite.Require().Equal(len(campaigns), 2)
 }
