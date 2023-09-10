@@ -231,6 +231,7 @@ func (suite *KeeperTestSuite) TestGetAllCampaigns() {
 	campaigns = suite.App.ItcKeeper.GetAllCampaigns(sdkCtx)
 	suite.Require().Equal(len(campaigns), 2)
 }
+
 func (suite *KeeperTestSuite) TestGetCampaignByCreator() {
 	suite.SetupTest()
 	sdkCtx := suite.Ctx
