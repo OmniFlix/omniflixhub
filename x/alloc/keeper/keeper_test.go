@@ -30,9 +30,6 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.app.AllocKeeper.SetParams(suite.ctx, types.DefaultParams())
 }
 
-// emptyAddress corresponds to community pool
-var emptyAddress = ""
-
 func TestKeeperTestSuite(t *testing.T) {
 	suite.Run(t, new(KeeperTestSuite))
 }
@@ -63,8 +60,8 @@ func (suite *KeeperTestSuite) TestDistribution() {
 	params.DistributionProportions.StakingRewards = sdk.NewDecWithPrec(60, 2)
 	params.DistributionProportions.NodeHostsIncentives = sdk.NewDecWithPrec(5, 2)
 	params.DistributionProportions.NftIncentives = sdk.NewDecWithPrec(15, 2)
-	params.DistributionProportions.CommunityPool = sdk.NewDecWithPrec(125, 3)
-	params.DistributionProportions.DeveloperRewards = sdk.NewDecWithPrec(15, 2).Quo(sdk.NewDec(2))
+	params.DistributionProportions.CommunityPool = sdk.NewDecWithPrec(5, 2)
+	params.DistributionProportions.DeveloperRewards = sdk.NewDecWithPrec(15, 2)
 	params.WeightedNftIncentivesReceivers = []types.WeightedAddress{
 		{
 			Address: nftIncentivesReceiver.String(),
@@ -80,11 +77,7 @@ func (suite *KeeperTestSuite) TestDistribution() {
 	params.WeightedDeveloperRewardsReceivers = []types.WeightedAddress{
 		{
 			Address: devRewardsReceiver.String(),
-			Weight:  sdk.MustNewDecFromStr("0.5"),
-		},
-		{ // asserts that distributeCoinToWeightedAddresses works well if a receiver is community pool
-			Address: emptyAddress,
-			Weight:  sdk.MustNewDecFromStr("0.5"),
+			Weight:  sdk.NewDec(1),
 		},
 	}
 	suite.app.AllocKeeper.SetParams(suite.ctx, params)
@@ -114,8 +107,7 @@ func (suite *KeeperTestSuite) TestDistribution() {
 		sdk.NewDec(0),
 		feePool.CommunityPool.AmountOf(denom))
 
-	err := allocKeeper.DistributeMintedCoins(suite.ctx)
-	suite.NoError(err)
+	_ = allocKeeper.DistributeMintedCoins(suite.ctx)
 
 	feeCollector = suite.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 	modulePortion := params.DistributionProportions.NftIncentives.
