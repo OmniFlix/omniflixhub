@@ -297,3 +297,21 @@ func (suite *KeeperTestSuite) TestFinalizeAndEndCampaigns() {
 	campaigns := keeper.GetAllCampaigns(sdkCtx)
 	suite.Require().Empty(campaigns)
 }
+
+func (suite *KeeperTestSuite) TestHasCampaign() {
+	suite.SetupTest()
+	sdkCtx := suite.Ctx
+	keeper := suite.App.ItcKeeper
+
+	suite.CreateDefaultCampaign()
+	suite.Require().True(keeper.HasCampaign(sdkCtx, 1))
+
+	suite.CreateSecondaryCampaign()
+	suite.Require().True(keeper.HasCampaign(sdkCtx, 2))
+
+	sdkCtx = sdkCtx.WithBlockTime(sdkCtx.BlockTime().Add(defaultDuration * 2))
+	keeper.FinalizeAndEndCampaigns(sdkCtx)
+
+	suite.Require().False(keeper.HasCampaign(sdkCtx, 1))
+	suite.Require().False(keeper.HasCampaign(sdkCtx, 2))
+}
