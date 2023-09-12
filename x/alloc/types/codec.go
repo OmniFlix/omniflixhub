@@ -28,8 +28,8 @@ func init() {
 
 // RegisterLegacyAminoCodec registers concrete types on the LegacyAmino codec
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(Params{}, "cosmos-sdk/x/mint/Params", nil)
-	legacy.RegisterAminoMsg(cdc, &MsgUpdateParams{}, "cosmos-sdk/x/mint/MsgUpdateParams")
+	cdc.RegisterConcrete(Params{}, "OmniFlix/alloc/Params", nil)
+	legacy.RegisterAminoMsg(cdc, &MsgUpdateParams{}, "OmniFlix/alloc/MsgUpdateParams")
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
