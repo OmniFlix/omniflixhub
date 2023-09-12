@@ -9,7 +9,6 @@ import (
 
 	"github.com/OmniFlix/omniflixhub/v2/app/apptesting"
 	"github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
-	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -40,10 +39,10 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func FundModuleAccount(bankKeeper bankkeeper.Keeper, ctx sdk.Context, recipientMod string, amounts sdk.Coins) error {
-	if err := bankKeeper.MintCoins(ctx, alloctypes.ModuleName, amounts); err != nil {
+	if err := bankKeeper.MintCoins(ctx, types.ModuleName, amounts); err != nil {
 		return err
 	}
-	return bankKeeper.SendCoinsFromModuleToModule(ctx, alloctypes.ModuleName, recipientMod, amounts)
+	return bankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, recipientMod, amounts)
 }
 
 func (suite *KeeperTestSuite) TestParams() {
