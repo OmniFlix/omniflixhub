@@ -12,7 +12,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/OmniFlix/omniflixhub/v2/app"
@@ -27,16 +26,12 @@ type KeeperTestSuite struct {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	isCheckTx := false
 	suite.app = app.Setup(suite.T())
-	suite.ctx = suite.app.BaseApp.NewContext(isCheckTx, tmproto.Header{
+	suite.ctx = suite.app.BaseApp.NewContext(false, tmproto.Header{
 		ChainID: app.SimAppChainID,
 		Height:  5,
 		Time:    time.Now().UTC(),
 	})
-
-	params := types.DefaultParams()
-	suite.app.AllocKeeper.SetParams(suite.ctx, params)
 }
 
 func TestKeeperTestSuite(t *testing.T) {
@@ -44,10 +39,63 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func FundModuleAccount(bankKeeper bankkeeper.Keeper, ctx sdk.Context, recipientMod string, amounts sdk.Coins) error {
-	if err := bankKeeper.MintCoins(ctx, minttypes.ModuleName, amounts); err != nil {
+	if err := bankKeeper.MintCoins(ctx, types.ModuleName, amounts); err != nil {
 		return err
 	}
-	return bankKeeper.SendCoinsFromModuleToModule(ctx, minttypes.ModuleName, recipientMod, amounts)
+	return bankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, recipientMod, amounts)
+}
+
+func (suite *KeeperTestSuite) TestParams() {
+	testCases := []struct {
+		name      string
+		input     types.Params
+		expectErr bool
+	}{
+		{
+			name: "set invalid params",
+			input: types.Params{
+				DistributionProportions: types.DistributionProportions{
+					StakingRewards:      sdk.NewDecWithPrec(-1, 2),
+					NftIncentives:       sdk.NewDecWithPrec(100, 2),
+					NodeHostsIncentives: sdk.NewDecWithPrec(5, 2),
+					DeveloperRewards:    sdk.NewDecWithPrec(0, 2),
+					CommunityPool:       sdk.NewDecWithPrec(5, 2),
+				},
+			},
+			expectErr: true,
+		},
+		{
+			name: "set full valid params",
+			input: types.Params{
+				DistributionProportions: types.DistributionProportions{
+					StakingRewards:      sdk.NewDecWithPrec(60, 2), // 60%
+					NftIncentives:       sdk.NewDecWithPrec(15, 2), // 15%
+					NodeHostsIncentives: sdk.NewDecWithPrec(5, 2),  // 5%
+					DeveloperRewards:    sdk.NewDecWithPrec(15, 2), // 15%
+					CommunityPool:       sdk.NewDecWithPrec(5, 2),  // 5%
+				},
+			},
+			expectErr: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+
+		suite.Run(tc.name, func() {
+			expected := suite.app.AllocKeeper.GetParams(suite.ctx)
+			err := suite.app.AllocKeeper.SetParams(suite.ctx, tc.input)
+			if tc.expectErr {
+				suite.Require().Error(err)
+			} else {
+				expected = tc.input
+				suite.Require().NoError(err)
+			}
+
+			p := suite.app.AllocKeeper.GetParams(suite.ctx)
+			suite.Require().Equal(expected, p)
+		})
+	}
 }
 
 func (suite *KeeperTestSuite) TestDistribution() {
@@ -82,8 +130,8 @@ func (suite *KeeperTestSuite) TestDistribution() {
 			Weight:  sdk.NewDec(1),
 		},
 	}
-	suite.app.AllocKeeper.SetParams(suite.ctx, params)
-
+	err := suite.app.AllocKeeper.SetParams(suite.ctx, params)
+	suite.Require().NoError(err)
 	feePool := suite.app.DistrKeeper.GetFeePool(suite.ctx)
 	feeCollector := suite.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 	suite.Equal(

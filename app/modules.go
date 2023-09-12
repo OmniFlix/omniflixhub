@@ -191,7 +191,7 @@ func appModules(
 		transfer.NewAppModule(app.TransferKeeper),
 		ica.NewAppModule(nil, &app.ICAHostKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper),
-		alloc.NewAppModule(appCodec, app.AllocKeeper),
+		alloc.NewAppModule(appCodec, app.AllocKeeper, app.GetSubspace(alloctypes.ModuleName)),
 		onft.NewAppModule(appCodec, app.ONFTKeeper, app.AccountKeeper, app.BankKeeper, app.DistrKeeper),
 		marketplace.NewAppModule(appCodec, app.MarketplaceKeeper),
 		streampay.NewAppModule(appCodec, app.StreamPayKeeper),
