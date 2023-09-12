@@ -1,8 +1,6 @@
 package types
 
-var (
-	ParamsKey = []byte{0x00}
-)
+var ParamsKey = []byte{0x00}
 
 const (
 	// ModuleName defines the module name
