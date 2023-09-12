@@ -2,8 +2,8 @@ package keeper
 
 import (
 	"context"
-	errorsmod "cosmossdk.io/errors"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
