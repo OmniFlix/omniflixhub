@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"github.com/OmniFlix/omniflixhub/v2/x/alloc/exported"
-	v2 "github.com/OmniFlix/omniflixhub/v2/x/alloc/migrations/v2"
+	v3 "github.com/OmniFlix/omniflixhub/v2/x/alloc/migrations/v3"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -19,10 +19,10 @@ func NewMigrator(k Keeper, ss exported.Subspace) Migrator {
 	}
 }
 
-// Migrate1to2 migrates the x/alloc module state from the consensus version 1 to
-// version 2. Specifically, it takes the parameters that are currently stored
+// Migrate2to3 migrates the x/alloc module state from the consensus version 2 to
+// version 3. Specifically, it takes the parameters that are currently stored
 // and managed by the x/params modules and stores them directly into the x/alloc
 // module state.
-func (m Migrator) Migrate1to2(ctx sdk.Context) error {
-	return v2.Migrate(ctx, ctx.KVStore(m.keeper.storeKey), m.legacySubspace, m.keeper.cdc)
+func (m Migrator) Migrate2to3(ctx sdk.Context) error {
+	return v3.Migrate(ctx, ctx.KVStore(m.keeper.storeKey), m.legacySubspace, m.keeper.cdc)
 }

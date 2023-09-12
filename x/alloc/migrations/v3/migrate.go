@@ -1,4 +1,4 @@
-package v2
+package v3
 
 import (
 	"github.com/OmniFlix/omniflixhub/v2/x/alloc/exported"
@@ -13,8 +13,8 @@ const (
 
 var ParamsKey = []byte{0x01}
 
-// Migrate migrates the x/alloc module state from the consensus version 1 to
-// version 2. Specifically, it takes the parameters that are currently stored
+// Migrate migrates the x/alloc module state from the consensus version 2 to
+// version 3. Specifically, it takes the parameters that are currently stored
 // and managed by the x/params modules and stores them directly into the x/alloc
 // module state.
 func Migrate(
