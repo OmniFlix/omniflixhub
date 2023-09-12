@@ -396,6 +396,19 @@ func (suite *KeeperTestSuite) TestClaimCampaign() {
 			expectedNftMintEvents:     0,
 			expectedNftBurnEvents:     0,
 		},
+		{
+			desc:                      "invalid case - non-existent campaignId",
+			campaignId:                10,
+			nftId:                     "onfttest1",
+			interactionType:           types.INTERACTION_TYPE_BURN,
+			claimer:                   suite.TestAccs[1].String(),
+			valid:                     false,
+			expectedMessageEvents:     0,
+			expectedTransferEvents:    0,
+			expectedNftTransferEvents: 0,
+			expectedNftMintEvents:     0,
+			expectedNftBurnEvents:     0,
+		},
 	} {
 		suite.Run(fmt.Sprintf("Case %s", tc.desc), func() {
 			ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
@@ -459,6 +472,15 @@ func (suite *KeeperTestSuite) TestDepositCampaign() {
 			campaignId:             1,
 			deposit:                sdk.NewInt64Coin(defaultTokensPerClaim.Denom, 10_000_000),
 			depositor:              suite.TestAccs[1].String(),
+			valid:                  false,
+			expectedMessageEvents:  0,
+			expectedTransferEvents: 0,
+		},
+		{
+			desc:                   "invalid case - non-existent campaignId",
+			campaignId:             10,
+			deposit:                sdk.NewInt64Coin(defaultTokensPerClaim.Denom, 10_000_000),
+			depositor:              suite.TestAccs[0].String(),
 			valid:                  false,
 			expectedMessageEvents:  0,
 			expectedTransferEvents: 0,
