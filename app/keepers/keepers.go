@@ -404,7 +404,7 @@ func NewAppKeeper(
 		appKeepers.ONFTKeeper,
 		appKeepers.StreamPayKeeper,
 		appKeepers.DistrKeeper,
-		appKeepers.GetSubspace(itctypes.ModuleName),
+		govModAddress,
 	)
 
 	var ibcStack porttypes.IBCModule

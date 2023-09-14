@@ -3,6 +3,8 @@ package keeper
 import (
 	"context"
 
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+
 	errorsmod "cosmossdk.io/errors"
 
 	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
@@ -178,4 +180,17 @@ func (m msgServer) DepositCampaign(goCtx context.Context,
 	}
 
 	return &types.MsgDepositCampaignResponse{}, nil
+}
+
+func (m msgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
+	if m.authority != req.Authority {
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", m.authority, req.Authority)
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := m.SetParams(ctx, req.Params); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateParamsResponse{}, nil
 }

@@ -16,6 +16,8 @@ var (
 	PrefixCampaignCreator    = []byte{0x02}
 	PrefixNextCampaignNumber = []byte{0x03}
 	PrefixClaimByNftId       = []byte{0x11}
+
+	ParamsKey = []byte{0x12}
 )
 
 func KeyCampaignIdPrefix(id uint64) []byte {

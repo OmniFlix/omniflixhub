@@ -10,7 +10,6 @@ import (
 	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 type (
@@ -23,7 +22,10 @@ type (
 		nftKeeper          types.NftKeeper
 		streampayKeeper    types.StreamPayKeeper
 		distributionKeeper types.DistributionKeeper
-		paramSpace         paramtypes.Subspace
+
+		// the address capable of executing a MsgUpdateParams message. Typically, this
+		// should be the x/gov module account.
+		authority string
 	}
 )
 
@@ -35,16 +37,11 @@ func NewKeeper(
 	nftKeeper types.NftKeeper,
 	streampayKeeper types.StreamPayKeeper,
 	distributionKeeper types.DistributionKeeper,
-	ps paramtypes.Subspace,
+	authority string,
 ) Keeper {
 	// ensure itc module account is set
 	if addr := accountKeeper.GetModuleAddress(types.ModuleName); addr == nil {
 		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
-	}
-
-	// set KeyTable if it has not already been set
-	if !ps.HasKeyTable() {
-		ps = ps.WithKeyTable(types.ParamKeyTable())
 	}
 
 	return Keeper{
@@ -55,8 +52,13 @@ func NewKeeper(
 		nftKeeper:          nftKeeper,
 		streampayKeeper:    streampayKeeper,
 		distributionKeeper: distributionKeeper,
-		paramSpace:         ps,
+		authority:          authority,
 	}
+}
+
+// GetAuthority returns the x/itc module's authority.
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {

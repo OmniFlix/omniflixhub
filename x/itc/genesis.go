@@ -18,7 +18,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetCampaignWithCreator(ctx, c.GetCreator(), c.GetId())
 	}
 	k.SetNextCampaignNumber(ctx, genState.NextCampaignNumber)
-	k.SetParams(ctx, genState.Params)
+	err := k.SetParams(ctx, genState.Params)
+	if err != nil {
+		panic(err)
+	}
 
 	for _, cc := range genState.Claims {
 		k.SetClaim(ctx, cc)
