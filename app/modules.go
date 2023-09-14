@@ -195,7 +195,7 @@ func appModules(
 		onft.NewAppModule(appCodec, app.ONFTKeeper, app.AccountKeeper, app.BankKeeper, app.DistrKeeper),
 		marketplace.NewAppModule(appCodec, app.MarketplaceKeeper),
 		streampay.NewAppModule(appCodec, app.StreamPayKeeper),
-		itc.NewAppModule(appCodec, app.ItcKeeper),
+		itc.NewAppModule(appCodec, app.ItcKeeper, app.GetSubspace(itctypes.ModuleName)),
 	}
 }
 
