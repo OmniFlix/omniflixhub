@@ -75,7 +75,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 
 func (suite *KeeperTestSuite) CreateDefaultCampaign() {
 	suite.createDefaultNftDenom()
-	_, _ = suite.msgServer.CreateCampaign(
+	_, err := suite.msgServer.CreateCampaign(
 		sdk.WrapSDKContext(suite.Ctx),
 		types.NewMsgCreateCampaign(
 			defaultCampaignName,
@@ -97,6 +97,8 @@ func (suite *KeeperTestSuite) CreateDefaultCampaign() {
 			types.DefaultCampaignCreationFee,
 		),
 	)
+
+	suite.Require().NoError(err)
 }
 
 func (suite *KeeperTestSuite) CreateSecondaryCampaign() {
@@ -210,6 +212,109 @@ func (suite *KeeperTestSuite) mintNFTs() {
 		suite.mintNFT(defaultNftDenomId, fmt.Sprintf("%s%d", defaultNftId, counter))
 		suite.mintNFT(secondaryNftDenomId, fmt.Sprintf("%s%d", secondaryNftId, counter))
 	}
+}
+
+func (suite *KeeperTestSuite) TestGetAllCampaigns() {
+	suite.SetupTest()
+
+	sdkCtx := suite.Ctx
+	campaigns := suite.App.ItcKeeper.GetAllCampaigns(sdkCtx)
+	suite.Require().Empty(campaigns)
+
+	suite.CreateDefaultCampaign()
+
+	campaigns = suite.App.ItcKeeper.GetAllCampaigns(sdkCtx)
+	suite.Require().Equal(len(campaigns), 1)
+
+	suite.CreateSecondaryCampaign()
+
+	campaigns = suite.App.ItcKeeper.GetAllCampaigns(sdkCtx)
+	suite.Require().Equal(len(campaigns), 2)
+}
+
+func (suite *KeeperTestSuite) TestGetCampaignByCreator() {
+	suite.SetupTest()
+	sdkCtx := suite.Ctx
+	defaultCreator := suite.TestAccs[0]
+
+	suite.CreateDefaultCampaign()
+
+	campaigns := suite.App.ItcKeeper.GetCampaignsByCreator(sdkCtx, defaultCreator)
+	suite.Require().Equal(len(campaigns), 1)
+
+	suite.CreateSecondaryCampaign()
+
+	campaigns = suite.App.ItcKeeper.GetCampaignsByCreator(sdkCtx, defaultCreator)
+	suite.Require().Equal(len(campaigns), 2)
+}
+
+func (suite *KeeperTestSuite) TestGetClaims() {
+	suite.SetupTest()
+	sdkCtx := suite.Ctx
+	defaultAddress := suite.TestAccs[0]
+	keeper := suite.App.ItcKeeper
+
+	claimsToSet := []types.Claim{
+		types.NewClaim(
+			1,
+			defaultAddress.String(),
+			defaultNftId,
+			defaultInteractionType,
+		),
+		types.NewClaim(
+			2,
+			defaultAddress.String(),
+			defaultNftId,
+			defaultInteractionType,
+		),
+		types.NewClaim(
+			3,
+			defaultAddress.String(),
+			defaultNftId,
+			defaultInteractionType,
+		),
+	}
+
+	for _, claimToSet := range claimsToSet {
+		claimToSet := claimToSet
+		keeper.SetClaim(sdkCtx, claimToSet)
+
+		got := keeper.GetClaims(sdkCtx, claimToSet.CampaignId)
+		suite.Require().Equal(len(got), 1)
+		suite.Require().Equal(claimToSet, got[0])
+	}
+}
+
+func (suite *KeeperTestSuite) TestFinalizeAndEndCampaigns() {
+	suite.SetupTest()
+	sdkCtx := suite.Ctx.WithBlockTime(suite.Ctx.BlockTime().Add(defaultDuration * 2))
+	keeper := suite.App.ItcKeeper
+
+	suite.CreateDefaultCampaign()
+	suite.CreateSecondaryCampaign()
+
+	keeper.FinalizeAndEndCampaigns(sdkCtx)
+
+	campaigns := keeper.GetAllCampaigns(sdkCtx)
+	suite.Require().Empty(campaigns)
+}
+
+func (suite *KeeperTestSuite) TestHasCampaign() {
+	suite.SetupTest()
+	sdkCtx := suite.Ctx
+	keeper := suite.App.ItcKeeper
+
+	suite.CreateDefaultCampaign()
+	suite.Require().True(keeper.HasCampaign(sdkCtx, 1))
+
+	suite.CreateSecondaryCampaign()
+	suite.Require().True(keeper.HasCampaign(sdkCtx, 2))
+
+	sdkCtx = sdkCtx.WithBlockTime(sdkCtx.BlockTime().Add(defaultDuration * 2))
+	keeper.FinalizeAndEndCampaigns(sdkCtx)
+
+	suite.Require().False(keeper.HasCampaign(sdkCtx, 1))
+	suite.Require().False(keeper.HasCampaign(sdkCtx, 2))
 }
 
 func (suite *KeeperTestSuite) TestParams() {
