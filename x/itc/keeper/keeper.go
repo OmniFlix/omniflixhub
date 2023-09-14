@@ -10,7 +10,6 @@ import (
 	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 type (
@@ -38,7 +37,7 @@ func NewKeeper(
 	nftKeeper types.NftKeeper,
 	streampayKeeper types.StreamPayKeeper,
 	distributionKeeper types.DistributionKeeper,
-	authority string,,
+	authority string,
 ) Keeper {
 	// ensure itc module account is set
 	if addr := accountKeeper.GetModuleAddress(types.ModuleName); addr == nil {
@@ -53,7 +52,7 @@ func NewKeeper(
 		nftKeeper:          nftKeeper,
 		streampayKeeper:    streampayKeeper,
 		distributionKeeper: distributionKeeper,
-		authority:         authority,
+		authority:          authority,
 	}
 }
 
