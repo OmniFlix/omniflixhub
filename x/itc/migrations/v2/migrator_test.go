@@ -1,8 +1,9 @@
 package v2_test
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/OmniFlix/omniflixhub/v2/x/itc"
 	"github.com/OmniFlix/omniflixhub/v2/x/itc/exported"
