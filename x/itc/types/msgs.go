@@ -21,7 +21,13 @@ const (
 	TypeMsgClaim           = "claim"
 )
 
-var _ sdk.Msg = &MsgCreateCampaign{}
+var (
+	_ sdk.Msg = &MsgCreateCampaign{}
+	_ sdk.Msg = &MsgCancelCampaign{}
+	_ sdk.Msg = &MsgDepositCampaign{}
+	_ sdk.Msg = &MsgClaim{}
+	_ sdk.Msg = &MsgUpdateParams{}
+)
 
 func NewMsgCreateCampaign(name, description string,
 	interaction InteractionType, claimType ClaimType,
@@ -226,8 +232,6 @@ func (msg MsgClaim) GetSigners() []sdk.AccAddress {
 	}
 	return []sdk.AccAddress{from}
 }
-
-var _ sdk.Msg = &MsgUpdateParams{}
 
 // GetSignBytes implements the LegacyMsg interface.
 func (m MsgUpdateParams) GetSignBytes() []byte {
