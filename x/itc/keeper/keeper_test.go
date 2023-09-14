@@ -211,3 +211,54 @@ func (suite *KeeperTestSuite) mintNFTs() {
 		suite.mintNFT(secondaryNftDenomId, fmt.Sprintf("%s%d", secondaryNftId, counter))
 	}
 }
+
+func (suite *KeeperTestSuite) TestParams() {
+	testCases := []struct {
+		name      string
+		input     types.Params
+		expectErr bool
+	}{
+		{
+			name: "set invalid max campaign duration",
+			input: types.Params{
+				MaxCampaignDuration: -1,
+				CreationFee:         types.DefaultCampaignCreationFee,
+			},
+			expectErr: true,
+		},
+		{
+			name: "set invalid creation fee",
+			input: types.Params{
+				MaxCampaignDuration: types.DefaultMaxCampaignDuration,
+				CreationFee:         sdk.Coin{},
+			},
+			expectErr: true,
+		},
+		{
+			name: "set full valid params",
+			input: types.Params{
+				CreationFee:         types.DefaultCampaignCreationFee,
+				MaxCampaignDuration: types.DefaultMaxCampaignDuration,
+			},
+			expectErr: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+
+		suite.Run(tc.name, func() {
+			expected := suite.App.ItcKeeper.GetParams(suite.Ctx)
+			err := suite.App.ItcKeeper.SetParams(suite.Ctx, tc.input)
+			if tc.expectErr {
+				suite.Require().Error(err)
+			} else {
+				expected = tc.input
+				suite.Require().NoError(err)
+			}
+
+			p := suite.App.ItcKeeper.GetParams(suite.Ctx)
+			suite.Require().Equal(expected, p)
+		})
+	}
+}
