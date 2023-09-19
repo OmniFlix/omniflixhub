@@ -20,7 +20,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetWithPriceDenom(ctx, l.Price.GetDenom(), l.GetId())
 	}
 	k.SetListingCount(ctx, genState.ListingCount)
-	k.SetParams(ctx, genState.Params)
+	err := k.SetParams(ctx, genState.Params)
+	if err != nil {
+		panic(err)
+	}
 
 	for _, al := range genState.Auctions {
 		k.SetAuctionListing(ctx, al)
