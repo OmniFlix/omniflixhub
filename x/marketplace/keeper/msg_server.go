@@ -2,8 +2,9 @@ package keeper
 
 import (
 	"context"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"time"
+
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	errorsmod "cosmossdk.io/errors"
 

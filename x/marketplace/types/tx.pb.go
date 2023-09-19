@@ -576,7 +576,7 @@ var xxx_messageInfo_MsgPlaceBidResponse proto.InternalMessageInfo
 type MsgUpdateParams struct {
 	// authority is the address of the governance account.
 	Authority string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
-	// params defines the x/itc parameters to update.
+	// params defines the x/marketplace parameters to update.
 	//
 	// NOTE: All parameters must be supplied.
 	Params Params `protobuf:"bytes,2,opt,name=params,proto3" json:"params"`

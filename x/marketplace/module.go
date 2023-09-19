@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/exported"
 
 	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/client/cli"
