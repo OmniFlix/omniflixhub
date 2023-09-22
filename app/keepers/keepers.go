@@ -384,7 +384,7 @@ func NewAppKeeper(
 		appKeepers.BankKeeper,
 		appKeepers.ONFTKeeper,
 		appKeepers.DistrKeeper,
-		appKeepers.GetSubspace(marketplacetypes.ModuleName),
+		govModAddress,
 	)
 
 	appKeepers.StreamPayKeeper = *streampaykeeper.NewKeeper(

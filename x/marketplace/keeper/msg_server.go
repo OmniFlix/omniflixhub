@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+
 	errorsmod "cosmossdk.io/errors"
 
 	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
@@ -21,6 +23,19 @@ var _ types.MsgServer = msgServer{}
 // for the provided Keeper.
 func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
+}
+
+func (m msgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
+	if m.authority != req.Authority {
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", m.authority, req.Authority)
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := m.SetParams(ctx, req.Params); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateParamsResponse{}, nil
 }
 
 func (m msgServer) ListNFT(goCtx context.Context, msg *types.MsgListNFT) (*types.MsgListNFTResponse, error) {

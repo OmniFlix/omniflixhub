@@ -9,13 +9,11 @@ import (
 
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-
-	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 )
 
 type Keeper struct {
@@ -26,7 +24,10 @@ type Keeper struct {
 	bankKeeper         types.BankKeeper
 	nftKeeper          types.NftKeeper
 	distributionKeeper types.DistributionKeeper
-	paramSpace         paramstypes.Subspace
+
+	// the address capable of executing a MsgUpdateParams message. Typically, this
+	// should be the x/gov module account.
+	authority string
 }
 
 func NewKeeper(
@@ -37,16 +38,11 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 	nftKeeper types.NftKeeper,
 	distrKeeper types.DistributionKeeper,
-	paramSpace paramstypes.Subspace,
+	authority string,
 ) Keeper {
 	// ensure marketplace module account is set
 	if addr := accountKeeper.GetModuleAddress(types.ModuleName); addr == nil {
 		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
-	}
-
-	// set KeyTable if it has not already been set
-	if !paramSpace.HasKeyTable() {
-		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
 	}
 
 	return Keeper{
@@ -56,8 +52,13 @@ func NewKeeper(
 		bankKeeper:         bankKeeper,
 		nftKeeper:          nftKeeper,
 		distributionKeeper: distrKeeper,
-		paramSpace:         paramSpace,
+		authority:          authority,
 	}
+}
+
+// GetAuthority returns the x/marketplace module's authority.
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }
 
 // Logger returns a module-specific logger.

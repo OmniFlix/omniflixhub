@@ -6,6 +6,7 @@ import (
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
+	authzcodec "github.com/cosmos/cosmos-sdk/x/authz/codec"
 	gogotypes "github.com/cosmos/gogoproto/types"
 
 	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/exported"
@@ -19,11 +20,13 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateAuction{}, "OmniFlix/marketplace/MsgCreateAuction", nil)
 	cdc.RegisterConcrete(&MsgCancelAuction{}, "OmniFlix/marketplace/MsgCancelAuction", nil)
 	cdc.RegisterConcrete(&MsgPlaceBid{}, "OmniFlix/marketplace/MsgPlaceBid", nil)
+	cdc.RegisterConcrete(&MsgUpdateParams{}, "OmniFlix/marketplace/MsgUpdateParams", nil)
 
 	cdc.RegisterInterface((*exported.ListingI)(nil), nil)
 	cdc.RegisterConcrete(&Listing{}, "OmniFlix/marketplace/Listing", nil)
 	cdc.RegisterInterface((*exported.AuctionListingI)(nil), nil)
 	cdc.RegisterConcrete(&AuctionListing{}, "OmniFlix/marketplace/AuctionListing", nil)
+	cdc.RegisterConcrete(&Params{}, "OmniFlix/marketplace/Params", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
@@ -35,6 +38,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgCreateAuction{},
 		&MsgCancelAuction{},
 		&MsgPlaceBid{},
+		&MsgUpdateParams{},
 	)
 
 	registry.RegisterImplementations((*exported.ListingI)(nil),
@@ -55,6 +59,10 @@ var (
 func init() {
 	RegisterLegacyAminoCodec(amino)
 	cryptocodec.RegisterCrypto(amino)
+	// Register all Amino interfaces and concrete types on the authz Amino codec
+	// so that this can later be used to properly serialize MsgGrant and MsgExec
+	// instances.
+	RegisterLegacyAminoCodec(authzcodec.Amino)
 	amino.Seal()
 }
 

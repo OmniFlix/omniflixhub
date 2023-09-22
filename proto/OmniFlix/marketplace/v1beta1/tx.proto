@@ -1,9 +1,12 @@
 syntax = "proto3";
 package OmniFlix.marketplace.v1beta1;
 
+import "cosmos/msg/v1/msg.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
 import "OmniFlix/marketplace/v1beta1/listing.proto";
 import "OmniFlix/marketplace/v1beta1/auction.proto";
+import "OmniFlix/marketplace/v1beta1/params.proto";
 import "gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
@@ -26,6 +29,12 @@ service Msg {
   rpc CancelAuction(MsgCancelAuction) returns (MsgCancelAuctionResponse);
 
   rpc PlaceBid(MsgPlaceBid) returns (MsgPlaceBidResponse);
+
+  // UpdateParams defines a governance operation for updating the x/marketplace module
+  // parameters. The authority is hard-coded to the x/marketplace module account.
+  //
+  // Since: cosmos-sdk 0.47
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 
 }
 
@@ -125,3 +134,24 @@ message MsgPlaceBid {
 }
 
 message MsgPlaceBidResponse {}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address of the governance account.
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the x/marketplace parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [(gogoproto.nullable) = false];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParamsResponse {}
