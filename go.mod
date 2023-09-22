@@ -7,7 +7,7 @@ require (
 	cosmossdk.io/errors v1.0.0-beta.7
 	cosmossdk.io/math v1.0.1
 	github.com/OmniFlix/onft v0.6.1-0.20230727173817-10b4097e9fcc
-	github.com/OmniFlix/streampay/v2 v2.1.1-0.20230727173843-b083d1098a64
+	github.com/OmniFlix/streampay/v2 v2.1.1-0.20230922163133-93e80c4663ef
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cometbft/cometbft-db v0.8.0
 	github.com/cosmos/cosmos-proto v1.0.0-beta.2

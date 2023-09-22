@@ -230,8 +230,8 @@ github.com/Microsoft/go-winio v0.6.0 h1:slsWYD/zyx7lCXoZVlvQrj0hPTM1HI4+v1sIda2y
 github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 h1:TngWCqHvy9oXAN6lEVMRuU21PR1EtLVZJmdB18Gu3Rw=
 github.com/OmniFlix/onft v0.6.1-0.20230727173817-10b4097e9fcc h1:QLt+Wo4zX5Dquej8J8/we7wVO1R6uYIxBvxtJUoylyk=
 github.com/OmniFlix/onft v0.6.1-0.20230727173817-10b4097e9fcc/go.mod h1:57nDQZxRTJIfyNlu/mGv7nPag5nRt4Si6mAUQCFv90M=
-github.com/OmniFlix/streampay/v2 v2.1.1-0.20230727173843-b083d1098a64 h1:89i5/fXeHdB4S3anVtJhB+82dgACgT/+tfiOGDAfaT4=
-github.com/OmniFlix/streampay/v2 v2.1.1-0.20230727173843-b083d1098a64/go.mod h1:+wz1JyAnGAblP0lLYxL3hNQmoJOFpBySsETMuMulfbY=
+github.com/OmniFlix/streampay/v2 v2.1.1-0.20230922163133-93e80c4663ef h1:odIDkcCWx5PTTGM01OgKicnuIx2KaxjNAxrUqdBgtHE=
+github.com/OmniFlix/streampay/v2 v2.1.1-0.20230922163133-93e80c4663ef/go.mod h1:geZrSHVaGHERqTn1tuFfoH3PIHV5TOwaRErzi4Jnbcw=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
