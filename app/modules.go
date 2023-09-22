@@ -194,7 +194,7 @@ func appModules(
 		alloc.NewAppModule(appCodec, app.AllocKeeper, app.GetSubspace(alloctypes.ModuleName)),
 		onft.NewAppModule(appCodec, app.ONFTKeeper, app.AccountKeeper, app.BankKeeper, app.DistrKeeper),
 		marketplace.NewAppModule(appCodec, app.MarketplaceKeeper, app.GetSubspace(marketplacetypes.ModuleName)),
-		streampay.NewAppModule(appCodec, app.StreamPayKeeper),
+		streampay.NewAppModule(appCodec, app.StreamPayKeeper, app.GetSubspace(streampaytypes.ModuleName)),
 		itc.NewAppModule(appCodec, app.ItcKeeper, app.GetSubspace(itctypes.ModuleName)),
 	}
 }

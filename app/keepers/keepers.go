@@ -394,7 +394,7 @@ func NewAppKeeper(
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		appKeepers.DistrKeeper,
-		appKeepers.GetSubspace(streampaytypes.ModuleName),
+		govModAddress,
 	)
 	appKeepers.ItcKeeper = itckeeper.NewKeeper(
 		appCodec,
