@@ -356,7 +356,7 @@ func (app *OmniFlixApp) RegisterNodeService(clientCtx client.Context) {
 
 func (app *OmniFlixApp) setupUpgradeHandlers() {
 	for _, upgrade := range Upgrades {
-		app.AppKeepers.UpgradeKeeper.SetUpgradeHandler(
+		app.UpgradeKeeper.SetUpgradeHandler(
 			upgrade.UpgradeName,
 			upgrade.CreateUpgradeHandler(
 				app.mm,

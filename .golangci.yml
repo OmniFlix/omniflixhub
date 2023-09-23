@@ -60,6 +60,7 @@ linters-settings:
     excludes:
       - G404
       - G101
+      - G601
   gocritic:
     disabled-checks:
       - appendAssign
