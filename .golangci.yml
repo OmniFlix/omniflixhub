@@ -12,6 +12,7 @@ linters:
     - goconst
     - gocritic
     - gofumpt
+    - gosec
     - gosimple
     - govet
     - ineffassign
@@ -27,13 +28,6 @@ linters:
     - unused
 
 issues:
-  gofumpt:
-    # Module path which contains the source code being formatted.
-    # Default: ""
-    module-path: github.com/cosmos/interchain-security
-    # Choose whether to use the extra rules.
-    # Default: false
-    extra-rules: true
   exclude-rules:
     - text: "Use of weak random number generator"
       linters:
@@ -53,11 +47,18 @@ issues:
     - text: "leading space"
       linters:
         - nolintlint
+    - path: "legacy"
+      text: "SA1019:"
+      linters:
+        - staticcheck
 
   max-issues-per-linter: 10000
   max-same-issues: 10000
 
 linters-settings:
+  gosec:
+    excludes:
+      - G404
   gocritic:
     disabled-checks:
       - appendAssign
