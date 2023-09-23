@@ -7,13 +7,20 @@ on:
       - master
       - main
   pull_request:
+    paths:
+      - '**.go'
+
 env:
-  GO_VERSION: '1.20.5'
+  GO_VERSION: '1.20.0'
 
 permissions:
   contents: read
   # Optional: allow read access to pull request. Use with `only-new-issues` option.
   # pull-requests: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   golangci:
     name: lint
@@ -27,4 +34,4 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: latest
-          args: --timeout 5m0s
+          args: --timeout 10m

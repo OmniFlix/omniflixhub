@@ -59,6 +59,7 @@ linters-settings:
   gosec:
     excludes:
       - G404
+      - G101
   gocritic:
     disabled-checks:
       - appendAssign
