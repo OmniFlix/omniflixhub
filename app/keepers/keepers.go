@@ -375,7 +375,7 @@ func NewAppKeeper(
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		appKeepers.DistrKeeper,
-		appKeepers.GetSubspace(onfttypes.ModuleName),
+		govModAddress,
 	)
 	appKeepers.MarketplaceKeeper = marketplacekeeper.NewKeeper(
 		appCodec,
