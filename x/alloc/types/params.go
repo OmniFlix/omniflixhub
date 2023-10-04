@@ -28,9 +28,9 @@ func DefaultParams() Params {
 			DeveloperRewards:    sdk.NewDecWithPrec(15, 2), // 15%
 			CommunityPool:       sdk.NewDecWithPrec(5, 2),  // 5%
 		},
-		WeightedDeveloperRewardsReceivers:    []WeightedAddress{},
-		WeightedNftIncentivesReceivers:       []WeightedAddress{},
-		WeightedNodeHostsIncentivesReceivers: []WeightedAddress{},
+		WeightedDeveloperRewardsReceivers:    []WeightedAddress(nil),
+		WeightedNftIncentivesReceivers:       []WeightedAddress(nil),
+		WeightedNodeHostsIncentivesReceivers: []WeightedAddress(nil),
 	}
 }
 

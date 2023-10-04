@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	sdkmath "cosmossdk.io/math"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"github.com/OmniFlix/omniflixhub/v2/app/apptesting"
@@ -147,7 +146,6 @@ func (suite *KeeperTestSuite) TestDistribution() {
 	suite.Require().NotNil(feeCollectorAccount)
 
 	suite.Require().NoError(FundModuleAccount(suite.app.BankKeeper, suite.ctx, feeCollectorAccount.GetName(), mintCoins))
-
 	feeCollector = suite.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 	suite.Equal(
 		mintCoin.Amount.String(),
@@ -167,11 +165,11 @@ func (suite *KeeperTestSuite) TestDistribution() {
 
 	// remaining going to next module should be 100% - 40% = 60%
 	suite.Equal(
-		sdkmath.LegacyNewDecFromInt(mintCoin.Amount).Mul(sdk.NewDecWithPrec(100, 2).Sub(modulePortion)).RoundInt().String(),
+		sdk.NewDecFromInt(mintCoin.Amount).Mul(sdk.NewDecWithPrec(100, 2).Sub(modulePortion)).RoundInt().String(),
 		suite.app.BankKeeper.GetAllBalances(suite.ctx, feeCollector).AmountOf(denom).String())
 
 	suite.Equal(
-		sdkmath.LegacyNewDecFromInt(mintCoin.Amount).Mul(params.DistributionProportions.DeveloperRewards).TruncateInt(),
+		sdk.NewDecFromInt(mintCoin.Amount).Mul(params.DistributionProportions.DeveloperRewards).TruncateInt(),
 		suite.app.BankKeeper.GetBalance(suite.ctx, devRewardsReceiver, denom).Amount)
 
 	// since the NFT incentives are not setup yet, funds go into the community pool
@@ -179,6 +177,6 @@ func (suite *KeeperTestSuite) TestDistribution() {
 	communityPoolPortion := params.DistributionProportions.CommunityPool // 5%
 
 	suite.Equal(
-		sdkmath.LegacyNewDecFromInt(mintCoin.Amount).Mul(communityPoolPortion),
+		sdk.NewDecFromInt(mintCoin.Amount).Mul(communityPoolPortion),
 		feePool.CommunityPool.AmountOf(denom))
 }

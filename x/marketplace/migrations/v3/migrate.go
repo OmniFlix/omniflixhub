@@ -29,7 +29,6 @@ func Migrate(
 	if err := currParams.ValidateBasic(); err != nil {
 		return err
 	}
-
 	bz := cdc.MustMarshal(&currParams)
 	store.Set(ParamsKey, bz)
 
