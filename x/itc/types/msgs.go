@@ -3,6 +3,8 @@ package types
 import (
 	"time"
 
+	errorsmod "cosmossdk.io/errors"
+
 	"github.com/OmniFlix/onft/types"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -19,7 +21,13 @@ const (
 	TypeMsgClaim           = "claim"
 )
 
-var _ sdk.Msg = &MsgCreateCampaign{}
+var (
+	_ sdk.Msg = &MsgCreateCampaign{}
+	_ sdk.Msg = &MsgCancelCampaign{}
+	_ sdk.Msg = &MsgDepositCampaign{}
+	_ sdk.Msg = &MsgClaim{}
+	_ sdk.Msg = &MsgUpdateParams{}
+)
 
 func NewMsgCreateCampaign(name, description string,
 	interaction InteractionType, claimType ClaimType,
@@ -58,7 +66,7 @@ func (msg MsgCreateCampaign) Type() string { return TypeMsgCreateCampaign }
 func (msg MsgCreateCampaign) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 	if err := ValidateClaimType(msg.ClaimType); err != nil {
 		return err
@@ -67,7 +75,7 @@ func (msg MsgCreateCampaign) ValidateBasic() error {
 		return err
 	}
 	if msg.NftDenomId == "" {
-		return sdkerrors.Wrapf(ErrInvalidNftDenomId, "nft denom id cannot be empty")
+		return errorsmod.Wrapf(ErrInvalidNftDenomId, "nft denom id cannot be empty")
 	}
 	if msg.ClaimType != CLAIM_TYPE_NFT {
 		if err := ValidateTokens(msg.Deposit, msg.TokensPerClaim); err != nil {
@@ -82,13 +90,13 @@ func (msg MsgCreateCampaign) ValidateBasic() error {
 			return err
 		}
 		if msg.NftMintDetails != nil && msg.NftDenomId == msg.NftMintDetails.DenomId {
-			return sdkerrors.Wrapf(ErrInvalidNFTMintDetails,
+			return errorsmod.Wrapf(ErrInvalidNFTMintDetails,
 				"nft denom id and nft mint details denom id cannot be same (%s)", msg.NftDenomId)
 		}
 
 	}
 	if msg.MaxAllowedClaims == 0 {
-		return sdkerrors.Wrapf(ErrInValidMaxAllowedClaims,
+		return errorsmod.Wrapf(ErrInValidMaxAllowedClaims,
 			"max allowed claims must be a positive number (%d)", msg.MaxAllowedClaims)
 	}
 	if err := ValidateTimestamp(msg.StartTime); err != nil {
@@ -128,7 +136,7 @@ func (msg MsgCancelCampaign) Type() string { return TypeMsgCancelCampaign }
 func (msg MsgCancelCampaign) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 	return nil
 }
@@ -162,10 +170,10 @@ func (msg MsgDepositCampaign) Type() string { return TypeMsgDepositCampaign }
 func (msg MsgDepositCampaign) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid depositor address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid depositor address (%s)", err)
 	}
 	if msg.Amount.IsNil() || (!msg.Amount.IsValid() && msg.Amount.IsZero()) {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins,
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins,
 			"amount must be valid and positive (%s)", msg.Amount.String())
 	}
 	return nil
@@ -203,10 +211,10 @@ func (msg MsgClaim) Type() string { return TypeMsgClaim }
 func (msg MsgClaim) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Claimer)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid claimer address (%s)", msg.Claimer)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid claimer address (%s)", msg.Claimer)
 	}
 	if len(msg.NftId) == 0 {
-		return sdkerrors.Wrapf(types.ErrInvalidONFTID, "invalid nft id (%s)", msg.NftId)
+		return errorsmod.Wrapf(types.ErrInvalidONFTID, "invalid nft id (%s)", msg.NftId)
 	}
 	return ValidateInteractionType(msg.Interaction)
 }
@@ -223,4 +231,24 @@ func (msg MsgClaim) GetSigners() []sdk.AccAddress {
 		panic(err)
 	}
 	return []sdk.AccAddress{from}
+}
+
+// GetSignBytes implements the LegacyMsg interface.
+func (m MsgUpdateParams) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&m))
+}
+
+// GetSigners returns the expected signers for a MsgUpdateParams message.
+func (m *MsgUpdateParams) GetSigners() []sdk.AccAddress {
+	addr, _ := sdk.AccAddressFromBech32(m.Authority)
+	return []sdk.AccAddress{addr}
+}
+
+// ValidateBasic does a sanity check on the provided data.
+func (m *MsgUpdateParams) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(m.Authority); err != nil {
+		return errorsmod.Wrap(err, "invalid authority address")
+	}
+
+	return m.Params.ValidateBasic()
 }

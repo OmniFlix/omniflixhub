@@ -4,7 +4,6 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
-// nolint:all
 const (
 	FlagNftDenomId       = "nft-denom-id"
 	FlagNftId            = "nft-id"

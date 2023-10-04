@@ -27,6 +27,8 @@ var (
 	PrefixBidByBidder       = []byte{0x12}
 	PrefixInactiveAuction   = []byte{0x13}
 	PrefixActiveAuction     = []byte{0x14}
+
+	ParamsKey = []byte{0x15}
 )
 
 func KeyListingIdPrefix(id string) []byte {

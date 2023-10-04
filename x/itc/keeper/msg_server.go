@@ -3,9 +3,12 @@ package keeper
 import (
 	"context"
 
-	"github.com/OmniFlix/omniflixhub/x/itc/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+
+	errorsmod "cosmossdk.io/errors"
+
+	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 type msgServer struct {
@@ -32,43 +35,43 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 		return nil, err
 	}
 	if msg.Deposit.Denom != msg.TokensPerClaim.Denom {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidTokens, "mismatched token denoms")
+		return nil, errorsmod.Wrapf(types.ErrInvalidTokens, "mismatched token denoms")
 	}
 	// StartTime must be after current time
 	if msg.StartTime.Before(ctx.BlockTime()) {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidDuration, "start time must be in future")
+		return nil, errorsmod.Wrapf(types.ErrInvalidDuration, "start time must be in future")
 	}
 	endTime := msg.StartTime.Add(msg.Duration)
 	if endTime.Before(msg.StartTime) || endTime.Equal(msg.StartTime) {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidDuration, "duration must be positive or nil")
+		return nil, errorsmod.Wrapf(types.ErrInvalidDuration, "duration must be positive or nil")
 	}
 	if msg.Duration > m.Keeper.GetMaxCampaignDuration(ctx) {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidDuration,
+		return nil, errorsmod.Wrapf(types.ErrInvalidDuration,
 			"duration must be less than max campaign duration (%d)", m.Keeper.GetMaxCampaignDuration(ctx))
 	}
 	campaignCreationFee := m.Keeper.GetCampaignCreationFee(ctx)
 	if !msg.CreationFee.Equal(campaignCreationFee) {
 		if msg.CreationFee.Denom != campaignCreationFee.Denom {
-			return nil, sdkerrors.Wrapf(types.ErrInvalidFeeDenom, "invalid creation fee denom %s",
+			return nil, errorsmod.Wrapf(types.ErrInvalidFeeDenom, "invalid creation fee denom %s",
 				msg.CreationFee.Denom)
 		}
 		if msg.CreationFee.Amount.LT(campaignCreationFee.Amount) {
-			return nil, sdkerrors.Wrapf(types.ErrNotEnoughFeeAmount,
+			return nil, errorsmod.Wrapf(types.ErrNotEnoughFeeAmount,
 				"%s fee is not enough, to create %s fee is required",
 				msg.CreationFee.String(), campaignCreationFee.String())
 		}
-		return nil, sdkerrors.Wrapf(types.ErrInvalidCreationFee,
+		return nil, errorsmod.Wrapf(types.ErrInvalidCreationFee,
 			"given fee (%s) not matched with  campaign creation fee. %s required to create itc campaign",
 			msg.CreationFee.String(), campaignCreationFee.String())
 	}
 	if (msg.ClaimType == types.CLAIM_TYPE_FT || msg.ClaimType == types.CLAIM_TYPE_FT_AND_NFT) && msg.Distribution == nil {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInvalidNFTMintDetails,
 			"distribution config is required for ft claim type",
 		)
 	}
 	if (msg.ClaimType == types.CLAIM_TYPE_NFT || msg.ClaimType == types.CLAIM_TYPE_FT_AND_NFT) && msg.NftMintDetails == nil {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInvalidNFTMintDetails,
 			"nft mint details are required for nft claim type",
 		)
@@ -132,14 +135,14 @@ func (m msgServer) Claim(goCtx context.Context, msg *types.MsgClaim) (*types.Msg
 
 	campaign, found := m.Keeper.GetCampaign(ctx, msg.CampaignId)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", msg.CampaignId)
+		return nil, errorsmod.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", msg.CampaignId)
 	}
 	if campaign.StartTime.Unix() > ctx.BlockTime().Unix() {
-		return nil, sdkerrors.Wrapf(types.ErrInactiveCampaign,
+		return nil, errorsmod.Wrapf(types.ErrInactiveCampaign,
 			"cannot claim on inactive campaign %d, ", campaign.Id)
 	}
 	if msg.Interaction != campaign.Interaction {
-		return nil, sdkerrors.Wrapf(types.ErrInteractionMismatch,
+		return nil, errorsmod.Wrapf(types.ErrInteractionMismatch,
 			"required interaction %s, got %s. ", campaign.Interaction, msg.Interaction)
 	}
 
@@ -163,13 +166,13 @@ func (m msgServer) DepositCampaign(goCtx context.Context,
 	}
 	campaign, found := m.Keeper.GetCampaign(ctx, msg.CampaignId)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", msg.CampaignId)
+		return nil, errorsmod.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", msg.CampaignId)
 	}
 	if campaign.ClaimType == types.CLAIM_TYPE_NFT {
-		return nil, sdkerrors.Wrapf(types.ErrDepositNotAllowed, "deposit not allowed for this type of campaign")
+		return nil, errorsmod.Wrapf(types.ErrDepositNotAllowed, "deposit not allowed for this type of campaign")
 	}
 	if msg.Amount.Denom != campaign.TotalTokens.Denom {
-		return nil, sdkerrors.Wrapf(types.ErrTokenDenomMismatch,
+		return nil, errorsmod.Wrapf(types.ErrTokenDenomMismatch,
 			"token denom mismatch, required %s, got %s", campaign.TotalTokens.Denom, msg.Amount.Denom)
 	}
 	if err := m.Keeper.DepositCampaign(ctx, msg.CampaignId, depositor, msg.Amount); err != nil {
@@ -177,4 +180,17 @@ func (m msgServer) DepositCampaign(goCtx context.Context,
 	}
 
 	return &types.MsgDepositCampaignResponse{}, nil
+}
+
+func (m msgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
+	if m.authority != req.Authority {
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", m.authority, req.Authority)
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := m.SetParams(ctx, req.Params); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateParamsResponse{}, nil
 }

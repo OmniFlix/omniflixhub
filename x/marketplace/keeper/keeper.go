@@ -3,45 +3,44 @@ package keeper
 import (
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
+
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
+	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	"github.com/tendermint/tendermint/libs/log"
-
-	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
 )
 
 type Keeper struct {
-	storeKey sdk.StoreKey
+	storeKey storetypes.StoreKey
 	cdc      codec.BinaryCodec
 
 	accountKeeper      types.AccountKeeper
 	bankKeeper         types.BankKeeper
 	nftKeeper          types.NftKeeper
 	distributionKeeper types.DistributionKeeper
-	paramSpace         paramstypes.Subspace
+
+	// the address capable of executing a MsgUpdateParams message. Typically, this
+	// should be the x/gov module account.
+	authority string
 }
 
 func NewKeeper(
 	cdc codec.BinaryCodec,
-	key sdk.StoreKey,
+	key storetypes.StoreKey,
 
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 	nftKeeper types.NftKeeper,
 	distrKeeper types.DistributionKeeper,
-	paramSpace paramstypes.Subspace,
+	authority string,
 ) Keeper {
 	// ensure marketplace module account is set
 	if addr := accountKeeper.GetModuleAddress(types.ModuleName); addr == nil {
 		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
-	}
-
-	// set KeyTable if it has not already been set
-	if !paramSpace.HasKeyTable() {
-		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
 	}
 
 	return Keeper{
@@ -51,8 +50,13 @@ func NewKeeper(
 		bankKeeper:         bankKeeper,
 		nftKeeper:          nftKeeper,
 		distributionKeeper: distrKeeper,
-		paramSpace:         paramSpace,
+		authority:          authority,
 	}
+}
+
+// GetAuthority returns the x/marketplace module's authority.
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }
 
 // Logger returns a module-specific logger.
@@ -64,7 +68,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 func (k Keeper) AddListing(ctx sdk.Context, listing types.Listing) error {
 	// check listing already exists
 	if k.HasListing(ctx, listing.GetId()) {
-		return sdkerrors.Wrapf(types.ErrListingAlreadyExists, "listing already exists: %s", listing.GetId())
+		return errorsmod.Wrapf(types.ErrListingAlreadyExists, "listing already exists: %s", listing.GetId())
 	}
 
 	err := k.nftKeeper.TransferOwnership(ctx,
@@ -186,7 +190,7 @@ func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress
 }
 
 func (k Keeper) GetProportions(totalCoin sdk.Coin, ratio sdk.Dec) sdk.Coin {
-	return sdk.NewCoin(totalCoin.Denom, totalCoin.Amount.ToDec().Mul(ratio).TruncateInt())
+	return sdk.NewCoin(totalCoin.Denom, sdk.NewDecFromInt(totalCoin.Amount).Mul(ratio).TruncateInt())
 }
 
 func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) error {
@@ -227,7 +231,7 @@ func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) 
 func (k Keeper) CreateAuctionListing(ctx sdk.Context, auction types.AuctionListing) error {
 	// check auction already exists or not
 	if k.HasAuctionListing(ctx, auction.GetId()) {
-		return sdkerrors.Wrapf(types.ErrListingAlreadyExists, "auction listing already exists: %d", auction.GetId())
+		return errorsmod.Wrapf(types.ErrListingAlreadyExists, "auction listing already exists: %d", auction.GetId())
 	}
 
 	err := k.nftKeeper.TransferOwnership(ctx,
@@ -257,7 +261,7 @@ func (k Keeper) CreateAuctionListing(ctx sdk.Context, auction types.AuctionListi
 func (k Keeper) CancelAuctionListing(ctx sdk.Context, auction types.AuctionListing) error {
 	// Check bid Exists or Not
 	if k.HasBid(ctx, auction.Id) {
-		return sdkerrors.Wrapf(types.ErrBidExists, "cannot cancel auction %d, bid exists ", auction.Id)
+		return errorsmod.Wrapf(types.ErrBidExists, "cannot cancel auction %d, bid exists ", auction.Id)
 	}
 
 	// Transfer Back NFT ownership to auction owner
@@ -282,7 +286,7 @@ func (k Keeper) PlaceBid(ctx sdk.Context, auction types.AuctionListing, newBid t
 		newBidPrice = k.GetNewBidPrice(auction.StartPrice.Denom, prevBid.Amount, auction.IncrementPercentage)
 	}
 	if newBid.Amount.IsLT(newBidPrice) {
-		return sdkerrors.Wrapf(types.ErrBidAmountNotEnough,
+		return errorsmod.Wrapf(types.ErrBidAmountNotEnough,
 			"cannot place bid for given auction %d, required amount to bid is %s", auction.Id, newBidPrice.String())
 	}
 
@@ -303,5 +307,5 @@ func (k Keeper) PlaceBid(ctx sdk.Context, auction types.AuctionListing, newBid t
 }
 
 func (k Keeper) GetNewBidPrice(denom string, amount sdk.Coin, increment sdk.Dec) sdk.Coin {
-	return sdk.NewCoin(denom, amount.Amount.Add(amount.Amount.ToDec().Mul(increment).TruncateInt()))
+	return sdk.NewCoin(denom, amount.Amount.Add(sdk.NewDecFromInt(amount.Amount).Mul(increment).TruncateInt()))
 }

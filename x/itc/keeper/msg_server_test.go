@@ -7,7 +7,7 @@ import (
 	onfttypes "github.com/OmniFlix/onft/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/OmniFlix/omniflixhub/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -505,6 +505,67 @@ func (suite *KeeperTestSuite) TestDepositCampaign() {
 			}
 
 			suite.AssertEventEmitted(ctx, types.TypeMsgDepositCampaign, tc.expectedMessageEvents)
+		})
+	}
+}
+
+func (suite *KeeperTestSuite) TestUpdateParams() {
+	testCases := []struct {
+		name      string
+		request   *types.MsgUpdateParams
+		expectErr bool
+	}{
+		{
+			name: "set invalid authority",
+			request: &types.MsgUpdateParams{
+				Authority: "foo",
+			},
+			expectErr: true,
+		},
+		{
+			name: "set invalid creation fee param",
+			request: &types.MsgUpdateParams{
+				Authority: suite.App.ItcKeeper.GetAuthority(),
+				Params: types.Params{
+					MaxCampaignDuration: types.DefaultMaxCampaignDuration,
+					CreationFee:         sdk.NewCoin("foo", sdk.NewInt(0)),
+				},
+			},
+			expectErr: true,
+		},
+		{
+			name: "set invalid max duration param",
+			request: &types.MsgUpdateParams{
+				Authority: suite.App.ItcKeeper.GetAuthority(),
+				Params: types.Params{
+					MaxCampaignDuration: -1,
+					CreationFee:         types.DefaultCampaignCreationFee,
+				},
+			},
+			expectErr: true,
+		},
+		{
+			name: "set full valid params",
+			request: &types.MsgUpdateParams{
+				Authority: suite.App.ItcKeeper.GetAuthority(),
+				Params: types.Params{
+					MaxCampaignDuration: types.DefaultMaxCampaignDuration,
+					CreationFee:         types.DefaultCampaignCreationFee,
+				},
+			},
+			expectErr: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		suite.Run(tc.name, func() {
+			_, err := suite.msgServer.UpdateParams(suite.Ctx, tc.request)
+			if tc.expectErr {
+				suite.Require().Error(err)
+			} else {
+				suite.Require().NoError(err)
+			}
 		})
 	}
 }

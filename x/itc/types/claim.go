@@ -1,9 +1,9 @@
 package types
 
 import (
-	"github.com/OmniFlix/omniflixhub/x/itc/exported"
+	"github.com/OmniFlix/omniflixhub/v2/x/itc/exported"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/gogo/protobuf/proto"
+	"github.com/cosmos/gogoproto/proto"
 )
 
 var (

@@ -23,11 +23,12 @@ func (suite *CodecTestSuite) TestRegisterInterfaces() {
 	RegisterInterfaces(registry)
 
 	impls := registry.ListImplementations(sdk.MsgInterfaceProtoName)
-	suite.Require().Equal(4, len(impls))
+	suite.Require().Equal(5, len(impls))
 	suite.Require().ElementsMatch([]string{
 		"/OmniFlix.itc.v1.MsgCreateCampaign",
 		"/OmniFlix.itc.v1.MsgCancelCampaign",
 		"/OmniFlix.itc.v1.MsgDepositCampaign",
 		"/OmniFlix.itc.v1.MsgClaim",
+		"/OmniFlix.itc.v1.MsgUpdateParams",
 	}, impls)
 }

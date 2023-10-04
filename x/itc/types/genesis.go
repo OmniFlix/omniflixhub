@@ -1,6 +1,7 @@
 package types
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
@@ -20,7 +21,7 @@ func NewGenesisState(campaigns []Campaign,
 func (m *GenesisState) ValidateGenesis() error {
 	for _, c := range m.Campaigns {
 		if c.GetCreator().Empty() {
-			return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing campaign creator address")
+			return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "missing campaign creator address")
 		}
 		if err := ValidateCampaign(c); err != nil {
 			return err
@@ -35,7 +36,7 @@ func (m *GenesisState) ValidateGenesis() error {
 		return err
 	}
 	if m.NextCampaignNumber <= 0 {
-		return sdkerrors.Wrap(ErrNonPositiveNumber, "must be a number and greater than 0.")
+		return errorsmod.Wrap(ErrNonPositiveNumber, "must be a number and greater than 0.")
 	}
 	return nil
 }

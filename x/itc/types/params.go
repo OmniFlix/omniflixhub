@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errorsmod "cosmossdk.io/errors"
 
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
@@ -16,16 +15,14 @@ const (
 
 var DefaultCampaignCreationFee = sdk.NewInt64Coin("uflix", 10_000_000)
 
-var (
-	ParamStoreKeyMaxCampaignDuration = []byte("MaxCampaignDuration")
-	ParamStoreKeyCampaignCreationFee = []byte("CampaignCreationFee")
-)
-
-var _ paramtypes.ParamSet = (*Params)(nil)
-
-// ParamKeyTable returns the parameter key table.
-func ParamKeyTable() paramtypes.KeyTable {
-	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
+func NewParams(
+	creationFee sdk.Coin,
+	maxCampaignDuration time.Duration,
+) Params {
+	return Params{
+		CreationFee:         creationFee,
+		MaxCampaignDuration: maxCampaignDuration,
+	}
 }
 
 // DefaultParams returns default itc parameters
@@ -33,14 +30,6 @@ func DefaultParams() Params {
 	return Params{
 		MaxCampaignDuration: DefaultMaxCampaignDuration,
 		CreationFee:         DefaultCampaignCreationFee,
-	}
-}
-
-// ParamSetPairs returns the parameter set pairs.
-func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
-	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(ParamStoreKeyMaxCampaignDuration, &p.MaxCampaignDuration, validateMaxCampaignDuration),
-		paramtypes.NewParamSetPair(ParamStoreKeyCampaignCreationFee, &p.CreationFee, validateCampaignCreationFee),
 	}
 }
 
@@ -75,7 +64,7 @@ func validateCampaignCreationFee(i interface{}) error {
 	}
 
 	if !fee.IsValid() || fee.IsZero() {
-		return sdkerrors.Wrapf(ErrInvalidCreationFee,
+		return errorsmod.Wrapf(ErrInvalidCreationFee,
 			"invalid fee amount %s, only accepts positive amounts", fee.String())
 	}
 	return nil

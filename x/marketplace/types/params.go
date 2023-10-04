@@ -5,7 +5,6 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 const (
@@ -13,21 +12,6 @@ const (
 	DefaultBidClosePeriod     time.Duration = time.Hour * 12      // 12 Hours
 	DefaultMaxAuctionDuration time.Duration = time.Hour * 24 * 90 // 90 Days
 )
-
-// Parameter keys
-var (
-	ParamStoreKeySaleCommission     = []byte("SaleCommission")
-	ParamStoreKeyDistribution       = []byte("MarketplaceDistribution")
-	ParamStoreKeyBidCloseDuration   = []byte("BidCloseDuration")
-	ParamStoreKeyMaxAuctionDuration = []byte("MaxAuctionDuration")
-)
-
-var _ paramtypes.ParamSet = (*Params)(nil)
-
-// ParamKeyTable returns the parameter key table.
-func ParamKeyTable() paramtypes.KeyTable {
-	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
-}
 
 func NewMarketplaceParams(
 	saleCommission sdk.Dec,
@@ -54,16 +38,6 @@ func DefaultParams() Params {
 		DefaultBidClosePeriod,
 		DefaultMaxAuctionDuration,
 	)
-}
-
-// ParamSetPairs returns the parameter set pairs.
-func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
-	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(ParamStoreKeySaleCommission, &p.SaleCommission, validateSaleCommission),
-		paramtypes.NewParamSetPair(ParamStoreKeyDistribution, &p.Distribution, validateMarketplaceDistributionParams),
-		paramtypes.NewParamSetPair(ParamStoreKeyBidCloseDuration, &p.BidCloseDuration, validateBidCloseDuration),
-		paramtypes.NewParamSetPair(ParamStoreKeyMaxAuctionDuration, &p.MaxAuctionDuration, validateMaxAuctionDuration),
-	}
 }
 
 // ValidateBasic performs basic validation on marketplace parameters.

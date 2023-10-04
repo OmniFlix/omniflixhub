@@ -3,8 +3,8 @@ package marketplace
 import (
 	"fmt"
 
-	"github.com/OmniFlix/omniflixhub/x/marketplace/keeper"
-	"github.com/OmniFlix/omniflixhub/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/keeper"
+	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -20,7 +20,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetWithPriceDenom(ctx, l.Price.GetDenom(), l.GetId())
 	}
 	k.SetListingCount(ctx, genState.ListingCount)
-	k.SetParams(ctx, genState.Params)
+	err := k.SetParams(ctx, genState.Params)
+	if err != nil {
+		panic(err)
+	}
 
 	for _, al := range genState.Auctions {
 		k.SetAuctionListing(ctx, al)

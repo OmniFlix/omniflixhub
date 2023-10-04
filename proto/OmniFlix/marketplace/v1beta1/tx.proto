@@ -1,0 +1,157 @@
+syntax = "proto3";
+package OmniFlix.marketplace.v1beta1;
+
+import "cosmos/msg/v1/msg.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
+import "OmniFlix/marketplace/v1beta1/listing.proto";
+import "OmniFlix/marketplace/v1beta1/auction.proto";
+import "OmniFlix/marketplace/v1beta1/params.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types";
+option (gogoproto.goproto_getters_all) = false;
+
+service Msg {
+
+  rpc ListNFT(MsgListNFT) returns (MsgListNFTResponse);
+
+  rpc EditListing(MsgEditListing) returns (MsgEditListingResponse);
+
+  rpc DeListNFT(MsgDeListNFT) returns (MsgDeListNFTResponse);
+
+  rpc BuyNFT(MsgBuyNFT) returns (MsgBuyNFTResponse);
+
+  rpc CreateAuction(MsgCreateAuction) returns (MsgCreateAuctionResponse);
+
+  rpc CancelAuction(MsgCancelAuction) returns (MsgCancelAuctionResponse);
+
+  rpc PlaceBid(MsgPlaceBid) returns (MsgPlaceBidResponse);
+
+  // UpdateParams defines a governance operation for updating the x/marketplace module
+  // parameters. The authority is hard-coded to the x/marketplace module account.
+  //
+  // Since: cosmos-sdk 0.47
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+
+}
+
+
+message MsgListNFT {
+  string                   id           = 1;
+  string                   nft_id       = 2;
+  string                   denom_id     = 3;
+  cosmos.base.v1beta1.Coin price        = 4 [
+    (gogoproto.nullable)     = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coin"
+  ];
+  string                   owner        = 5;
+  repeated WeightedAddress split_shares = 6 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"split_shares\""
+  ];
+}
+message MsgListNFTResponse {}
+
+message MsgEditListing {
+  string                   id    = 1;
+  cosmos.base.v1beta1.Coin price = 2 [
+    (gogoproto.nullable)     = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coin"
+  ];
+  string                   owner = 3;
+}
+message MsgEditListingResponse {}
+
+message MsgDeListNFT {
+  string id    = 1;
+  string owner = 2;
+}
+
+message MsgDeListNFTResponse {}
+
+message MsgBuyNFT {
+  string                   id    = 1;
+  cosmos.base.v1beta1.Coin price = 2 [
+    (gogoproto.nullable)     = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coin"
+  ];
+  string                   buyer = 3;
+}
+
+message MsgBuyNFTResponse {}
+
+message MsgCreateAuction {
+  string                    nft_id               = 1;
+  string                    denom_id             = 2;
+  google.protobuf.Timestamp start_time           = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdtime) = true,
+    (gogoproto.moretags)    = "yaml:\"start_time\""
+  ];
+  cosmos.base.v1beta1.Coin  start_price          = 4 [
+    (gogoproto.nullable)     = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coin",
+    (gogoproto.moretags)     = "yaml:\"start_price\""
+  ];
+  google.protobuf.Duration  duration             = 5 [(gogoproto.stdduration) = true];
+  string                    increment_percentage = 6 [
+    (gogoproto.nullable)   = false,
+    (gogoproto.moretags)   = "yaml:\"increment_percentage\"",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
+  ];
+  repeated string           whitelist_accounts   = 7 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"whitelist_accounts\""
+  ];
+  repeated WeightedAddress  split_shares         = 8 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"split_shares\""
+  ];
+  string                    owner                = 9;
+}
+
+message MsgCreateAuctionResponse {
+  AuctionListing auction = 1;
+}
+
+message MsgCancelAuction {
+  uint64 auction_id = 1 [(gogoproto.moretags) = "yaml:\"auction_id\""];
+  string owner      = 2;
+}
+
+message MsgCancelAuctionResponse {}
+
+message MsgPlaceBid {
+  uint64                   auction_id = 1 [(gogoproto.moretags) = "yaml:\"auction_id\""];
+  cosmos.base.v1beta1.Coin amount     = 2 [
+    (gogoproto.nullable)     = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coin"
+  ];
+  string                   bidder     = 3;
+}
+
+message MsgPlaceBidResponse {}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address of the governance account.
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the x/marketplace parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [(gogoproto.nullable) = false];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParamsResponse {}

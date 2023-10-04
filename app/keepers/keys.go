@@ -1,9 +1,9 @@
 package keepers
 
 import (
-	alloctypes "github.com/OmniFlix/omniflixhub/x/alloc/types"
-	itctypes "github.com/OmniFlix/omniflixhub/x/itc/types"
-	marketplacetypes "github.com/OmniFlix/omniflixhub/x/marketplace/types"
+	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
+	itctypes "github.com/OmniFlix/omniflixhub/v2/x/itc/types"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 	onfttypes "github.com/OmniFlix/onft/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -12,6 +12,8 @@ import (
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
+	consensusparamtypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
+	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
@@ -21,10 +23,10 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	icahosttypes "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/host/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
-	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
-	packetforwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
+	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 )
 
 func (appKeepers *AppKeepers) GenerateKeys() {
@@ -37,13 +39,15 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		slashingtypes.StoreKey,
 		govtypes.StoreKey,
 		paramstypes.StoreKey,
-		ibchost.StoreKey,
+		consensusparamtypes.StoreKey,
+		ibcexported.StoreKey,
 		upgradetypes.StoreKey,
 		evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey,
 		icahosttypes.StoreKey,
 		packetforwardtypes.StoreKey,
 		capabilitytypes.StoreKey,
+		crisistypes.StoreKey,
 		feegrant.StoreKey,
 		authzkeeper.StoreKey,
 		alloctypes.StoreKey,

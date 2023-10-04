@@ -1,46 +1,47 @@
 package keeper
 
 import (
+	"errors"
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
-
-	"github.com/OmniFlix/omniflixhub/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
+	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 type (
 	Keeper struct {
 		cdc      codec.BinaryCodec
-		storeKey sdk.StoreKey
-		memKey   sdk.StoreKey
+		storeKey storetypes.StoreKey
+		memKey   storetypes.StoreKey
 
 		accountKeeper types.AccountKeeper
 		bankKeeper    types.BankKeeper
 		stakingKeeper types.StakingKeeper
 		distrKeeper   types.DistrKeeper
 
-		paramstore paramtypes.Subspace
+		// the address capable of executing a MsgUpdateParams message. Typically, this
+		// should be the x/gov module account.
+		authority string
 	}
 )
 
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeKey,
-	memKey sdk.StoreKey,
+	memKey storetypes.StoreKey,
 
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 	stakingKeeper types.StakingKeeper,
 	distrKeeper types.DistrKeeper,
-	ps paramtypes.Subspace,
+	authority string,
 ) *Keeper {
-	// set KeyTable if it has not already been set
-	if !ps.HasKeyTable() {
-		ps = ps.WithKeyTable(types.ParamKeyTable())
+	if addr := accountKeeper.GetModuleAddress(types.ModuleName); addr == nil {
+		panic(fmt.Sprintf("the x/%s module account has not been set", types.ModuleName))
 	}
 
 	return &Keeper{
@@ -52,8 +53,13 @@ func NewKeeper(
 		bankKeeper:    bankKeeper,
 		stakingKeeper: stakingKeeper,
 		distrKeeper:   distrKeeper,
-		paramstore:    ps,
+		authority:     authority,
 	}
+}
+
+// GetAuthority returns the x/alloc module's authority.
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
@@ -69,13 +75,14 @@ func (k Keeper) GetModuleAccountAddress() sdk.AccAddress {
 func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 	blockRewardsAddr := k.accountKeeper.GetModuleAccount(ctx, authtypes.FeeCollectorName).GetAddress()
 	blockRewards := k.bankKeeper.GetBalance(ctx, blockRewardsAddr, k.stakingKeeper.BondDenom(ctx))
-	blockRewardsAmountDec := blockRewards.Amount.ToDec()
 
 	params := k.GetParams(ctx)
 	proportions := params.DistributionProportions
 
-	nftIncentiveAmount := blockRewardsAmountDec.Mul(proportions.NftIncentives).TruncateInt()
-	nftIncentiveCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), nftIncentiveAmount)
+	nftIncentiveCoin, err := getProportionAmount(blockRewards, proportions.NftIncentives)
+	if err != nil {
+		return err
+	}
 
 	k.Logger(ctx).Debug(
 		"distributing minted coins to nft incentives receivers",
@@ -90,8 +97,10 @@ func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 		return err
 	}
 
-	nodeHostsIncentiveAmount := blockRewardsAmountDec.Mul(proportions.NodeHostsIncentives).TruncateInt()
-	nodeHostsIncentiveCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), nodeHostsIncentiveAmount)
+	nodeHostsIncentiveCoin, err := getProportionAmount(blockRewards, proportions.NodeHostsIncentives)
+	if err != nil {
+		return err
+	}
 
 	k.Logger(ctx).Debug(
 		"distributing minted coins to node host incentives receivers",
@@ -106,8 +115,10 @@ func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 		return err
 	}
 
-	devRewardAmount := blockRewardsAmountDec.Mul(proportions.DeveloperRewards).TruncateInt()
-	devRewardCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), devRewardAmount)
+	devRewardCoin, err := getProportionAmount(blockRewards, proportions.DeveloperRewards)
+	if err != nil {
+		return err
+	}
 
 	k.Logger(ctx).Debug(
 		"distributing minted coins to developer rewards receivers",
@@ -124,8 +135,10 @@ func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 	}
 
 	// calculate staking rewards
-	stakingRewardAmount := blockRewardsAmountDec.Mul(proportions.StakingRewards).TruncateInt()
-	stakingRewardCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), stakingRewardAmount)
+	stakingRewardCoin, err := getProportionAmount(blockRewards, proportions.StakingRewards)
+	if err != nil {
+		return err
+	}
 
 	// subtract from original provision to ensure no coins left over after the allocations
 	communityPoolCoin := blockRewards.
@@ -144,12 +157,14 @@ func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 func (k Keeper) distributeCoinToWeightedAddresses(
 	ctx sdk.Context,
 	weightedAddresses []types.WeightedAddress,
-	totalAmount sdk.Coin,
+	totalCoin sdk.Coin,
 	fromAddress sdk.AccAddress,
 ) error {
-	totalAmountDec := totalAmount.Amount.ToDec()
 	for _, w := range weightedAddresses {
-		amount := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), totalAmountDec.Mul(w.Weight).TruncateInt())
+		amount, err := getProportionAmount(totalCoin, w.Weight)
+		if err != nil {
+			return err
+		}
 		if w.Address == "" {
 			err := k.distrKeeper.FundCommunityPool(ctx, sdk.NewCoins(amount), fromAddress)
 			if err != nil {
@@ -169,4 +184,11 @@ func (k Keeper) distributeCoinToWeightedAddresses(
 		}
 	}
 	return nil
+}
+
+func getProportionAmount(totalCoin sdk.Coin, ratio sdk.Dec) (sdk.Coin, error) {
+	if ratio.GT(sdk.OneDec()) {
+		return sdk.Coin{}, errors.New("ratio cannot be greater than 1")
+	}
+	return sdk.NewCoin(totalCoin.Denom, sdk.NewDecFromInt(totalCoin.Amount).Mul(ratio).TruncateInt()), nil
 }
