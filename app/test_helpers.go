@@ -160,6 +160,8 @@ func setup(t *testing.T, withGenesis bool) (*OmniFlixApp, GenesisState) {
 		0,
 		encCdc,
 		appOptions,
+		EmptyWasmOpts,
+		GetEnabledProposals(),
 		baseApp.SetChainID(SimAppChainID),
 		baseApp.SetSnapshot(snapshotStore, snapshottypes.SnapshotOptions{KeepRecent: 2}),
 	)

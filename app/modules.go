@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/CosmWasm/wasmd/x/wasm"
 	appparams "github.com/OmniFlix/omniflixhub/v2/app/params"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -62,6 +63,8 @@ import (
 	icatypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/types"
 	"github.com/cosmos/ibc-go/v7/modules/apps/transfer"
 
+	// wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router"
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
 
@@ -107,6 +110,7 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		wasm.AppModuleBasic{},
 
 		alloc.AppModuleBasic{},
 		onft.AppModuleBasic{},
@@ -126,6 +130,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		icatypes.ModuleName:            nil,
+		wasmtypes.ModuleName:           {},
 		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		onfttypes.ModuleName:           nil,
 		marketplacetypes.ModuleName:    nil,
@@ -190,6 +195,15 @@ func appModules(
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
 		ica.NewAppModule(nil, &app.ICAHostKeeper),
+		wasm.NewAppModule(
+			appCodec,
+			&app.WasmKeeper,
+			app.StakingKeeper,
+			app.AccountKeeper,
+			app.BankKeeper,
+			app.MsgServiceRouter(),
+			app.GetSubspace(wasmtypes.ModuleName),
+		),
 		packetforward.NewAppModule(app.PacketForwardKeeper),
 		alloc.NewAppModule(appCodec, app.AllocKeeper, app.GetSubspace(alloctypes.ModuleName)),
 		onft.NewAppModule(
@@ -233,7 +247,9 @@ func simulationModules(
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.GetSubspace(slashingtypes.ModuleName)),
 		params.NewAppModule(app.ParamsKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
+		wasm.NewAppModule(appCodec, &app.AppKeepers.WasmKeeper, app.AppKeepers.StakingKeeper, app.AppKeepers.AccountKeeper, app.AppKeepers.BankKeeper, app.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
 		ibc.NewAppModule(app.IBCKeeper),
+		transfer.NewAppModule(app.AppKeepers.TransferKeeper),
 	}
 }
 
@@ -266,6 +282,7 @@ func orderBeginBlockers() []string {
 		consensusparamtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
+		wasmtypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
@@ -295,6 +312,7 @@ func orderEndBlockers() []string {
 		consensusparamtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
+		wasmtypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		minttypes.ModuleName,
 		slashingtypes.ModuleName,
@@ -341,6 +359,7 @@ func orderInitGenesis() []string {
 		ibcexported.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
+		wasmtypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		alloctypes.ModuleName,
 		onfttypes.ModuleName,

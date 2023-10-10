@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"errors"
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	"github.com/prometheus/client_golang/prometheus"
 	"io"
 	"os"
 
@@ -198,6 +201,11 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 
 	baseappOptions := server.DefaultBaseappOptions(appOpts)
 
+	var wasmOpts []wasm.Option //nolint:staticcheck
+	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
+		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
+	}
+
 	return app.NewOmniFlixApp(
 		logger,
 		db,
@@ -208,6 +216,8 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		a.encCfg,
 		appOpts,
+		wasmOpts,
+		app.GetEnabledProposals(),
 		baseappOptions...,
 	)
 }
@@ -241,6 +251,8 @@ func (a appCreator) appExport(
 			uint(1),
 			a.encCfg,
 			appOpts,
+			app.EmptyWasmOpts,
+			app.GetEnabledProposals(),
 		)
 
 		if err := anApp.LoadHeight(height); err != nil {
@@ -257,6 +269,8 @@ func (a appCreator) appExport(
 			uint(1),
 			a.encCfg,
 			appOpts,
+			app.EmptyWasmOpts,
+			app.GetEnabledProposals(),
 		)
 	}
 

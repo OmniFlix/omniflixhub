@@ -2,10 +2,15 @@ package app
 
 import (
 	"fmt"
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"github.com/prometheus/client_golang/prometheus"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
@@ -42,6 +47,10 @@ import (
 	ibcclientclient "github.com/cosmos/ibc-go/v7/modules/core/02-client/client"
 	"github.com/spf13/cast"
 
+	// wasm "github.com/CosmWasm/wasmd/x/wasm"
+	// wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	// wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
 	"github.com/OmniFlix/omniflixhub/v2/app/keepers"
 	"github.com/OmniFlix/omniflixhub/v2/app/upgrades"
 	v012 "github.com/OmniFlix/omniflixhub/v2/app/upgrades/v012"
@@ -51,17 +60,52 @@ import (
 
 const Name = "omniflixhub"
 
+var (
+	// ProposalsEnabled If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
+	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
+	ProposalsEnabled = "true"
+	// EnableSpecificProposals If set to non-empty string it must be comma-separated list of values that are all a subset
+	// of "EnableAllProposals" (takes precedence over ProposalsEnabled)
+	// https://github.com/CosmWasm/wasmd/blob/02a54d33ff2c064f3539ae12d75d027d9c665f05/x/wasm/internal/types/proposal.go#L28-L34
+	EnableSpecificProposals = ""
+
+	EmptyWasmOpts []wasmkeeper.Option
+)
+
+// GetEnabledProposals parses the ProposalsEnabled / EnableSpecificProposals values to
+// produce a list of enabled proposals to pass into wasmd app.
+func GetEnabledProposals() []wasmtypes.ProposalType {
+	if EnableSpecificProposals == "" {
+		if ProposalsEnabled == "true" {
+			return wasmtypes.EnableAllProposals
+		}
+		return wasmtypes.DisableAllProposals
+	}
+	chunks := strings.Split(EnableSpecificProposals, ",")
+	proposals, err := wasmtypes.ConvertToProposals(chunks)
+	if err != nil {
+		panic(err)
+	}
+	return proposals
+}
+
+func GetWasmOpts(appOpts servertypes.AppOptions) []wasmkeeper.Option {
+	var wasmOpts []wasmkeeper.Option
+	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
+		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
+	}
+
+	return wasmOpts
+}
+
 func getGovProposalHandlers() []govclient.ProposalHandler {
-	var govProposalHandlers []govclient.ProposalHandler
-	govProposalHandlers = append(govProposalHandlers,
+	return []govclient.ProposalHandler{
 		paramsclient.ProposalHandler,
 		upgradeclient.LegacyProposalHandler,
 		upgradeclient.LegacyCancelProposalHandler,
 		ibcclientclient.UpdateClientProposalHandler,
 		ibcclientclient.UpgradeProposalHandler,
-	)
-
-	return govProposalHandlers
+	}
 }
 
 var (
@@ -114,6 +158,8 @@ func NewOmniFlixApp(
 	invCheckPeriod uint,
 	encodingConfig appparams.EncodingConfig,
 	appOpts servertypes.AppOptions,
+	wasmOpts []wasmkeeper.Option,
+	enabledProposals []wasm.ProposalType, //nolint:staticcheck
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *OmniFlixApp {
 	appCodec := encodingConfig.Marshaler
@@ -147,7 +193,9 @@ func NewOmniFlixApp(
 		homePath,
 		invCheckPeriod,
 		logger,
+		enabledProposals,
 		appOpts,
+		wasmOpts,
 	)
 
 	/****  Module Options ****/
@@ -199,6 +247,11 @@ func NewOmniFlixApp(
 	}
 	reflectionv1.RegisterReflectionServiceServer(app.GRPCQueryRouter(), reflectionSvc)
 
+	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
+	if err != nil {
+		panic("error while reading wasm config: " + err.Error())
+	}
+
 	anteHandler, err := NewAnteHandler(
 		HandlerOptions{
 			HandlerOptions: ante.HandlerOptions{
@@ -208,9 +261,11 @@ func NewOmniFlixApp(
 				SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 			},
-			GovKeeper: app.GovKeeper,
-			IBCKeeper: app.IBCKeeper,
-			Codec:     appCodec,
+			GovKeeper:         app.GovKeeper,
+			IBCKeeper:         app.IBCKeeper,
+			TxCounterStoreKey: app.AppKeepers.GetKey(wasmtypes.StoreKey),
+			WasmConfig:        wasmConfig,
+			Codec:             appCodec,
 		},
 	)
 	if err != nil {

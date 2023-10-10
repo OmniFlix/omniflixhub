@@ -3,6 +3,7 @@ module github.com/OmniFlix/omniflixhub/v2
 go 1.20
 
 require (
+	github.com/CosmWasm/wasmd v0.42.0
 	github.com/OmniFlix/onft v0.6.1-0.20230923181114-30842581416b
 	github.com/OmniFlix/streampay/v2 v2.1.1-0.20230922163133-93e80c4663ef
 	github.com/cometbft/cometbft v0.37.2
@@ -11,7 +12,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.47.5
 	github.com/cosmos/gogoproto v1.4.10
 	github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7 v7.0.0
-	github.com/cosmos/ibc-go/v7 v7.2.0
+	github.com/cosmos/ibc-go/v7 v7.3.0
 	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
@@ -27,17 +28,24 @@ require (
 )
 
 require (
-	cosmossdk.io/api v0.3.1
-	cosmossdk.io/errors v1.0.0
-	cosmossdk.io/math v1.1.2
+	github.com/CosmWasm/wasmvm v1.4.0 // indirect
+	github.com/docker/distribution v2.8.2+incompatible // indirect
+	github.com/google/gofuzz v1.2.0 // indirect
+	github.com/opencontainers/go-digest v1.0.0 // indirect
+)
+
+require (
 	cloud.google.com/go v0.110.4 // indirect
 	cloud.google.com/go/compute v1.20.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v1.1.0 // indirect
 	cloud.google.com/go/storage v1.30.1 // indirect
+	cosmossdk.io/api v0.3.1
 	cosmossdk.io/core v0.5.1 // indirect
 	cosmossdk.io/depinject v1.0.0-alpha.4 // indirect
+	cosmossdk.io/errors v1.0.0
 	cosmossdk.io/log v1.2.1 // indirect
+	cosmossdk.io/math v1.1.2
 	cosmossdk.io/tools/rosetta v0.2.1 // indirect
 	filippo.io/edwards25519 v1.0.0 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
@@ -62,7 +70,7 @@ require (
 	github.com/cosmos/btcutil v1.0.5 // indirect
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/cosmos/gogogateway v1.2.0 // indirect
-	github.com/cosmos/iavl v0.20.0 // indirect
+	github.com/cosmos/iavl v0.20.1 // indirect
 	github.com/cosmos/ics23/go v0.10.0 // indirect
 	github.com/cosmos/ledger-cosmos-go v0.12.2 // indirect
 	github.com/cosmos/rosetta-sdk-go v0.10.0 // indirect
@@ -136,10 +144,10 @@ require (
 	github.com/petermattis/goid v0.0.0-20230317030725-371a4b8eda08 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/prometheus/client_golang v1.14.0 // indirect
+	github.com/prometheus/client_golang v1.16.0
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
-	github.com/prometheus/procfs v0.9.0 // indirect
+	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/rakyll/statik v0.1.7 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
