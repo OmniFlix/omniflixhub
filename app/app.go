@@ -1,14 +1,9 @@
 package app
 
 import (
-	"fmt"
-	"io"
-	"net/http"
-	"os"
-	"path/filepath"
-
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
+	"fmt"
 	"github.com/OmniFlix/omniflixhub/v2/app/openapiconsole"
 	appparams "github.com/OmniFlix/omniflixhub/v2/app/params"
 	"github.com/OmniFlix/omniflixhub/v2/docs"
@@ -39,8 +34,16 @@ import (
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
-	ibcclientclient "github.com/cosmos/ibc-go/v7/modules/core/02-client/client"
 	"github.com/spf13/cast"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
+
+	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+	ibcclientclient "github.com/cosmos/ibc-go/v7/modules/core/02-client/client"
+	ibcclienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
+	ibcchanneltypes "github.com/cosmos/ibc-go/v7/modules/core/04-channel/types"
 
 	"github.com/OmniFlix/omniflixhub/v2/app/keepers"
 	"github.com/OmniFlix/omniflixhub/v2/app/upgrades"
@@ -211,6 +214,10 @@ func NewOmniFlixApp(
 			GovKeeper: app.GovKeeper,
 			IBCKeeper: app.IBCKeeper,
 			Codec:     appCodec,
+
+			BypassMinFeeMsgTypes: GetDefaultBypassFeeMessages(),
+
+			GlobalFeeKeeper: app.GlobalFeeKeeper,
 		},
 	)
 	if err != nil {
@@ -393,4 +400,23 @@ func GetMaccPerms() map[string][]string {
 		dupMaccPerms[k] = v
 	}
 	return dupMaccPerms
+}
+
+func GetDefaultBypassFeeMessages() []string {
+	return []string{
+		// IBC messages
+		sdk.MsgTypeURL(&ibcchanneltypes.MsgRecvPacket{}),
+		sdk.MsgTypeURL(&ibcchanneltypes.MsgAcknowledgement{}),
+		sdk.MsgTypeURL(&ibcclienttypes.MsgUpdateClient{}),
+		sdk.MsgTypeURL(&ibctransfertypes.MsgTransfer{}),
+		sdk.MsgTypeURL(&ibcchanneltypes.MsgTimeout{}),
+		sdk.MsgTypeURL(&ibcchanneltypes.MsgTimeoutOnClose{}),
+		sdk.MsgTypeURL(&ibcchanneltypes.MsgChannelOpenTry{}),
+		sdk.MsgTypeURL(&ibcchanneltypes.MsgChannelOpenConfirm{}),
+		sdk.MsgTypeURL(&ibcchanneltypes.MsgChannelOpenAck{}),
+	}
+}
+
+func (app *OmniFlixApp) GetChainBondDenom() string {
+	return "uflix"
 }

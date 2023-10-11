@@ -1,9 +1,9 @@
 syntax = "proto3";
-package gaia.globalfee.v1beta1;
+package OmniFlix.globalfee.v1beta1;
 
 
 import "cosmos/msg/v1/msg.proto";
-import "gaia/globalfee/v1beta1/genesis.proto";
+import "OmniFlix/globalfee/v1beta1/genesis.proto";
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
 
