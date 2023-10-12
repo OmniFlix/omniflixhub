@@ -23,7 +23,7 @@ import (
 func TestDefaultGenesis(t *testing.T) {
 	encCfg := appparams.MakeEncodingConfig()
 	gotJSON := AppModuleBasic{}.DefaultGenesis(encCfg.Marshaler)
-	assert.JSONEq(t, `{"params":{"minimum_gas_prices":[]}}`, string(gotJSON), string(gotJSON))
+	assert.JSONEq(t, `{"params":{"minimum_gas_prices":[],"bypass_min_fee_msg_types":[],"max_total_bypass_min_fee_msg_gas_usage":"2000000"}}`, string(gotJSON), string(gotJSON))
 }
 
 func TestValidateGenesis(t *testing.T) {
@@ -80,32 +80,35 @@ func TestInitExportGenesis(t *testing.T) {
 		exp types.GenesisState
 	}{
 		"single fee": {
-			src: `{"params":{minimum_gas_prices":[{"denom":"ALX", "amount":"1"}]}}`,
+			src: `{"params":{"minimum_gas_prices":[{"denom":"ALX", "amount":"1"}],"bypass_min_fee_msg_types":[],"max_total_bypass_min_fee_msg_gas_usage":"0"}}`,
 			exp: types.GenesisState{
 				Params: types.Params{
 					MinimumGasPrices:                sdk.NewDecCoins(sdk.NewDecCoin("ALX", sdk.NewInt(1))),
 					BypassMinFeeMsgTypes:            []string{},
-					MaxTotalBypassMinFeeMsgGasUsage: uint64(2_000_000),
+					MaxTotalBypassMinFeeMsgGasUsage: uint64(0),
 				},
 			},
 		},
 		"multiple fee options": {
-			src: `{"params":{"minimum_gas_prices":[{"denom":"ALX", "amount":"1"}, {"denom":"BLX", "amount":"0.001"}]}}`,
+			src: `{"params":{"minimum_gas_prices":[{"denom":"ALX", "amount":"1"}, {"denom":"BLX", "amount":"0.001"}],"bypass_min_fee_msg_types":[],"max_total_bypass_min_fee_msg_gas_usage":"0"}}`,
 			exp: types.GenesisState{
 				Params: types.Params{
-					MinimumGasPrices:                sdk.NewDecCoins(sdk.NewDecCoinFromDec("BLX", sdk.NewDecWithPrec(1, 3))),
+					MinimumGasPrices: sdk.NewDecCoins(
+						sdk.NewDecCoin("ALX", sdk.NewInt(1)),
+						sdk.NewDecCoinFromDec("BLX", sdk.NewDecWithPrec(1, 3)),
+					),
 					BypassMinFeeMsgTypes:            []string{},
-					MaxTotalBypassMinFeeMsgGasUsage: uint64(2_000_000),
+					MaxTotalBypassMinFeeMsgGasUsage: uint64(0),
 				},
 			},
 		},
 		"no fee set": {
-			src: `{"params":{}}`,
+			src: `{"params":{"minimum_gas_prices":[],"bypass_min_fee_msg_types":[],"max_total_bypass_min_fee_msg_gas_usage":"0"}}`,
 			exp: types.GenesisState{
 				Params: types.Params{
 					MinimumGasPrices:                sdk.DecCoins{},
 					BypassMinFeeMsgTypes:            []string{},
-					MaxTotalBypassMinFeeMsgGasUsage: uint64(2_000_000),
+					MaxTotalBypassMinFeeMsgGasUsage: uint64(0),
 				},
 			},
 		},

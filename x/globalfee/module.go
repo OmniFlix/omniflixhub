@@ -3,13 +3,12 @@ package globalfee
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
 	abci "github.com/cometbft/cometbft/abci/types"
-
-	errorsmod "cosmossdk.io/errors"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -50,8 +49,8 @@ func (am AppModuleBasic) ValidateGenesis(marshaler codec.JSONCodec, _ client.TxE
 	if err != nil {
 		return err
 	}
-	if err := data.Params.Validate(); err != nil {
-		return errorsmod.Wrap(err, "params")
+	if err := types.ValidateGenesis(data); err != nil {
+		return err
 	}
 	return nil
 }
@@ -101,17 +100,21 @@ func NewAppModule(
 	}
 }
 
-func (am AppModule) InitGenesis(ctx sdk.Context, marshaler codec.JSONCodec, message json.RawMessage) []abci.ValidatorUpdate {
+func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState types.GenesisState
-	marshaler.MustUnmarshalJSON(message, &genesisState)
-	_ = am.keeper.SetParams(ctx, genesisState.Params)
+	cdc.MustUnmarshalJSON(gs, &genesisState)
+	fmt.Println(genesisState)
+	if err := am.keeper.SetParams(ctx, genesisState.Params); err != nil {
+		panic(err)
+	}
 	return nil
 }
 
-func (am AppModule) ExportGenesis(ctx sdk.Context, marshaler codec.JSONCodec) json.RawMessage {
-	params := am.keeper.GetParams(ctx)
-	genState := types.NewGenesisState(params)
-	return marshaler.MustMarshalJSON(genState)
+func (am AppModule) ExportGenesis(ctx sdk.Context, marshaller codec.JSONCodec) json.RawMessage {
+	genState := &types.GenesisState{
+		Params: am.keeper.GetParams(ctx),
+	}
+	return marshaller.MustMarshalJSON(genState)
 }
 
 func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {

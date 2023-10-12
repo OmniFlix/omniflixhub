@@ -1,6 +1,7 @@
 package keepers
 
 import (
+	globalfeetypes "github.com/OmniFlix/omniflixhub/v2/x/globalfee/types"
 	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -221,6 +222,7 @@ func NewAppKeeper(
 		keys[feegrant.StoreKey],
 		appKeepers.AccountKeeper,
 	)
+
 	appKeepers.StakingKeeper = stakingkeeper.NewKeeper(
 		appCodec,
 		keys[stakingtypes.StoreKey],
@@ -360,6 +362,12 @@ func NewAppKeeper(
 		bApp.MsgServiceRouter(),
 	)
 	icaHostIBCModule := icahost.NewIBCModule(appKeepers.ICAHostKeeper)
+
+	appKeepers.GlobalFeeKeeper = globalfeekeeper.NewKeeper(
+		appCodec,
+		keys[globalfeetypes.StoreKey],
+		govModAddress,
+	)
 
 	appKeepers.AllocKeeper = *allockeeper.NewKeeper(
 		appCodec,

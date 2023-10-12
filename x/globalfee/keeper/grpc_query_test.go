@@ -54,7 +54,7 @@ func TestQueryGlobalFeeParamMinGasPrices(t *testing.T) {
 			gotResp, gotErr := q.Params(sdk.WrapSDKContext(ctx), nil)
 			require.NoError(t, gotErr)
 			require.NotNil(t, gotResp)
-			assert.Equal(t, spec.expMin, gotResp.Params)
+			assert.Equal(t, spec.expMin, gotResp.Params.MinimumGasPrices)
 		})
 	}
 }

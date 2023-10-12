@@ -2,6 +2,7 @@ package keepers
 
 import (
 	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
+	globalfeetypes "github.com/OmniFlix/omniflixhub/v2/x/globalfee/types"
 	itctypes "github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 	marketplacetypes "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 	onfttypes "github.com/OmniFlix/onft/types"
@@ -49,6 +50,7 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		capabilitytypes.StoreKey,
 		crisistypes.StoreKey,
 		feegrant.StoreKey,
+		globalfeetypes.StoreKey,
 		authzkeeper.StoreKey,
 		alloctypes.StoreKey,
 		onfttypes.StoreKey,

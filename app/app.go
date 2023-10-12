@@ -1,9 +1,15 @@
 package app
 
 import (
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
+
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
-	"fmt"
+
 	"github.com/OmniFlix/omniflixhub/v2/app/openapiconsole"
 	appparams "github.com/OmniFlix/omniflixhub/v2/app/params"
 	"github.com/OmniFlix/omniflixhub/v2/docs"
@@ -35,10 +41,6 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	"github.com/spf13/cast"
-	"io"
-	"net/http"
-	"os"
-	"path/filepath"
 
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 	ibcclientclient "github.com/cosmos/ibc-go/v7/modules/core/02-client/client"
@@ -216,8 +218,8 @@ func NewOmniFlixApp(
 			Codec:     appCodec,
 
 			BypassMinFeeMsgTypes: GetDefaultBypassFeeMessages(),
-
-			GlobalFeeKeeper: app.GlobalFeeKeeper,
+			GlobalFeeKeeper:      app.GlobalFeeKeeper,
+			StakingKeeper:        *app.StakingKeeper,
 		},
 	)
 	if err != nil {
