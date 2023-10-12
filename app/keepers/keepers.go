@@ -1,6 +1,7 @@
 package keepers
 
 import (
+	globalfeetypes "github.com/OmniFlix/omniflixhub/v2/x/globalfee/types"
 	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -39,6 +40,9 @@ import (
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+
+	"github.com/OmniFlix/omniflixhub/v2/x/globalfee"
+	globalfeekeeper "github.com/OmniFlix/omniflixhub/v2/x/globalfee/keeper"
 
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
@@ -116,6 +120,7 @@ type AppKeepers struct {
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
+	GlobalFeeKeeper       globalfeekeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -217,6 +222,7 @@ func NewAppKeeper(
 		keys[feegrant.StoreKey],
 		appKeepers.AccountKeeper,
 	)
+
 	appKeepers.StakingKeeper = stakingkeeper.NewKeeper(
 		appCodec,
 		keys[stakingtypes.StoreKey],
@@ -357,6 +363,12 @@ func NewAppKeeper(
 	)
 	icaHostIBCModule := icahost.NewIBCModule(appKeepers.ICAHostKeeper)
 
+	appKeepers.GlobalFeeKeeper = globalfeekeeper.NewKeeper(
+		appCodec,
+		keys[globalfeetypes.StoreKey],
+		govModAddress,
+	)
+
 	appKeepers.AllocKeeper = *allockeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[alloctypes.StoreKey],
@@ -450,6 +462,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibcexported.ModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(packetforwardtypes.ModuleName)
+	paramsKeeper.Subspace(globalfee.ModuleName)
 	paramsKeeper.Subspace(alloctypes.ModuleName)
 	paramsKeeper.Subspace(onfttypes.ModuleName)
 	paramsKeeper.Subspace(marketplacetypes.ModuleName)

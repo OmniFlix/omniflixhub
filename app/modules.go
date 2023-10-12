@@ -2,6 +2,7 @@ package app
 
 import (
 	appparams "github.com/OmniFlix/omniflixhub/v2/app/params"
+	"github.com/OmniFlix/omniflixhub/v2/x/globalfee"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -107,6 +108,7 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		globalfee.AppModuleBasic{},
 
 		alloc.AppModuleBasic{},
 		onft.AppModuleBasic{},
@@ -126,6 +128,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		icatypes.ModuleName:            nil,
+		globalfee.ModuleName:           nil,
 		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		onfttypes.ModuleName:           nil,
 		marketplacetypes.ModuleName:    nil,
@@ -140,6 +143,7 @@ func appModules(
 	skipGenesisInvariants bool,
 ) []module.AppModule {
 	appCodec := encodingConfig.Marshaler
+	bondDenom := app.GetChainBondDenom()
 	return []module.AppModule{
 		genutil.NewAppModule(
 			app.AccountKeeper, app.StakingKeeper, app.BaseApp.DeliverTx,
@@ -191,6 +195,7 @@ func appModules(
 		transfer.NewAppModule(app.TransferKeeper),
 		ica.NewAppModule(nil, &app.ICAHostKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper),
+		globalfee.NewAppModule(appCodec, app.GlobalFeeKeeper, bondDenom),
 		alloc.NewAppModule(appCodec, app.AllocKeeper, app.GetSubspace(alloctypes.ModuleName)),
 		onft.NewAppModule(
 			appCodec,
@@ -272,6 +277,7 @@ func orderBeginBlockers() []string {
 		authtypes.ModuleName,
 		crisistypes.ModuleName,
 		feegrant.ModuleName,
+		globalfee.ModuleName,
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,
 		streampaytypes.ModuleName,
@@ -301,6 +307,7 @@ func orderEndBlockers() []string {
 		distrtypes.ModuleName,
 		ibcexported.ModuleName,
 		feegrant.ModuleName,
+		globalfee.ModuleName,
 		authz.ModuleName,
 		alloctypes.ModuleName,
 		onfttypes.ModuleName,
@@ -338,6 +345,7 @@ func orderInitGenesis() []string {
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
+		globalfee.ModuleName,
 		ibcexported.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
