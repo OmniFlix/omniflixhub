@@ -19,6 +19,7 @@ import (
 	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/cosmos/cosmos-sdk/x/group"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
@@ -51,6 +52,7 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		crisistypes.StoreKey,
 		feegrant.StoreKey,
 		globalfeetypes.StoreKey,
+		group.StoreKey,
 		authzkeeper.StoreKey,
 		alloctypes.StoreKey,
 		onfttypes.StoreKey,
