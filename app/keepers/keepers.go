@@ -44,6 +44,8 @@ import (
 	"github.com/OmniFlix/omniflixhub/v2/x/globalfee"
 	globalfeekeeper "github.com/OmniFlix/omniflixhub/v2/x/globalfee/keeper"
 
+	"github.com/cosmos/cosmos-sdk/x/group"
+	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 
@@ -121,6 +123,7 @@ type AppKeepers struct {
 	AuthzKeeper           authzkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	GlobalFeeKeeper       globalfeekeeper.Keeper
+	GroupKeeper           groupkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -324,6 +327,16 @@ func NewAppKeeper(
 		// register the governance hooks
 		),
 	)
+
+	groupConfig := group.DefaultConfig()
+	appKeepers.GroupKeeper = groupkeeper.NewKeeper(
+		keys[group.StoreKey],
+		appCodec,
+		bApp.MsgServiceRouter(),
+		appKeepers.AccountKeeper,
+		groupConfig,
+	)
+
 	// initialize ibc packet forwarding middleware router
 	appKeepers.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
 		appCodec, appKeepers.keys[packetforwardtypes.StoreKey],

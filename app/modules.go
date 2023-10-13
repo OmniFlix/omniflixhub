@@ -9,6 +9,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/consensus"
 	consensusparamtypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
+	"github.com/cosmos/cosmos-sdk/x/group"
 
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
@@ -39,6 +40,10 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+
+	// "github.com/cosmos/cosmos-sdk/x/group"
+	// groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
+	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
 
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
@@ -95,6 +100,7 @@ var (
 		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(getGovProposalHandlers()),
+		groupmodule.AppModuleBasic{},
 		params.AppModuleBasic{},
 		consensus.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -160,6 +166,13 @@ func appModules(
 			app.AccountKeeper,
 			app.BankKeeper,
 			app.GetSubspace(govtypes.ModuleName),
+		),
+		groupmodule.NewAppModule(
+			appCodec,
+			app.GroupKeeper,
+			app.AccountKeeper,
+			app.BankKeeper,
+			app.interfaceRegistry,
 		),
 		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper, nil, app.GetSubspace(minttypes.ModuleName)),
 		slashing.NewAppModule(
@@ -278,6 +291,7 @@ func orderBeginBlockers() []string {
 		crisistypes.ModuleName,
 		feegrant.ModuleName,
 		globalfee.ModuleName,
+		group.ModuleName,
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,
 		streampaytypes.ModuleName,
@@ -308,6 +322,7 @@ func orderEndBlockers() []string {
 		ibcexported.ModuleName,
 		feegrant.ModuleName,
 		globalfee.ModuleName,
+		group.ModuleName,
 		authz.ModuleName,
 		alloctypes.ModuleName,
 		onfttypes.ModuleName,
@@ -346,6 +361,7 @@ func orderInitGenesis() []string {
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
 		globalfee.ModuleName,
+		group.ModuleName,
 		ibcexported.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
