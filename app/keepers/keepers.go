@@ -9,6 +9,9 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/store/streaming"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	icq "github.com/cosmos/ibc-apps/modules/async-icq/v7"
+	icqkeeper "github.com/cosmos/ibc-apps/modules/async-icq/v7/keeper"
+	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v7/types"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -116,6 +119,7 @@ type AppKeepers struct {
 	ParamsKeeper          paramskeeper.Keeper
 	IBCKeeper             *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	ICAHostKeeper         icahostkeeper.Keeper
+	ICQKeeper             icqkeeper.Keeper
 	EvidenceKeeper        evidencekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
 	PacketForwardKeeper   *packetforwardkeeper.Keeper
@@ -129,6 +133,7 @@ type AppKeepers struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
+	ScopedICQKeeper      capabilitykeeper.ScopedKeeper
 
 	AllocKeeper       allockeeper.Keeper
 	ONFTKeeper        onftkeeper.Keeper
@@ -187,6 +192,7 @@ func NewAppKeeper(
 	appKeepers.ScopedIBCKeeper = appKeepers.CapabilityKeeper.ScopeToModule(ibcexported.ModuleName)
 	appKeepers.ScopedTransferKeeper = appKeepers.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	appKeepers.ScopedICAHostKeeper = appKeepers.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
+	appKeepers.ScopedICQKeeper = appKeepers.CapabilityKeeper.ScopeToModule(icqtypes.ModuleName)
 
 	appKeepers.CapabilityKeeper.Seal()
 
@@ -376,6 +382,19 @@ func NewAppKeeper(
 	)
 	icaHostIBCModule := icahost.NewIBCModule(appKeepers.ICAHostKeeper)
 
+	// ICQ Keeper
+	appKeepers.ICQKeeper = icqkeeper.NewKeeper(
+		appCodec,
+		appKeepers.keys[icqtypes.StoreKey],
+		appKeepers.GetSubspace(icqtypes.ModuleName),
+		appKeepers.IBCKeeper.ChannelKeeper, // may be replaced with middleware
+		appKeepers.IBCKeeper.ChannelKeeper,
+		&appKeepers.IBCKeeper.PortKeeper,
+		appKeepers.ScopedICQKeeper,
+		bApp.GRPCQueryRouter(),
+	)
+	icqModule := icq.NewIBCModule(appKeepers.ICQKeeper)
+
 	appKeepers.GlobalFeeKeeper = globalfeekeeper.NewKeeper(
 		appCodec,
 		keys[globalfeetypes.StoreKey],
@@ -445,8 +464,9 @@ func NewAppKeeper(
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.
+		AddRoute(ibctransfertypes.ModuleName, ibcStack).
 		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
-		AddRoute(ibctransfertypes.ModuleName, ibcStack)
+		AddRoute(icqtypes.ModuleName, icqModule)
 
 	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 
@@ -474,6 +494,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibcexported.ModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
+	paramsKeeper.Subspace(icqtypes.ModuleName)
 	paramsKeeper.Subspace(packetforwardtypes.ModuleName)
 	paramsKeeper.Subspace(globalfee.ModuleName)
 	paramsKeeper.Subspace(alloctypes.ModuleName)

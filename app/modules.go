@@ -68,6 +68,9 @@ import (
 	icatypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/types"
 	"github.com/cosmos/ibc-go/v7/modules/apps/transfer"
 
+	icq "github.com/cosmos/ibc-apps/modules/async-icq/v7"
+	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v7/types"
+
 	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router"
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
 
@@ -107,6 +110,7 @@ var (
 		slashing.AppModuleBasic{},
 		ibc.AppModuleBasic{},
 		ica.AppModuleBasic{},
+		icq.AppModuleBasic{},
 		packetforward.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
@@ -207,6 +211,7 @@ func appModules(
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
 		ica.NewAppModule(nil, &app.ICAHostKeeper),
+		icq.NewAppModule(app.ICQKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper),
 		globalfee.NewAppModule(appCodec, app.GlobalFeeKeeper, bondDenom),
 		alloc.NewAppModule(appCodec, app.AllocKeeper, app.GetSubspace(alloctypes.ModuleName)),
@@ -284,6 +289,7 @@ func orderBeginBlockers() []string {
 		consensusparamtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
+		icqtypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
@@ -315,6 +321,7 @@ func orderEndBlockers() []string {
 		consensusparamtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
+		icqtypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		minttypes.ModuleName,
 		slashingtypes.ModuleName,
@@ -365,6 +372,7 @@ func orderInitGenesis() []string {
 		ibcexported.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
+		icqtypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		alloctypes.ModuleName,
 		onfttypes.ModuleName,
