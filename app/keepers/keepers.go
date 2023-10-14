@@ -104,13 +104,11 @@ import (
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 )
 
-var (
-	tokenFactoryCapabilities = []string{
-		tokenfactorytypes.EnableBurnFrom,
-		tokenfactorytypes.EnableForceTransfer,
-		tokenfactorytypes.EnableSetMetadata,
-	}
-)
+var tokenFactoryCapabilities = []string{
+	tokenfactorytypes.EnableBurnFrom,
+	tokenfactorytypes.EnableForceTransfer,
+	tokenfactorytypes.EnableSetMetadata,
+}
 
 type AppKeepers struct {
 	// keys to access the substores
@@ -344,7 +342,7 @@ func NewAppKeeper(
 	appKeepers.GovKeeper.SetLegacyRouter(govRouter)
 	appKeepers.GovKeeper = *govKeeper.SetHooks(
 		govtypes.NewMultiGovHooks(
-			// register the governance hooks
+		// register the governance hooks
 		),
 	)
 
