@@ -10,6 +10,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/consensus"
 	consensusparamtypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 	"github.com/cosmos/cosmos-sdk/x/group"
+	ibcfee "github.com/cosmos/ibc-go/v7/modules/apps/29-fee"
+	ibcfeetypes "github.com/cosmos/ibc-go/v7/modules/apps/29-fee/types"
 
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
@@ -41,8 +43,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	// "github.com/cosmos/cosmos-sdk/x/group"
-	// groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
 
 	"github.com/cosmos/cosmos-sdk/x/mint"
@@ -109,6 +109,7 @@ var (
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		ibc.AppModuleBasic{},
+		ibcfee.AppModuleBasic{},
 		ica.AppModuleBasic{},
 		icq.AppModuleBasic{},
 		packetforward.AppModuleBasic{},
@@ -137,6 +138,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		ibcfeetypes.ModuleName:         nil,
 		icatypes.ModuleName:            nil,
 		globalfee.ModuleName:           nil,
 		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
@@ -210,6 +212,7 @@ func appModules(
 		params.NewAppModule(app.ParamsKeeper),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
+		ibcfee.NewAppModule(app.AppKeepers.IBCFeeKeeper),
 		ica.NewAppModule(nil, &app.ICAHostKeeper),
 		icq.NewAppModule(app.ICQKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper),
@@ -257,6 +260,7 @@ func simulationModules(
 		params.NewAppModule(app.ParamsKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
+		ibcfee.NewAppModule(app.AppKeepers.IBCFeeKeeper),
 	}
 }
 
@@ -288,6 +292,7 @@ func orderBeginBlockers() []string {
 		paramstypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		ibctransfertypes.ModuleName,
+		ibcfeetypes.ModuleName,
 		icatypes.ModuleName,
 		icqtypes.ModuleName,
 		packetforwardtypes.ModuleName,
@@ -320,6 +325,7 @@ func orderEndBlockers() []string {
 		paramstypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		ibctransfertypes.ModuleName,
+		ibcfeetypes.ModuleName,
 		icatypes.ModuleName,
 		icqtypes.ModuleName,
 		packetforwardtypes.ModuleName,
@@ -371,6 +377,7 @@ func orderInitGenesis() []string {
 		group.ModuleName,
 		ibcexported.ModuleName,
 		ibctransfertypes.ModuleName,
+		ibcfeetypes.ModuleName,
 		icatypes.ModuleName,
 		icqtypes.ModuleName,
 		packetforwardtypes.ModuleName,

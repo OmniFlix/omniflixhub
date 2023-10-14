@@ -12,6 +12,9 @@ import (
 	icq "github.com/cosmos/ibc-apps/modules/async-icq/v7"
 	icqkeeper "github.com/cosmos/ibc-apps/modules/async-icq/v7/keeper"
 	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v7/types"
+	ibcfee "github.com/cosmos/ibc-go/v7/modules/apps/29-fee"
+	ibcfeekeeper "github.com/cosmos/ibc-go/v7/modules/apps/29-fee/keeper"
+	ibcfeetypes "github.com/cosmos/ibc-go/v7/modules/apps/29-fee/types"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -118,6 +121,7 @@ type AppKeepers struct {
 	UpgradeKeeper         *upgradekeeper.Keeper
 	ParamsKeeper          paramskeeper.Keeper
 	IBCKeeper             *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	IBCFeeKeeper          ibcfeekeeper.Keeper
 	ICAHostKeeper         icahostkeeper.Keeper
 	ICQKeeper             icqkeeper.Keeper
 	EvidenceKeeper        evidencekeeper.Keeper
@@ -343,6 +347,16 @@ func NewAppKeeper(
 		groupConfig,
 	)
 
+	appKeepers.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
+		appCodec,
+		appKeepers.keys[ibcfeetypes.StoreKey],
+		appKeepers.IBCKeeper.ChannelKeeper,
+		appKeepers.IBCKeeper.ChannelKeeper,
+		&appKeepers.IBCKeeper.PortKeeper,
+		appKeepers.AccountKeeper,
+		appKeepers.BankKeeper,
+	)
+
 	// initialize ibc packet forwarding middleware router
 	appKeepers.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
 		appCodec, appKeepers.keys[packetforwardtypes.StoreKey],
@@ -453,6 +467,7 @@ func NewAppKeeper(
 
 	var ibcStack porttypes.IBCModule
 	ibcStack = transfer.NewIBCModule(appKeepers.TransferKeeper)
+	ibcStack = ibcfee.NewIBCMiddleware(ibcStack, appKeepers.IBCFeeKeeper)
 	ibcStack = packetforward.NewIBCMiddleware(
 		ibcStack,
 		appKeepers.PacketForwardKeeper,
