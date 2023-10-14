@@ -5,6 +5,7 @@ import (
 	globalfeetypes "github.com/OmniFlix/omniflixhub/v2/x/globalfee/types"
 	itctypes "github.com/OmniFlix/omniflixhub/v2/x/itc/types"
 	marketplacetypes "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
+	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/types"
 	onfttypes "github.com/OmniFlix/onft/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -55,6 +56,7 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		feegrant.StoreKey,
 		globalfeetypes.StoreKey,
 		group.StoreKey,
+		tokenfactorytypes.StoreKey,
 		authzkeeper.StoreKey,
 		alloctypes.StoreKey,
 		onfttypes.StoreKey,

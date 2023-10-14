@@ -28,6 +28,11 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+var (
+	SecondaryDenom  = "uxflx"
+	SecondaryAmount = sdk.NewInt(100000000)
+)
+
 type KeeperTestHelper struct {
 	suite.Suite
 

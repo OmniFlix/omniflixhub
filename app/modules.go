@@ -3,6 +3,7 @@ package app
 import (
 	appparams "github.com/OmniFlix/omniflixhub/v2/app/params"
 	"github.com/OmniFlix/omniflixhub/v2/x/globalfee"
+
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -41,8 +42,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	// "github.com/cosmos/cosmos-sdk/x/group"
-	// groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
 
 	"github.com/cosmos/cosmos-sdk/x/mint"
@@ -56,6 +55,9 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	"github.com/OmniFlix/omniflixhub/v2/x/tokenfactory"
+	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/types"
 
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
@@ -119,6 +121,7 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		globalfee.AppModuleBasic{},
+		tokenfactory.AppModuleBasic{},
 
 		alloc.AppModuleBasic{},
 		onft.AppModuleBasic{},
@@ -138,6 +141,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		icatypes.ModuleName:            nil,
+		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 		globalfee.ModuleName:           nil,
 		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		onfttypes.ModuleName:           nil,
@@ -177,6 +181,11 @@ func appModules(
 			app.AccountKeeper,
 			app.BankKeeper,
 			app.interfaceRegistry,
+		),
+		tokenfactory.NewAppModule(
+			app.AppKeepers.TokenFactoryKeeper,
+			app.AppKeepers.AccountKeeper,
+			app.AppKeepers.BankKeeper,
 		),
 		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper, nil, app.GetSubspace(minttypes.ModuleName)),
 		slashing.NewAppModule(
@@ -297,6 +306,7 @@ func orderBeginBlockers() []string {
 		crisistypes.ModuleName,
 		feegrant.ModuleName,
 		globalfee.ModuleName,
+		tokenfactorytypes.ModuleName,
 		group.ModuleName,
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,
@@ -330,6 +340,7 @@ func orderEndBlockers() []string {
 		feegrant.ModuleName,
 		globalfee.ModuleName,
 		group.ModuleName,
+		tokenfactorytypes.ModuleName,
 		authz.ModuleName,
 		alloctypes.ModuleName,
 		onfttypes.ModuleName,
@@ -369,6 +380,7 @@ func orderInitGenesis() []string {
 		feegrant.ModuleName,
 		globalfee.ModuleName,
 		group.ModuleName,
+		tokenfactorytypes.ModuleName,
 		ibcexported.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
