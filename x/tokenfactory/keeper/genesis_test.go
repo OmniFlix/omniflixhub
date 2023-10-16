@@ -9,23 +9,24 @@ import (
 
 func (suite *KeeperTestSuite) TestGenesis() {
 	genesisState := types.GenesisState{
+		Params: types.DefaultParams(),
 		FactoryDenoms: []types.GenesisDenom{
 			{
-				Denom: "factory/omniflix1m6laazm32m8dw8zygmaelprclnmyxy0jv54jpt/bitcoin",
+				Denom: "factory/cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8/bitcoin",
 				AuthorityMetadata: types.DenomAuthorityMetadata{
-					Admin: "omniflix1m6laazm32m8dw8zygmaelprclnmyxy0jv54jpt",
+					Admin: "cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8",
 				},
 			},
 			{
-				Denom: "factory/omniflix1m6laazm32m8dw8zygmaelprclnmyxy0jv54jpt/diff-admin",
+				Denom: "factory/cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8/diff-admin",
 				AuthorityMetadata: types.DenomAuthorityMetadata{
-					Admin: "omniflix1t9zu49k7pyc3sdqw2vxtt0ueny8gd7d09lv2dt",
+					Admin: "cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8",
 				},
 			},
 			{
-				Denom: "factory/omniflix1m6laazm32m8dw8zygmaelprclnmyxy0jv54jpt/litecoin",
+				Denom: "factory/cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8/litecoin",
 				AuthorityMetadata: types.DenomAuthorityMetadata{
-					Admin: "omniflix1m6laazm32m8dw8zygmaelprclnmyxy0jv54jpt",
+					Admin: "cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8",
 				},
 			},
 		},
@@ -42,7 +43,7 @@ func (suite *KeeperTestSuite) TestGenesis() {
 		}
 	}
 
-	if err := app.AppKeepers.TokenFactoryKeeper.SetParams(suite.Ctx, types.Params{DenomCreationFee: sdk.Coins{sdk.NewInt64Coin("stake", 100)}}); err != nil {
+	if err := app.AppKeepers.TokenFactoryKeeper.SetParams(suite.Ctx, types.Params{DenomCreationFee: sdk.Coins{sdk.NewInt64Coin("uflix", 100)}}); err != nil {
 		panic(err)
 	}
 	app.AppKeepers.TokenFactoryKeeper.InitGenesis(suite.Ctx, genesisState)

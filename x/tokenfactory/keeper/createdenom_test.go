@@ -76,7 +76,7 @@ func (suite *KeeperTestSuite) TestCreateDenom() {
 		defaultDenomCreationFee = types.Params{DenomCreationFee: sdk.NewCoins(sdk.NewCoin(primaryDenom, sdk.NewInt(50000000)))}
 		twoDenomCreationFee     = types.Params{DenomCreationFee: sdk.NewCoins(sdk.NewCoin(primaryDenom, sdk.NewInt(50000000)), sdk.NewCoin(secondaryDenom, sdk.NewInt(50000000)))}
 		nilCreationFee          = types.Params{DenomCreationFee: nil}
-		largeCreationFee        = types.Params{DenomCreationFee: sdk.NewCoins(sdk.NewCoin(primaryDenom, sdk.NewInt(5000000000)))}
+		largeCreationFee        = types.Params{DenomCreationFee: sdk.NewCoins(sdk.NewCoin(primaryDenom, sdk.NewInt(50000000000)))}
 	)
 
 	for _, tc := range []struct {
@@ -149,10 +149,10 @@ func (suite *KeeperTestSuite) TestCreateDenom() {
 
 			// note balance, create a tokenfactory denom, then note balance again
 			// preCreateBalance := bankKeeper.GetAllBalances(suite.Ctx, suite.TestAccs[0])
-			preCreateBalance := bankKeeper.GetBalance(suite.Ctx, suite.TestAccs[0], "stake")
+			preCreateBalance := bankKeeper.GetBalance(suite.Ctx, suite.TestAccs[0], "uflix")
 			res, err := suite.msgServer.CreateDenom(sdk.WrapSDKContext(suite.Ctx), types.NewMsgCreateDenom(suite.TestAccs[0].String(), tc.subdenom))
 			// postCreateBalance := bankKeeper.GetAllBalances(suite.Ctx, suite.TestAccs[0])
-			postCreateBalance := bankKeeper.GetBalance(suite.Ctx, suite.TestAccs[0], "stake")
+			postCreateBalance := bankKeeper.GetBalance(suite.Ctx, suite.TestAccs[0], "uflix")
 			if tc.valid {
 				suite.Require().NoError(err)
 				if denomCreationFee != nil {
