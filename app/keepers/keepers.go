@@ -339,7 +339,6 @@ func NewAppKeeper(
 		govModAddress,
 	)
 
-	appKeepers.GovKeeper.SetLegacyRouter(govRouter)
 	appKeepers.GovKeeper = *govKeeper.SetHooks(
 		govtypes.NewMultiGovHooks(
 		// register the governance hooks
@@ -473,6 +472,8 @@ func NewAppKeeper(
 		appKeepers.DistrKeeper,
 		govModAddress,
 	)
+
+	appKeepers.GovKeeper.SetLegacyRouter(govRouter)
 
 	var ibcStack porttypes.IBCModule
 	ibcStack = transfer.NewIBCModule(appKeepers.TransferKeeper)
