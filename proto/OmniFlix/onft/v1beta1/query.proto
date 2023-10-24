@@ -1,0 +1,126 @@
+syntax = "proto3";
+package OmniFlix.onft.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "OmniFlix/onft/v1beta1/onft.proto";
+import "OmniFlix/onft/v1beta1/params.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/v2/x/onft/types";
+
+service Query {
+  rpc Collection(QueryCollectionRequest) returns (QueryCollectionResponse) {
+    option (google.api.http).get = "/omniflix/onft/v1beta1/collections/{denom_id}";
+  }
+
+  rpc IBCCollection(QueryIBCCollectionRequest) returns (QueryCollectionResponse) {
+    option (google.api.http).get = "/omniflix/onft/v1beta1/collections/ibc/{hash}";
+  }
+
+  rpc Denom(QueryDenomRequest) returns (QueryDenomResponse) {
+    option (google.api.http).get = "/omniflix/onft/v1beta1/denoms/{denom_id}";
+  }
+
+  rpc IBCDenom(QueryIBCDenomRequest) returns (QueryDenomResponse) {
+    option (google.api.http).get = "/omniflix/onft/v1beta1/denoms/ibc/{hash}";
+  }
+
+  rpc Denoms(QueryDenomsRequest) returns (QueryDenomsResponse) {
+    option (google.api.http).get = "/omniflix/onft/v1beta1/denoms";
+  }
+  rpc ONFT(QueryONFTRequest) returns (QueryONFTResponse) {
+    option (google.api.http).get = "/omniflix/onft/v1beta1/denoms/{denom_id}/onfts/{id}";
+  }
+  rpc OwnerONFTs(QueryOwnerONFTsRequest) returns (QueryOwnerONFTsResponse) {
+    option (google.api.http).get = "/omniflix/onft/v1beta1/onfts/{denom_id}/{owner}";
+  }
+  rpc Supply(QuerySupplyRequest) returns (QuerySupplyResponse) {
+    option (google.api.http).get = "/omniflix/onft/v1beta1/denoms/{denom_id}/supply";
+  }
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/omniflix/onft/v1beta1/params";
+  }
+}
+
+message QueryCollectionRequest {
+  string                                denom_id   = 1 [(gogoproto.moretags) = "yaml:\"denom_id\""];
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryCollectionResponse {
+  Collection                             collection = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryIBCCollectionRequest {
+  string                                hash   = 1 [(gogoproto.moretags) = "yaml:\"hash\""];
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryDenomRequest {
+  string denom_id = 1 [(gogoproto.moretags) = "yaml:\"denom_id\""];
+}
+
+message QueryDenomResponse {
+  Denom denom = 1;
+}
+
+message QueryIBCDenomRequest {
+  string hash = 1 [(gogoproto.moretags) = "yaml:\"hash\""];
+}
+
+message QueryDenomsRequest {
+  // pagination defines an optional pagination for the request.
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+  string                                owner      = 2;
+}
+
+message QueryDenomsResponse {
+  repeated Denom                         denoms     = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryONFTRequest {
+  string denom_id = 1 [(gogoproto.moretags) = "yaml:\"denom_id\""];
+  string id       = 2;
+}
+
+message QueryONFTResponse {
+  ONFT onft = 1 [(gogoproto.customname) = "ONFT"];
+}
+
+
+message QueryOwnerONFTsRequest {
+  string                                denom_id   = 1 [(gogoproto.moretags) = "yaml:\"denom_id\""];
+  string                                owner      = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
+}
+
+message QueryOwnerONFTsResponse {
+  Owner   owner = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination  = 2;
+}
+
+message QuerySupplyRequest {
+  string denom_id = 1 [(gogoproto.moretags) = "yaml:\"denom_id\""];
+  string owner    = 2;
+}
+
+message QuerySupplyResponse {
+  uint64 amount = 1;
+}
+
+message OwnerONFTCollection {
+  Denom         denom = 1  [(gogoproto.nullable) = false];
+  repeated ONFT onfts = 2 [(gogoproto.nullable) = false];
+}
+
+// QueryParamsRequest is the request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is the response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params defines the parameters of the module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
