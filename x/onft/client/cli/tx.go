@@ -41,8 +41,9 @@ func GetCmdCreateDenom() *cobra.Command {
 		Long: strings.TrimSpace(
 			fmt.Sprintf(`Create a new denom.
 Example:
-$ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<description> --preview-uri=<preview-uri> 
---creation-fee <collection-creation-fee> --chain-id=<chain-id> --from=<key-name> --fees=<fee>`,
+$ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<description>
+--uri=<uri> --uri-hash=<uri hash> --preview-uri=<preview-uri> --creation-fee <fee>
+--chain-id=<chain-id> --from=<key-name> --fees=<fee>`,
 				version.AppName,
 			),
 		),
@@ -69,7 +70,20 @@ $ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<desc
 				return err
 			}
 
+			URI, err := cmd.Flags().GetString(FlagURI)
+			if err != nil {
+				return err
+			}
+
+			URIHash, err := cmd.Flags().GetString(FlagURIHash)
+			if err != nil {
+				return err
+			}
 			previewURI, err := cmd.Flags().GetString(FlagPreviewURI)
+			if err != nil {
+				return err
+			}
+			data, err := cmd.Flags().GetString(FlagData)
 			if err != nil {
 				return err
 			}
@@ -82,11 +96,15 @@ $ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<desc
 				return fmt.Errorf("failed to parse creation fee: %s", creationFeeStr)
 			}
 
-			msg := types.NewMsgCreateDenom(symbol,
+			msg := types.NewMsgCreateDenom(
+				symbol,
 				denomName,
 				schema,
 				description,
+				URI,
+				URIHash,
 				previewURI,
+				data,
 				clientCtx.GetFromAddress().String(),
 				creationFee,
 			)
@@ -98,7 +116,6 @@ $ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<desc
 	}
 	cmd.Flags().AddFlagSet(FsCreateDenom)
 	_ = cmd.MarkFlagRequired(FlagName)
-	_ = cmd.MarkFlagRequired(FlagCreationFee)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
@@ -115,6 +132,7 @@ $ %s tx onft mint [denom-id] \
 	--description <onft-descritpion> \
 	--media-uri=<uri> \
 	--preview-uri=<uri> \
+    --uri-hash=<uri-hash> \
 	--from=<key-name> \
 	--chain-id=<chain-id> \
 	--fees=<fee>
@@ -167,6 +185,11 @@ Additional Flags
 				return err
 			}
 
+			onftURIHash, err := cmd.Flags().GetString(FlagURIHash)
+			if err != nil {
+				return err
+			}
+
 			onftPreviewURI, err := cmd.Flags().GetString(FlagPreviewURI)
 			if err != nil {
 				return err
@@ -183,6 +206,9 @@ Additional Flags
 			}
 			if len(onftPreviewURI) > 0 {
 				onftMetadata.PreviewURI = onftPreviewURI
+			}
+			if len(onftURIHash) > 0 {
+				onftMetadata.UriHash = onftURIHash
 			}
 			data, err := cmd.Flags().GetString(FlagData)
 			if err != nil {
@@ -243,6 +269,7 @@ Additional Flags
 	}
 	cmd.Flags().AddFlagSet(FsMintONFT)
 	_ = cmd.MarkFlagRequired(FlagMediaURI)
+	_ = cmd.MarkFlagRequired(FlagName)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
@@ -265,7 +292,7 @@ $ %s tx onft update-denom [denom-id] --name=<onft-name> --description=<onft-desc
 			if err != nil {
 				return err
 			}
-			denomId := strings.TrimSpace(args[0])
+			denomId := args[0]
 
 			denomName, err := cmd.Flags().GetString(FlagName)
 			if err != nil {
@@ -364,8 +391,8 @@ $ %s tx onft transfer [recipient] [denom-id] [onft-id] --from=<key-name> --chain
 				return err
 			}
 
-			denomId := strings.ToLower(strings.TrimSpace(args[1]))
-			onftId := strings.ToLower(strings.TrimSpace(args[2]))
+			denomId := args[1]
+			onftId := args[2]
 
 			msg := types.NewMsgTransferONFT(
 				onftId,
@@ -401,8 +428,8 @@ $ %s tx onft burn [denom-id] [onft-id] --from=<key-name> --chain-id=<chain-id> -
 			if err != nil {
 				return err
 			}
-			denomId := strings.ToLower(strings.TrimSpace(args[0]))
-			onftId := strings.ToLower(strings.TrimSpace(args[1]))
+			denomId := args[0]
+			onftId := args[1]
 
 			msg := types.NewMsgBurnONFT(denomId, onftId, clientCtx.GetFromAddress().String())
 			if err := msg.ValidateBasic(); err != nil {

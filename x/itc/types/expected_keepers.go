@@ -29,7 +29,7 @@ type BankKeeper interface {
 // NftKeeper defines the expected nft keeper
 type NftKeeper interface {
 	GetONFT(ctx sdk.Context, denomId, onftId string) (nft nft.ONFTI, err error)
-	GetDenom(ctx sdk.Context, denomId string) (nfttypes.Denom, error)
+	GetDenomInfo(ctx sdk.Context, denomId string) (*nfttypes.Denom, error)
 	MintONFT(
 		ctx sdk.Context,
 		denomID,

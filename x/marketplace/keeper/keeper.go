@@ -106,7 +106,7 @@ func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress
 	if err != nil {
 		return err
 	}
-	denom, err := k.nftKeeper.GetDenom(ctx, listing.DenomId)
+	denom, err := k.nftKeeper.GetDenomInfo(ctx, listing.DenomId)
 	if err != nil {
 		return err
 	}

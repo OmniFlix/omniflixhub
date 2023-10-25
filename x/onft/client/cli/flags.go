@@ -19,6 +19,8 @@ const (
 	FlagNsfw            = "nsfw"
 	FlagRoyaltyShare    = "royalty-share"
 	FlagCreationFee     = "creation-fee"
+	FlagURI             = "uri"
+	FlagURIHash         = "uri-hash"
 )
 
 var (
@@ -41,6 +43,9 @@ func init() {
 	FsUpdateDenom.String(FlagName, "[do-not-modify]", "Name of the denom")
 	FsUpdateDenom.String(FlagDescription, "[do-not-modify]", "Description for denom")
 	FsUpdateDenom.String(FlagPreviewURI, "[do-not-modify]", "Preview image uri for denom")
+	FsCreateDenom.String(FlagURI, "", "uri for denom")
+	FsCreateDenom.String(FlagURIHash, "", "uri hash for denom")
+	FsCreateDenom.String(FlagData, "", "json data of the denom")
 
 	FsTransferDenom.String(FlagRecipient, "", "recipient of the denom")
 
@@ -54,6 +59,7 @@ func init() {
 	FsMintONFT.Bool(FlagInExtensible, false, "To mint non-extensisble onft")
 	FsMintONFT.Bool(FlagNsfw, false, "not safe for work flag for onft")
 	FsMintONFT.String(FlagRoyaltyShare, "", "Royalty share value decimal value between 0 and 1")
+	FsMintONFT.String(FlagURIHash, "", "uri hash for the nft")
 
 	FsTransferONFT.String(FlagRecipient, "", "Receiver of the onft. default value is sender address of transaction")
 	FsQuerySupply.String(FlagOwner, "", "The owner of a nft")

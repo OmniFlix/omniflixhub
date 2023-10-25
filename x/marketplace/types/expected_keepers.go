@@ -23,10 +23,10 @@ type BankKeeper interface {
 	SendCoinsFromAccountToModule(ctx sdk.Context, fromAddr sdk.AccAddress, toModule string, amt sdk.Coins) error
 }
 
+// NftKeeper methods imported from nft should be defined here
 type NftKeeper interface {
-	// methods imported from nft should be defined here
 	GetONFT(ctx sdk.Context, denomId, onftId string) (nft nft.ONFTI, err error)
-	GetDenom(ctx sdk.Context, denomId string) (nftypes.Denom, error)
+	GetDenomInfo(ctx sdk.Context, denomId string) (*nftypes.Denom, error)
 	TransferOwnership(ctx sdk.Context, denomId, nftId string, srcOwner, dstOwner sdk.AccAddress) error
 }
 

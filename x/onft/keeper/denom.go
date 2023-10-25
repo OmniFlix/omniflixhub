@@ -45,18 +45,6 @@ func (k Keeper) SaveDenom(
 	})
 }
 
-func (k Keeper) GetDenom(ctx sdk.Context, id string) (denom types.Denom, err error) {
-	store := ctx.KVStore(k.storeKey)
-
-	bz := store.Get(types.KeyDenomID(id))
-	if bz == nil || len(bz) == 0 {
-		return denom, errorsmod.Wrapf(types.ErrInvalidDenom, "not found denomID: %s", id)
-	}
-
-	k.cdc.MustUnmarshal(bz, &denom)
-	return denom, nil
-}
-
 // TransferDenomOwner transfers the ownership to new address
 func (k Keeper) TransferDenomOwner(
 	ctx sdk.Context,
@@ -218,6 +206,8 @@ func (k Keeper) GetDenomInfo(ctx sdk.Context, denomID string) (*types.Denom, err
 		Creator:     denomMetadata.Creator,
 		Symbol:      class.Symbol,
 		Description: class.Description,
-		PreviewURI:  class.Uri,
+		PreviewURI:  denomMetadata.PreviewUri,
+		Uri:         class.Uri,
+		UriHash:     class.UriHash,
 	}, nil
 }

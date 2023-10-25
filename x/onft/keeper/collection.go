@@ -51,7 +51,7 @@ func (k Keeper) SetCollection(ctx sdk.Context, collection types.Collection) erro
 }
 
 func (k Keeper) GetCollection(ctx sdk.Context, denomID string) (types.Collection, error) {
-	denom, err := k.GetDenom(ctx, denomID)
+	denom, err := k.GetDenomInfo(ctx, denomID)
 	if err != nil {
 		return types.Collection{}, errorsmod.Wrapf(types.ErrInvalidDenom, "denomID %s not existed ", denomID)
 	}
@@ -60,7 +60,7 @@ func (k Keeper) GetCollection(ctx sdk.Context, denomID string) (types.Collection
 	if err != nil {
 		return types.Collection{}, err
 	}
-	return types.NewCollection(denom, onfts), nil
+	return types.NewCollection(*denom, onfts), nil
 }
 
 func (k Keeper) GetCollections(ctx sdk.Context) (collections []types.Collection, err error) {
