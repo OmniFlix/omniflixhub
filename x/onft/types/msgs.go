@@ -36,7 +36,6 @@ func NewMsgCreateDenom(
 	name, schema, description, uri, uriHash, previewUri, data, sender string,
 	creationFee sdk.Coin,
 ) *MsgCreateDenom {
-
 	return &MsgCreateDenom{
 		Sender:      sender,
 		Id:          GenUniqueID(DenomPrefix),
