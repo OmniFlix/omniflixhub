@@ -13,8 +13,6 @@ mkdir -p ./tmp-swagger-gen
 # Get the paths used repos from go/pkg/mod
 cosmos_sdk_dir=$(go list -f '{{ .Dir }}' -m github.com/cosmos/cosmos-sdk)
 ibc_go=$(go list -f '{{ .Dir }}' -m github.com/cosmos/ibc-go/v7)
-onft=$(go list -f '{{ .Dir }}' -m github.com/OmniFlix/onft)
-marketplace=$(go list -f '{{ .Dir }}' -m github.com/OmniFlix/marketplace)
 streampay=$(go list -f '{{ .Dir }}' -m github.com/OmniFlix/streampay)
 
 
@@ -59,10 +57,6 @@ for f in $files; do
     cp $f ./tmp-swagger-gen/_all/cosmos-$counter.json
   elif [[ "$f" =~ "omniflix" ]]; then
     cp $f ./tmp-swagger-gen/_all/omniflix-$counter.json
-  elif [[ "$f" =~ "onft" ]]; then
-    cp $f ./tmp-swagger-gen/_all/onft-$counter.json
-  elif [[ "$f" =~ "marketplace" ]]; then
-    cp $f ./tmp-swagger-gen/_all/marketplace-$counter.json
   elif [[ "$f" =~ "streampay" ]]; then
     cp $f ./tmp-swagger-gen/_all/streampay-$counter.json
   else

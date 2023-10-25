@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	onftkeeper "github.com/OmniFlix/onft/keeper"
-	onfttypes "github.com/OmniFlix/onft/types"
+	onftkeeper "github.com/OmniFlix/omniflixhub/v2/x/onft/keeper"
+	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 
 	"github.com/OmniFlix/omniflixhub/v2/app/apptesting"
 	"github.com/OmniFlix/omniflixhub/v2/x/itc/keeper"

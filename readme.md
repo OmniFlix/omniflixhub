@@ -53,8 +53,8 @@ curl https://raw.githubusercontent.com/OmniFlix/mainnet/main/omniflixhub-1/genes
  - [NodeStake snapshot](https://nodestake.top/omniflix)
    
 ### OmniFlix Modules
-- [oNFT](https://github.com/OmniFlix/onft)
-- [Marketplace](https://github.com/OmniFlix/marketplace)
+- [oNFT](https://github.com/OmniFlix/omniflixhub/tree/main/x/onft)
+- [Marketplace](https://github.com/OmniFlix/omniflixhub/tree/main/marketplace)
 - [StreamPay](https://github.com/OmniFlix/streampay)
  
 ### Documentation

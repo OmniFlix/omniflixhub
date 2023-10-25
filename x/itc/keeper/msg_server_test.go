@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	onfttypes "github.com/OmniFlix/onft/types"
+	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
 	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"

@@ -79,8 +79,8 @@ import (
 	"github.com/OmniFlix/omniflixhub/v2/x/alloc"
 	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
 
-	"github.com/OmniFlix/onft"
-	onfttypes "github.com/OmniFlix/onft/types"
+	"github.com/OmniFlix/omniflixhub/v2/x/onft"
+	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 
 	"github.com/OmniFlix/omniflixhub/v2/x/marketplace"
 	marketplacetypes "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"

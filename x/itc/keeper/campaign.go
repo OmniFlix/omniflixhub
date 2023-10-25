@@ -7,7 +7,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 
 	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
-	nfttypes "github.com/OmniFlix/onft/types"
+	nfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -198,18 +198,17 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 			ctx,
 			campaign.NftMintDetails.DenomId,
 			generateClaimNftId(ctx, campaign.Id, campaign.MintCount),
-			nfttypes.Metadata{
-				Name:        campaign.NftMintDetails.Name + fmt.Sprintf("%d", campaign.MintCount),
-				Description: campaign.NftMintDetails.Description,
-				MediaURI:    campaign.NftMintDetails.MediaUri,
-				PreviewURI:  campaign.NftMintDetails.PreviewUri,
-			},
+			campaign.NftMintDetails.Name+fmt.Sprintf("%d", campaign.MintCount),
+			campaign.NftMintDetails.Description,
+			campaign.NftMintDetails.MediaUri,
+			campaign.NftMintDetails.UriHash,
+			campaign.NftMintDetails.PreviewUri,
 			campaign.NftMintDetails.Data,
+			ctx.BlockTime().UTC(),
 			campaign.NftMintDetails.Transferable,
 			campaign.NftMintDetails.Extensible,
 			campaign.NftMintDetails.Nsfw,
 			campaign.NftMintDetails.RoyaltyShare,
-			campaign.GetCreator(),
 			claimer,
 		); err != nil {
 			return errorsmod.Wrapf(types.ErrClaimingNFT,

@@ -108,6 +108,7 @@ message NFTDetails {
   bool       extensible = 8;
   bool       nsfw = 9;
   string     data = 10;
+  string     uri_hash = 11;
 }
 
 message Claim {

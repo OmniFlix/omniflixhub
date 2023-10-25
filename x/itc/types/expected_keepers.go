@@ -3,8 +3,8 @@ package types
 import (
 	"time"
 
-	nft "github.com/OmniFlix/onft/exported"
-	nfttypes "github.com/OmniFlix/onft/types"
+	nft "github.com/OmniFlix/omniflixhub/v2/x/onft/exported"
+	nfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -30,11 +30,22 @@ type BankKeeper interface {
 type NftKeeper interface {
 	GetONFT(ctx sdk.Context, denomId, onftId string) (nft nft.ONFTI, err error)
 	GetDenom(ctx sdk.Context, denomId string) (nfttypes.Denom, error)
-	MintONFT(ctx sdk.Context,
-		denomID, onftID string,
-		metadata nfttypes.Metadata, data string,
-		transferable, extensible, nsfw bool,
-		royaltyShare sdk.Dec, sender, recipient sdk.AccAddress,
+	MintONFT(
+		ctx sdk.Context,
+		denomID,
+		nftID,
+		name,
+		description,
+		mediaURI,
+		uriHash,
+		previewURI,
+		nftData string,
+		createdAt time.Time,
+		transferable,
+		extensible,
+		nsfw bool,
+		royaltyShare sdk.Dec,
+		receiver sdk.AccAddress,
 	) error
 	TransferOwnership(ctx sdk.Context, denomId, nftId string, srcOwner, dstOwner sdk.AccAddress) error
 	BurnONFT(ctx sdk.Context, denomId, nftId string, owner sdk.AccAddress) error

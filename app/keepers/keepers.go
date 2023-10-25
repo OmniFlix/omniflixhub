@@ -91,8 +91,8 @@ import (
 	allockeeper "github.com/OmniFlix/omniflixhub/v2/x/alloc/keeper"
 	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
 
-	onftkeeper "github.com/OmniFlix/onft/keeper"
-	onfttypes "github.com/OmniFlix/onft/types"
+	onftkeeper "github.com/OmniFlix/omniflixhub/v2/x/onft/keeper"
+	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 
 	marketplacekeeper "github.com/OmniFlix/omniflixhub/v2/x/marketplace/keeper"
 	marketplacetypes "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
