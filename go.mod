@@ -27,8 +27,6 @@ require (
 	google.golang.org/protobuf v1.31.0
 )
 
-require github.com/gogo/protobuf v1.3.2 // indirect
-
 require (
 	cloud.google.com/go v0.110.4 // indirect
 	cloud.google.com/go/compute v1.20.1 // indirect
