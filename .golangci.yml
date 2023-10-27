@@ -44,7 +44,7 @@ issues:
       text: "SA1019:"
       linters:
         - staticcheck
-    - path: "client"
+    - path: "cli"
       text: "use of repeated strings"
       linters:
         - goconst

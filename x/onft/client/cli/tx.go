@@ -35,6 +35,7 @@ func NewTxCmd() *cobra.Command {
 	return txCmd
 }
 
+//nolintlint:goconst
 func GetCmdCreateDenom() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "create [symbol]",
@@ -121,6 +122,7 @@ $ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<desc
 	return cmd
 }
 
+//nolintlint:goconst
 func GetCmdMintONFT() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "mint [denom-id]",
@@ -275,6 +277,7 @@ Additional Flags
 	return cmd
 }
 
+//nolintlint:goconst
 func GetCmdUpdateDenom() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "update-denom [denom-id]",
@@ -328,6 +331,7 @@ $ %s tx onft update-denom [denom-id] --name=<onft-name> --description=<onft-desc
 	return cmd
 }
 
+//nolintlint:goconst
 func GetCmdTransferDenom() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "transfer-denom [recipient] [denom-id]",
@@ -369,6 +373,7 @@ $ %s tx onft transfer-denom [recipient] [denom-id] --from=<key-name> --chain-id=
 	return cmd
 }
 
+//nolintlint:goconst
 func GetCmdTransferONFT() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "transfer [recipient] [denom-id] [onft-id]",
@@ -412,6 +417,7 @@ $ %s tx onft transfer [recipient] [denom-id] [onft-id] --from=<key-name> --chain
 	return cmd
 }
 
+//nolintlint:goconst
 func GetCmdBurnONFT() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "burn [denom-id] [onft-id]",
