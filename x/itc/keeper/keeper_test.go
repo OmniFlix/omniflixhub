@@ -135,7 +135,10 @@ func (suite *KeeperTestSuite) createDefaultNftDenom() {
 		"test11",
 		"{}",
 		"test description",
+		"ipfs://testuri",
+		"ipfs://testUriHash",
 		"ipfs://testpreviewuri",
+		"",
 		suite.TestAccs[0].String(),
 		onfttypes.DefaultDenomCreationFee,
 	)
@@ -153,7 +156,10 @@ func (suite *KeeperTestSuite) createSecondaryNftDenom() {
 		"test12",
 		"{}",
 		"test description",
+		"ipfs://testuri",
+		"ipfs://testUriHash",
 		"ipfs://testpreviewuri",
+		"",
 		suite.TestAccs[0].String(),
 		onfttypes.DefaultDenomCreationFee,
 	)
@@ -171,7 +177,10 @@ func (suite *KeeperTestSuite) createDefaultMintNftDenom() {
 		"test22",
 		"{}",
 		"test description",
+		"ipfs://testuri",
+		"ipfs://testUriHash",
 		"ipfs://testpreviewuri",
+		"",
 		suite.TestAccs[0].String(),
 		onfttypes.DefaultDenomCreationFee,
 	)

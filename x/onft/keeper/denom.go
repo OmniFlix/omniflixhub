@@ -34,7 +34,7 @@ func (k Keeper) SaveDenom(
 	if err != nil {
 		return err
 	}
-	return k.nk.SaveClass(ctx, nft.Class{
+	err = k.nk.SaveClass(ctx, nft.Class{
 		Id:          id,
 		Name:        name,
 		Symbol:      symbol,
@@ -43,6 +43,13 @@ func (k Keeper) SaveDenom(
 		UriHash:     uriHash,
 		Data:        metadata,
 	})
+	if err != nil {
+		return err
+	}
+	// emit events
+	k.emitCreateONFTDenomEvent(ctx, id, symbol, name, creator.String())
+
+	return nil
 }
 
 // TransferDenomOwner transfers the ownership to new address
@@ -87,9 +94,13 @@ func (k Keeper) TransferDenomOwner(
 		UriHash:     denom.UriHash,
 		Data:        data,
 	}
-	k.emitTransferONFTDenomEvent(ctx, denomID, denom.Symbol, sender, recipient)
 
-	return k.nk.UpdateClass(ctx, class)
+	err = k.nk.UpdateClass(ctx, class)
+	if err != nil {
+		return err
+	}
+	k.emitTransferONFTDenomEvent(ctx, denomID, denom.Symbol, sender, recipient)
+	return nil
 }
 
 func (k Keeper) HasDenom(ctx sdk.Context, id string) bool {

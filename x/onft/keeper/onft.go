@@ -44,13 +44,18 @@ func (k Keeper) MintONFT(
 	if err != nil {
 		return err
 	}
-	return k.nk.Mint(ctx, nft.NFT{
+	err = k.nk.Mint(ctx, nft.NFT{
 		ClassId: denomID,
 		Id:      nftID,
 		Uri:     mediaURI,
 		UriHash: uriHash,
 		Data:    data,
 	}, receiver)
+	if err != nil {
+		return err
+	}
+	k.emitMintONFTEvent(ctx, nftID, denomID, mediaURI, receiver.String())
+	return nil
 }
 
 func (k Keeper) TransferOwnership(ctx sdk.Context, denomID, onftID string, srcOwner, dstOwner sdk.AccAddress) error {
@@ -74,7 +79,12 @@ func (k Keeper) TransferOwnership(ctx sdk.Context, denomID, onftID string, srcOw
 	if !onftMetadata.Transferable {
 		return errorsmod.Wrap(types.ErrNotTransferable, onft.GetId())
 	}
-	return k.nk.Transfer(ctx, denomID, onftID, dstOwner)
+	err = k.nk.Transfer(ctx, denomID, onftID, dstOwner)
+	if err != nil {
+		return err
+	}
+	k.emitTransferONFTEvent(ctx, onftID, denomID, srcOwner.String(), dstOwner.String())
+	return nil
 }
 
 func (k Keeper) BurnONFT(
@@ -96,7 +106,12 @@ func (k Keeper) BurnONFT(
 		return err
 	}
 
-	return k.nk.Burn(ctx, denomID, onftID)
+	err = k.nk.Burn(ctx, denomID, onftID)
+	if err != nil {
+		return err
+	}
+	k.emitBurnONFTEvent(ctx, onftID, denomID, owner.String())
+	return nil
 }
 
 func (k Keeper) GetONFT(ctx sdk.Context, denomID, onftID string) (nft exported.ONFTI, err error) {

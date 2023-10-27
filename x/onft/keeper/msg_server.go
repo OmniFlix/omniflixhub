@@ -82,9 +82,6 @@ func (m msgServer) CreateDenom(goCtx context.Context, msg *types.MsgCreateDenom)
 		return nil, err
 	}
 
-	// emit events
-	m.Keeper.emitCreateONFTDenomEvent(ctx, msg.Id, msg.Symbol, msg.Name, msg.Sender)
-
 	return &types.MsgCreateDenomResponse{}, nil
 }
 
@@ -166,7 +163,6 @@ func (m msgServer) MintONFT(goCtx context.Context, msg *types.MsgMintONFT) (*typ
 		return nil, err
 	}
 
-	m.Keeper.emitMintONFTEvent(ctx, msg.Id, msg.DenomId, msg.Metadata.MediaURI, msg.Recipient)
 	return &types.MsgMintONFTResponse{}, nil
 }
 
@@ -191,8 +187,6 @@ func (m msgServer) TransferONFT(goCtx context.Context,
 		return nil, err
 	}
 
-	m.Keeper.emitTransferONFTEvent(ctx, msg.Id, msg.DenomId, msg.Sender, msg.Recipient)
-
 	return &types.MsgTransferONFTResponse{}, nil
 }
 
@@ -208,8 +202,6 @@ func (m msgServer) BurnONFT(goCtx context.Context,
 	if err := m.Keeper.BurnONFT(ctx, msg.DenomId, msg.Id, sender); err != nil {
 		return nil, err
 	}
-
-	m.Keeper.emitBurnONFTEvent(ctx, msg.Id, msg.DenomId, msg.Sender)
 
 	return &types.MsgBurnONFTResponse{}, nil
 }
