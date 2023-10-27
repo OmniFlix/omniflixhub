@@ -1,5 +1,3 @@
-//nolint: goconst
-
 package cli
 
 import (

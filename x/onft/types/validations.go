@@ -101,7 +101,6 @@ func ValidateMediaURI(uri string) error {
 			ErrInvalidURI,
 			"invalid uri %s, media uri should not be empty",
 			uri,
-			0,
 		)
 	}
 	if len(uri) > MaxURILen {
