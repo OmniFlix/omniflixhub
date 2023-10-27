@@ -1,3 +1,5 @@
+//nolint: goconst
+
 package cli
 
 import (
@@ -129,7 +131,7 @@ func GetCmdMintONFT() *cobra.Command {
 Example:
 $ %s tx onft mint [denom-id] \ 
 	--name <onft-name> \
-	--description <onft-descritpion> \
+	--description <onft-description> \
 	--media-uri=<uri> \
 	--preview-uri=<uri> \
     --uri-hash=<uri-hash> \
