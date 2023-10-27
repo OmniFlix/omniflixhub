@@ -86,3 +86,6 @@ linters-settings:
     allow-leading-space: true
     require-explanation: false
     require-specific: false
+
+service:
+  golangci-lint-version: 1.52.x
