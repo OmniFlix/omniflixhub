@@ -3,7 +3,6 @@ module github.com/OmniFlix/omniflixhub/v2
 go 1.20
 
 require (
-	github.com/OmniFlix/onft v0.6.1-0.20230923181114-30842581416b
 	github.com/OmniFlix/streampay/v2 v2.1.1-0.20230922163133-93e80c4663ef
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cometbft/cometbft-db v0.8.0
@@ -135,7 +134,7 @@ require (
 	github.com/mtibben/percent v0.2.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/petermattis/goid v0.0.0-20230317030725-371a4b8eda08 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.14.0 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect

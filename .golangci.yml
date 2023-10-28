@@ -44,6 +44,9 @@ issues:
       text: "SA1019:"
       linters:
         - staticcheck
+    - path: cli
+      linters:
+        - goconst
     - text: "leading space"
       linters:
         - nolintlint
@@ -71,6 +74,9 @@ linters-settings:
     rules:
       - name: var-naming
         disabled: true
+  govet:
+    excludes:
+      - SA1019
   maligned:
     # print struct with more effective memory layout or not, false by default
     suggest-new: true

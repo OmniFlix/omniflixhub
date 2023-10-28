@@ -266,7 +266,7 @@ func (k Keeper) processBid(ctx sdk.Context, auction types.AuctionListing, bid ty
 	if err != nil {
 		return err
 	}
-	denom, err := k.nftKeeper.GetDenom(ctx, auction.DenomId)
+	denom, err := k.nftKeeper.GetDenomInfo(ctx, auction.DenomId)
 	if err != nil {
 		return err
 	}
