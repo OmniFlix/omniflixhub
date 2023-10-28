@@ -44,8 +44,7 @@ issues:
       text: "SA1019:"
       linters:
         - staticcheck
-    - path: "cli"
-      text: "use of repeated strings"
+    - path: cli
       linters:
         - goconst
     - text: "leading space"
@@ -86,6 +85,3 @@ linters-settings:
     allow-leading-space: true
     require-explanation: false
     require-specific: false
-
-service:
-  golangci-lint-version: 1.52.x
