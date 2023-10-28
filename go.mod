@@ -1,6 +1,6 @@
 module github.com/OmniFlix/omniflixhub/v2
 
-go 1.20
+go 1.21
 
 require (
 	github.com/OmniFlix/streampay/v2 v2.1.1-0.20230922163133-93e80c4663ef
@@ -9,9 +9,10 @@ require (
 	github.com/cosmos/cosmos-proto v1.0.0-beta.2
 	github.com/cosmos/cosmos-sdk v0.47.5
 	github.com/cosmos/gogoproto v1.4.10
+	github.com/bianjieai/nft-transfer v1.1.2-ibc-v6.1.0.0.20231027024800-d841419984f1
 	github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7 v7.0.0
 	github.com/cosmos/ibc-apps/modules/async-icq/v7 v7.0.0
-	github.com/cosmos/ibc-go/v7 v7.2.0
+	github.com/cosmos/ibc-go/v7 v7.3.0
 	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0

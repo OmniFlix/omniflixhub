@@ -3,6 +3,8 @@ package app
 import (
 	appparams "github.com/OmniFlix/omniflixhub/v2/app/params"
 	"github.com/OmniFlix/omniflixhub/v2/x/globalfee"
+	nfttransfer "github.com/bianjieai/nft-transfer"
+	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -122,6 +124,7 @@ var (
 		vesting.AppModuleBasic{},
 		globalfee.AppModuleBasic{},
 		tokenfactory.AppModuleBasic{},
+		nfttransfer.AppModuleBasic{},
 
 		alloc.AppModuleBasic{},
 		onft.AppModuleBasic{},
@@ -140,6 +143,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		ibcnfttransfertypes.ModuleName: nil,
 		icatypes.ModuleName:            nil,
 		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 		globalfee.ModuleName:           nil,
@@ -222,6 +226,7 @@ func appModules(
 		transfer.NewAppModule(app.TransferKeeper),
 		ica.NewAppModule(nil, &app.ICAHostKeeper),
 		icq.NewAppModule(app.ICQKeeper),
+		nfttransfer.NewAppModule(app.IBCNFTTransferKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper),
 		globalfee.NewAppModule(appCodec, app.GlobalFeeKeeper, bondDenom),
 		alloc.NewAppModule(appCodec, app.AllocKeeper, app.GetSubspace(alloctypes.ModuleName)),
@@ -301,6 +306,7 @@ func orderBeginBlockers() []string {
 		icatypes.ModuleName,
 		icqtypes.ModuleName,
 		packetforwardtypes.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
 		authtypes.ModuleName,
@@ -334,6 +340,7 @@ func orderEndBlockers() []string {
 		icatypes.ModuleName,
 		icqtypes.ModuleName,
 		packetforwardtypes.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 		minttypes.ModuleName,
 		slashingtypes.ModuleName,
 		distrtypes.ModuleName,
@@ -387,6 +394,7 @@ func orderInitGenesis() []string {
 		icatypes.ModuleName,
 		icqtypes.ModuleName,
 		packetforwardtypes.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 		alloctypes.ModuleName,
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,

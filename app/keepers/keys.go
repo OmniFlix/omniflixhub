@@ -8,6 +8,7 @@ import (
 	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
+	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -51,6 +52,7 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		icahosttypes.StoreKey,
 		icqtypes.StoreKey,
 		packetforwardtypes.StoreKey,
+		ibcnfttransfertypes.StoreKey,
 		capabilitytypes.StoreKey,
 		crisistypes.StoreKey,
 		feegrant.StoreKey,
