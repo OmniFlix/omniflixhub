@@ -1,6 +1,7 @@
 package keepers
 
 import (
+	"github.com/OmniFlix/omniflixhub/v2/x/ics721nft"
 	nfttransfer "github.com/bianjieai/nft-transfer"
 	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
@@ -459,8 +460,7 @@ func NewAppKeeper(
 		appKeepers.IBCKeeper.ChannelKeeper,
 		&appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.AccountKeeper,
-		nil,
-		// ics721nft.NewICS721NftKeeper(appCodec, appKeepers.ONFTKeeper, appKeepers.AccountKeeper),
+		ics721nft.NewKeeper(appCodec, appKeepers.ONFTKeeper, appKeepers.AccountKeeper),
 		appKeepers.ScopedNFTTransferKeeper,
 	)
 
