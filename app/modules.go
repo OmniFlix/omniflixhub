@@ -61,8 +61,8 @@ import (
 	icatypes "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/types"
 	"github.com/cosmos/ibc-go/v4/modules/apps/transfer"
 
-	packetforward "github.com/strangelove-ventures/packet-forward-middleware/v4/router"
-	packetforwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
+	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v4/router"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v4/router/types"
 
 	"github.com/OmniFlix/omniflixhub/x/alloc"
 	alloctypes "github.com/OmniFlix/omniflixhub/x/alloc/types"
