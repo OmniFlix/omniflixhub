@@ -86,9 +86,9 @@ import (
 	icahostkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/keeper"
 	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
 
-	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router"
-	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/keeper"
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
+	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward"
+	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/keeper"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
 
 	allockeeper "github.com/OmniFlix/omniflixhub/v2/x/alloc/keeper"
 	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
@@ -364,13 +364,14 @@ func NewAppKeeper(
 
 	// initialize ibc packet forwarding middleware router
 	appKeepers.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
-		appCodec, appKeepers.keys[packetforwardtypes.StoreKey],
-		appKeepers.GetSubspace(packetforwardtypes.ModuleName),
+		appCodec,
+		appKeepers.keys[packetforwardtypes.StoreKey],
 		appKeepers.TransferKeeper, // Will be zero-value here. Reference is set later on with SetTransferKeeper.
 		appKeepers.IBCKeeper.ChannelKeeper,
 		appKeepers.DistrKeeper,
 		appKeepers.BankKeeper,
 		appKeepers.IBCKeeper.ChannelKeeper,
+		govModAddress,
 	)
 
 	// Create Transfer Keepers
@@ -405,12 +406,12 @@ func NewAppKeeper(
 	appKeepers.ICQKeeper = icqkeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[icqtypes.StoreKey],
-		appKeepers.GetSubspace(icqtypes.ModuleName),
 		appKeepers.IBCKeeper.ChannelKeeper, // may be replaced with middleware
 		appKeepers.IBCKeeper.ChannelKeeper,
 		&appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.ScopedICQKeeper,
 		bApp.GRPCQueryRouter(),
+		govModAddress,
 	)
 	icqModule := icq.NewIBCModule(appKeepers.ICQKeeper)
 
