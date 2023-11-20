@@ -205,7 +205,7 @@ func (cb ClassBuilder) Build(classID, classURI, classData string) (nft.Class, er
 	if v, ok := dataMap[ClassKeyPreviewURI]; ok {
 		if vMap, ok := v.(map[string]interface{}); ok {
 			if vStr, ok := vMap[KeyMediaFieldValue].(string); ok {
-				schema = vStr
+				previewURI = vStr
 				delete(dataMap, ClassKeyPreviewURI)
 			}
 		}
