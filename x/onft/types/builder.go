@@ -221,9 +221,12 @@ func (cb ClassBuilder) Build(classID, classURI, classData string) (nft.Class, er
 	}
 
 	denomMeta, err := codectypes.NewAnyWithValue(&DenomMetadata{
-		Creator: creator,
-		Schema:  schema,
-		Data:    data,
+		Creator:     creator,
+		Schema:      schema,
+		Description: description,
+		PreviewUri:  previewURI,
+		Data:        data,
+		UriHash:     uriHash,
 	})
 	if err != nil {
 		return nft.Class{}, err
