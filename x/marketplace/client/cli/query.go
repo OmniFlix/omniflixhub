@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -80,7 +79,7 @@ func GetCmdQueryListing() *cobra.Command {
 				return err
 			}
 
-			listingId := strings.ToLower(strings.TrimSpace(args[0]))
+			listingId := args[0]
 
 			queryClient := types.NewQueryClient(clientCtx)
 
@@ -208,7 +207,7 @@ func GetCmdQueryAuction() *cobra.Command {
 				return err
 			}
 
-			auctionId, err := strconv.ParseUint(strings.ToLower(strings.TrimSpace(args[0])), 10, 64)
+			auctionId, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}
@@ -339,7 +338,7 @@ func GetCmdQueryAuctionBid() *cobra.Command {
 				return err
 			}
 
-			auctionId, err := strconv.ParseUint(strings.ToLower(strings.TrimSpace(args[0])), 10, 64)
+			auctionId, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}

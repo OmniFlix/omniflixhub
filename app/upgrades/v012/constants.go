@@ -3,7 +3,7 @@ package v012
 import (
 	"github.com/OmniFlix/omniflixhub/v2/app/upgrades"
 	store "github.com/cosmos/cosmos-sdk/store/types"
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
 	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
 )
 

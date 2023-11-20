@@ -1,6 +1,8 @@
 package keepers
 
 import (
+	"github.com/OmniFlix/omniflixhub/v2/x/ics721nft"
+	nfttransfer "github.com/bianjieai/nft-transfer"
 	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -84,9 +86,9 @@ import (
 	icahostkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/keeper"
 	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
 
-	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router"
-	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/keeper"
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
+	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward"
+	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/keeper"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
 
 	allockeeper "github.com/OmniFlix/omniflixhub/v2/x/alloc/keeper"
 	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
@@ -102,6 +104,9 @@ import (
 
 	streampaykeeper "github.com/OmniFlix/streampay/v2/x/streampay/keeper"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
+
+	ibcnfttransferkeeper "github.com/bianjieai/nft-transfer/keeper"
+	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 )
 
 var tokenFactoryCapabilities = []string{
@@ -140,12 +145,14 @@ type AppKeepers struct {
 	GlobalFeeKeeper       globalfeekeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	TokenFactoryKeeper    tokenfactorykeeper.Keeper
+	IBCNFTTransferKeeper  ibcnfttransferkeeper.Keeper
 
 	// make scoped keepers public for test purposes
-	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
-	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
-	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
-	ScopedICQKeeper      capabilitykeeper.ScopedKeeper
+	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
+	ScopedTransferKeeper    capabilitykeeper.ScopedKeeper
+	ScopedICAHostKeeper     capabilitykeeper.ScopedKeeper
+	ScopedICQKeeper         capabilitykeeper.ScopedKeeper
+	ScopedNFTTransferKeeper capabilitykeeper.ScopedKeeper
 
 	AllocKeeper       allockeeper.Keeper
 	ONFTKeeper        onftkeeper.Keeper
@@ -205,6 +212,7 @@ func NewAppKeeper(
 	appKeepers.ScopedTransferKeeper = appKeepers.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	appKeepers.ScopedICAHostKeeper = appKeepers.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
 	appKeepers.ScopedICQKeeper = appKeepers.CapabilityKeeper.ScopeToModule(icqtypes.ModuleName)
+	appKeepers.ScopedNFTTransferKeeper = appKeepers.CapabilityKeeper.ScopeToModule(ibcnfttransfertypes.ModuleName)
 
 	appKeepers.CapabilityKeeper.Seal()
 
@@ -356,13 +364,14 @@ func NewAppKeeper(
 
 	// initialize ibc packet forwarding middleware router
 	appKeepers.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
-		appCodec, appKeepers.keys[packetforwardtypes.StoreKey],
-		appKeepers.GetSubspace(packetforwardtypes.ModuleName),
+		appCodec,
+		appKeepers.keys[packetforwardtypes.StoreKey],
 		appKeepers.TransferKeeper, // Will be zero-value here. Reference is set later on with SetTransferKeeper.
 		appKeepers.IBCKeeper.ChannelKeeper,
 		appKeepers.DistrKeeper,
 		appKeepers.BankKeeper,
 		appKeepers.IBCKeeper.ChannelKeeper,
+		govModAddress,
 	)
 
 	// Create Transfer Keepers
@@ -397,12 +406,12 @@ func NewAppKeeper(
 	appKeepers.ICQKeeper = icqkeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[icqtypes.StoreKey],
-		appKeepers.GetSubspace(icqtypes.ModuleName),
 		appKeepers.IBCKeeper.ChannelKeeper, // may be replaced with middleware
 		appKeepers.IBCKeeper.ChannelKeeper,
 		&appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.ScopedICQKeeper,
 		bApp.GRPCQueryRouter(),
+		govModAddress,
 	)
 	icqModule := icq.NewIBCModule(appKeepers.ICQKeeper)
 
@@ -443,6 +452,21 @@ func NewAppKeeper(
 		appKeepers.DistrKeeper,
 		govModAddress,
 	)
+
+	appKeepers.IBCNFTTransferKeeper = ibcnfttransferkeeper.NewKeeper(
+		appCodec,
+		keys[ibcnfttransfertypes.StoreKey],
+		govModAddress,
+		appKeepers.IBCKeeper.ChannelKeeper,
+		appKeepers.IBCKeeper.ChannelKeeper,
+		&appKeepers.IBCKeeper.PortKeeper,
+		appKeepers.AccountKeeper,
+		ics721nft.NewKeeper(appCodec, appKeepers.ONFTKeeper, appKeepers.AccountKeeper),
+		appKeepers.ScopedNFTTransferKeeper,
+	)
+
+	nfttransferIBCModule := nfttransfer.NewIBCModule(appKeepers.IBCNFTTransferKeeper)
+
 	appKeepers.MarketplaceKeeper = marketplacekeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[marketplacetypes.StoreKey],
@@ -490,7 +514,8 @@ func NewAppKeeper(
 	ibcRouter.
 		AddRoute(ibctransfertypes.ModuleName, ibcStack).
 		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
-		AddRoute(icqtypes.ModuleName, icqModule)
+		AddRoute(icqtypes.ModuleName, icqModule).
+		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule)
 
 	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 

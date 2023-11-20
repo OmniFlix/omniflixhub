@@ -62,18 +62,16 @@ func (msg MsgCreateDenom) ValidateBasic() error {
 	if err := ValidateDenomSymbol(msg.Symbol); err != nil {
 		return err
 	}
-	name := strings.TrimSpace(msg.Name)
-	if len(name) > 0 && !utf8.ValidString(name) {
+	if len(msg.Name) > 0 && !utf8.ValidString(msg.Name) {
 		return errorsmod.Wrap(ErrInvalidName, "denom name is invalid")
 	}
-	if err := ValidateName(name); err != nil {
+	if err := ValidateName(msg.Name); err != nil {
 		return err
 	}
-	description := strings.TrimSpace(msg.Description)
-	if len(description) > 0 && !utf8.ValidString(description) {
+	if len(msg.Description) > 0 && !utf8.ValidString(msg.Description) {
 		return errorsmod.Wrap(ErrInvalidDescription, "denom description is invalid")
 	}
-	if err := ValidateDescription(description); err != nil {
+	if err := ValidateDescription(msg.Description); err != nil {
 		return err
 	}
 	if err := ValidateURI(msg.PreviewURI); err != nil {
@@ -121,18 +119,16 @@ func (msg MsgUpdateDenom) ValidateBasic() error {
 	if err := ValidateDenomID(msg.Id); err != nil {
 		return err
 	}
-	name := msg.Name
-	if len(name) > 0 && !utf8.ValidString(name) {
+	if len(msg.Name) > 0 && !utf8.ValidString(msg.Name) {
 		return errorsmod.Wrap(ErrInvalidName, "denom name is invalid")
 	}
-	if err := ValidateName(name); err != nil {
+	if err := ValidateName(msg.Name); err != nil {
 		return err
 	}
-	description := strings.TrimSpace(msg.Description)
-	if len(description) > 0 && !utf8.ValidString(description) {
+	if len(msg.Description) > 0 && !utf8.ValidString(msg.Description) {
 		return errorsmod.Wrap(ErrInvalidDescription, "denom description is invalid")
 	}
-	if err := ValidateDescription(description); err != nil {
+	if err := ValidateDescription(msg.Description); err != nil {
 		return err
 	}
 	if err := ValidateURI(msg.PreviewURI); err != nil {

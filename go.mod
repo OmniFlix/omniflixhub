@@ -1,23 +1,24 @@
 module github.com/OmniFlix/omniflixhub/v2
 
-go 1.20
+go 1.21
 
 require (
-	github.com/OmniFlix/streampay/v2 v2.1.1-0.20230922163133-93e80c4663ef
+	github.com/OmniFlix/streampay/v2 v2.2.0-alpha.1
+	github.com/bianjieai/nft-transfer v1.1.3-ibc-v7.3.0
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cometbft/cometbft-db v0.8.0
 	github.com/cosmos/cosmos-proto v1.0.0-beta.2
 	github.com/cosmos/cosmos-sdk v0.47.5
 	github.com/cosmos/gogoproto v1.4.10
-	github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7 v7.0.0
-	github.com/cosmos/ibc-apps/modules/async-icq/v7 v7.0.0
-	github.com/cosmos/ibc-go/v7 v7.2.0
+	github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7 v7.1.1
+	github.com/cosmos/ibc-apps/modules/async-icq/v7 v7.1.1
+	github.com/cosmos/ibc-go/v7 v7.3.1
 	github.com/golang/protobuf v1.5.3
-	github.com/google/uuid v1.3.0
-	github.com/gorilla/mux v1.8.0
+	github.com/google/uuid v1.4.0
+	github.com/gorilla/mux v1.8.1
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/spf13/cast v1.5.1
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb

@@ -129,7 +129,7 @@ func GetCmdEditListing() *cobra.Command {
 
 			owner := clientCtx.GetFromAddress()
 
-			listingId := strings.TrimSpace(args[0])
+			listingId := args[0]
 
 			priceStr, err := cmd.Flags().GetString(FlagPrice)
 			if err != nil {
@@ -177,7 +177,7 @@ func GetCmdDeListNft() *cobra.Command {
 
 			owner := clientCtx.GetFromAddress()
 
-			listingId := strings.TrimSpace(args[0])
+			listingId := args[0]
 
 			msg := types.NewMsgDeListNFT(listingId, owner)
 			if err := msg.ValidateBasic(); err != nil {
@@ -408,7 +408,7 @@ func GetCmdCancelAuction() *cobra.Command {
 
 			owner := clientCtx.GetFromAddress()
 
-			auctionId, err := strconv.ParseUint(strings.TrimSpace(args[0]), 10, 64)
+			auctionId, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}

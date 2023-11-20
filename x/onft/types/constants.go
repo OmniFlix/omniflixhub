@@ -2,9 +2,9 @@ package types
 
 const (
 	MinDenomLen       = 3
-	MaxDenomLen       = 64
+	MaxDenomLen       = 128
 	MinIDLen          = 3
-	MaxIDLen          = 64
+	MaxIDLen          = 128
 	MaxNameLen        = 256
 	MaxDescriptionLen = 4096
 	MaxURILen         = 256

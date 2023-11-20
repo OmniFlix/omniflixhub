@@ -3,6 +3,8 @@ package app
 import (
 	appparams "github.com/OmniFlix/omniflixhub/v2/app/params"
 	"github.com/OmniFlix/omniflixhub/v2/x/globalfee"
+	nfttransfer "github.com/bianjieai/nft-transfer"
+	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -65,6 +67,7 @@ import (
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v7/modules/core"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
+	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 
 	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
 	icatypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/types"
@@ -73,8 +76,8 @@ import (
 	icq "github.com/cosmos/ibc-apps/modules/async-icq/v7"
 	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v7/types"
 
-	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router"
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
+	"github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
 
 	"github.com/OmniFlix/omniflixhub/v2/x/alloc"
 	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
@@ -111,6 +114,7 @@ var (
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		ibc.AppModuleBasic{},
+		ibctm.AppModuleBasic{},
 		ica.AppModuleBasic{},
 		icq.AppModuleBasic{},
 		packetforward.AppModuleBasic{},
@@ -122,6 +126,7 @@ var (
 		vesting.AppModuleBasic{},
 		globalfee.AppModuleBasic{},
 		tokenfactory.AppModuleBasic{},
+		nfttransfer.AppModuleBasic{},
 
 		alloc.AppModuleBasic{},
 		onft.AppModuleBasic{},
@@ -140,6 +145,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		ibcnfttransfertypes.ModuleName: nil,
 		icatypes.ModuleName:            nil,
 		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 		globalfee.ModuleName:           nil,
@@ -221,8 +227,9 @@ func appModules(
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
 		ica.NewAppModule(nil, &app.ICAHostKeeper),
-		icq.NewAppModule(app.ICQKeeper),
-		packetforward.NewAppModule(app.PacketForwardKeeper),
+		icq.NewAppModule(app.ICQKeeper, app.GetSubspace(icqtypes.ModuleName)),
+		nfttransfer.NewAppModule(app.IBCNFTTransferKeeper),
+		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
 		globalfee.NewAppModule(appCodec, app.GlobalFeeKeeper, bondDenom),
 		alloc.NewAppModule(appCodec, app.AllocKeeper, app.GetSubspace(alloctypes.ModuleName)),
 		onft.NewAppModule(
@@ -301,6 +308,7 @@ func orderBeginBlockers() []string {
 		icatypes.ModuleName,
 		icqtypes.ModuleName,
 		packetforwardtypes.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
 		authtypes.ModuleName,
@@ -334,6 +342,7 @@ func orderEndBlockers() []string {
 		icatypes.ModuleName,
 		icqtypes.ModuleName,
 		packetforwardtypes.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 		minttypes.ModuleName,
 		slashingtypes.ModuleName,
 		distrtypes.ModuleName,
@@ -387,6 +396,7 @@ func orderInitGenesis() []string {
 		icatypes.ModuleName,
 		icqtypes.ModuleName,
 		packetforwardtypes.ModuleName,
+		ibcnfttransfertypes.ModuleName,
 		alloctypes.ModuleName,
 		onfttypes.ModuleName,
 		marketplacetypes.ModuleName,

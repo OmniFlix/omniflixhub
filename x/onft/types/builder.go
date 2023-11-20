@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -31,6 +32,11 @@ var (
 	nftKeyURIHash       = fmt.Sprintf("%s%s", Namespace, "uri_hash")
 	nftKeyPreviewURI    = fmt.Sprintf("%s%s", Namespace, "preview_uri")
 	nftKeyDescription   = fmt.Sprintf("%s%s", Namespace, "description")
+	nftKeyCreatedAt     = fmt.Sprintf("%s%s", Namespace, "created_at")
+	nftKeyTransferable  = fmt.Sprintf("%s%s", Namespace, "transferable")
+	nftKeyExtensible    = fmt.Sprintf("%s%s", Namespace, "extensible")
+	nftKeyNSFW          = fmt.Sprintf("%s%s", Namespace, "nsfw")
+	nftKeyRoyaltyShare  = fmt.Sprintf("%s%s", Namespace, "royalty_share")
 )
 
 type ClassBuilder struct {
@@ -215,9 +221,12 @@ func (cb ClassBuilder) Build(classID, classURI, classData string) (nft.Class, er
 	}
 
 	denomMeta, err := codectypes.NewAnyWithValue(&DenomMetadata{
-		Creator: creator,
-		Schema:  schema,
-		Data:    data,
+		Creator:     creator,
+		Schema:      schema,
+		Description: description,
+		PreviewUri:  previewURI,
+		Data:        data,
+		UriHash:     uriHash,
 	})
 	if err != nil {
 		return nft.Class{}, err
@@ -264,9 +273,14 @@ func (nb NFTBuilder) BuildMetadata(_nft nft.NFT) (string, error) {
 		}
 	}
 	kvals[nftKeyName] = MediaField{Value: nftMetadata.Name}
-	kvals[nftKeyURIHash] = MediaField{Value: _nft.UriHash}
-	kvals[nftKeyPreviewURI] = MediaField{Value: nftMetadata.PreviewURI}
 	kvals[nftKeyDescription] = MediaField{Value: nftMetadata.Description}
+	kvals[nftKeyPreviewURI] = MediaField{Value: nftMetadata.PreviewURI}
+	kvals[nftKeyTransferable] = MediaField{Value: nftMetadata.Transferable}
+	kvals[nftKeyExtensible] = MediaField{Value: nftMetadata.Extensible}
+	kvals[nftKeyNSFW] = MediaField{Value: nftMetadata.Nsfw}
+	kvals[nftKeyCreatedAt] = MediaField{Value: nftMetadata.CreatedAt}
+	kvals[nftKeyRoyaltyShare] = MediaField{Value: nftMetadata.RoyaltyShare}
+	kvals[nftKeyURIHash] = MediaField{Value: _nft.UriHash}
 	data, err := json.Marshal(kvals)
 	if err != nil {
 		return "", err
@@ -299,14 +313,30 @@ func (nb NFTBuilder) Build(classId, nftID, nftURI, nftData string) (nft.NFT, err
 	}
 
 	var (
-		name    string
-		uriHash string
+		name         string
+		description  string
+		previewURI   string
+		transferable = true
+		extensible   = true
+		nsfw         = false
+		createdAt    string
+		royaltyShare string
+		uriHash      string
 	)
 	if v, ok := dataMap[nftKeyName]; ok {
 		if vMap, ok := v.(map[string]interface{}); ok {
 			if vStr, ok := vMap[KeyMediaFieldValue].(string); ok {
 				name = vStr
 				delete(dataMap, nftKeyName)
+			}
+		}
+	}
+
+	if v, ok := dataMap[nftKeyDescription]; ok {
+		if vMap, ok := v.(map[string]interface{}); ok {
+			if vStr, ok := vMap[KeyMediaFieldValue].(string); ok {
+				description = vStr
+				delete(dataMap, nftKeyDescription)
 			}
 		}
 	}
@@ -319,6 +349,57 @@ func (nb NFTBuilder) Build(classId, nftID, nftURI, nftData string) (nft.NFT, err
 			}
 		}
 	}
+	if v, ok := dataMap[nftKeyPreviewURI]; ok {
+		if vMap, ok := v.(map[string]interface{}); ok {
+			if vStr, ok := vMap[KeyMediaFieldValue].(string); ok {
+				previewURI = vStr
+				delete(dataMap, nftKeyPreviewURI)
+			}
+		}
+	}
+	if v, ok := dataMap[nftKeyCreatedAt]; ok {
+		if vMap, ok := v.(map[string]interface{}); ok {
+			if vStr, ok := vMap[KeyMediaFieldValue].(string); ok {
+				createdAt = vStr
+				delete(dataMap, nftKeyCreatedAt)
+			}
+		}
+	}
+	if v, ok := dataMap[nftKeyTransferable]; ok {
+		if vMap, ok := v.(map[string]interface{}); ok {
+			if vBool, ok := vMap[KeyMediaFieldValue].(bool); ok {
+				transferable = vBool
+				delete(dataMap, nftKeyTransferable)
+			}
+		}
+	}
+
+	if v, ok := dataMap[nftKeyExtensible]; ok {
+		if vMap, ok := v.(map[string]interface{}); ok {
+			if vBool, ok := vMap[KeyMediaFieldValue].(bool); ok {
+				extensible = vBool
+				delete(dataMap, nftKeyExtensible)
+			}
+		}
+	}
+
+	if v, ok := dataMap[nftKeyNSFW]; ok {
+		if vMap, ok := v.(map[string]interface{}); ok {
+			if vBool, ok := vMap[KeyMediaFieldValue].(bool); ok {
+				nsfw = vBool
+				delete(dataMap, nftKeyNSFW)
+			}
+		}
+	}
+
+	if v, ok := dataMap[nftKeyRoyaltyShare]; ok {
+		if vMap, ok := v.(map[string]interface{}); ok {
+			if vDec, ok := vMap[KeyMediaFieldValue].(string); ok {
+				royaltyShare = vDec
+				delete(dataMap, nftKeyRoyaltyShare)
+			}
+		}
+	}
 
 	data := ""
 	if len(dataMap) > 0 {
@@ -328,10 +409,19 @@ func (nb NFTBuilder) Build(classId, nftID, nftURI, nftData string) (nft.NFT, err
 		}
 		data = string(dataBz)
 	}
+	createdTime, _ := time.Parse(time.RFC3339, createdAt)
+	royalty, _ := sdk.NewDecFromStr(royaltyShare)
 
 	metadata, err := codectypes.NewAnyWithValue(&ONFTMetadata{
-		Name: name,
-		Data: data,
+		Name:         name,
+		Description:  description,
+		PreviewURI:   previewURI,
+		Data:         data,
+		Transferable: transferable,
+		Extensible:   extensible,
+		Nsfw:         nsfw,
+		CreatedAt:    createdTime,
+		RoyaltyShare: royalty,
 	})
 	if err != nil {
 		return nft.NFT{}, err
