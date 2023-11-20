@@ -140,6 +140,14 @@ func (k Keeper) GetNFT(ctx sdk.Context, classID, tokenID string) (nfttransfer.NF
 	if !has {
 		return nil, false
 	}
+	nftMetadata, err := onfttypes.UnmarshalNFTMetadata(k.cdc, _nft.Data.GetValue())
+	if err != nil {
+		return nil, false
+	}
+	if nftMetadata.Transferable == false {
+		k.Logger(ctx).Error("non-transferable nft")
+		return nil, false
+	}
 	metadata, err := k.nb.BuildMetadata(_nft)
 	if err != nil {
 		k.Logger(ctx).Error("encode nft data failed")
