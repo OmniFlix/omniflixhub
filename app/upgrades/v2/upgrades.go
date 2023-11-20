@@ -23,6 +23,7 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
 	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 	"github.com/cosmos/ibc-go/v7/modules/core/exported"
@@ -86,6 +87,8 @@ func CreateV2UpgradeHandler(
 				subspace.WithKeyTable(keyTable)
 			}
 		}
+		// set correct previous module version for pfm
+		fromVM[packetforwardtypes.ModuleName] = 1
 
 		// Migrate Tendermint consensus parameters from x/params module to a deprecated x/consensus module.
 		// The old params module is required to still be imported in your app.go in order to handle this migration.
