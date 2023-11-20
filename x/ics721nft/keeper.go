@@ -18,7 +18,7 @@ type Keeper struct {
 	cdc codec.Codec
 	ak  AccountKeeper
 	cb  onfttypes.ClassBuilder
-	tb  onfttypes.NFTBuilder
+	nb  onfttypes.NFTBuilder
 }
 
 // NewKeeper creates a new ics721 Keeper instance
@@ -31,7 +31,7 @@ func NewKeeper(cdc codec.Codec,
 		cdc: cdc,
 		ak:  ak,
 		cb:  onfttypes.NewClassBuilder(cdc, ak.GetModuleAddress),
-		tb:  onfttypes.NewNFTBuilder(cdc),
+		nb:  onfttypes.NewNFTBuilder(cdc),
 	}
 }
 
@@ -83,7 +83,7 @@ func (k Keeper) Mint(ctx sdk.Context,
 	tokenData string,
 	receiver sdk.AccAddress,
 ) error {
-	token, err := k.tb.Build(classID, tokenID, tokenURI, tokenData)
+	token, err := k.nb.Build(classID, tokenID, tokenURI, tokenData)
 	if err != nil {
 		k.Logger(ctx).Error("unable to build token from packet data", "error:", err.Error())
 		return err
@@ -106,7 +106,7 @@ func (k Keeper) Transfer(
 		return nil
 	}
 	_nft, _ := k.nk.GetNFT(ctx, classID, tokenID)
-	token, err := k.tb.Build(classID, tokenID, _nft.GetUri(), tokenData)
+	token, err := k.nb.Build(classID, tokenID, _nft.GetUri(), tokenData)
 	if err != nil {
 		k.Logger(ctx).Error("unable to build token on transfer from packet data", "error:", err.Error())
 		return err
@@ -140,7 +140,7 @@ func (k Keeper) GetNFT(ctx sdk.Context, classID, tokenID string) (nfttransfer.NF
 	if !has {
 		return nil, false
 	}
-	metadata, err := k.tb.BuildMetadata(_nft)
+	metadata, err := k.nb.BuildMetadata(_nft)
 	if err != nil {
 		k.Logger(ctx).Error("encode nft data failed")
 		return nil, false
