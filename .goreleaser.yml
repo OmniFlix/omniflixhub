@@ -6,7 +6,7 @@ env:
 
 before:
   hooks:
-    - go mod tidy -compat=1.20
+    - go mod tidy -compat=1.21
 
 builds:
   - main: ./cmd/omniflixhubd
