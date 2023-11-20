@@ -144,7 +144,7 @@ func (k Keeper) GetNFT(ctx sdk.Context, classID, tokenID string) (nfttransfer.NF
 	if err != nil {
 		return nil, false
 	}
-	if nftMetadata.Transferable == false {
+	if !nftMetadata.Transferable {
 		k.Logger(ctx).Error("non-transferable nft")
 		return nil, false
 	}
