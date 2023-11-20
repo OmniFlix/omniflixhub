@@ -4,6 +4,7 @@ import (
 	"github.com/OmniFlix/omniflixhub/v2/app/upgrades"
 	globalfeetypes "github.com/OmniFlix/omniflixhub/v2/x/globalfee/types"
 	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/types"
+	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 	consensustypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
@@ -24,6 +25,7 @@ var Upgrade = upgrades.Upgrade{
 			group.ModuleName,
 			icqtypes.ModuleName,
 			tokenfactorytypes.ModuleName,
+			ibcnfttransfertypes.ModuleName,
 		},
 	},
 }
