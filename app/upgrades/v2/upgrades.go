@@ -67,6 +67,8 @@ func CreateV2UpgradeHandler(
 				keyTable = ibctransfertypes.ParamKeyTable()
 			case icahosttypes.SubModuleName:
 				keyTable = icahosttypes.ParamKeyTable()
+			case packetforwardtypes.ModuleName:
+				keyTable = packetforwardtypes.ParamKeyTable()
 
 			// omniflix
 			case alloctypes.ModuleName:
