@@ -1,7 +1,6 @@
 package types
 
 import (
-	"strings"
 	"time"
 
 	errorsmod "cosmossdk.io/errors"
@@ -49,7 +48,6 @@ func ValidateDuration(t interface{}) error {
 }
 
 func ValidateId(id string) error {
-	id = strings.TrimSpace(id)
 	if len(id) < MinListingIdLength || len(id) > MaxListingIdLength {
 		return errorsmod.Wrapf(
 			ErrInvalidListingId,

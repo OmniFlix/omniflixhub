@@ -3,13 +3,11 @@ package cli
 import (
 	"context"
 	"fmt"
-	"strconv"
-	"strings"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
+	"strconv"
 
 	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 	"github.com/spf13/cobra"
@@ -80,7 +78,7 @@ func GetCmdQueryListing() *cobra.Command {
 				return err
 			}
 
-			listingId := strings.ToLower(strings.TrimSpace(args[0]))
+			listingId := args[0]
 
 			queryClient := types.NewQueryClient(clientCtx)
 
@@ -208,7 +206,7 @@ func GetCmdQueryAuction() *cobra.Command {
 				return err
 			}
 
-			auctionId, err := strconv.ParseUint(strings.ToLower(strings.TrimSpace(args[0])), 10, 64)
+			auctionId, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}
@@ -339,7 +337,7 @@ func GetCmdQueryAuctionBid() *cobra.Command {
 				return err
 			}
 
-			auctionId, err := strconv.ParseUint(strings.ToLower(strings.TrimSpace(args[0])), 10, 64)
+			auctionId, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}

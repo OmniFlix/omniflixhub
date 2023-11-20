@@ -2,8 +2,6 @@ package keeper
 
 import (
 	"context"
-	"strings"
-
 	"github.com/cosmos/cosmos-sdk/x/nft"
 
 	"google.golang.org/grpc/codes"
@@ -18,19 +16,18 @@ import (
 var _ types.QueryServer = Keeper{}
 
 func (k Keeper) Supply(c context.Context, request *types.QuerySupplyRequest) (*types.QuerySupplyResponse, error) {
-	denom := strings.ToLower(strings.TrimSpace(request.DenomId))
 	ctx := sdk.UnwrapSDKContext(c)
 
 	var supply uint64
 	switch {
-	case len(request.Owner) == 0 && len(denom) > 0:
-		supply = k.GetTotalSupply(ctx, denom)
+	case len(request.Owner) == 0 && len(request.DenomId) > 0:
+		supply = k.GetTotalSupply(ctx, request.DenomId)
 	default:
 		owner, err := sdk.AccAddressFromBech32(request.Owner)
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "invalid owner address %s", request.Owner)
 		}
-		supply = k.GetBalance(ctx, denom, owner)
+		supply = k.GetBalance(ctx, request.DenomId, owner)
 	}
 	return &types.QuerySupplyResponse{
 		Amount: supply,
@@ -151,10 +148,9 @@ func (k Keeper) IBCCollection(c context.Context, request *types.QueryIBCCollecti
 }
 
 func (k Keeper) Denom(c context.Context, request *types.QueryDenomRequest) (*types.QueryDenomResponse, error) {
-	denom := strings.ToLower(strings.TrimSpace(request.DenomId))
 	ctx := sdk.UnwrapSDKContext(c)
 
-	denomObject, err := k.GetDenomInfo(ctx, denom)
+	denomObject, err := k.GetDenomInfo(ctx, request.DenomId)
 	if err != nil {
 		return nil, err
 	}
@@ -216,11 +212,9 @@ func (k Keeper) Denoms(c context.Context, request *types.QueryDenomsRequest) (*t
 }
 
 func (k Keeper) ONFT(c context.Context, request *types.QueryONFTRequest) (*types.QueryONFTResponse, error) {
-	denom := strings.ToLower(strings.TrimSpace(request.DenomId))
-	onftID := strings.ToLower(strings.TrimSpace(request.Id))
 	ctx := sdk.UnwrapSDKContext(c)
 
-	onft, err := k.GetONFT(ctx, denom, onftID)
+	onft, err := k.GetONFT(ctx, request.DenomId, request.Id)
 	if err != nil {
 		return nil, errorsmod.Wrapf(types.ErrUnknownONFT, "invalid ONFT %s from collection %s", request.Id, request.DenomId)
 	}

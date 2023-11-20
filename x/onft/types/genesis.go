@@ -25,9 +25,6 @@ func ValidateGenesis(data GenesisState) error {
 		if err := ValidateDenomID(c.Denom.Id); err != nil {
 			return err
 		}
-		if err := ValidateDenomSymbol(c.Denom.Symbol); err != nil {
-			return err
-		}
 		if err := ValidateName(c.Denom.Name); err != nil {
 			return err
 		}
