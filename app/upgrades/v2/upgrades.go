@@ -6,8 +6,10 @@ import (
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
+	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v7/types"
 )
 
 func CreateV2UpgradeHandler(
@@ -18,7 +20,25 @@ func CreateV2UpgradeHandler(
 ) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		ctx.Logger().Info("running migrations ...")
+		for _, subspace := range keepers.ParamsKeeper.GetSubspaces() {
+			subspace := subspace
 
+			var keyTable paramstypes.KeyTable
+			switch subspace.Name() {
+			// ibc-apps types
+			case packetforwardtypes.ModuleName:
+				keyTable = packetforwardtypes.ParamKeyTable()
+			case icqtypes.ModuleName:
+				keyTable = icqtypes.ParamKeyTable()
+
+			default:
+				continue
+			}
+
+			if !subspace.HasKeyTable() {
+				subspace.WithKeyTable(keyTable)
+			}
+		}
 		// set correct previous module version for pfm
 		fromVM[packetforwardtypes.ModuleName] = 1
 
