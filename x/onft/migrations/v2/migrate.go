@@ -2,7 +2,6 @@ package v2
 
 import (
 	"github.com/OmniFlix/omniflixhub/v2/x/onft/exported"
-	"github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -25,22 +24,26 @@ func Migrate(
 	cdc codec.BinaryCodec,
 	nftKeeper NFTKeeper,
 ) error {
-	var currParams types.Params
-	legacySubspace.GetParamSet(ctx, &currParams)
+	/*
+		var currParams types.Params
+		legacySubspace.GetParamSet(ctx, &currParams)
+	*/
 
 	k := keeper{
 		storeKey:  storeKey,
 		cdc:       cdc,
 		nftKeeper: nftKeeper,
 	}
+	/*
+		if err := currParams.ValidateBasic(); err != nil {
+			return err
+		}
+		store := ctx.KVStore(k.storeKey)
 
-	if err := currParams.ValidateBasic(); err != nil {
-		return err
-	}
-	store := ctx.KVStore(k.storeKey)
+		bz := cdc.MustMarshal(&currParams)
+		store.Set(ParamsKey, bz)
 
-	bz := cdc.MustMarshal(&currParams)
-	store.Set(ParamsKey, bz)
+	*/
 
 	return MigrateCollections(ctx, storeKey, cdc, ctx.Logger(), k)
 }
