@@ -1,11 +1,12 @@
 package v2
 
 import (
+	"net/url"
+	"strings"
 	"time"
 
 	"github.com/cometbft/cometbft/libs/log"
 
-	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -15,7 +16,6 @@ import (
 // MigrateCollections is used to migrate nft data from onft to x/nft
 func MigrateCollections(ctx sdk.Context,
 	storeKey storetypes.StoreKey,
-	cdc codec.BinaryCodec,
 	logger log.Logger,
 	k keeper,
 ) error {
@@ -27,12 +27,12 @@ func MigrateCollections(ctx sdk.Context,
 	defer iterator.Close()
 
 	var (
-		totkalDenoms int64
-		totalNFTs    int64
+		totalDenoms int64
+		totalNFTs   int64
 	)
 	for ; iterator.Valid(); iterator.Next() {
 		var denom types.Denom
-		cdc.MustUnmarshal(iterator.Value(), &denom)
+		k.cdc.MustUnmarshal(iterator.Value(), &denom)
 
 		// delete unused key
 		store.Delete(KeyDenomID(denom.Id))
@@ -43,6 +43,8 @@ func MigrateCollections(ctx sdk.Context,
 		if err != nil {
 			return err
 		}
+		// update abs preview uris to ipfs reference
+		previewURI := getIPFSReferenceURIFromMediaURI(denom.PreviewURI)
 
 		if err := k.nftKeeper.SaveDenom(
 			ctx,
@@ -52,7 +54,7 @@ func MigrateCollections(ctx sdk.Context,
 			denom.Schema,
 			creator,
 			denom.Description,
-			denom.PreviewURI,
+			previewURI,
 			denom.Uri,
 			denom.UriHash,
 			denom.Data,
@@ -64,12 +66,12 @@ func MigrateCollections(ctx sdk.Context,
 		if err != nil {
 			return err
 		}
-		totkalDenoms++
+		totalDenoms++
 		totalNFTs += totalNFTsInDenom
 
 	}
 	logger.Info("migrate store data success",
-		"Total Denoms", totkalDenoms,
+		"Total Denoms", totalDenoms,
 		"total NFTs", totalNFTs,
 		"time taken", time.Since(startTime).String(),
 	)
@@ -106,14 +108,18 @@ func migrateONFT(
 		store.Delete(KeyONFT(denomID, oNFT.Id))
 		store.Delete(KeyOwner(owner, denomID, oNFT.Id))
 
+		// update abs uris to ipfs reference
+		mediaURI := getIPFSReferenceURIFromMediaURI(oNFT.Metadata.MediaURI)
+		previewURI := getIPFSReferenceURIFromMediaURI(oNFT.Metadata.PreviewURI)
+
 		if err := k.saveNFT(
 			ctx,
 			denomID,
 			oNFT.Id,
 			oNFT.Metadata.Name,
 			oNFT.Metadata.Description,
-			oNFT.Metadata.MediaURI,
-			oNFT.Metadata.PreviewURI,
+			mediaURI,
+			previewURI,
 			oNFT.Metadata.UriHash,
 			oNFT.Data,
 			oNFT.Extensible,
@@ -129,4 +135,24 @@ func migrateONFT(
 	}
 	logger.Info("migrate onft collection success", "DenomID", denomID, "TotalNFTs", total)
 	return total, nil
+}
+
+func getIPFSReferenceURIFromMediaURI(uriString string) string {
+	parsedURL, err := url.Parse(uriString)
+	if err != nil {
+		return uriString
+	}
+	path := parsedURL.Path
+	query := parsedURL.RawQuery
+	if strings.HasPrefix(path, "/ipfs/") {
+		hashPart := strings.TrimPrefix(path, "/ipfs/")
+		if len(hashPart) > 0 {
+			referenceURI := "ipfs://" + hashPart
+			if len(query) > 0 {
+				referenceURI = referenceURI + "?" + query
+			}
+			return referenceURI
+		}
+	}
+	return uriString
 }
