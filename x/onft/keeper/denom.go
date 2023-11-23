@@ -220,5 +220,6 @@ func (k Keeper) GetDenomInfo(ctx sdk.Context, denomID string) (*types.Denom, err
 		PreviewURI:  denomMetadata.PreviewUri,
 		Uri:         class.Uri,
 		UriHash:     class.UriHash,
+		Data:        denomMetadata.Data,
 	}, nil
 }
