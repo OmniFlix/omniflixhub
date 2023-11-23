@@ -23,6 +23,9 @@ func NewMigrator(k Keeper, ss exported.Subspace) Migrator {
 // version 2. Specifically, it takes the parameters that are currently stored
 // and managed by the x/params modules and stores them directly into the onft
 // module state.
+// and
+//
+//	migrates onft store to x/nft
 func (m Migrator) Migrate1to2(ctx sdk.Context) error {
 	return v2.Migrate(ctx, m.keeper.storeKey, m.legacySubspace, m.keeper.cdc, m.keeper)
 }
