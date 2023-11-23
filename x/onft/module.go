@@ -96,7 +96,8 @@ func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, accountKeeper types.Acc
 
 func (AppModule) Name() string { return types.ModuleName }
 
-func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {
+func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
+	keeper.RegisterInvariants(ir, am.keeper)
 }
 
 func (AppModule) QuerierRoute() string { return types.RouterKey }
