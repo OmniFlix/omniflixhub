@@ -3,16 +3,28 @@ package v2_test
 import (
 	"testing"
 
+	"github.com/OmniFlix/omniflixhub/v2/app/apptesting"
+	"github.com/stretchr/testify/suite"
+
 	"github.com/stretchr/testify/require"
 
-	"github.com/OmniFlix/omniflixhub/v2/x/onft"
 	"github.com/OmniFlix/omniflixhub/v2/x/onft/exported"
 	v2 "github.com/OmniFlix/omniflixhub/v2/x/onft/migrations/v2"
 	"github.com/OmniFlix/omniflixhub/v2/x/onft/types"
-	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 )
+
+type MigratorTestSuite struct {
+	apptesting.KeeperTestHelper
+}
+
+func TestMigratorTestSuite(t *testing.T) {
+	suite.Run(t, new(MigratorTestSuite))
+}
+
+func (suite *MigratorTestSuite) SetupTest() {
+	suite.Setup()
+}
 
 type mockSubspace struct {
 	ps types.Params
@@ -26,20 +38,20 @@ func (ms mockSubspace) GetParamSet(ctx sdk.Context, ps exported.ParamSet) {
 	*ps.(*types.Params) = ms.ps
 }
 
-func TestMigrate(t *testing.T) {
-	encCfg := moduletestutil.MakeTestEncodingConfig(onft.AppModuleBasic{})
-	cdc := encCfg.Codec
-
-	storeKey := sdk.NewKVStoreKey(v2.ModuleName)
-	tKey := sdk.NewTransientStoreKey("transient_test")
-	ctx := testutil.DefaultContext(storeKey, tKey)
+func (suite *MigratorTestSuite) TestMigrate() {
+	storeKey := suite.App.GetKey(types.StoreKey)
+	// tKey := sdk.NewTransientStoreKey("transient_test")
+	ctx := suite.Ctx
+	cdc := suite.App.AppCodec()
 	store := ctx.KVStore(storeKey)
+	collections := generateCollectionsData(ctx, storeKey, cdc)
 
 	legacySubspace := newMockSubspace(types.DefaultParams())
-	require.NoError(t, v2.Migrate(ctx, storeKey, legacySubspace, cdc, nil))
+	require.NoError(suite.T(), v2.Migrate(ctx, storeKey, legacySubspace, cdc, suite.App.ONFTKeeper))
 
 	var res types.Params
 	bz := store.Get(v2.ParamsKey)
-	require.NoError(t, cdc.Unmarshal(bz, &res))
-	require.Equal(t, legacySubspace.ps, res)
+	require.NoError(suite.T(), cdc.Unmarshal(bz, &res))
+	require.Equal(suite.T(), legacySubspace.ps, res)
+	check(suite.T(), ctx, suite.App.ONFTKeeper, collections)
 }
