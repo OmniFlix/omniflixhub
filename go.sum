@@ -232,6 +232,8 @@ github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 h1:TngWCqHvy9oXAN6lEV
 github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5/go.mod h1:lmUJ/7eu/Q8D7ML55dXQrVaamCz2vxCfdQBasLZfHKk=
 github.com/OmniFlix/streampay/v2 v2.2.0-alpha.1 h1:atuisgnfQ1APLEwVOOvrRbJFf0qN8WfWeLBKEF9CFdQ=
 github.com/OmniFlix/streampay/v2 v2.2.0-alpha.1/go.mod h1:C0+uhcZvzLqT9o1Xiy+LshBp8FzMTK6KHjAPKLVD818=
+github.com/OmniFlix/streampay/v2 v2.2.0-alpha.1.0.20231124092844-2867ed68bb07 h1:igbf6flIr+Vji6pyVVKEqkhdBReXbTh3Jo2cYxIewGI=
+github.com/OmniFlix/streampay/v2 v2.2.0-alpha.1.0.20231124092844-2867ed68bb07/go.mod h1:ywG2hlTIfTj39iJNbAn6k+kzBupphhYlarOZY4NjtF8=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=

@@ -8,7 +8,6 @@ import (
 	marketplacetypes "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/types"
-	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -79,8 +78,6 @@ func CreateV2UpgradeHandler(
 				keyTable = marketplacetypes.ParamKeyTable()
 			case itctypes.ModuleName:
 				keyTable = itctypes.ParamKeyTable()
-			case streampaytypes.ModuleName:
-				keyTable = streampaytypes.ParamKeyTable()
 			default:
 				continue
 			}

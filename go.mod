@@ -3,7 +3,7 @@ module github.com/OmniFlix/omniflixhub/v2
 go 1.21
 
 require (
-	github.com/OmniFlix/streampay/v2 v2.2.0-alpha.1
+	github.com/OmniFlix/streampay/v2 v2.2.0-alpha.1.0.20231124092844-2867ed68bb07
 	github.com/bianjieai/nft-transfer v1.1.3-ibc-v7.3.0
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cometbft/cometbft-db v0.8.0
