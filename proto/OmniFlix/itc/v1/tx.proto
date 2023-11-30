@@ -30,6 +30,8 @@ service Msg {
 }
 
 message MsgCreateCampaign {
+  option (cosmos.msg.v1.signer) = "creator";
+
   string                      name = 1;
   string                      description = 2;
   InteractionType             interaction = 3;
@@ -69,6 +71,8 @@ message MsgCreateCampaign {
 message MsgCreateCampaignResponse {}
 
 message MsgCancelCampaign {
+  option (cosmos.msg.v1.signer) = "creator";
+
   uint64 campaign_id = 1;
   string creator = 2;
 }
@@ -76,6 +80,8 @@ message MsgCancelCampaign {
 message MsgCancelCampaignResponse {}
 
 message MsgClaim {
+  option (cosmos.msg.v1.signer) = "claimer";
+
   uint64 campaign_id = 1;
   string nft_id = 2;
   InteractionType interaction = 3;
@@ -85,6 +91,8 @@ message MsgClaim {
 message MsgClaimResponse {}
 
 message MsgDepositCampaign {
+  option (cosmos.msg.v1.signer) = "depositor";
+
   uint64                    campaign_id = 1;
   cosmos.base.v1beta1.Coin  amount = 2 [(gogoproto.nullable) = false];
   string                    depositor = 3;

@@ -40,6 +40,8 @@ service Msg {
 
 
 message MsgListNFT {
+  option (cosmos.msg.v1.signer) = "owner";
+
   string                   id           = 1;
   string                   nft_id       = 2;
   string                   denom_id     = 3;
@@ -56,6 +58,8 @@ message MsgListNFT {
 message MsgListNFTResponse {}
 
 message MsgEditListing {
+  option (cosmos.msg.v1.signer) = "owner";
+
   string                   id    = 1;
   cosmos.base.v1beta1.Coin price = 2 [
     (gogoproto.nullable)     = false,
@@ -73,6 +77,8 @@ message MsgDeListNFT {
 message MsgDeListNFTResponse {}
 
 message MsgBuyNFT {
+  option (cosmos.msg.v1.signer) = "buyer";
+
   string                   id    = 1;
   cosmos.base.v1beta1.Coin price = 2 [
     (gogoproto.nullable)     = false,
@@ -84,6 +90,8 @@ message MsgBuyNFT {
 message MsgBuyNFTResponse {}
 
 message MsgCreateAuction {
+  option (cosmos.msg.v1.signer) = "owner";
+
   string                    nft_id               = 1;
   string                    denom_id             = 2;
   google.protobuf.Timestamp start_time           = 3 [
@@ -118,6 +126,8 @@ message MsgCreateAuctionResponse {
 }
 
 message MsgCancelAuction {
+  option (cosmos.msg.v1.signer) = "owner";
+
   uint64 auction_id = 1 [(gogoproto.moretags) = "yaml:\"auction_id\""];
   string owner      = 2;
 }
@@ -125,6 +135,8 @@ message MsgCancelAuction {
 message MsgCancelAuctionResponse {}
 
 message MsgPlaceBid {
+  option (cosmos.msg.v1.signer) = "bidder";
+
   uint64                   auction_id = 1 [(gogoproto.moretags) = "yaml:\"auction_id\""];
   cosmos.base.v1beta1.Coin amount     = 2 [
     (gogoproto.nullable)     = false,
