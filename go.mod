@@ -3,7 +3,7 @@ module github.com/OmniFlix/omniflixhub/v2
 go 1.21
 
 require (
-	github.com/OmniFlix/streampay/v2 v2.2.0-alpha.2
+	github.com/OmniFlix/streampay/v2 v2.2.0-alpha.3
 	github.com/bianjieai/nft-transfer v1.1.3-ibc-v7.3.0
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cometbft/cometbft-db v0.8.0
@@ -26,6 +26,8 @@ require (
 	google.golang.org/grpc v1.56.2
 	google.golang.org/protobuf v1.31.0
 )
+
+require github.com/gogo/protobuf v1.3.2 // indirect
 
 require (
 	cloud.google.com/go v0.110.4 // indirect
@@ -85,7 +87,6 @@ require (
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect
 	github.com/gogo/googleapis v1.4.1 // indirect
-	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v1.1.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/mock v1.6.0 // indirect

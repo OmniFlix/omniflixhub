@@ -27,15 +27,14 @@ const (
 	createTFDenom        = "tokenfactory/create-denom"
 	mintTFDenom          = "tokenfactory/mint"
 	burnTFDenom          = "tokenfactory/burn"
-	forceTransferTFDenom = "okenfactory/force-transfer"
+	forceTransferTFDenom = "tokenfactory/force-transfer"
 	changeAdminTFDenom   = "tokenfactory/change-admin"
-	updateTFparams       = "tokenfactory/msg-update-params"
+	updateTFParams       = "tokenfactory/msg-update-params"
 )
 
 // NOTE: This is required for the GetSignBytes function
 func init() {
 	RegisterLegacyAminoCodec(amino)
-
 	sdk.RegisterLegacyAminoCodec(amino)
 	// cryptocodec.RegisterCrypto(amino)
 	// codec.RegisterEvidences(amino)
@@ -67,5 +66,5 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgBurn{}, burnTFDenom, nil)
 	cdc.RegisterConcrete(&MsgForceTransfer{}, forceTransferTFDenom, nil)
 	cdc.RegisterConcrete(&MsgChangeAdmin{}, changeAdminTFDenom, nil)
-	cdc.RegisterConcrete(&MsgUpdateParams{}, updateTFparams, nil)
+	cdc.RegisterConcrete(&MsgUpdateParams{}, updateTFParams, nil)
 }
