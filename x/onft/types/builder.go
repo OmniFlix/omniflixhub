@@ -78,7 +78,7 @@ func (cb ClassBuilder) BuildMetadata(class nft.Class) (string, error) {
 		err := json.Unmarshal([]byte(metadata.Data), &kvals)
 		if err != nil && IsIBCDenom(class.Id) {
 			// when classData is not a legal json, there is no need to parse the data
-			return base64.RawStdEncoding.EncodeToString([]byte(metadata.Data)), nil
+			return base64.StdEncoding.EncodeToString([]byte(metadata.Data)), nil
 		}
 		// note: if metadata.Data is null, it may cause map to be redefined as nil
 		if kvals == nil {
@@ -102,12 +102,12 @@ func (cb ClassBuilder) BuildMetadata(class nft.Class) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return base64.RawStdEncoding.EncodeToString(data), nil
+	return base64.StdEncoding.EncodeToString(data), nil
 }
 
 // Build create a class from ics721 packetData
 func (cb ClassBuilder) Build(classID, classURI, classData string) (nft.Class, error) {
-	classDataBz, err := base64.RawStdEncoding.DecodeString(classData)
+	classDataBz, err := base64.StdEncoding.DecodeString(classData)
 	if err != nil {
 		return nft.Class{}, err
 	}
@@ -265,7 +265,7 @@ func (nb NFTBuilder) BuildMetadata(_nft nft.NFT) (string, error) {
 		err := json.Unmarshal([]byte(nftMetadata.Data), &kvals)
 		if err != nil && IsIBCDenom(_nft.ClassId) {
 			// when nftMetadata is not a legal json, there is no need to parse the data
-			return base64.RawStdEncoding.EncodeToString([]byte(nftMetadata.Data)), nil
+			return base64.StdEncoding.EncodeToString([]byte(nftMetadata.Data)), nil
 		}
 		// note: if nftMetadata.Data is null, it may cause map to be redefined as nil
 		if kvals == nil {
@@ -285,12 +285,12 @@ func (nb NFTBuilder) BuildMetadata(_nft nft.NFT) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return base64.RawStdEncoding.EncodeToString(data), nil
+	return base64.StdEncoding.EncodeToString(data), nil
 }
 
 // Build create a nft from ics721 packet data
 func (nb NFTBuilder) Build(classId, nftID, nftURI, nftData string) (nft.NFT, error) {
-	nftDataBz, err := base64.RawStdEncoding.DecodeString(nftData)
+	nftDataBz, err := base64.StdEncoding.DecodeString(nftData)
 	if err != nil {
 		return nft.NFT{}, err
 	}
