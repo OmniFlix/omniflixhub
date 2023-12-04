@@ -2,6 +2,7 @@ syntax = "proto3";
 package OmniFlix.marketplace.v1beta1;
 
 import "cosmos/msg/v1/msg.proto";
+import "amino/amino.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
 import "OmniFlix/marketplace/v1beta1/listing.proto";
@@ -15,6 +16,7 @@ option go_package = "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types";
 option (gogoproto.goproto_getters_all) = false;
 
 service Msg {
+  option (cosmos.msg.v1.service) = true;
 
   rpc ListNFT(MsgListNFT) returns (MsgListNFTResponse);
 
@@ -40,6 +42,10 @@ service Msg {
 
 
 message MsgListNFT {
+  option (cosmos.msg.v1.signer) = "owner";
+  option (amino.name)           = "OmniFlix/marketplace/MsgListNFT";
+  option (gogoproto.equal)      = false;
+
   string                   id           = 1;
   string                   nft_id       = 2;
   string                   denom_id     = 3;
@@ -56,6 +62,10 @@ message MsgListNFT {
 message MsgListNFTResponse {}
 
 message MsgEditListing {
+  option (cosmos.msg.v1.signer) = "owner";
+  option (amino.name)           = "OmniFlix/marketplace/MsgEditListing";
+  option (gogoproto.equal)      = false;
+
   string                   id    = 1;
   cosmos.base.v1beta1.Coin price = 2 [
     (gogoproto.nullable)     = false,
@@ -66,6 +76,10 @@ message MsgEditListing {
 message MsgEditListingResponse {}
 
 message MsgDeListNFT {
+  option (cosmos.msg.v1.signer) = "owner";
+  option (amino.name)           = "OmniFlix/marketplace/MsgDeListNFT";
+  option (gogoproto.equal)      = false;
+
   string id    = 1;
   string owner = 2;
 }
@@ -73,6 +87,10 @@ message MsgDeListNFT {
 message MsgDeListNFTResponse {}
 
 message MsgBuyNFT {
+  option (cosmos.msg.v1.signer) = "buyer";
+  option (amino.name)           = "OmniFlix/marketplace/MsgBuyNFT";
+  option (gogoproto.equal)      = false;
+
   string                   id    = 1;
   cosmos.base.v1beta1.Coin price = 2 [
     (gogoproto.nullable)     = false,
@@ -84,6 +102,10 @@ message MsgBuyNFT {
 message MsgBuyNFTResponse {}
 
 message MsgCreateAuction {
+  option (cosmos.msg.v1.signer) = "owner";
+  option (amino.name)           = "OmniFlix/marketplace/MsgCreateAuction";
+  option (gogoproto.equal)      = false;
+
   string                    nft_id               = 1;
   string                    denom_id             = 2;
   google.protobuf.Timestamp start_time           = 3 [
@@ -118,6 +140,10 @@ message MsgCreateAuctionResponse {
 }
 
 message MsgCancelAuction {
+  option (cosmos.msg.v1.signer) = "owner";
+  option (amino.name)           = "OmniFlix/marketplace/MsgCancelAuction";
+  option (gogoproto.equal)      = false;
+
   uint64 auction_id = 1 [(gogoproto.moretags) = "yaml:\"auction_id\""];
   string owner      = 2;
 }
@@ -125,6 +151,10 @@ message MsgCancelAuction {
 message MsgCancelAuctionResponse {}
 
 message MsgPlaceBid {
+  option (cosmos.msg.v1.signer) = "bidder";
+  option (amino.name)           = "OmniFlix/marketplace/MsgPlaceBid";
+  option (gogoproto.equal)      = false;
+
   uint64                   auction_id = 1 [(gogoproto.moretags) = "yaml:\"auction_id\""];
   cosmos.base.v1beta1.Coin amount     = 2 [
     (gogoproto.nullable)     = false,

@@ -2,6 +2,7 @@ syntax = "proto3";
 package OmniFlix.itc.v1;
 
 import "cosmos/msg/v1/msg.proto";
+import "amino/amino.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
@@ -14,6 +15,8 @@ option go_package = "github.com/OmniFlix/omniflixhub/v2/x/itc/types";
 option (gogoproto.goproto_getters_all) = false;
 
 service Msg {
+  option (cosmos.msg.v1.service) = true;
+
   rpc CreateCampaign(MsgCreateCampaign) returns (MsgCreateCampaignResponse);
 
   rpc CancelCampaign(MsgCancelCampaign) returns (MsgCancelCampaignResponse);
@@ -30,6 +33,10 @@ service Msg {
 }
 
 message MsgCreateCampaign {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name)           = "OmniFlix/itc/MsgCreateCampaign";
+  option (gogoproto.equal)      = false;
+
   string                      name = 1;
   string                      description = 2;
   InteractionType             interaction = 3;
@@ -69,6 +76,10 @@ message MsgCreateCampaign {
 message MsgCreateCampaignResponse {}
 
 message MsgCancelCampaign {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name)           = "OmniFlix/itc/MsgCancelCampaign";
+  option (gogoproto.equal)      = false;
+
   uint64 campaign_id = 1;
   string creator = 2;
 }
@@ -76,6 +87,10 @@ message MsgCancelCampaign {
 message MsgCancelCampaignResponse {}
 
 message MsgClaim {
+  option (cosmos.msg.v1.signer) = "claimer";
+  option (amino.name)           = "OmniFlix/itc/MsgClaim";
+  option (gogoproto.equal)      = false;
+
   uint64 campaign_id = 1;
   string nft_id = 2;
   InteractionType interaction = 3;
@@ -85,6 +100,10 @@ message MsgClaim {
 message MsgClaimResponse {}
 
 message MsgDepositCampaign {
+  option (cosmos.msg.v1.signer) = "depositor";
+  option (amino.name)           = "OmniFlix/itc/MsgDepositCampaign";
+  option (gogoproto.equal)      = false;
+
   uint64                    campaign_id = 1;
   cosmos.base.v1beta1.Coin  amount = 2 [(gogoproto.nullable) = false];
   string                    depositor = 3;

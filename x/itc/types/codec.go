@@ -3,19 +3,21 @@ package types
 import (
 	"github.com/OmniFlix/omniflixhub/v2/x/itc/exported"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 	authzcodec "github.com/cosmos/cosmos-sdk/x/authz/codec"
+	govcodec "github.com/cosmos/cosmos-sdk/x/gov/codec"
 )
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgCreateCampaign{}, "OmniFlix/itc/MsgCreateCampaign", nil)
-	cdc.RegisterConcrete(&MsgCancelCampaign{}, "OmniFlix/itc/MsgCancelCampaign", nil)
-	cdc.RegisterConcrete(&MsgClaim{}, "OmniFlix/itc/MsgClaim", nil)
-	cdc.RegisterConcrete(&MsgDepositCampaign{}, "OmniFlix/itc/MsgDepositCampaign", nil)
-	cdc.RegisterConcrete(&MsgUpdateParams{}, "OmniFlix/itc/MsgUpdateParams", nil)
+	legacy.RegisterAminoMsg(cdc, &MsgCreateCampaign{}, "OmniFlix/itc/MsgCreateCampaign")
+	legacy.RegisterAminoMsg(cdc, &MsgCancelCampaign{}, "OmniFlix/itc/MsgCancelCampaign")
+	legacy.RegisterAminoMsg(cdc, &MsgClaim{}, "OmniFlix/itc/MsgClaim")
+	legacy.RegisterAminoMsg(cdc, &MsgDepositCampaign{}, "OmniFlix/itc/MsgDepositCampaign")
+	legacy.RegisterAminoMsg(cdc, &MsgUpdateParams{}, "OmniFlix/itc/MsgUpdateParams")
 
 	cdc.RegisterInterface((*exported.CampaignI)(nil), nil)
 	cdc.RegisterConcrete(&Campaign{}, "OmniFlix/itc/Campaign", nil)
@@ -43,19 +45,18 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 }
 
 var (
-	amino = codec.NewLegacyAmino()
-
+	amino     = codec.NewLegacyAmino()
 	ModuleCdc = codec.NewAminoCodec(amino)
 )
 
 func init() {
 	RegisterLegacyAminoCodec(amino)
 	cryptocodec.RegisterCrypto(amino)
+	sdk.RegisterLegacyAminoCodec(amino)
 
 	// Register all Amino interfaces and concrete types on the authz Amino codec
 	// so that this can later be used to properly serialize MsgGrant and MsgExec
 	// instances.
 	RegisterLegacyAminoCodec(authzcodec.Amino)
-
-	amino.Seal()
+	RegisterLegacyAminoCodec(govcodec.Amino)
 }

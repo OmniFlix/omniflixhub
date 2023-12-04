@@ -2,6 +2,7 @@ syntax = "proto3";
 package OmniFlix.onft.v1beta1;
 
 import "cosmos/msg/v1/msg.proto";
+import "amino/amino.proto";
 import "cosmos_proto/cosmos.proto";
 import "OmniFlix/onft/v1beta1/params.proto";
 import "cosmos/base/v1beta1/coin.proto";
@@ -12,6 +13,8 @@ option go_package = "github.com/OmniFlix/omniflixhub/v2/x/onft/types";
 option (gogoproto.goproto_getters_all) = false;
 
 service Msg {
+  option (cosmos.msg.v1.service) = true;
+
   rpc CreateDenom(MsgCreateDenom) returns (MsgCreateDenomResponse);
 
   rpc UpdateDenom(MsgUpdateDenom) returns (MsgUpdateDenomResponse);
@@ -32,7 +35,9 @@ service Msg {
 }
 
 message MsgCreateDenom {
-  option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "sender";
+  option (amino.name)           = "OmniFlix/onft/MsgCreateDenom";
+  option (gogoproto.equal)      = false;
 
   string id = 1;
   string symbol = 2;
@@ -57,7 +62,9 @@ message MsgCreateDenom {
 message MsgCreateDenomResponse {}
 
 message MsgUpdateDenom {
-  option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "sender";
+  option (amino.name)           = "OmniFlix/onft/MsgUpdateDenom";
+  option (gogoproto.equal)      = false;
 
   string id = 1;
   string name = 2;
@@ -72,7 +79,9 @@ message MsgUpdateDenom {
 message MsgUpdateDenomResponse {}
 
 message MsgTransferDenom {
-  option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "sender";
+  option (amino.name)           = "OmniFlix/onft/MsgTransferDenom";
+  option (gogoproto.equal)      = false;
 
   string id = 1;
   string sender = 2;
@@ -82,7 +91,9 @@ message MsgTransferDenom {
 message MsgTransferDenomResponse {}
 
 message MsgMintONFT {
-  option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "sender";
+  option (amino.name)           = "OmniFlix/onft/MsgMintONFT";
+  option (gogoproto.equal)      = false;
 
   string   id = 1;
   string   denom_id = 2 [(gogoproto.moretags) = "yaml:\"denom_id\""];
@@ -103,7 +114,9 @@ message MsgMintONFT {
 message MsgMintONFTResponse {}
 
 message MsgTransferONFT {
-  option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "sender";
+  option (amino.name)           = "OmniFlix/onft/MsgTransferONFT";
+  option (gogoproto.equal)      = false;
 
   string id = 1;
   string denom_id = 2 [(gogoproto.moretags) = "yaml:\"denom_id\""];
@@ -114,7 +127,9 @@ message MsgTransferONFT {
 message MsgTransferONFTResponse {}
 
 message MsgBurnONFT {
-  option (gogoproto.equal) = true;
+  option (cosmos.msg.v1.signer) = "sender";
+  option (amino.name)           = "OmniFlix/onft/MsgBurnONFT";
+  option (gogoproto.equal)      = false;
 
   string id = 1;
   string denom_id = 2 [(gogoproto.moretags) = "yaml:\"denom_id\""];
