@@ -298,7 +298,9 @@ func (nb NFTBuilder) Build(classId, nftID, nftURI, nftData string) (nft.NFT, err
 	dataMap := make(map[string]interface{})
 	if err := json.Unmarshal(nftDataBz, &dataMap); err != nil {
 		metadata, err := codectypes.NewAnyWithValue(&ONFTMetadata{
-			Data: string(nftDataBz),
+			Data:         string(nftDataBz),
+			Transferable: true,
+			Extensible:   true,
 		})
 		if err != nil {
 			return nft.NFT{}, err
@@ -316,13 +318,12 @@ func (nb NFTBuilder) Build(classId, nftID, nftURI, nftData string) (nft.NFT, err
 		name         string
 		description  string
 		previewURI   string
-		transferable = true
-		extensible   = true
 		nsfw         = false
 		createdAt    string
 		royaltyShare string
 		uriHash      string
 	)
+
 	if v, ok := dataMap[nftKeyName]; ok {
 		if vMap, ok := v.(map[string]interface{}); ok {
 			if vStr, ok := vMap[KeyMediaFieldValue].(string); ok {
@@ -365,23 +366,6 @@ func (nb NFTBuilder) Build(classId, nftID, nftURI, nftData string) (nft.NFT, err
 			}
 		}
 	}
-	if v, ok := dataMap[nftKeyTransferable]; ok {
-		if vMap, ok := v.(map[string]interface{}); ok {
-			if vBool, ok := vMap[KeyMediaFieldValue].(bool); ok {
-				transferable = vBool
-				delete(dataMap, nftKeyTransferable)
-			}
-		}
-	}
-
-	if v, ok := dataMap[nftKeyExtensible]; ok {
-		if vMap, ok := v.(map[string]interface{}); ok {
-			if vBool, ok := vMap[KeyMediaFieldValue].(bool); ok {
-				extensible = vBool
-				delete(dataMap, nftKeyExtensible)
-			}
-		}
-	}
 
 	if v, ok := dataMap[nftKeyNSFW]; ok {
 		if vMap, ok := v.(map[string]interface{}); ok {
@@ -417,8 +401,8 @@ func (nb NFTBuilder) Build(classId, nftID, nftURI, nftData string) (nft.NFT, err
 		Description:  description,
 		PreviewURI:   previewURI,
 		Data:         data,
-		Transferable: transferable,
-		Extensible:   extensible,
+		Transferable: true,
+		Extensible:   true,
 		Nsfw:         nsfw,
 		CreatedAt:    createdTime,
 		RoyaltyShare: royalty,
