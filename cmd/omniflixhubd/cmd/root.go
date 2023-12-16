@@ -16,8 +16,6 @@ import (
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-
 	dbm "github.com/cometbft/cometbft-db"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
 	"github.com/cometbft/cometbft/libs/log"
@@ -44,13 +42,6 @@ var ChainID string
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	// Set config for prefixes
 	encodingConfig := app.MakeEncodingConfig()
-
-	cfg := sdk.GetConfig()
-	cfg.SetBech32PrefixForAccount(app.AccountAddressPrefix, app.AccountPubKeyPrefix)
-	cfg.SetBech32PrefixForValidator(app.ValidatorAddressPrefix, app.ValidatorPubKeyPrefix)
-	cfg.SetBech32PrefixForConsensusNode(app.ConsNodeAddressPrefix, app.ConsNodePubKeyPrefix)
-	cfg.SetAddressVerifier(wasmtypes.VerifyAddressLen())
-	cfg.Seal()
 	app.SetConfig()
 
 	initClientCtx := client.Context{}.
