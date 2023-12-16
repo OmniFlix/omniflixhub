@@ -9,10 +9,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/pruning"
-
-	"github.com/OmniFlix/omniflixhub/v2/app/params"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/OmniFlix/omniflixhub/v2/app"
+	"github.com/OmniFlix/omniflixhub/v2/app/params"
+
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
 	dbm "github.com/cometbft/cometbft-db"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
 	"github.com/cometbft/cometbft/libs/log"
@@ -39,6 +44,13 @@ var ChainID string
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	// Set config for prefixes
 	encodingConfig := app.MakeEncodingConfig()
+
+	cfg := sdk.GetConfig()
+	cfg.SetBech32PrefixForAccount(app.AccountAddressPrefix, app.AccountPubKeyPrefix)
+	cfg.SetBech32PrefixForValidator(app.ValidatorAddressPrefix, app.ValidatorPubKeyPrefix)
+	cfg.SetBech32PrefixForConsensusNode(app.ConsNodeAddressPrefix, app.ConsNodePubKeyPrefix)
+	cfg.SetAddressVerifier(wasmtypes.VerifyAddressLen())
+	cfg.Seal()
 	app.SetConfig()
 
 	initClientCtx := client.Context{}.
@@ -122,6 +134,8 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 
 func addModuleInitFlags(startCmd *cobra.Command) {
 	crisis.AddModuleInitFlags(startCmd)
+	wasm.AddModuleInitFlags(startCmd)
+
 }
 
 func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
@@ -196,6 +210,11 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		skipUpgradeHeights[int64(h)] = true
 	}
 
+	var wasmOpts []wasmkeeper.Option
+	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
+		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
+	}
+
 	baseappOptions := server.DefaultBaseappOptions(appOpts)
 
 	return app.NewOmniFlixApp(
@@ -208,6 +227,7 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		a.encCfg,
 		appOpts,
+		wasmOpts,
 		baseappOptions...,
 	)
 }
@@ -230,6 +250,7 @@ func (a appCreator) appExport(
 		return servertypes.ExportedApp{}, errors.New("application home not set")
 	}
 
+	var emptyWasmOpts []wasmkeeper.Option
 	if height != -1 {
 		anApp = app.NewOmniFlixApp(
 			logger,
@@ -241,6 +262,7 @@ func (a appCreator) appExport(
 			uint(1),
 			a.encCfg,
 			appOpts,
+			emptyWasmOpts,
 		)
 
 		if err := anApp.LoadHeight(height); err != nil {
@@ -257,6 +279,7 @@ func (a appCreator) appExport(
 			uint(1),
 			a.encCfg,
 			appOpts,
+			emptyWasmOpts,
 		)
 	}
 
