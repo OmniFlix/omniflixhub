@@ -33,7 +33,6 @@ var (
 	nftKeyPreviewURI    = fmt.Sprintf("%s%s", Namespace, "preview_uri")
 	nftKeyDescription   = fmt.Sprintf("%s%s", Namespace, "description")
 	nftKeyCreatedAt     = fmt.Sprintf("%s%s", Namespace, "created_at")
-	nftKeyTransferable  = fmt.Sprintf("%s%s", Namespace, "transferable")
 	nftKeyExtensible    = fmt.Sprintf("%s%s", Namespace, "extensible")
 	nftKeyNSFW          = fmt.Sprintf("%s%s", Namespace, "nsfw")
 	nftKeyRoyaltyShare  = fmt.Sprintf("%s%s", Namespace, "royalty_share")

@@ -93,7 +93,6 @@ func initTendermintConfig() *tmcfg.Config {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
-
 	ac := appCreator{encodingConfig}
 
 	rootCmd.AddCommand(
