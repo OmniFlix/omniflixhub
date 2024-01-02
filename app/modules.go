@@ -103,7 +103,7 @@ var (
 	// and genesis verification.
 	ModuleBasics = module.NewBasicManager(
 		auth.AppModuleBasic{},
-		genutil.AppModuleBasic{},
+		genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
 		bank.AppModuleBasic{},
 		capability.AppModuleBasic{},
 		staking.AppModuleBasic{},
@@ -152,7 +152,7 @@ var (
 		icatypes.ModuleName:            nil,
 		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 		globalfee.ModuleName:           nil,
-		wasmtypes.ModuleName:           {},
+		wasmtypes.ModuleName:           {authtypes.Burner},
 		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		nft.ModuleName:                 nil,
 		onfttypes.ModuleName:           nil,

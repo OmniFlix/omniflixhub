@@ -568,7 +568,7 @@ func NewAppKeeper(
 		wasmDir,
 		wasmConfig,
 		GetWasmCapabilities(),
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		govModAddress,
 		wasmOpts...,
 	)
 
@@ -600,6 +600,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(packetforwardtypes.ModuleName)
 	paramsKeeper.Subspace(globalfee.ModuleName)
 	paramsKeeper.Subspace(tokenfactorytypes.ModuleName)
+	paramsKeeper.Subspace(wasmtypes.ModuleName)
 	paramsKeeper.Subspace(alloctypes.ModuleName)
 	paramsKeeper.Subspace(onfttypes.ModuleName)
 	paramsKeeper.Subspace(marketplacetypes.ModuleName)
