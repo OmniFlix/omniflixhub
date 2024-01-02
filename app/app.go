@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"io"
 	"net/http"
 	"os"
@@ -233,10 +234,11 @@ func NewOmniFlixApp(
 				SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 			},
-			GovKeeper:  app.GovKeeper,
-			IBCKeeper:  app.IBCKeeper,
-			Codec:      appCodec,
-			WasmConfig: wasmConfig,
+			GovKeeper:         app.GovKeeper,
+			IBCKeeper:         app.IBCKeeper,
+			Codec:             appCodec,
+			WasmConfig:        wasmConfig,
+			TxCounterStoreKey: app.AppKeepers.GetKey(wasmtypes.StoreKey),
 
 			BypassMinFeeMsgTypes: GetDefaultBypassFeeMessages(),
 			GlobalFeeKeeper:      app.GlobalFeeKeeper,
