@@ -52,7 +52,7 @@ func AcceptedStargateQueries() wasmkeeper.AcceptedStargateQueries {
 		"/cosmos.staking.v1beta1.Query/Params":              &stakingtypes.QueryParamsResponse{},
 		"/cosmos.staking.v1beta1.Query/Pool":                &stakingtypes.QueryPoolResponse{},
 
-		//onft
+		// onft
 		"/OmniFlix.onft.v1beta1.Query/Denoms":        &onfttypes.QueryDenomsResponse{},
 		"/OmniFlix.onft.v1beta1.Query/Denom":         &onfttypes.QueryDenomResponse{},
 		"/OmniFlix.onft.v1beta1.Query/IBCDenom":      &onfttypes.QueryDenomResponse{},
@@ -63,7 +63,7 @@ func AcceptedStargateQueries() wasmkeeper.AcceptedStargateQueries {
 		"/OmniFlix.onft.v1beta1.Query/Supply":        &onfttypes.QuerySupplyResponse{},
 		"/OmniFlix.onft.v1beta1.Query/Params":        &onfttypes.QueryParamsResponse{},
 
-		//marketplace
+		// marketplace
 		"/OmniFlix.marketplace.v1beta1.Query/Listings":        &marketplacetypes.QueryListingsResponse{},
 		"/OmniFlix.marketplace.v1beta1.Query/Listing":         &marketplacetypes.QueryListingResponse{},
 		"/OmniFlix.marketplace.v1beta1.Query/ListingsByOwner": &marketplacetypes.QueryListingsByOwnerResponse{},

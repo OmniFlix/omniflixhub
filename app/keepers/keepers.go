@@ -2,6 +2,8 @@ package keepers
 
 import (
 	"fmt"
+	"path/filepath"
+
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
@@ -17,7 +19,6 @@ import (
 	icq "github.com/cosmos/ibc-apps/modules/async-icq/v7"
 	icqkeeper "github.com/cosmos/ibc-apps/modules/async-icq/v7/keeper"
 	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v7/types"
-	"path/filepath"
 
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 

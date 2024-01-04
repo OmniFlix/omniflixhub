@@ -2,10 +2,11 @@ package app
 
 import (
 	"encoding/json"
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"path/filepath"
 	"testing"
 	"time"
+
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/snapshots"
