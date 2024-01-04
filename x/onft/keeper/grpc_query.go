@@ -16,6 +16,8 @@ import (
 
 var _ types.QueryServer = Keeper{}
 
+const IbcDenomPrefix = "ibc/"
+
 func (k Keeper) Supply(c context.Context, request *types.QuerySupplyRequest) (*types.QuerySupplyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 
@@ -41,13 +43,13 @@ func (k Keeper) IBCDenomSupply(c context.Context, request *types.QueryIBCDenomSu
 	var supply uint64
 	switch {
 	case len(request.Owner) == 0 && len(request.Hash) > 0:
-		supply = k.GetTotalSupply(ctx, "ibc/"+request.Hash)
+		supply = k.GetTotalSupply(ctx, IbcDenomPrefix+request.Hash)
 	default:
 		owner, err := sdk.AccAddressFromBech32(request.Owner)
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "invalid owner address %s", request.Owner)
 		}
-		supply = k.GetBalance(ctx, "ibc/"+request.Hash, owner)
+		supply = k.GetBalance(ctx, IbcDenomPrefix+request.Hash, owner)
 	}
 	return &types.QuerySupplyResponse{
 		Amount: supply,
@@ -115,7 +117,7 @@ func (k Keeper) Collection(c context.Context, request *types.QueryCollectionRequ
 func (k Keeper) IBCCollection(c context.Context, request *types.QueryIBCCollectionRequest) (*types.QueryCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 
-	denom, err := k.GetDenomInfo(ctx, "ibc/"+request.Hash)
+	denom, err := k.GetDenomInfo(ctx, IbcDenomPrefix+request.Hash)
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +185,7 @@ func (k Keeper) Denom(c context.Context, request *types.QueryDenomRequest) (*typ
 func (k Keeper) IBCDenom(c context.Context, request *types.QueryIBCDenomRequest) (*types.QueryDenomResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 
-	denomObject, err := k.GetDenomInfo(ctx, "ibc/"+request.Hash)
+	denomObject, err := k.GetDenomInfo(ctx, IbcDenomPrefix+request.Hash)
 	if err != nil {
 		return nil, err
 	}
@@ -251,7 +253,7 @@ func (k Keeper) ONFT(c context.Context, request *types.QueryONFTRequest) (*types
 
 func (k Keeper) IBCDenomONFT(c context.Context, request *types.QueryIBCDenomONFTRequest) (*types.QueryONFTResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
-	denomId := "ibc/" + request.Hash
+	denomId := IbcDenomPrefix + request.Hash
 
 	onft, err := k.GetONFT(ctx, denomId, request.Id)
 	if err != nil {
@@ -314,7 +316,7 @@ func (k Keeper) OwnerIBCDenomONFTs(
 	request *types.QueryOwnerIBCDenomONFTsRequest,
 ) (*types.QueryOwnerONFTsResponse, error) {
 	r := &nft.QueryNFTsRequest{
-		ClassId:    "ibc/" + request.Hash,
+		ClassId:    IbcDenomPrefix + request.Hash,
 		Owner:      request.Owner,
 		Pagination: shapePageRequest(request.Pagination),
 	}
