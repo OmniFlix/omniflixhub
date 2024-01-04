@@ -35,6 +35,25 @@ func (k Keeper) Supply(c context.Context, request *types.QuerySupplyRequest) (*t
 	}, nil
 }
 
+func (k Keeper) IBCDenomSupply(c context.Context, request *types.QueryIBCDenomSupplyRequest) (*types.QuerySupplyResponse, error) {
+	ctx := sdk.UnwrapSDKContext(c)
+
+	var supply uint64
+	switch {
+	case len(request.Owner) == 0 && len(request.Hash) > 0:
+		supply = k.GetTotalSupply(ctx, "ibc/"+request.Hash)
+	default:
+		owner, err := sdk.AccAddressFromBech32(request.Owner)
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid owner address %s", request.Owner)
+		}
+		supply = k.GetBalance(ctx, "ibc/"+request.Hash, owner)
+	}
+	return &types.QuerySupplyResponse{
+		Amount: supply,
+	}, nil
+}
+
 func (k Keeper) Collection(c context.Context, request *types.QueryCollectionRequest) (*types.QueryCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 	denom, err := k.GetDenomInfo(ctx, request.DenomId)
@@ -230,9 +249,72 @@ func (k Keeper) ONFT(c context.Context, request *types.QueryONFTRequest) (*types
 	}, nil
 }
 
+func (k Keeper) IBCDenomONFT(c context.Context, request *types.QueryIBCDenomONFTRequest) (*types.QueryONFTResponse, error) {
+	ctx := sdk.UnwrapSDKContext(c)
+	denomId := "ibc/" + request.Hash
+
+	onft, err := k.GetONFT(ctx, denomId, request.Id)
+	if err != nil {
+		return nil, errorsmod.Wrapf(types.ErrUnknownONFT, "invalid ONFT %s from collection %s", request.Id, denomId)
+	}
+
+	oNFT, ok := onft.(types.ONFT)
+	if !ok {
+		return nil, errorsmod.Wrapf(types.ErrUnknownONFT, "invalid type ONFT %s from collection %s", request.Id, denomId)
+	}
+
+	return &types.QueryONFTResponse{
+		ONFT: &oNFT,
+	}, nil
+}
+
 func (k Keeper) OwnerONFTs(c context.Context, request *types.QueryOwnerONFTsRequest) (*types.QueryOwnerONFTsResponse, error) {
 	r := &nft.QueryNFTsRequest{
 		ClassId:    request.DenomId,
+		Owner:      request.Owner,
+		Pagination: shapePageRequest(request.Pagination),
+	}
+
+	result, err := k.nk.NFTs(c, r)
+	if err != nil {
+		return nil, err
+	}
+
+	denomMap := make(map[string][]string)
+	var denoms []string
+	for _, _nft := range result.Nfts {
+		if denomMap[_nft.ClassId] == nil {
+			denomMap[_nft.ClassId] = []string{}
+			denoms = append(denoms, _nft.ClassId)
+		}
+		denomMap[_nft.ClassId] = append(denomMap[_nft.ClassId], _nft.Id)
+	}
+
+	var idc []types.IDCollection
+	for _, denomID := range denoms {
+		idc = append(idc, types.IDCollection{
+			DenomId: denomID,
+			OnftIds: denomMap[denomID],
+		})
+	}
+
+	response := &types.QueryOwnerONFTsResponse{
+		Owner: &types.Owner{
+			Address:       request.Owner,
+			IDCollections: idc,
+		},
+		Pagination: result.Pagination,
+	}
+
+	return response, nil
+}
+
+func (k Keeper) OwnerIBCDenomONFTs(
+	c context.Context,
+	request *types.QueryOwnerIBCDenomONFTsRequest,
+) (*types.QueryOwnerONFTsResponse, error) {
+	r := &nft.QueryNFTsRequest{
+		ClassId:    "ibc/" + request.Hash,
 		Owner:      request.Owner,
 		Pagination: shapePageRequest(request.Pagination),
 	}
