@@ -241,7 +241,7 @@ func appModules(
 			app.GetSubspace(onfttypes.ModuleName),
 		),
 		marketplace.NewAppModule(appCodec, app.MarketplaceKeeper, app.GetSubspace(marketplacetypes.ModuleName)),
-		streampay.NewAppModule(appCodec, app.StreamPayKeeper, app.GetSubspace(streampaytypes.ModuleName)),
+		streampay.NewAppModule(appCodec, app.StreamPayKeeper),
 		itc.NewAppModule(appCodec, app.ItcKeeper, app.GetSubspace(itctypes.ModuleName)),
 	}
 }

@@ -5,7 +5,7 @@ import (
 	store "github.com/cosmos/cosmos-sdk/store/types"
 )
 
-const UpgradeName = "v2-dev4"
+const UpgradeName = "v2-dev5"
 
 var Upgrade = upgrades.Upgrade{
 	UpgradeName:          UpgradeName,
