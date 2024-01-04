@@ -11,10 +11,10 @@ func ValidateONFTID(onftId string) error {
 			ErrInvalidONFTID,
 			"invalid onftId %s, length must be between [%d, %d]", onftId, MinIDLen, MaxIDLen)
 	}
-	if !IsBeginWithAlpha(onftId) || !IsAlphaNumeric(onftId) {
+	if !IsAlphaNumeric(onftId) {
 		return errorsmod.Wrapf(
 			ErrInvalidONFTID,
-			"invalid onftId %s, only accepts alphanumeric characters and begin with an english letter", onftId)
+			"invalid onftId %s, only accepts alphanumeric characters", onftId)
 	}
 	return nil
 }
