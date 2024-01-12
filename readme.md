@@ -1,29 +1,40 @@
 # OmniFlix Hub
 
-**OmniFlix Hub** is a blockchain built using Cosmos SDK and Tendermint and initially created
-with [Ignite CLI](https://github.com/ignite/cli).
+OmniFlix Hub is the root chain of the OmniFlix Network. Sovereign chains and DAOs build on top of or connect to the OmniFlix Hub to manage their web2 & web3 media operations to mint, manage, distribute & monetize NFTs enabled with community interactions
+
+OmniFlix Hub blockchain is built using Cosmos-SDK and CometBFT
 
 ### Hardware Requirements
- - Quad Core or larger AMD or Intel (amd64) CPU 
- - 16GB RAM
+ - 6+ core CPU (recommended: AMD x86_64)
+ - 32GB RAM
  - 1TB SSD Storage
 
 ### Go Requirement
-- go 1.19.3 +
+- go 1.21.3 +
 ```
 sudo rm -rf /usr/local/go
 wget -q -O - https://git.io/vQhTU | bash -s -- --remove
-wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.19.3
+wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.21.3
  ```
 
 ### Installation
 
 **Linux**
 
+### Before v2 upgrade
 ```
 git clone https://github.com/Omniflix/omniflixhub.git
 cd omniflixhub
-git checkout v0.12.0
+git checkout v0.12.1
+go mod tidy
+make install
+```
+
+### After v2 upgrade
+```
+git clone https://github.com/Omniflix/omniflixhub.git
+cd omniflixhub
+git checkout v2.0.0
 go mod tidy
 make install
 ```
@@ -55,6 +66,7 @@ curl https://raw.githubusercontent.com/OmniFlix/mainnet/main/omniflixhub-1/genes
 ### OmniFlix Modules
 - [oNFT](https://github.com/OmniFlix/omniflixhub/tree/main/x/onft)
 - [Marketplace](https://github.com/OmniFlix/omniflixhub/tree/main/marketplace)
+- [ITC](https://github.com/OmniFlix/omniflixhub/tree/main/itc)
 - [StreamPay](https://github.com/OmniFlix/streampay)
  
 ### Documentation
@@ -70,6 +82,7 @@ curl https://raw.githubusercontent.com/OmniFlix/mainnet/main/omniflixhub-1/genes
  - [v0.10.0](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v0.10.0-upgrade.md) at block 6262420
  - [v0.11.0](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v0.11.0-upgrade.md) at block 7339200
  - [v0.12.x](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v0.12.x-upgrade.md) at block 8054200
+ - [v2](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v2-upgrade.md) at block 10428200
 
 ### Testnets
 
