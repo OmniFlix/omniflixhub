@@ -27,6 +27,8 @@ func CreateV2UpgradeHandler(
 	return func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		ctx.Logger().Info("running migrations ...")
 
+		// set correct previous module version for streampay
+		fromVM[streampaytypes.ModuleName] = 2
 		// Run migrations before applying any other state changes.
 		// NOTE: DO NOT PUT ANY STATE CHANGES BEFORE RunMigrations().
 		versionMap, err := mm.RunMigrations(ctx, cfg, fromVM)
