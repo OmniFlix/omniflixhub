@@ -25,19 +25,20 @@ message IDCollection {
 message Denom {
   option (gogoproto.equal) = true;
 
-  string id                = 1;
-  string symbol            = 2;
-  string name              = 3;
-  string schema            = 4;
-  string creator           = 5;
-  string description       = 6;
-  string preview_uri       = 7 [
-    (gogoproto.moretags)   = "yaml:\"preview_uri\"",
+  string id                                         = 1;
+  string symbol                                     = 2;
+  string name                                       = 3;
+  string schema                                     = 4;
+  string creator                                    = 5;
+  string description                                = 6;
+  string preview_uri                                = 7 [
+    (gogoproto.moretags) = "yaml:\"preview_uri\"",
     (gogoproto.customname) = "PreviewURI"
   ];
-  string uri               = 8;
-  string uri_hash          = 9;
-  string data              = 10;
+  string uri                                        = 8;
+  string uri_hash                                   = 9;
+  string data                                       = 10;
+  repeated WeightedAddress royalty_receivers        = 11 [(gogoproto.moretags) = "yaml:\"royalty_receivers\""];
 }
 
 message DenomMetadata {
@@ -47,6 +48,7 @@ message DenomMetadata {
   string preview_uri = 4;
   string data = 5;
   string uri_hash = 6;
+  repeated WeightedAddress royalty_recipients       = 7 [(gogoproto.moretags) = "yaml:\"royalty_receivers\""];
 }
 
 //ASSET or ONFT
@@ -120,5 +122,14 @@ message Owner {
     (gogoproto.moretags)   = "yaml:\"idcs\"",
     (gogoproto.customname) = "IDCollections",
     (gogoproto.nullable)   = false
+  ];
+}
+
+message WeightedAddress {
+  string address = 1 [ (gogoproto.moretags) = "yaml:\"address\"" ];
+  string weight = 2 [
+    (gogoproto.moretags) = "yaml:\"weight\"",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
   ];
 }
