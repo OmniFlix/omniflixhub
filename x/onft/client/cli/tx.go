@@ -327,6 +327,7 @@ $ %s tx onft update-denom [denom-id] --name=<onft-name> --description=<onft-desc
 				return err
 			}
 			var royaltyReceivers []*types.WeightedAddress
+			royaltyReceivers = nil
 			if len(royaltyReceiversStr) > 0 {
 				royaltyReceivers, err = parseSplitShares(royaltyReceiversStr)
 				if err != nil {
