@@ -5,22 +5,23 @@ import (
 )
 
 const (
-	FlagName            = "name"
-	FlagDescription     = "description"
-	FlagMediaURI        = "media-uri"
-	FlagPreviewURI      = "preview-uri"
-	FlagData            = "data"
-	FlagNonTransferable = "non-transferable"
-	FlagInExtensible    = "inextensible"
-	FlagRecipient       = "recipient"
-	FlagOwner           = "owner"
-	FlagDenomID         = "denom-id"
-	FlagSchema          = "schema"
-	FlagNsfw            = "nsfw"
-	FlagRoyaltyShare    = "royalty-share"
-	FlagCreationFee     = "creation-fee"
-	FlagURI             = "uri"
-	FlagURIHash         = "uri-hash"
+	FlagName             = "name"
+	FlagDescription      = "description"
+	FlagMediaURI         = "media-uri"
+	FlagPreviewURI       = "preview-uri"
+	FlagData             = "data"
+	FlagNonTransferable  = "non-transferable"
+	FlagInExtensible     = "inextensible"
+	FlagRecipient        = "recipient"
+	FlagOwner            = "owner"
+	FlagDenomID          = "denom-id"
+	FlagSchema           = "schema"
+	FlagNsfw             = "nsfw"
+	FlagRoyaltyShare     = "royalty-share"
+	FlagCreationFee      = "creation-fee"
+	FlagURI              = "uri"
+	FlagURIHash          = "uri-hash"
+	FlagRoyaltyReceivers = "royalty-receivers"
 )
 
 var (
@@ -39,10 +40,12 @@ func init() {
 	FsCreateDenom.String(FlagDescription, "", "Description for denom")
 	FsCreateDenom.String(FlagPreviewURI, "", "Preview image uri for denom")
 	FsCreateDenom.String(FlagCreationFee, "", "fee amount for creating denom")
+	FsUpdateDenom.String(FlagRoyaltyReceivers, "", "royalty receivers with comma seperated ex: \"address:percentage,address:percentage\"")
 
 	FsUpdateDenom.String(FlagName, "[do-not-modify]", "Name of the denom")
 	FsUpdateDenom.String(FlagDescription, "[do-not-modify]", "Description for denom")
 	FsUpdateDenom.String(FlagPreviewURI, "[do-not-modify]", "Preview image uri for denom")
+	FsUpdateDenom.String(FlagRoyaltyReceivers, "", "royalty receivers with comma seperated ex: \"address:percentage,address:percentage\"")
 	FsCreateDenom.String(FlagURI, "", "uri for denom")
 	FsCreateDenom.String(FlagURIHash, "", "uri hash for denom")
 	FsCreateDenom.String(FlagData, "", "json data of the denom")

@@ -57,7 +57,9 @@ message MsgCreateDenom {
   string uri = 9;
   string uri_hash = 10;
   string data = 11;
-  repeated WeightedAddress royalty_receivers = 12 [(gogoproto.moretags) = "yaml:\"royalty_receivers\""];
+  repeated WeightedAddress royalty_receivers = 12 [
+    (gogoproto.moretags) = "yaml:\"royalty_receivers\""
+  ];
 }
 
 message MsgCreateDenomResponse {}
@@ -75,6 +77,9 @@ message MsgUpdateDenom {
     (gogoproto.customname) = "PreviewURI"
   ];
   string sender = 5;
+  repeated WeightedAddress royalty_receivers = 6 [
+    (gogoproto.moretags) = "yaml:\"royalty_receivers\""
+  ];
 }
 
 message MsgUpdateDenomResponse {}

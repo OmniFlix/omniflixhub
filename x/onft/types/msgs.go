@@ -35,19 +35,21 @@ func NewMsgCreateDenom(
 	symbol,
 	name, schema, description, uri, uriHash, previewUri, data, sender string,
 	creationFee sdk.Coin,
+	royaltyReceivers []*WeightedAddress,
 ) *MsgCreateDenom {
 	return &MsgCreateDenom{
-		Sender:      sender,
-		Id:          GenUniqueID(DenomPrefix),
-		Symbol:      symbol,
-		Name:        name,
-		Schema:      schema,
-		Description: description,
-		PreviewURI:  previewUri,
-		Uri:         uri,
-		UriHash:     uriHash,
-		Data:        data,
-		CreationFee: creationFee,
+		Sender:           sender,
+		Id:               GenUniqueID(DenomPrefix),
+		Symbol:           symbol,
+		Name:             name,
+		Schema:           schema,
+		Description:      description,
+		PreviewURI:       previewUri,
+		Uri:              uri,
+		UriHash:          uriHash,
+		Data:             data,
+		CreationFee:      creationFee,
+		RoyaltyReceivers: royaltyReceivers,
 	}
 }
 
@@ -80,6 +82,11 @@ func (msg MsgCreateDenom) ValidateBasic() error {
 	if err := ValidateCreationFee(msg.CreationFee); err != nil {
 		return err
 	}
+	if msg.RoyaltyReceivers != nil {
+		if err := ValidateWeightedAddresses(msg.RoyaltyReceivers); err != nil {
+			return errorsmod.Wrap(ErrInvalidRoyaltyReceivers, "royalty receivers value is invalid")
+		}
+	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
@@ -101,13 +108,17 @@ func (msg MsgCreateDenom) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
-func NewMsgUpdateDenom(id, name, description, previewUri, sender string) *MsgUpdateDenom {
+func NewMsgUpdateDenom(
+	id, name, description, previewUri, sender string,
+	royaltyReceivers []*WeightedAddress,
+) *MsgUpdateDenom {
 	return &MsgUpdateDenom{
-		Id:          id,
-		Name:        name,
-		Description: description,
-		PreviewURI:  previewUri,
-		Sender:      sender,
+		Id:               id,
+		Name:             name,
+		Description:      description,
+		PreviewURI:       previewUri,
+		Sender:           sender,
+		RoyaltyReceivers: royaltyReceivers,
 	}
 }
 
@@ -133,6 +144,11 @@ func (msg MsgUpdateDenom) ValidateBasic() error {
 	}
 	if err := ValidateURI(msg.PreviewURI); err != nil {
 		return err
+	}
+	if msg.RoyaltyReceivers != nil {
+		if err := ValidateWeightedAddresses(msg.RoyaltyReceivers); err != nil {
+			return errorsmod.Wrap(ErrInvalidRoyaltyReceivers, "royalty receivers value is invalid")
+		}
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
