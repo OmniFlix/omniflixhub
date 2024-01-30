@@ -40,7 +40,7 @@ func init() {
 	FsCreateDenom.String(FlagDescription, "", "Description for denom")
 	FsCreateDenom.String(FlagPreviewURI, "", "Preview image uri for denom")
 	FsCreateDenom.String(FlagCreationFee, "", "fee amount for creating denom")
-	FsUpdateDenom.String(FlagRoyaltyReceivers, "", "royalty receivers with comma seperated ex: \"address:percentage,address:percentage\"")
+	FsCreateDenom.String(FlagRoyaltyReceivers, "", "royalty receivers with comma seperated ex: \"address:percentage,address:percentage\"")
 
 	FsUpdateDenom.String(FlagName, "[do-not-modify]", "Name of the denom")
 	FsUpdateDenom.String(FlagDescription, "[do-not-modify]", "Description for denom")
