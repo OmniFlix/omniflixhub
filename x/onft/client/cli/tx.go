@@ -473,7 +473,7 @@ func parseSplitShares(splitSharesStr string) ([]*types.WeightedAddress, error) {
 	splitsStrList := strings.Split(splitSharesStr, ",")
 	var weightedAddrsList []*types.WeightedAddress
 	for _, splitStr := range splitsStrList {
-		var share *types.WeightedAddress
+		var share types.WeightedAddress
 		split := strings.Split(strings.TrimSpace(splitStr), ":")
 		address, err := sdk.AccAddressFromBech32(strings.TrimSpace(split[0]))
 		if err != nil {
@@ -485,7 +485,7 @@ func parseSplitShares(splitSharesStr string) ([]*types.WeightedAddress, error) {
 		}
 		share.Address = address.String()
 		share.Weight = weight
-		weightedAddrsList = append(weightedAddrsList, share)
+		weightedAddrsList = append(weightedAddrsList, &share)
 	}
 	return weightedAddrsList, nil
 }
