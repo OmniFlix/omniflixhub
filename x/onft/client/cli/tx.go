@@ -96,6 +96,19 @@ $ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<desc
 				return fmt.Errorf("failed to parse creation fee: %s", creationFeeStr)
 			}
 
+			royaltyReceiversStr, err := cmd.Flags().GetString(FlagRoyaltyReceivers)
+			if err != nil {
+				return err
+			}
+			var royaltyReceivers []*types.WeightedAddress
+			royaltyReceivers = nil
+			if len(royaltyReceiversStr) > 0 {
+				royaltyReceivers, err = parseSplitShares(royaltyReceiversStr)
+				if err != nil {
+					return err
+				}
+			}
+
 			msg := types.NewMsgCreateDenom(
 				symbol,
 				denomName,
@@ -107,6 +120,7 @@ $ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<desc
 				data,
 				clientCtx.GetFromAddress().String(),
 				creationFee,
+				royaltyReceivers,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -308,6 +322,18 @@ $ %s tx onft update-denom [denom-id] --name=<onft-name> --description=<onft-desc
 			if err != nil {
 				return err
 			}
+			royaltyReceiversStr, err := cmd.Flags().GetString(FlagRoyaltyReceivers)
+			if err != nil {
+				return err
+			}
+			var royaltyReceivers []*types.WeightedAddress
+			royaltyReceivers = nil
+			if len(royaltyReceiversStr) > 0 {
+				royaltyReceivers, err = parseSplitShares(royaltyReceiversStr)
+				if err != nil {
+					return err
+				}
+			}
 
 			msg := types.NewMsgUpdateDenom(
 				denomId,
@@ -315,6 +341,7 @@ $ %s tx onft update-denom [denom-id] --name=<onft-name> --description=<onft-desc
 				denomDescription,
 				denomPreviewURI,
 				clientCtx.GetFromAddress().String(),
+				royaltyReceivers,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -441,4 +468,26 @@ $ %s tx onft burn [denom-id] [onft-id] --from=<key-name> --chain-id=<chain-id> -
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
+}
+
+func parseSplitShares(splitSharesStr string) ([]*types.WeightedAddress, error) {
+	splitSharesStr = strings.TrimSpace(splitSharesStr)
+	splitsStrList := strings.Split(splitSharesStr, ",")
+	var weightedAddrsList []*types.WeightedAddress
+	for _, splitStr := range splitsStrList {
+		var share types.WeightedAddress
+		split := strings.Split(strings.TrimSpace(splitStr), ":")
+		address, err := sdk.AccAddressFromBech32(strings.TrimSpace(split[0]))
+		if err != nil {
+			return nil, err
+		}
+		weight, err := sdk.NewDecFromStr(strings.TrimSpace(split[1]))
+		if err != nil {
+			return nil, err
+		}
+		share.Address = address.String()
+		share.Weight = weight
+		weightedAddrsList = append(weightedAddrsList, &share)
+	}
+	return weightedAddrsList, nil
 }

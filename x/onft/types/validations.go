@@ -1,7 +1,10 @@
 package types
 
 import (
+	"fmt"
+
 	errorsmod "cosmossdk.io/errors"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -122,5 +125,41 @@ func ValidateCreationFee(fee sdk.Coin) error {
 			fee.String(),
 		)
 	}
+	return nil
+}
+
+func ValidateWeightedAddresses(i interface{}) error {
+	v, ok := i.([]*WeightedAddress)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	// fund community pool when rewards address is empty
+	if len(v) == 0 {
+		return nil
+	}
+
+	weightSum := sdk.NewDec(0)
+	for i, w := range v {
+		// we allow address to be "" to go to community pool
+		if w.Address != "" {
+			_, err := sdk.AccAddressFromBech32(w.Address)
+			if err != nil {
+				return fmt.Errorf("invalid address at %dth", i)
+			}
+		}
+		if !w.Weight.IsPositive() {
+			return fmt.Errorf("non-positive weight at %dth", i)
+		}
+		if w.Weight.GT(sdk.NewDec(1)) {
+			return fmt.Errorf("more than 1 weight at %dth", i)
+		}
+		weightSum = weightSum.Add(w.Weight)
+	}
+
+	if !weightSum.Equal(sdk.NewDec(1)) {
+		return fmt.Errorf("invalid weight sum: %s", weightSum.String())
+	}
+
 	return nil
 }

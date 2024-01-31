@@ -1,6 +1,7 @@
 package v2
 
 import (
+	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -18,5 +19,6 @@ type NFTKeeper interface {
 		uri,
 		uriHash,
 		data string,
+		royaltyReceivers []*onfttypes.WeightedAddress,
 	) error
 }
