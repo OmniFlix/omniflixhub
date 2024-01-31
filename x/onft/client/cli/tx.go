@@ -42,8 +42,8 @@ func GetCmdCreateDenom() *cobra.Command {
 			fmt.Sprintf(`Create a new denom.
 Example:
 $ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<description>
---uri=<uri> --uri-hash=<uri hash> --preview-uri=<preview-uri> --creation-fee <fee>
---chain-id=<chain-id> --from=<key-name> --fees=<fee>`,
+--uri=<uri> --uri-hash=<uri hash> --preview-uri=<preview-uri> --royalty-receivers=<"addr1:weight,addr2:weight"> 
+--creation-fee <fee> --chain-id=<chain-id> --from=<key-name> --fees=<fee>`,
 				version.AppName,
 			),
 		),
@@ -296,7 +296,7 @@ func GetCmdUpdateDenom() *cobra.Command {
 			fmt.Sprintf(`Edit the data of Denom.
 Example:
 $ %s tx onft update-denom [denom-id] --name=<onft-name> --description=<onft-description> 
---preview-uri=<uri> --from=<key-name> --chain-id=<chain-id> --fees=<fee>`,
+--preview-uri=<uri> --royalty-receivers="addr1:weight,addr2:weight" --from=<key-name> --chain-id=<chain-id> --fees=<fee>`,
 				version.AppName,
 			),
 		),
