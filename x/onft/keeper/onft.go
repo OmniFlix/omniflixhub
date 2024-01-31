@@ -141,7 +141,7 @@ func (k Keeper) GetONFT(ctx sdk.Context, denomID, onftID string) (nft exported.O
 		Owner:        owner.String(),
 		Transferable: nftMetadata.Transferable,
 		Extensible:   nftMetadata.Extensible,
-		Nsfw:         nftMetadata.Extensible,
+		Nsfw:         nftMetadata.Nsfw,
 		CreatedAt:    nftMetadata.CreatedAt,
 		RoyaltyShare: nftMetadata.RoyaltyShare,
 	}, nil
@@ -170,7 +170,7 @@ func (k Keeper) GetONFTs(ctx sdk.Context, denomID string) (onfts []exported.ONFT
 			Owner:        owner.String(),
 			Transferable: nftMetadata.Transferable,
 			Extensible:   nftMetadata.Extensible,
-			Nsfw:         nftMetadata.Extensible,
+			Nsfw:         nftMetadata.Nsfw,
 			CreatedAt:    nftMetadata.CreatedAt,
 			RoyaltyShare: nftMetadata.RoyaltyShare,
 		})
@@ -201,7 +201,7 @@ func (k Keeper) GetOwnerONFTs(ctx sdk.Context, denomID string, owner sdk.AccAddr
 			Owner:        owner.String(),
 			Transferable: nftMetadata.Transferable,
 			Extensible:   nftMetadata.Extensible,
-			Nsfw:         nftMetadata.Extensible,
+			Nsfw:         nftMetadata.Nsfw,
 			CreatedAt:    nftMetadata.CreatedAt,
 			RoyaltyShare: nftMetadata.RoyaltyShare,
 		})
