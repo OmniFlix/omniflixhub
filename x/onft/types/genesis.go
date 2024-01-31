@@ -34,6 +34,11 @@ func ValidateGenesis(data GenesisState) error {
 		if err := ValidateURI(c.Denom.PreviewURI); err != nil {
 			return err
 		}
+		if c.Denom.RoyaltyReceivers != nil {
+			if err := ValidateWeightedAddresses(c.Denom.RoyaltyReceivers); err != nil {
+				return err
+			}
+		}
 
 		for _, nft := range c.ONFTs {
 			if nft.GetOwner().Empty() {

@@ -126,10 +126,11 @@ func (k Keeper) UpdateDenom(ctx sdk.Context, msg *types.MsgUpdateDenom) error {
 	}
 
 	denomMetadata := &types.DenomMetadata{
-		Creator:    denom.Creator,
-		Schema:     denom.Schema,
-		PreviewUri: denom.PreviewURI,
-		Data:       denom.Data,
+		Creator:          denom.Creator,
+		Schema:           denom.Schema,
+		PreviewUri:       denom.PreviewURI,
+		Data:             denom.Data,
+		RoyaltyReceivers: denom.RoyaltyReceivers,
 	}
 	if msg.PreviewURI != types.DoNotModify {
 		denomMetadata.PreviewUri = msg.PreviewURI
