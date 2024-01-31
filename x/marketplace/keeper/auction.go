@@ -296,11 +296,9 @@ func (k Keeper) processBid(ctx sdk.Context, auction types.AuctionListing, bid ty
 		if err != nil {
 			return err
 		}
-		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, sdk.NewCoins(nftRoyaltyShareCoin))
-		if err != nil {
+		if err := k.TransferRoyalty(ctx, nftRoyaltyShareCoin, denom.RoyaltyReceivers, creator); err != nil {
 			return err
 		}
-		k.createRoyaltyShareTransferEvent(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName), creator, nftRoyaltyShareCoin)
 		auctionSaleAmountCoin = auctionSaleAmountCoin.Sub(nftRoyaltyShareCoin)
 	}
 	remaining := auctionSaleAmountCoin

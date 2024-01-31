@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
+
 	errorsmod "cosmossdk.io/errors"
 
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -124,7 +126,6 @@ func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress
 	err = k.nftKeeper.TransferOwnership(ctx, listing.GetDenomId(), listing.GetNftId(),
 		k.accountKeeper.GetModuleAddress(types.ModuleName), buyer)
 	if err != nil {
-		_ = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, buyer, sdk.NewCoins(listing.Price))
 		return err
 	}
 	saleCommission := k.GetSaleCommission(ctx)
@@ -136,17 +137,16 @@ func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress
 		}
 		listingSaleAmountCoin = listingPriceCoin.Sub(marketplaceCoin)
 	}
-	if nft.GetRoyaltyShare().GT(sdk.ZeroDec()) {
+	// check if it is a valid royalty share
+	if nft.GetRoyaltyShare().GT(sdk.ZeroDec()) && nft.GetRoyaltyShare().LTE(sdk.OneDec()) {
 		nftRoyaltyShareCoin := k.GetProportions(listingSaleAmountCoin, nft.GetRoyaltyShare())
 		creator, err := sdk.AccAddressFromBech32(denom.Creator)
 		if err != nil {
 			return err
 		}
-		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, sdk.NewCoins(nftRoyaltyShareCoin))
-		if err != nil {
+		if err := k.TransferRoyalty(ctx, nftRoyaltyShareCoin, denom.RoyaltyReceivers, creator); err != nil {
 			return err
 		}
-		k.createRoyaltyShareTransferEvent(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName), creator, nftRoyaltyShareCoin)
 		listingSaleAmountCoin = listingSaleAmountCoin.Sub(nftRoyaltyShareCoin)
 	}
 	remaining := listingSaleAmountCoin
@@ -308,4 +308,52 @@ func (k Keeper) PlaceBid(ctx sdk.Context, auction types.AuctionListing, newBid t
 
 func (k Keeper) GetNewBidPrice(denom string, amount sdk.Coin, increment sdk.Dec) sdk.Coin {
 	return sdk.NewCoin(denom, amount.Amount.Add(sdk.NewDecFromInt(amount.Amount).Mul(increment).TruncateInt()))
+}
+
+func (k Keeper) TransferRoyalty(
+	ctx sdk.Context,
+	nftRoyaltyShareCoin sdk.Coin,
+	royaltyReceivers []*onfttypes.WeightedAddress,
+	creator sdk.AccAddress,
+) error {
+	// if royalty splits configured, distributing royalty
+	// else sending royalty to collection creator
+	if len(royaltyReceivers) > 0 {
+		remaining := nftRoyaltyShareCoin
+		for _, share := range royaltyReceivers {
+			sharePortionCoin := k.GetProportions(nftRoyaltyShareCoin, share.Weight)
+			sharePortionCoins := sdk.NewCoins(sharePortionCoin)
+			royaltySplitAddr, err := sdk.AccAddressFromBech32(share.Address)
+			if err != nil {
+				// ignoring error and sending royalty to creator
+				if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, sharePortionCoins); err != nil {
+					return err
+				}
+				k.createRoyaltyShareTransferEvent(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName), creator, sharePortionCoin)
+			} else {
+				err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, royaltySplitAddr, sharePortionCoins)
+				if err != nil {
+					return err
+				}
+				k.createRoyaltyShareTransferEvent(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName), royaltySplitAddr, sharePortionCoin)
+			}
+
+			remaining = remaining.Sub(sharePortionCoin)
+		}
+		// sending remaining to creator
+		if remaining.Amount.GT(sdk.ZeroInt()) {
+			err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, sdk.NewCoins(remaining))
+			if err != nil {
+				return err
+			}
+			k.createRoyaltyShareTransferEvent(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName), creator, nftRoyaltyShareCoin)
+		}
+	} else {
+		err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, sdk.NewCoins(nftRoyaltyShareCoin))
+		if err != nil {
+			return err
+		}
+		k.createRoyaltyShareTransferEvent(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName), creator, nftRoyaltyShareCoin)
+	}
+	return nil
 }
