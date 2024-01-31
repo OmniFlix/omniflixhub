@@ -232,3 +232,41 @@ func (k Keeper) GetDenomInfo(ctx sdk.Context, denomID string) (*types.Denom, err
 		RoyaltyReceivers: denomMetadata.RoyaltyReceivers,
 	}, nil
 }
+
+// PurgeDenom deletes the denom if no nfts in it
+func (k Keeper) PurgeDenom(
+	ctx sdk.Context,
+	denomID string,
+	sender sdk.AccAddress,
+) error {
+	denom, err := k.GetDenomInfo(ctx, denomID)
+	if err != nil {
+		return err
+	}
+
+	// authorize
+	if sender.String() != denom.Creator {
+		return errorsmod.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"%s is not allowed to purge denom %s", sender,
+			denomID,
+		)
+	}
+	if k.nk.GetTotalSupply(ctx, denomID) != 0 {
+		return errorsmod.Wrapf(
+			types.ErrNotAllowed,
+			"can not purge denom (%s) with nfts available in it",
+			denomID,
+		)
+	}
+	// delete the denom
+	k.DeleteDenomFromStore(ctx, denomID)
+
+	k.emitPurgeONFTDenomEvent(ctx, denomID)
+	return nil
+}
+
+func (k Keeper) DeleteDenomFromStore(ctx sdk.Context, denomId string) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(classStoreKey(denomId))
+}
