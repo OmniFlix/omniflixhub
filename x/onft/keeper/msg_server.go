@@ -67,6 +67,14 @@ func (m msgServer) CreateDenom(goCtx context.Context, msg *types.MsgCreateDenom)
 			denomCreationFee.String(),
 		)
 	}
+	err = m.Keeper.distributionKeeper.FundCommunityPool(
+		ctx,
+		sdk.NewCoins(denomCreationFee),
+		sender,
+	)
+	if err != nil {
+		return nil, err
+	}
 	if err := m.Keeper.SaveDenom(ctx,
 		msg.Id,
 		msg.Symbol,
@@ -78,6 +86,7 @@ func (m msgServer) CreateDenom(goCtx context.Context, msg *types.MsgCreateDenom)
 		msg.Uri,
 		msg.UriHash,
 		msg.Data,
+		msg.RoyaltyReceivers,
 	); err != nil {
 		return nil, err
 	}

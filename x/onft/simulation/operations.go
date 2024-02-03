@@ -138,6 +138,7 @@ func SimulateMsgCreateDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 			"{}",
 			sender.Address.String(),
 			creationFee,
+			nil,
 		)
 		msg.Id = denomId
 		denom, _ := k.GetDenomInfo(ctx, msg.Id)
@@ -407,6 +408,7 @@ func SimulateMsgUpdateDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 			simtypes.RandStringOfLength(r, 45),
 			simtypes.RandStringOfLength(r, 45),
 			ownerAccount.Address.String(),
+			nil,
 		)
 
 		spendableCoins := bk.SpendableCoins(ctx, ownerAccount.Address)

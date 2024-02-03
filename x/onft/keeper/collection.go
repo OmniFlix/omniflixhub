@@ -23,6 +23,7 @@ func (k Keeper) SetCollection(ctx sdk.Context, collection types.Collection) erro
 		denom.Uri,
 		denom.UriHash,
 		denom.Data,
+		denom.RoyaltyReceivers,
 	); err != nil {
 		return err
 	}

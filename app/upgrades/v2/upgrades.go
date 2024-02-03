@@ -8,6 +8,7 @@ import (
 	marketplacetypes "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
 	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/types"
+	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -123,6 +124,12 @@ func CreateV2UpgradeHandler(
 
 		// set token-factory denom creation fee
 		err = keepers.TokenFactoryKeeper.SetParams(ctx, tokenfactorytypes.DefaultParams())
+		if err != nil {
+			return nil, err
+		}
+
+		// set streampay default params
+		err = keepers.StreamPayKeeper.SetParams(ctx, streampaytypes.DefaultParams())
 		if err != nil {
 			return nil, err
 		}

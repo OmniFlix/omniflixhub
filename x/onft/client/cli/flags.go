@@ -5,22 +5,23 @@ import (
 )
 
 const (
-	FlagName            = "name"
-	FlagDescription     = "description"
-	FlagMediaURI        = "media-uri"
-	FlagPreviewURI      = "preview-uri"
-	FlagData            = "data"
-	FlagNonTransferable = "non-transferable"
-	FlagInExtensible    = "inextensible"
-	FlagRecipient       = "recipient"
-	FlagOwner           = "owner"
-	FlagDenomID         = "denom-id"
-	FlagSchema          = "schema"
-	FlagNsfw            = "nsfw"
-	FlagRoyaltyShare    = "royalty-share"
-	FlagCreationFee     = "creation-fee"
-	FlagURI             = "uri"
-	FlagURIHash         = "uri-hash"
+	FlagName             = "name"
+	FlagDescription      = "description"
+	FlagMediaURI         = "media-uri"
+	FlagPreviewURI       = "preview-uri"
+	FlagData             = "data"
+	FlagNonTransferable  = "non-transferable"
+	FlagInExtensible     = "inextensible"
+	FlagRecipient        = "recipient"
+	FlagOwner            = "owner"
+	FlagDenomID          = "denom-id"
+	FlagSchema           = "schema"
+	FlagNsfw             = "nsfw"
+	FlagRoyaltyShare     = "royalty-share"
+	FlagCreationFee      = "creation-fee"
+	FlagURI              = "uri"
+	FlagURIHash          = "uri-hash"
+	FlagRoyaltyReceivers = "royalty-receivers"
 )
 
 var (
@@ -39,10 +40,12 @@ func init() {
 	FsCreateDenom.String(FlagDescription, "", "Description for denom")
 	FsCreateDenom.String(FlagPreviewURI, "", "Preview image uri for denom")
 	FsCreateDenom.String(FlagCreationFee, "", "fee amount for creating denom")
+	FsCreateDenom.String(FlagRoyaltyReceivers, "", "royalty receivers with comma separated ex: \"address:percentage,address:percentage\"")
 
 	FsUpdateDenom.String(FlagName, "[do-not-modify]", "Name of the denom")
 	FsUpdateDenom.String(FlagDescription, "[do-not-modify]", "Description for denom")
 	FsUpdateDenom.String(FlagPreviewURI, "[do-not-modify]", "Preview image uri for denom")
+	FsUpdateDenom.String(FlagRoyaltyReceivers, "", "royalty receivers with comma separated ex: \"address:percentage,address:percentage\"")
 	FsCreateDenom.String(FlagURI, "", "uri for denom")
 	FsCreateDenom.String(FlagURIHash, "", "uri hash for denom")
 	FsCreateDenom.String(FlagData, "", "json data of the denom")
@@ -56,7 +59,7 @@ func init() {
 	FsMintONFT.String(FlagDescription, "", "Description of onft")
 	FsMintONFT.String(FlagData, "", "custom data of onft")
 	FsMintONFT.Bool(FlagNonTransferable, false, "To mint non-transferable onft")
-	FsMintONFT.Bool(FlagInExtensible, false, "To mint non-extensisble onft")
+	FsMintONFT.Bool(FlagInExtensible, false, "To mint non-extensible onft")
 	FsMintONFT.Bool(FlagNsfw, false, "not safe for work flag for onft")
 	FsMintONFT.String(FlagRoyaltyShare, "", "Royalty share value decimal value between 0 and 1")
 	FsMintONFT.String(FlagURIHash, "", "uri hash for the nft")

@@ -23,12 +23,14 @@ func (k Keeper) SaveDenom(
 	uri,
 	uriHash,
 	data string,
+	royaltyReceivers []*types.WeightedAddress,
 ) error {
 	denomMetadata := &types.DenomMetadata{
-		Creator:    creator.String(),
-		Schema:     schema,
-		PreviewUri: previewUri,
-		Data:       data,
+		Creator:          creator.String(),
+		Schema:           schema,
+		PreviewUri:       previewUri,
+		Data:             data,
+		RoyaltyReceivers: royaltyReceivers,
 	}
 	metadata, err := codectypes.NewAnyWithValue(denomMetadata)
 	if err != nil {
@@ -76,10 +78,11 @@ func (k Keeper) TransferDenomOwner(
 	}
 
 	denomMetadata := &types.DenomMetadata{
-		Creator:    recipient,
-		Schema:     denom.Schema,
-		PreviewUri: denom.PreviewURI,
-		Data:       denom.Data,
+		Creator:          recipient,
+		Schema:           denom.Schema,
+		PreviewUri:       denom.PreviewURI,
+		Data:             denom.Data,
+		RoyaltyReceivers: denom.RoyaltyReceivers,
 	}
 	data, err := codectypes.NewAnyWithValue(denomMetadata)
 	if err != nil {
@@ -123,13 +126,17 @@ func (k Keeper) UpdateDenom(ctx sdk.Context, msg *types.MsgUpdateDenom) error {
 	}
 
 	denomMetadata := &types.DenomMetadata{
-		Creator:    denom.Creator,
-		Schema:     denom.Schema,
-		PreviewUri: denom.PreviewURI,
-		Data:       denom.Data,
+		Creator:          denom.Creator,
+		Schema:           denom.Schema,
+		PreviewUri:       denom.PreviewURI,
+		Data:             denom.Data,
+		RoyaltyReceivers: denom.RoyaltyReceivers,
 	}
 	if msg.PreviewURI != types.DoNotModify {
 		denomMetadata.PreviewUri = msg.PreviewURI
+	}
+	if msg.RoyaltyReceivers != nil {
+		denomMetadata.RoyaltyReceivers = msg.RoyaltyReceivers
 	}
 	data, err := codectypes.NewAnyWithValue(denomMetadata)
 	if err != nil {
@@ -162,15 +169,16 @@ func (k Keeper) GetDenoms(ctx sdk.Context) (denoms []types.Denom, err error) {
 			return nil, err
 		}
 		denoms = append(denoms, types.Denom{
-			Id:          class.Id,
-			Name:        class.Name,
-			Schema:      denomMetadata.Schema,
-			Creator:     denomMetadata.Creator,
-			Symbol:      class.Symbol,
-			Description: class.Description,
-			PreviewURI:  denomMetadata.PreviewUri,
-			Uri:         class.Uri,
-			UriHash:     class.UriHash,
+			Id:               class.Id,
+			Name:             class.Name,
+			Schema:           denomMetadata.Schema,
+			Creator:          denomMetadata.Creator,
+			Symbol:           class.Symbol,
+			Description:      class.Description,
+			PreviewURI:       denomMetadata.PreviewUri,
+			Uri:              class.Uri,
+			UriHash:          class.UriHash,
+			RoyaltyReceivers: denomMetadata.RoyaltyReceivers,
 		})
 	}
 	return denoms, nil
@@ -211,15 +219,16 @@ func (k Keeper) GetDenomInfo(ctx sdk.Context, denomID string) (*types.Denom, err
 		return nil, err
 	}
 	return &types.Denom{
-		Id:          class.Id,
-		Name:        class.Name,
-		Schema:      denomMetadata.Schema,
-		Creator:     denomMetadata.Creator,
-		Symbol:      class.Symbol,
-		Description: class.Description,
-		PreviewURI:  denomMetadata.PreviewUri,
-		Uri:         class.Uri,
-		UriHash:     class.UriHash,
-		Data:        denomMetadata.Data,
+		Id:               class.Id,
+		Name:             class.Name,
+		Schema:           denomMetadata.Schema,
+		Creator:          denomMetadata.Creator,
+		Symbol:           class.Symbol,
+		Description:      class.Description,
+		PreviewURI:       denomMetadata.PreviewUri,
+		Uri:              class.Uri,
+		UriHash:          class.UriHash,
+		Data:             denomMetadata.Data,
+		RoyaltyReceivers: denomMetadata.RoyaltyReceivers,
 	}, nil
 }

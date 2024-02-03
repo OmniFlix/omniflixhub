@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/CosmWasm/wasmd v0.45.0
 	github.com/CosmWasm/wasmvm v1.5.0
-	github.com/OmniFlix/streampay/v2 v2.2.0-alpha.3
+	github.com/OmniFlix/streampay/v2 v2.3.0-alpha.1
 	github.com/bianjieai/nft-transfer v1.1.3-ibc-v7.3.0
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cometbft/cometbft-db v0.8.0

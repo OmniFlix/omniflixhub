@@ -33,7 +33,6 @@ var (
 	nftKeyPreviewURI    = fmt.Sprintf("%s%s", Namespace, "preview_uri")
 	nftKeyDescription   = fmt.Sprintf("%s%s", Namespace, "description")
 	nftKeyCreatedAt     = fmt.Sprintf("%s%s", Namespace, "created_at")
-	nftKeyTransferable  = fmt.Sprintf("%s%s", Namespace, "transferable")
 	nftKeyExtensible    = fmt.Sprintf("%s%s", Namespace, "extensible")
 	nftKeyNSFW          = fmt.Sprintf("%s%s", Namespace, "nsfw")
 	nftKeyRoyaltyShare  = fmt.Sprintf("%s%s", Namespace, "royalty_share")
@@ -275,7 +274,6 @@ func (nb NFTBuilder) BuildMetadata(_nft nft.NFT) (string, error) {
 	kvals[nftKeyName] = MediaField{Value: nftMetadata.Name}
 	kvals[nftKeyDescription] = MediaField{Value: nftMetadata.Description}
 	kvals[nftKeyPreviewURI] = MediaField{Value: nftMetadata.PreviewURI}
-	kvals[nftKeyTransferable] = MediaField{Value: nftMetadata.Transferable}
 	kvals[nftKeyExtensible] = MediaField{Value: nftMetadata.Extensible}
 	kvals[nftKeyNSFW] = MediaField{Value: nftMetadata.Nsfw}
 	kvals[nftKeyCreatedAt] = MediaField{Value: nftMetadata.CreatedAt}
@@ -319,6 +317,7 @@ func (nb NFTBuilder) Build(classId, nftID, nftURI, nftData string) (nft.NFT, err
 		description  string
 		previewURI   string
 		nsfw         = false
+		extensible   = true
 		createdAt    string
 		royaltyShare string
 		uriHash      string
@@ -367,6 +366,24 @@ func (nb NFTBuilder) Build(classId, nftID, nftURI, nftData string) (nft.NFT, err
 		}
 	}
 
+	if v, ok := dataMap[nftKeyExtensible]; ok {
+		if vMap, ok := v.(map[string]interface{}); ok {
+			if vBool, ok := vMap[KeyMediaFieldValue].(bool); ok {
+				extensible = vBool
+				delete(dataMap, nftKeyExtensible)
+			}
+		}
+	}
+
+	if v, ok := dataMap[nftKeyNSFW]; ok {
+		if vMap, ok := v.(map[string]interface{}); ok {
+			if vBool, ok := vMap[KeyMediaFieldValue].(bool); ok {
+				nsfw = vBool
+				delete(dataMap, nftKeyNSFW)
+			}
+		}
+	}
+
 	if v, ok := dataMap[nftKeyNSFW]; ok {
 		if vMap, ok := v.(map[string]interface{}); ok {
 			if vBool, ok := vMap[KeyMediaFieldValue].(bool); ok {
@@ -402,7 +419,7 @@ func (nb NFTBuilder) Build(classId, nftID, nftURI, nftData string) (nft.NFT, err
 		PreviewURI:   previewURI,
 		Data:         data,
 		Transferable: true,
-		Extensible:   true,
+		Extensible:   extensible,
 		Nsfw:         nsfw,
 		CreatedAt:    createdTime,
 		RoyaltyShare: royalty,
