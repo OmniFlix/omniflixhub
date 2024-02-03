@@ -1,10 +1,11 @@
 package keeper
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	"fmt"
-
 	"github.com/cometbft/cometbft/libs/log"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -60,4 +61,17 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 // NFTkeeper returns a cosmos-sdk nftkeeper.Keeper.
 func (k Keeper) NFTkeeper() nftkeeper.Keeper {
 	return k.nk
+}
+
+func (k Keeper) ValidateRoyaltyReceiverAddresses(splitShares []*types.WeightedAddress) error {
+	for _, share := range splitShares {
+		addr, err := sdk.AccAddressFromBech32(share.Address)
+		if err != nil {
+			return err
+		}
+		if k.bankKeeper.BlockedAddr(addr) {
+			return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "%s is a blocked address and not allowed receive funds", addr)
+		}
+	}
+	return nil
 }

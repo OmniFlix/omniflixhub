@@ -46,6 +46,13 @@ func (m msgServer) CreateDenom(goCtx context.Context, msg *types.MsgCreateDenom)
 	if m.Keeper.HasDenom(ctx, msg.Id) {
 		return nil, errorsmod.Wrapf(types.ErrDenomIdExists, "denom id already exists %s", msg.Id)
 	}
+
+	if msg.RoyaltyReceivers != nil {
+		if err := m.Keeper.ValidateRoyaltyReceiverAddresses(msg.RoyaltyReceivers); err != nil {
+			return nil, err
+		}
+	}
+
 	denomCreationFee := m.Keeper.GetDenomCreationFee(ctx)
 	if !msg.CreationFee.Equal(denomCreationFee) {
 		if msg.CreationFee.Denom != denomCreationFee.Denom {
@@ -98,6 +105,12 @@ func (m msgServer) UpdateDenom(goCtx context.Context, msg *types.MsgUpdateDenom)
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
+	}
+
+	if msg.RoyaltyReceivers != nil {
+		if err := m.Keeper.ValidateRoyaltyReceiverAddresses(msg.RoyaltyReceivers); err != nil {
+			return nil, err
+		}
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)

@@ -59,6 +59,10 @@ func (m msgServer) ListNFT(goCtx context.Context, msg *types.MsgListNFT) (*types
 			types.ErrNftNonTransferable, "non-transferable nfts not allowed to list in marketplace")
 	}
 
+	if err := m.Keeper.ValidateSplitShareAddresses(msg.SplitShares); err != nil {
+		return nil, err
+	}
+
 	listing := types.NewListing(msg.Id, msg.NftId, msg.DenomId, msg.Price, owner, msg.SplitShares)
 	err = m.Keeper.AddListing(ctx, listing)
 	if err != nil {
@@ -186,6 +190,11 @@ func (m msgServer) CreateAuction(goCtx context.Context, msg *types.MsgCreateAuct
 		return nil, errorsmod.Wrapf(
 			types.ErrNftNonTransferable, "non-transferable nfts not allowed to list in marketplace")
 	}
+
+	if err := m.Keeper.ValidateSplitShareAddresses(msg.SplitShares); err != nil {
+		return nil, err
+	}
+
 	var endTime *time.Time
 	if msg.Duration != nil {
 		maxAuctionDuration := m.Keeper.GetMaxAuctionDuration(ctx)
