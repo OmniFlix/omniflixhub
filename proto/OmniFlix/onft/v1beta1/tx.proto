@@ -21,6 +21,8 @@ service Msg {
 
   rpc TransferDenom(MsgTransferDenom) returns (MsgTransferDenomResponse);
 
+  rpc PurgeDenom(MsgPurgeDenom) returns (MsgPurgeDenomResponse);
+
   rpc MintONFT(MsgMintONFT) returns (MsgMintONFTResponse);
 
   rpc TransferONFT(MsgTransferONFT) returns (MsgTransferONFTResponse);
@@ -83,6 +85,17 @@ message MsgUpdateDenom {
 }
 
 message MsgUpdateDenomResponse {}
+
+message MsgPurgeDenom {
+  option (cosmos.msg.v1.signer) = "sender";
+  option (amino.name)           = "OmniFlix/onft/MsgPurgeDenom";
+  option (gogoproto.equal)      = false;
+
+  string id = 1;
+  string sender = 2;
+}
+
+message MsgPurgeDenomResponse {}
 
 message MsgTransferDenom {
   option (cosmos.msg.v1.signer) = "sender";

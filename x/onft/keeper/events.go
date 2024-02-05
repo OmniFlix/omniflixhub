@@ -42,6 +42,15 @@ func (k Keeper) emitTransferONFTDenomEvent(ctx sdk.Context, denomId, symbol, sen
 	)
 }
 
+func (k Keeper) emitPurgeONFTDenomEvent(ctx sdk.Context, denomId string) {
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			onfttypes.EventTypePurgeONFTDenom,
+			sdk.NewAttribute(onfttypes.AttributeKeyDenomID, denomId),
+		),
+	)
+}
+
 func (k Keeper) emitMintONFTEvent(ctx sdk.Context, nftId, denomId, uri, owner string) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(

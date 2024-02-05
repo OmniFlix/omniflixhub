@@ -27,6 +27,7 @@ func NewTxCmd() *cobra.Command {
 		GetCmdCreateDenom(),
 		GetCmdUpdateDenom(),
 		GetCmdTransferDenom(),
+		GetCmdPurgeDenom(),
 		GetCmdMintONFT(),
 		GetCmdTransferONFT(),
 		GetCmdBurnONFT(),
@@ -459,6 +460,38 @@ $ %s tx onft burn [denom-id] [onft-id] --from=<key-name> --chain-id=<chain-id> -
 			onftId := args[1]
 
 			msg := types.NewMsgBurnONFT(denomId, onftId, clientCtx.GetFromAddress().String())
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func GetCmdPurgeDenom() *cobra.Command {
+	cmd := &cobra.Command{
+		Use: "purge-denom [recipient] [denom-id]",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Purge an empty denom .
+Example:
+$ %s tx onft purge-denom [denom-id] --from=<key-name> --chain-id=<chain-id> --fees=<fee>`,
+				version.AppName,
+			),
+		),
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgPurgeDenom(
+				args[0],
+				clientCtx.GetFromAddress().String(),
+			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

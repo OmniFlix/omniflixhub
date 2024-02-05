@@ -214,3 +214,19 @@ func (m msgServer) BurnONFT(goCtx context.Context,
 
 	return &types.MsgBurnONFTResponse{}, nil
 }
+
+func (m msgServer) PurgeDenom(goCtx context.Context,
+	msg *types.MsgPurgeDenom,
+) (*types.MsgPurgeDenomResponse, error) {
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := m.Keeper.PurgeDenom(ctx, msg.Id, sender); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgPurgeDenomResponse{}, nil
+}

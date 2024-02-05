@@ -207,6 +207,37 @@ func (msg MsgTransferDenom) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
+func NewMsgPurgeDenom(id, sender string) *MsgPurgeDenom {
+	return &MsgPurgeDenom{
+		Id:     id,
+		Sender: sender,
+	}
+}
+
+func (msg MsgPurgeDenom) Route() string { return RouterKey }
+
+func (msg MsgPurgeDenom) Type() string { return TypeMsgTransferDenom }
+
+func (msg MsgPurgeDenom) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address; %s", err)
+	}
+	return nil
+}
+
+func (msg MsgPurgeDenom) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(&msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg MsgPurgeDenom) GetSigners() []sdk.AccAddress {
+	from, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
+}
+
 func NewMsgMintONFT(
 	denomId, sender, recipient string, metadata Metadata, data string,
 	transferable, extensible, nsfw bool, royaltyShare sdk.Dec,
