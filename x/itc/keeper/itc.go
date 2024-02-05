@@ -178,9 +178,9 @@ func (k Keeper) FinalizeAndEndCampaigns(ctx sdk.Context) error {
 func (k Keeper) endCampaign(ctx sdk.Context, campaign types.Campaign) {
 	// Transfer Remaining funds to creator
 	availableTokens := campaign.AvailableTokens
+	moduleAccAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	if availableTokens.IsValid() && availableTokens.Amount != sdk.ZeroInt() {
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
-			types.ModuleName, campaign.GetCreator(),
+		if err := k.bankKeeper.SendCoins(ctx, moduleAccAddr, campaign.GetCreator(),
 			sdk.NewCoins(sdk.NewCoin(availableTokens.Denom, availableTokens.Amount))); err != nil {
 			panic(err)
 		}
@@ -191,7 +191,7 @@ func (k Keeper) endCampaign(ctx sdk.Context, campaign types.Campaign) {
 			err := k.nftKeeper.TransferOwnership(ctx,
 				campaign.NftDenomId,
 				nft,
-				k.GetModuleAccountAddress(ctx),
+				moduleAccAddr,
 				campaign.GetCreator(),
 			)
 			if err != nil {
