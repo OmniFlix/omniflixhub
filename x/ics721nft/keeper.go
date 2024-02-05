@@ -1,7 +1,10 @@
 package ics721nft
 
 import (
+	"errors"
+
 	errorsmod "cosmossdk.io/errors"
+
 	onftkeeper "github.com/OmniFlix/omniflixhub/v2/x/onft/keeper"
 	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 	nfttransfer "github.com/bianjieai/nft-transfer/types"
@@ -12,6 +15,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/nft"
 	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
+	"github.com/cosmos/gogoproto/proto"
 )
 
 // Keeper defines the ICS721 Keeper
@@ -78,13 +82,17 @@ func (k Keeper) CreateOrUpdateClass(ctx sdk.Context,
 			Data: metadata,
 		}
 	}
-	var denomMeta onfttypes.DenomMetadata
-	if err := k.cdc.UnpackAny(class.Data, &denomMeta); err != nil {
+	var message proto.Message
+	if err := k.cdc.UnpackAny(class.Data, &message); err != nil {
 		return err
 	}
-	if denomMeta.RoyaltyReceivers != nil && !k.validRoyaltyReceiverAddresses(denomMeta.RoyaltyReceivers) {
-		denomMeta.RoyaltyReceivers = nil
-		dMeta, err := codectypes.NewAnyWithValue(&denomMeta)
+	denomMetadata, ok := message.(*onfttypes.DenomMetadata)
+	if !ok {
+		return errors.New("unsupported classMetadata")
+	}
+	if denomMetadata.RoyaltyReceivers != nil && !k.validRoyaltyReceiverAddresses(denomMetadata.RoyaltyReceivers) {
+		denomMetadata.RoyaltyReceivers = nil
+		dMeta, err := codectypes.NewAnyWithValue(denomMetadata)
 		if err != nil {
 			return err
 		}
