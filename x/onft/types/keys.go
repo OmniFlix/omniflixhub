@@ -13,16 +13,12 @@ const (
 )
 
 var (
-	PrefixONFT        = []byte{0x01}
-	PrefixOwners      = []byte{0x02}
-	PrefixCollection  = []byte{0x03}
-	PrefixDenom       = []byte{0x04}
-	PrefixDenomSymbol = []byte{0x05}
-	PrefixCreator     = []byte{0x06}
+	PrefixONFT       = []byte{0x01}
+	PrefixOwners     = []byte{0x02}
+	PrefixCollection = []byte{0x03}
+	PrefixDenom      = []byte{0x04}
 
 	ParamsKey = []byte{0x07}
-
-	delimiter = []byte("/")
 )
 
 func MustUnMarshalSupply(cdc codec.BinaryCodec, value []byte) uint64 {
