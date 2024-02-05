@@ -21,16 +21,6 @@ wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.21.3
 
 **Linux**
 
-### Before v2 upgrade
-```
-git clone https://github.com/Omniflix/omniflixhub.git
-cd omniflixhub
-git checkout v0.12.1
-go mod tidy
-make install
-```
-
-### After v2 upgrade
 ```
 git clone https://github.com/Omniflix/omniflixhub.git
 cd omniflixhub
@@ -83,6 +73,7 @@ curl https://raw.githubusercontent.com/OmniFlix/mainnet/main/omniflixhub-1/genes
  - [v0.11.0](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v0.11.0-upgrade.md) at block 7339200
  - [v0.12.x](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v0.12.x-upgrade.md) at block 8054200
  - [v2](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v2-upgrade.md) at block 10428200
+ - [v2.1]((https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v2.1-upgrade.md)) at block 10678600
 
 ### Testnets
 
