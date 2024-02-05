@@ -211,8 +211,5 @@ func (k Keeper) validRoyaltyReceiverAddresses(addresses []*onfttypes.WeightedAdd
 		}
 		weightSum = weightSum.Add(addr.Weight)
 	}
-	if !weightSum.Equal(sdk.NewDec(1)) {
-		return false
-	}
-	return true
+	return weightSum.Equal(sdk.NewDec(1))
 }
