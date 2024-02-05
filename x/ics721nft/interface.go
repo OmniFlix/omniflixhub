@@ -12,6 +12,9 @@ type (
 		SetAccount(sdk.Context, authtypes.AccountI)
 		GetModuleAddress(name string) sdk.AccAddress
 	}
+	BankKeeper interface {
+		BlockedAddr(addr sdk.AccAddress) bool
+	}
 
 	ICS721Class struct {
 		ID   string
