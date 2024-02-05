@@ -21,21 +21,22 @@ const (
 )
 
 var (
-	ClassKeyName        = fmt.Sprintf("%s%s", Namespace, "name")
-	ClassKeySymbol      = fmt.Sprintf("%s%s", Namespace, "symbol")
-	ClassKeyDescription = fmt.Sprintf("%s%s", Namespace, "description")
-	ClassKeyURIHash     = fmt.Sprintf("%s%s", Namespace, "uri_hash")
-	ClassKeyCreator     = fmt.Sprintf("%s%s", Namespace, "creator")
-	ClassKeySchema      = fmt.Sprintf("%s%s", Namespace, "schema")
-	ClassKeyPreviewURI  = fmt.Sprintf("%s%s", Namespace, "preview_uri")
-	nftKeyName          = fmt.Sprintf("%s%s", Namespace, "name")
-	nftKeyURIHash       = fmt.Sprintf("%s%s", Namespace, "uri_hash")
-	nftKeyPreviewURI    = fmt.Sprintf("%s%s", Namespace, "preview_uri")
-	nftKeyDescription   = fmt.Sprintf("%s%s", Namespace, "description")
-	nftKeyCreatedAt     = fmt.Sprintf("%s%s", Namespace, "created_at")
-	nftKeyExtensible    = fmt.Sprintf("%s%s", Namespace, "extensible")
-	nftKeyNSFW          = fmt.Sprintf("%s%s", Namespace, "nsfw")
-	nftKeyRoyaltyShare  = fmt.Sprintf("%s%s", Namespace, "royalty_share")
+	ClassKeyName             = fmt.Sprintf("%s%s", Namespace, "name")
+	ClassKeySymbol           = fmt.Sprintf("%s%s", Namespace, "symbol")
+	ClassKeyDescription      = fmt.Sprintf("%s%s", Namespace, "description")
+	ClassKeyURIHash          = fmt.Sprintf("%s%s", Namespace, "uri_hash")
+	ClassKeyCreator          = fmt.Sprintf("%s%s", Namespace, "creator")
+	ClassKeySchema           = fmt.Sprintf("%s%s", Namespace, "schema")
+	ClassKeyPreviewURI       = fmt.Sprintf("%s%s", Namespace, "preview_uri")
+	ClassKeyRoyaltyReceivers = fmt.Sprintf("%s%s", Namespace, "royalty_receivers")
+	nftKeyName               = fmt.Sprintf("%s%s", Namespace, "name")
+	nftKeyURIHash            = fmt.Sprintf("%s%s", Namespace, "uri_hash")
+	nftKeyPreviewURI         = fmt.Sprintf("%s%s", Namespace, "preview_uri")
+	nftKeyDescription        = fmt.Sprintf("%s%s", Namespace, "description")
+	nftKeyCreatedAt          = fmt.Sprintf("%s%s", Namespace, "created_at")
+	nftKeyExtensible         = fmt.Sprintf("%s%s", Namespace, "extensible")
+	nftKeyNSFW               = fmt.Sprintf("%s%s", Namespace, "nsfw")
+	nftKeyRoyaltyShare       = fmt.Sprintf("%s%s", Namespace, "royalty_share")
 )
 
 type ClassBuilder struct {
@@ -97,6 +98,7 @@ func (cb ClassBuilder) BuildMetadata(class nft.Class) (string, error) {
 	kvals[ClassKeyCreator] = MediaField{Value: hexCreator}
 	kvals[ClassKeySchema] = MediaField{Value: metadata.Schema}
 	kvals[ClassKeyPreviewURI] = MediaField{Value: metadata.PreviewUri}
+	kvals[ClassKeyRoyaltyReceivers] = MediaField{Value: metadata.RoyaltyReceivers}
 	data, err := json.Marshal(kvals)
 	if err != nil {
 		return "", err
@@ -112,13 +114,14 @@ func (cb ClassBuilder) Build(classID, classURI, classData string) (nft.Class, er
 	}
 
 	var (
-		name        = ""
-		symbol      = ""
-		description = ""
-		uriHash     = ""
-		schema      = ""
-		previewURI  = ""
-		creator     = cb.getModuleAddress(ModuleName).String()
+		name             = ""
+		symbol           = ""
+		description      = ""
+		uriHash          = ""
+		schema           = ""
+		previewURI       = ""
+		royaltyReceivers []*WeightedAddress
+		creator          = cb.getModuleAddress(ModuleName).String()
 	)
 
 	dataMap := make(map[string]interface{})
@@ -210,6 +213,15 @@ func (cb ClassBuilder) Build(classID, classURI, classData string) (nft.Class, er
 		}
 	}
 
+	if v, ok := dataMap[ClassKeyRoyaltyReceivers]; ok {
+		if vMap, ok := v.(map[string]interface{}); ok {
+			if vAddrs, ok := vMap[KeyMediaFieldValue].([]*WeightedAddress); ok {
+				royaltyReceivers = vAddrs
+				delete(dataMap, ClassKeyRoyaltyReceivers)
+			}
+		}
+	}
+
 	data := ""
 	if len(dataMap) > 0 {
 		dataBz, err := json.Marshal(dataMap)
@@ -220,12 +232,13 @@ func (cb ClassBuilder) Build(classID, classURI, classData string) (nft.Class, er
 	}
 
 	denomMeta, err := codectypes.NewAnyWithValue(&DenomMetadata{
-		Creator:     creator,
-		Schema:      schema,
-		Description: description,
-		PreviewUri:  previewURI,
-		Data:        data,
-		UriHash:     uriHash,
+		Creator:          creator,
+		Schema:           schema,
+		Description:      description,
+		PreviewUri:       previewURI,
+		Data:             data,
+		UriHash:          uriHash,
+		RoyaltyReceivers: royaltyReceivers,
 	})
 	if err != nil {
 		return nft.Class{}, err

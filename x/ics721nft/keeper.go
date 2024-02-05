@@ -1,6 +1,7 @@
 package ics721nft
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	onftkeeper "github.com/OmniFlix/omniflixhub/v2/x/onft/keeper"
 	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
 	nfttransfer "github.com/bianjieai/nft-transfer/types"
@@ -8,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/nft"
 	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
 )
@@ -17,6 +19,7 @@ type Keeper struct {
 	nk  nftkeeper.Keeper
 	cdc codec.Codec
 	ak  AccountKeeper
+	bk  BankKeeper
 	cb  onfttypes.ClassBuilder
 	nb  onfttypes.NFTBuilder
 }
@@ -25,11 +28,13 @@ type Keeper struct {
 func NewKeeper(cdc codec.Codec,
 	k onftkeeper.Keeper,
 	ak AccountKeeper,
+	bk BankKeeper,
 ) Keeper {
 	return Keeper{
 		nk:  k.NFTkeeper(),
 		cdc: cdc,
 		ak:  ak,
+		bk:  bk,
 		cb:  onfttypes.NewClassBuilder(cdc, ak.GetModuleAddress),
 		nb:  onfttypes.NewNFTBuilder(cdc),
 	}
@@ -53,9 +58,13 @@ func (k Keeper) CreateOrUpdateClass(ctx sdk.Context,
 		}
 	} else {
 		denomMetadata := &onfttypes.DenomMetadata{
-			Creator:    k.ak.GetModuleAddress(onfttypes.ModuleName).String(),
-			PreviewUri: "",
-			Schema:     "",
+			Creator:          k.ak.GetModuleAddress(onfttypes.ModuleName).String(),
+			PreviewUri:       "",
+			Schema:           "",
+			Description:      "",
+			Data:             "",
+			UriHash:          "",
+			RoyaltyReceivers: nil,
 		}
 
 		metadata, err := codectypes.NewAnyWithValue(denomMetadata)
@@ -68,6 +77,18 @@ func (k Keeper) CreateOrUpdateClass(ctx sdk.Context,
 			Uri:  classURI,
 			Data: metadata,
 		}
+	}
+	var denomMeta onfttypes.DenomMetadata
+	if err := k.cdc.UnpackAny(class.Data, &denomMeta); err != nil {
+		return err
+	}
+	if denomMeta.RoyaltyReceivers != nil && !k.validRoyaltyReceiverAddresses(denomMeta.RoyaltyReceivers) {
+		denomMeta.RoyaltyReceivers = nil
+		dMeta, err := codectypes.NewAnyWithValue(&denomMeta)
+		if err != nil {
+			return err
+		}
+		class.Data = dMeta
 	}
 	if k.nk.HasClass(ctx, classID) {
 		return k.nk.UpdateClass(ctx, class)
@@ -96,23 +117,22 @@ func (k Keeper) Transfer(
 	ctx sdk.Context,
 	classID,
 	tokenID,
-	tokenData string,
+	_ string,
 	receiver sdk.AccAddress,
 ) error {
+	_nft, _ := k.nk.GetNFT(ctx, classID, tokenID)
+	nftMetadata, err := onfttypes.UnmarshalNFTMetadata(k.cdc, _nft.Data.GetValue())
+	if err != nil {
+		return err
+	}
+	if !nftMetadata.Transferable {
+		k.Logger(ctx).Error("non-transferable nft")
+		return errorsmod.Wrap(sdkerrors.ErrUnauthorized, "non-transferable nft")
+	}
 	if err := k.nk.Transfer(ctx, classID, tokenID, receiver); err != nil {
 		return err
 	}
-	if len(tokenData) == 0 {
-		return nil
-	}
-	_nft, _ := k.nk.GetNFT(ctx, classID, tokenID)
-	token, err := k.nb.Build(classID, tokenID, _nft.GetUri(), tokenData)
-	if err != nil {
-		k.Logger(ctx).Error("unable to build token on transfer from packet data", "error:", err.Error())
-		return err
-	}
-
-	return k.nk.Update(ctx, token)
+	return nil
 }
 
 // GetClass implement the method of ICS721Keeper.GetClass
@@ -138,14 +158,6 @@ func (k Keeper) GetClass(ctx sdk.Context, classID string) (nfttransfer.Class, bo
 func (k Keeper) GetNFT(ctx sdk.Context, classID, tokenID string) (nfttransfer.NFT, bool) {
 	_nft, has := k.nk.GetNFT(ctx, classID, tokenID)
 	if !has {
-		return nil, false
-	}
-	nftMetadata, err := onfttypes.UnmarshalNFTMetadata(k.cdc, _nft.Data.GetValue())
-	if err != nil {
-		return nil, false
-	}
-	if !nftMetadata.Transferable {
-		k.Logger(ctx).Error("non-transferable nft")
 		return nil, false
 	}
 	metadata, err := k.nb.BuildMetadata(_nft)
@@ -179,4 +191,25 @@ func (k Keeper) HasClass(ctx sdk.Context, classID string) bool {
 // Logger returns a module-specific logger.
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", "ics721/NFTKeeper")
+}
+
+func (k Keeper) validRoyaltyReceiverAddresses(addresses []*onfttypes.WeightedAddress) bool {
+	weightSum := sdk.NewDec(0)
+	for _, addr := range addresses {
+		address, err := sdk.AccAddressFromBech32(addr.Address)
+		if err != nil {
+			return false
+		}
+		if k.bk.BlockedAddr(address) {
+			return false
+		}
+		if !addr.Weight.IsPositive() {
+			return false
+		}
+		if addr.Weight.GT(sdk.NewDec(1)) {
+			return false
+		}
+		weightSum = weightSum.Add(addr.Weight)
+	}
+	return weightSum.Equal(sdk.NewDec(1))
 }
