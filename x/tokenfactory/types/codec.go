@@ -2,49 +2,24 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 	authzcodec "github.com/cosmos/cosmos-sdk/x/authz/codec"
+	govcodec "github.com/cosmos/cosmos-sdk/x/gov/codec"
+	groupcodec "github.com/cosmos/cosmos-sdk/x/group/codec"
 )
 
-var (
-	amino = codec.NewLegacyAmino()
-
-	// ModuleCdc references the global erc20 module codec. Note, the codec should
-	// ONLY be used in certain instances of tests and for JSON encoding.
-	//
-	// The actual codec used for serialization should be provided to modules/erc20 and
-	// defined at the application level.
-	ModuleCdc = codec.NewProtoCodec(codectypes.NewInterfaceRegistry())
-
-	// AminoCdc is a amino codec created to support amino JSON compatible msgs.
-	AminoCdc = codec.NewAminoCodec(amino)
-)
-
-const (
-	// Amino names
-	createTFDenom        = "tokenfactory/create-denom"
-	mintTFDenom          = "tokenfactory/mint"
-	burnTFDenom          = "tokenfactory/burn"
-	forceTransferTFDenom = "tokenfactory/force-transfer"
-	changeAdminTFDenom   = "tokenfactory/change-admin"
-	updateTFParams       = "tokenfactory/msg-update-params"
-)
-
-// NOTE: This is required for the GetSignBytes function
-func init() {
-	RegisterLegacyAminoCodec(amino)
-	sdk.RegisterLegacyAminoCodec(amino)
-	// cryptocodec.RegisterCrypto(amino)
-	// codec.RegisterEvidences(amino)
-
-	// Register all Amino interfaces and concrete types on the authz Amino codec
-	// so that this can later be used to properly serialize MsgGrant and MsgExec
-	// instances.
-	RegisterLegacyAminoCodec(authzcodec.Amino)
-
-	amino.Seal()
+func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
+	legacy.RegisterAminoMsg(cdc, &MsgCreateDenom{}, "tokenfactory/create-denom")
+	legacy.RegisterAminoMsg(cdc, &MsgMint{}, "tokenfactory/mint")
+	legacy.RegisterAminoMsg(cdc, &MsgBurn{}, "tokenfactory/burn")
+	legacy.RegisterAminoMsg(cdc, &MsgChangeAdmin{}, "tokenfactory/change-admin")
+	legacy.RegisterAminoMsg(cdc, &MsgSetDenomMetadata{}, "tokenfactory/set-denom-metadata")
+	legacy.RegisterAminoMsg(cdc, &MsgForceTransfer{}, "tokenfactory/force-transfer")
+	legacy.RegisterAminoMsg(cdc, &MsgUpdateParams{}, "tokenfactory/update-params")
 }
 
 func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
@@ -53,18 +28,28 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 		&MsgCreateDenom{},
 		&MsgMint{},
 		&MsgBurn{},
-		&MsgForceTransfer{},
 		&MsgChangeAdmin{},
+		&MsgSetDenomMetadata{},
+		&MsgForceTransfer{},
 		&MsgUpdateParams{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
 
-func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgCreateDenom{}, createTFDenom, nil)
-	cdc.RegisterConcrete(&MsgMint{}, mintTFDenom, nil)
-	cdc.RegisterConcrete(&MsgBurn{}, burnTFDenom, nil)
-	cdc.RegisterConcrete(&MsgForceTransfer{}, forceTransferTFDenom, nil)
-	cdc.RegisterConcrete(&MsgChangeAdmin{}, changeAdminTFDenom, nil)
-	cdc.RegisterConcrete(&MsgUpdateParams{}, updateTFParams, nil)
+var (
+	amino     = codec.NewLegacyAmino()
+	ModuleCdc = codec.NewAminoCodec(amino)
+)
+
+func init() {
+	RegisterLegacyAminoCodec(amino)
+	cryptocodec.RegisterCrypto(amino)
+	sdk.RegisterLegacyAminoCodec(amino)
+	amino.Seal()
+
+	// Register all Amino interfaces and concrete types on the authz and gov Amino codec so that this can later be
+	// used to properly serialize MsgGrant, MsgExec and MsgSubmitProposal instances
+	RegisterLegacyAminoCodec(authzcodec.Amino)
+	RegisterLegacyAminoCodec(govcodec.Amino)
+	RegisterLegacyAminoCodec(groupcodec.Amino)
 }
