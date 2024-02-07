@@ -118,13 +118,13 @@ func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress
 	if err != nil {
 		return err
 	}
+	moduleAccAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 
-	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, buyer, types.ModuleName, sdk.NewCoins(listingPriceCoin))
+	err = k.bankKeeper.SendCoins(ctx, buyer, moduleAccAddr, sdk.NewCoins(listingPriceCoin))
 	if err != nil {
 		return err
 	}
-	err = k.nftKeeper.TransferOwnership(ctx, listing.GetDenomId(), listing.GetNftId(),
-		k.accountKeeper.GetModuleAddress(types.ModuleName), buyer)
+	err = k.nftKeeper.TransferOwnership(ctx, listing.GetDenomId(), listing.GetNftId(), moduleAccAddr, buyer)
 	if err != nil {
 		return err
 	}
@@ -156,7 +156,7 @@ func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress
 			sharePortionCoin := k.GetProportions(listingSaleAmountCoin, share.Weight)
 			sharePortionCoins := sdk.NewCoins(sharePortionCoin)
 			if share.Address == "" {
-				err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, owner, sharePortionCoins)
+				err = k.bankKeeper.SendCoins(ctx, moduleAccAddr, owner, sharePortionCoins)
 				if err != nil {
 					return err
 				}
@@ -165,21 +165,20 @@ func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress
 				if err != nil {
 					return err
 				}
-				err = k.bankKeeper.SendCoinsFromModuleToAccount(
-					ctx, types.ModuleName, saleSplitAddr, sharePortionCoins)
+				err = k.bankKeeper.SendCoins(ctx, moduleAccAddr, saleSplitAddr, sharePortionCoins)
 				if err != nil {
 					return err
 				}
-				k.createSplitShareTransferEvent(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName), saleSplitAddr, sharePortionCoin)
+				k.createSplitShareTransferEvent(ctx, moduleAccAddr, saleSplitAddr, sharePortionCoin)
 			}
 			remaining = remaining.Sub(sharePortionCoin)
 		}
-		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, owner, sdk.NewCoins(remaining))
+		err = k.bankKeeper.SendCoins(ctx, moduleAccAddr, owner, sdk.NewCoins(remaining))
 		if err != nil {
 			return err
 		}
 	} else {
-		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, owner, sdk.NewCoins(remaining))
+		err = k.bankKeeper.SendCoins(ctx, moduleAccAddr, owner, sdk.NewCoins(remaining))
 		if err != nil {
 			return err
 		}
@@ -196,14 +195,16 @@ func (k Keeper) GetProportions(totalCoin sdk.Coin, ratio sdk.Dec) sdk.Coin {
 func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) error {
 	distrParams := k.GetMarketplaceDistributionParams(ctx)
 	stakingCommissionCoin := k.GetProportions(marketplaceCoin, distrParams.Staking)
+	moduleAccAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
+	feeCollectorAddr := k.accountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 	if distrParams.Staking.GT(sdk.ZeroDec()) && stakingCommissionCoin.Amount.GT(sdk.ZeroInt()) {
-		err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, authtypes.FeeCollectorName, sdk.NewCoins(stakingCommissionCoin))
+		err := k.bankKeeper.SendCoins(ctx, moduleAccAddr, feeCollectorAddr, sdk.NewCoins(stakingCommissionCoin))
 		if err != nil {
 			return err
 		}
 		k.createSaleCommissionTransferEvent(ctx,
-			k.accountKeeper.GetModuleAddress(types.ModuleName),
-			k.accountKeeper.GetModuleAddress(authtypes.FeeCollectorName),
+			moduleAccAddr,
+			feeCollectorAddr,
 			stakingCommissionCoin,
 		)
 		marketplaceCoin = marketplaceCoin.Sub(stakingCommissionCoin)
@@ -213,13 +214,13 @@ func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) 
 	err := k.distributionKeeper.FundCommunityPool(
 		ctx,
 		sdk.NewCoins(communityPoolCommissionCoin),
-		k.accountKeeper.GetModuleAddress(types.ModuleName),
+		moduleAccAddr,
 	)
 	if err != nil {
 		return err
 	}
 	k.createSaleCommissionTransferEvent(ctx,
-		k.accountKeeper.GetModuleAddress(types.ModuleName),
+		moduleAccAddr,
 		k.accountKeeper.GetModuleAddress("distribution"),
 		communityPoolCommissionCoin,
 	)
@@ -289,15 +290,19 @@ func (k Keeper) PlaceBid(ctx sdk.Context, auction types.AuctionListing, newBid t
 		return errorsmod.Wrapf(types.ErrBidAmountNotEnough,
 			"cannot place bid for given auction %d, required amount to bid is %s", auction.Id, newBidPrice.String())
 	}
+	moduleAccAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 
 	// Transfer amount from bidder to module account
-	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, newBid.GetBidder(), types.ModuleName, sdk.NewCoins(newBid.Amount))
+	err := k.bankKeeper.SendCoins(ctx, newBid.GetBidder(), moduleAccAddr, sdk.NewCoins(newBid.Amount))
 	if err != nil {
 		return err
 	}
 	// Release previous Bid
 	if bidExists {
-		_ = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, prevBid.GetBidder(), sdk.NewCoins(prevBid.Amount))
+		err = k.bankKeeper.SendCoins(ctx, moduleAccAddr, prevBid.GetBidder(), sdk.NewCoins(prevBid.Amount))
+		if err != nil {
+			return err
+		}
 		k.RemoveBid(ctx, prevBid.AuctionId)
 	}
 	// Set new bid
@@ -318,6 +323,7 @@ func (k Keeper) TransferRoyalty(
 ) error {
 	// if royalty splits configured, distributing royalty
 	// else sending royalty to collection creator
+	moduleAcc := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	if len(royaltyReceivers) > 0 {
 		remaining := nftRoyaltyShareCoin
 		for _, share := range royaltyReceivers {
@@ -326,34 +332,34 @@ func (k Keeper) TransferRoyalty(
 			royaltySplitAddr, err := sdk.AccAddressFromBech32(share.Address)
 			if err != nil {
 				// ignoring error and sending royalty to creator
-				if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, sharePortionCoins); err != nil {
+				if err := k.bankKeeper.SendCoins(ctx, moduleAcc, creator, sharePortionCoins); err != nil {
 					return err
 				}
-				k.createRoyaltyShareTransferEvent(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName), creator, sharePortionCoin)
+				k.createRoyaltyShareTransferEvent(ctx, moduleAcc, creator, sharePortionCoin)
 			} else {
-				err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, royaltySplitAddr, sharePortionCoins)
+				err = k.bankKeeper.SendCoins(ctx, moduleAcc, royaltySplitAddr, sharePortionCoins)
 				if err != nil {
 					return err
 				}
-				k.createRoyaltyShareTransferEvent(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName), royaltySplitAddr, sharePortionCoin)
+				k.createRoyaltyShareTransferEvent(ctx, moduleAcc, royaltySplitAddr, sharePortionCoin)
 			}
 
 			remaining = remaining.Sub(sharePortionCoin)
 		}
 		// sending remaining to creator
 		if remaining.Amount.GT(sdk.ZeroInt()) {
-			err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, sdk.NewCoins(remaining))
+			err := k.bankKeeper.SendCoins(ctx, moduleAcc, creator, sdk.NewCoins(remaining))
 			if err != nil {
 				return err
 			}
-			k.createRoyaltyShareTransferEvent(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName), creator, nftRoyaltyShareCoin)
+			k.createRoyaltyShareTransferEvent(ctx, moduleAcc, creator, nftRoyaltyShareCoin)
 		}
 	} else {
-		err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, sdk.NewCoins(nftRoyaltyShareCoin))
+		err := k.bankKeeper.SendCoins(ctx, moduleAcc, creator, sdk.NewCoins(nftRoyaltyShareCoin))
 		if err != nil {
 			return err
 		}
-		k.createRoyaltyShareTransferEvent(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName), creator, nftRoyaltyShareCoin)
+		k.createRoyaltyShareTransferEvent(ctx, moduleAcc, creator, nftRoyaltyShareCoin)
 	}
 	return nil
 }

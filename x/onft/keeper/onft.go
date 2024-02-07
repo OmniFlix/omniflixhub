@@ -133,6 +133,7 @@ func (k Keeper) GetONFT(ctx sdk.Context, denomID, onftID string) (nft exported.O
 		Description: nftMetadata.Description,
 		MediaURI:    onft.Uri,
 		PreviewURI:  nftMetadata.PreviewURI,
+		UriHash:     onft.UriHash,
 	}
 	return types.ONFT{
 		Id:           onft.Id,
@@ -162,6 +163,7 @@ func (k Keeper) GetONFTs(ctx sdk.Context, denomID string) (onfts []exported.ONFT
 			Description: nftMetadata.Description,
 			MediaURI:    _nft.Uri,
 			PreviewURI:  nftMetadata.PreviewURI,
+			UriHash:     _nft.UriHash,
 		}
 		onfts = append(onfts, types.ONFT{
 			Id:           _nft.GetId(),
@@ -193,6 +195,7 @@ func (k Keeper) GetOwnerONFTs(ctx sdk.Context, denomID string, owner sdk.AccAddr
 			Description: nftMetadata.Description,
 			MediaURI:    _nft.Uri,
 			PreviewURI:  nftMetadata.PreviewURI,
+			UriHash:     _nft.UriHash,
 		}
 		onfts = append(onfts, types.ONFT{
 			Id:           _nft.GetId(),

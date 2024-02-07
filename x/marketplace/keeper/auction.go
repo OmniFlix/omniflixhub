@@ -276,8 +276,8 @@ func (k Keeper) processBid(ctx sdk.Context, auction types.AuctionListing, bid ty
 	}
 	BidAmountCoin := bid.Amount
 	auctionSaleAmountCoin := BidAmountCoin
-	err = k.nftKeeper.TransferOwnership(ctx, auction.GetDenomId(), auction.GetNftId(),
-		k.accountKeeper.GetModuleAddress(types.ModuleName), bid.GetBidder())
+	moduleAccAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
+	err = k.nftKeeper.TransferOwnership(ctx, auction.GetDenomId(), auction.GetNftId(), moduleAccAddr, bid.GetBidder())
 	if err != nil {
 		return err
 	}
@@ -308,7 +308,7 @@ func (k Keeper) processBid(ctx sdk.Context, auction types.AuctionListing, bid ty
 			sharePortionCoin := k.GetProportions(auctionSaleAmountCoin, share.Weight)
 			sharePortionCoins := sdk.NewCoins(sharePortionCoin)
 			if share.Address == "" {
-				err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, owner, sharePortionCoins)
+				err = k.bankKeeper.SendCoins(ctx, moduleAccAddr, owner, sharePortionCoins)
 				if err != nil {
 					return err
 				}
@@ -317,21 +317,20 @@ func (k Keeper) processBid(ctx sdk.Context, auction types.AuctionListing, bid ty
 				if err != nil {
 					return err
 				}
-				err = k.bankKeeper.SendCoinsFromModuleToAccount(
-					ctx, types.ModuleName, saleSplitAddr, sharePortionCoins)
+				err = k.bankKeeper.SendCoins(ctx, moduleAccAddr, saleSplitAddr, sharePortionCoins)
 				if err != nil {
 					return err
 				}
-				k.createSplitShareTransferEvent(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName), saleSplitAddr, sharePortionCoin)
+				k.createSplitShareTransferEvent(ctx, moduleAccAddr, saleSplitAddr, sharePortionCoin)
 			}
 			remaining = remaining.Sub(sharePortionCoin)
 		}
-		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, owner, sdk.NewCoins(remaining))
+		err = k.bankKeeper.SendCoins(ctx, moduleAccAddr, owner, sdk.NewCoins(remaining))
 		if err != nil {
 			return err
 		}
 	} else {
-		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, owner, sdk.NewCoins(remaining))
+		err = k.bankKeeper.SendCoins(ctx, moduleAccAddr, owner, sdk.NewCoins(remaining))
 		if err != nil {
 			return err
 		}
