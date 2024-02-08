@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/spf13/cobra"
 
-	"github.com/OmniFlix/omniflixhub/v2/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v3/x/onft/types"
 )
 
 func GetQueryCmd() *cobra.Command {

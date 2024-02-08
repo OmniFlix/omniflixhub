@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/OmniFlix/omniflixhub/v2/x/onft/exported"
+	"github.com/OmniFlix/omniflixhub/v3/x/onft/exported"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"

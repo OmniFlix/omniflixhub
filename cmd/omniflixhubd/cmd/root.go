@@ -11,8 +11,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/pruning"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/OmniFlix/omniflixhub/v2/app"
-	"github.com/OmniFlix/omniflixhub/v2/app/params"
+	"github.com/OmniFlix/omniflixhub/v3/app"
+	"github.com/OmniFlix/omniflixhub/v3/app/params"
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"

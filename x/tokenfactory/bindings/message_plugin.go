@@ -12,9 +12,9 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	bindingstypes "github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/bindings/types"
-	tokenfactorykeeper "github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/keeper"
-	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/types"
+	bindingstypes "github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/bindings/types"
+	tokenfactorykeeper "github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/keeper"
+	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/types"
 )
 
 // CustomMessageDecorator returns decorator for custom CosmWasm bindings messages

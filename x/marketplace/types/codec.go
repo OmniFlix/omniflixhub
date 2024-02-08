@@ -11,7 +11,7 @@ import (
 	govcodec "github.com/cosmos/cosmos-sdk/x/gov/codec"
 	gogotypes "github.com/cosmos/gogoproto/types"
 
-	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/exported"
+	"github.com/OmniFlix/omniflixhub/v3/x/marketplace/exported"
 )
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
