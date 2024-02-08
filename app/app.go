@@ -55,6 +55,7 @@ import (
 	v012 "github.com/OmniFlix/omniflixhub/v3/app/upgrades/v012"
 	v2 "github.com/OmniFlix/omniflixhub/v3/app/upgrades/v2"
 	v2_1 "github.com/OmniFlix/omniflixhub/v3/app/upgrades/v2.1"
+	v3 "github.com/OmniFlix/omniflixhub/v3/app/upgrades/v3"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
@@ -69,7 +70,7 @@ var (
 	// https://github.com/CosmWasm/wasmd/blob/02a54d33ff2c064f3539ae12d75d027d9c665f05/x/wasm/internal/types/proposal.go#L28-L34
 	EnableSpecificProposals = ""
 
-	EmptyWasmOpts []wasm.Option
+	EmptyWasmOpts [][]wasmkeeper.Option
 )
 
 func getGovProposalHandlers() []govclient.ProposalHandler {
@@ -88,7 +89,7 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 var (
 	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome string
-	Upgrades        = []upgrades.Upgrade{v012.Upgrade, v2.Upgrade, v2_1.Upgrade}
+	Upgrades        = []upgrades.Upgrade{v012.Upgrade, v2.Upgrade, v2_1.Upgrade, v3.Upgrade}
 	Forks           []upgrades.Fork
 )
 
