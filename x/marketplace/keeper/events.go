@@ -3,7 +3,7 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v3/x/marketplace/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

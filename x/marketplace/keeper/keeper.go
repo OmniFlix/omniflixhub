@@ -3,13 +3,13 @@ package keeper
 import (
 	"fmt"
 
-	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
+	onfttypes "github.com/OmniFlix/omniflixhub/v3/x/onft/types"
 
 	errorsmod "cosmossdk.io/errors"
 
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 
-	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v3/x/marketplace/types"
 	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"

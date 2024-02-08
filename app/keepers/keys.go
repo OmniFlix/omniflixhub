@@ -2,12 +2,12 @@ package keepers
 
 import (
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
-	globalfeetypes "github.com/OmniFlix/omniflixhub/v2/x/globalfee/types"
-	itctypes "github.com/OmniFlix/omniflixhub/v2/x/itc/types"
-	marketplacetypes "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
-	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
-	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/types"
+	alloctypes "github.com/OmniFlix/omniflixhub/v3/x/alloc/types"
+	globalfeetypes "github.com/OmniFlix/omniflixhub/v3/x/globalfee/types"
+	itctypes "github.com/OmniFlix/omniflixhub/v3/x/itc/types"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/v3/x/marketplace/types"
+	onfttypes "github.com/OmniFlix/omniflixhub/v3/x/onft/types"
+	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"

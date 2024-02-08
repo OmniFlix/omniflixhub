@@ -5,7 +5,7 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/OmniFlix/omniflixhub/v2/x/globalfee/types"
+	"github.com/OmniFlix/omniflixhub/v3/x/globalfee/types"
 )
 
 // Keeper of the globalfee store

@@ -8,10 +8,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/OmniFlix/omniflixhub/v2/app/apptesting"
-	"github.com/OmniFlix/omniflixhub/v2/x/onft/keeper"
-	v2 "github.com/OmniFlix/omniflixhub/v2/x/onft/migrations/v2"
-	"github.com/OmniFlix/omniflixhub/v2/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v3/app/apptesting"
+	"github.com/OmniFlix/omniflixhub/v3/x/onft/keeper"
+	v2 "github.com/OmniFlix/omniflixhub/v3/x/onft/migrations/v2"
+	"github.com/OmniFlix/omniflixhub/v3/x/onft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"

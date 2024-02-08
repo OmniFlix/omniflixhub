@@ -11,9 +11,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/OmniFlix/omniflixhub/v2/app"
-	bindings "github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/bindings/types"
-	"github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/types"
+	"github.com/OmniFlix/omniflixhub/v3/app"
+	bindings "github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/bindings/types"
+	"github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/types"
 )
 
 func TestCreateDenomMsg(t *testing.T) {

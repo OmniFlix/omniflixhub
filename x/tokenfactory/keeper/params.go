@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/types"
+	"github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/types"
 )
 
 // GetParams returns the total set params.
