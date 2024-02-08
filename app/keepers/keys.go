@@ -1,6 +1,7 @@
 package keepers
 
 import (
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
 	globalfeetypes "github.com/OmniFlix/omniflixhub/v2/x/globalfee/types"
 	itctypes "github.com/OmniFlix/omniflixhub/v2/x/itc/types"
@@ -56,6 +57,7 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		capabilitytypes.StoreKey,
 		crisistypes.StoreKey,
 		feegrant.StoreKey,
+		wasmtypes.StoreKey,
 		globalfeetypes.StoreKey,
 		group.StoreKey,
 		tokenfactorytypes.StoreKey,

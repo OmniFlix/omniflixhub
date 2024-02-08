@@ -2,6 +2,8 @@ package app
 
 import (
 	errorsmod "cosmossdk.io/errors"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	globalfeeante "github.com/OmniFlix/omniflixhub/v2/x/globalfee/ante"
 	globalfeekeeper "github.com/OmniFlix/omniflixhub/v2/x/globalfee/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -26,6 +28,7 @@ type HandlerOptions struct {
 	GovKeeper         govkeeper.Keeper
 	IBCKeeper         *ibckeeper.Keeper
 	TxCounterStoreKey storetypes.StoreKey
+	WasmConfig        wasmtypes.WasmConfig
 	Codec             codec.BinaryCodec
 
 	BypassMinFeeMsgTypes []string
@@ -52,6 +55,8 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(), // Outermost AnteDecorator, SetUpContext must be called first
+		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit),
+		wasmkeeper.NewCountTXDecorator(options.TxCounterStoreKey),
 		ante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
 		ante.NewValidateBasicDecorator(),
 		ante.NewTxTimeoutHeightDecorator(),

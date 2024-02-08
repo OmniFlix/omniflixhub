@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/snapshots"
 
@@ -133,7 +135,7 @@ func SetupWithGenesisValSet(
 	return omniflixTestApp
 }
 
-func setup(t *testing.T, withGenesis bool) (*OmniFlixApp, GenesisState) {
+func setup(t *testing.T, withGenesis bool, opts ...wasmkeeper.Option) (*OmniFlixApp, GenesisState) {
 	t.Helper()
 
 	db := dbm.NewMemDB()
@@ -147,7 +149,7 @@ func setup(t *testing.T, withGenesis bool) (*OmniFlixApp, GenesisState) {
 	snapshotStore, err := snapshots.NewStore(snapshotDB, snapshotDir)
 	require.NoError(t, err)
 
-	appOptions := make(simtestutil.AppOptionsMap, 0)
+	appOptions := make(simtestutil.AppOptionsMap)
 	appOptions[flags.FlagHome] = nodeHome // ensure unique folder
 
 	app := NewOmniFlixApp(
@@ -160,6 +162,7 @@ func setup(t *testing.T, withGenesis bool) (*OmniFlixApp, GenesisState) {
 		0,
 		encCdc,
 		appOptions,
+		opts,
 		baseApp.SetChainID(SimAppChainID),
 		baseApp.SetSnapshot(snapshotStore, snapshottypes.SnapshotOptions{KeepRecent: 2}),
 	)

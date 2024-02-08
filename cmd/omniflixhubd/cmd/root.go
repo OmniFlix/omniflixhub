@@ -9,10 +9,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/pruning"
-
-	"github.com/OmniFlix/omniflixhub/v2/app/params"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/OmniFlix/omniflixhub/v2/app"
+	"github.com/OmniFlix/omniflixhub/v2/app/params"
+
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	dbm "github.com/cometbft/cometbft-db"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
 	"github.com/cometbft/cometbft/libs/log"
@@ -118,6 +121,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 
 func addModuleInitFlags(startCmd *cobra.Command) {
 	crisis.AddModuleInitFlags(startCmd)
+	wasm.AddModuleInitFlags(startCmd)
 }
 
 func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
@@ -192,6 +196,11 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		skipUpgradeHeights[int64(h)] = true
 	}
 
+	var wasmOpts []wasmkeeper.Option
+	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
+		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
+	}
+
 	baseappOptions := server.DefaultBaseappOptions(appOpts)
 
 	return app.NewOmniFlixApp(
@@ -204,6 +213,7 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		a.encCfg,
 		appOpts,
+		wasmOpts,
 		baseappOptions...,
 	)
 }
@@ -226,6 +236,7 @@ func (a appCreator) appExport(
 		return servertypes.ExportedApp{}, errors.New("application home not set")
 	}
 
+	var emptyWasmOpts []wasmkeeper.Option
 	if height != -1 {
 		anApp = app.NewOmniFlixApp(
 			logger,
@@ -237,6 +248,7 @@ func (a appCreator) appExport(
 			uint(1),
 			a.encCfg,
 			appOpts,
+			emptyWasmOpts,
 		)
 
 		if err := anApp.LoadHeight(height); err != nil {
@@ -253,6 +265,7 @@ func (a appCreator) appExport(
 			uint(1),
 			a.encCfg,
 			appOpts,
+			emptyWasmOpts,
 		)
 	}
 

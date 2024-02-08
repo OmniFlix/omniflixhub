@@ -1,6 +1,8 @@
 package app
 
 import (
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	appparams "github.com/OmniFlix/omniflixhub/v2/app/params"
 	"github.com/OmniFlix/omniflixhub/v2/x/globalfee"
 	nfttransfer "github.com/bianjieai/nft-transfer"
@@ -108,6 +110,7 @@ var (
 		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(getGovProposalHandlers()),
+		wasm.AppModuleBasic{},
 		groupmodule.AppModuleBasic{},
 		params.AppModuleBasic{},
 		consensus.AppModuleBasic{},
@@ -149,6 +152,7 @@ var (
 		icatypes.ModuleName:            nil,
 		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 		globalfee.ModuleName:           nil,
+		wasmtypes.ModuleName:           {authtypes.Burner},
 		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		nft.ModuleName:                 nil,
 		onfttypes.ModuleName:           nil,
@@ -226,6 +230,15 @@ func appModules(
 		params.NewAppModule(app.ParamsKeeper),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
+		wasm.NewAppModule(
+			appCodec,
+			&app.WasmKeeper,
+			app.StakingKeeper,
+			app.AccountKeeper,
+			app.BankKeeper,
+			app.MsgServiceRouter(),
+			app.GetSubspace(wasmtypes.ModuleName),
+		),
 		ica.NewAppModule(nil, &app.ICAHostKeeper),
 		icq.NewAppModule(app.ICQKeeper, app.GetSubspace(icqtypes.ModuleName)),
 		nfttransfer.NewAppModule(app.IBCNFTTransferKeeper),
@@ -304,6 +317,7 @@ func orderBeginBlockers() []string {
 		govtypes.ModuleName,
 		paramstypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		wasmtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
 		icqtypes.ModuleName,
@@ -338,6 +352,7 @@ func orderEndBlockers() []string {
 		vestingtypes.ModuleName,
 		paramstypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		wasmtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
 		icqtypes.ModuleName,
@@ -388,6 +403,7 @@ func orderInitGenesis() []string {
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
+		wasmtypes.ModuleName,
 		globalfee.ModuleName,
 		group.ModuleName,
 		tokenfactorytypes.ModuleName,
