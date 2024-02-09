@@ -52,13 +52,17 @@ func (msg MsgListNFT) Route() string { return MsgRoute }
 func (msg MsgListNFT) Type() string { return TypeMsgListNFT }
 
 func (msg MsgListNFT) ValidateBasic() error {
+	owner, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return err
+	}
 	return ValidateListing(
 		NewListing(
 			msg.Id,
 			msg.NftId,
 			msg.DenomId,
 			msg.Price,
-			sdk.AccAddress(msg.Owner),
+			owner,
 			msg.SplitShares,
 		),
 	)
