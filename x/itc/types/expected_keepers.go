@@ -3,8 +3,8 @@ package types
 import (
 	"time"
 
-	nft "github.com/OmniFlix/omniflixhub/v2/x/onft/exported"
-	nfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
+	nft "github.com/OmniFlix/omniflixhub/v3/x/onft/exported"
+	nfttypes "github.com/OmniFlix/omniflixhub/v3/x/onft/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"

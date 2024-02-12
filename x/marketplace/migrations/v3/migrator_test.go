@@ -5,10 +5,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/OmniFlix/omniflixhub/v2/x/marketplace"
-	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/exported"
-	v3 "github.com/OmniFlix/omniflixhub/v2/x/marketplace/migrations/v3"
-	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v3/x/marketplace"
+	"github.com/OmniFlix/omniflixhub/v3/x/marketplace/exported"
+	v3 "github.com/OmniFlix/omniflixhub/v3/x/marketplace/migrations/v3"
+	"github.com/OmniFlix/omniflixhub/v3/x/marketplace/types"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"

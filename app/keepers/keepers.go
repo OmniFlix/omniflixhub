@@ -1,7 +1,13 @@
 package keepers
 
 import (
-	"github.com/OmniFlix/omniflixhub/v2/x/ics721nft"
+	"fmt"
+	"path/filepath"
+
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"github.com/OmniFlix/omniflixhub/v3/x/ics721nft"
 	nfttransfer "github.com/bianjieai/nft-transfer"
 	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
@@ -10,7 +16,6 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/store/streaming"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
-
 	icq "github.com/cosmos/ibc-apps/modules/async-icq/v7"
 	icqkeeper "github.com/cosmos/ibc-apps/modules/async-icq/v7/keeper"
 	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v7/types"
@@ -47,9 +52,9 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
-	"github.com/OmniFlix/omniflixhub/v2/x/globalfee"
-	globalfeekeeper "github.com/OmniFlix/omniflixhub/v2/x/globalfee/keeper"
-	globalfeetypes "github.com/OmniFlix/omniflixhub/v2/x/globalfee/types"
+	"github.com/OmniFlix/omniflixhub/v3/x/globalfee"
+	globalfeekeeper "github.com/OmniFlix/omniflixhub/v3/x/globalfee/keeper"
+	globalfeetypes "github.com/OmniFlix/omniflixhub/v3/x/globalfee/types"
 
 	"github.com/cosmos/cosmos-sdk/x/group"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
@@ -67,8 +72,8 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	tokenfactorykeeper "github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/keeper"
-	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/types"
+	tokenfactorykeeper "github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/keeper"
+	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/types"
 
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
@@ -90,23 +95,25 @@ import (
 	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/keeper"
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
 
-	allockeeper "github.com/OmniFlix/omniflixhub/v2/x/alloc/keeper"
-	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
+	allockeeper "github.com/OmniFlix/omniflixhub/v3/x/alloc/keeper"
+	alloctypes "github.com/OmniFlix/omniflixhub/v3/x/alloc/types"
 
-	onftkeeper "github.com/OmniFlix/omniflixhub/v2/x/onft/keeper"
-	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
+	onftkeeper "github.com/OmniFlix/omniflixhub/v3/x/onft/keeper"
+	onfttypes "github.com/OmniFlix/omniflixhub/v3/x/onft/types"
 
-	marketplacekeeper "github.com/OmniFlix/omniflixhub/v2/x/marketplace/keeper"
-	marketplacetypes "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
+	marketplacekeeper "github.com/OmniFlix/omniflixhub/v3/x/marketplace/keeper"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/v3/x/marketplace/types"
 
-	itckeeper "github.com/OmniFlix/omniflixhub/v2/x/itc/keeper"
-	itctypes "github.com/OmniFlix/omniflixhub/v2/x/itc/types"
+	itckeeper "github.com/OmniFlix/omniflixhub/v3/x/itc/keeper"
+	itctypes "github.com/OmniFlix/omniflixhub/v3/x/itc/types"
 
 	streampaykeeper "github.com/OmniFlix/streampay/v2/x/streampay/keeper"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 
 	ibcnfttransferkeeper "github.com/bianjieai/nft-transfer/keeper"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
+
+	tfbindings "github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/bindings"
 )
 
 var tokenFactoryCapabilities = []string{
@@ -146,6 +153,7 @@ type AppKeepers struct {
 	GroupKeeper           groupkeeper.Keeper
 	TokenFactoryKeeper    tokenfactorykeeper.Keeper
 	IBCNFTTransferKeeper  ibcnfttransferkeeper.Keeper
+	WasmKeeper            wasmkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -153,6 +161,7 @@ type AppKeepers struct {
 	ScopedICAHostKeeper     capabilitykeeper.ScopedKeeper
 	ScopedICQKeeper         capabilitykeeper.ScopedKeeper
 	ScopedNFTTransferKeeper capabilitykeeper.ScopedKeeper
+	ScopedWasmKeeper        capabilitykeeper.ScopedKeeper
 
 	AllocKeeper       allockeeper.Keeper
 	ONFTKeeper        onftkeeper.Keeper
@@ -173,6 +182,7 @@ func NewAppKeeper(
 	invCheckPeriod uint,
 	logger log.Logger,
 	appOpts servertypes.AppOptions,
+	wasmOpts []wasmkeeper.Option,
 ) AppKeepers {
 	appKeepers := AppKeepers{}
 
@@ -213,7 +223,7 @@ func NewAppKeeper(
 	appKeepers.ScopedICAHostKeeper = appKeepers.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
 	appKeepers.ScopedICQKeeper = appKeepers.CapabilityKeeper.ScopeToModule(icqtypes.ModuleName)
 	appKeepers.ScopedNFTTransferKeeper = appKeepers.CapabilityKeeper.ScopeToModule(ibcnfttransfertypes.ModuleName)
-
+	appKeepers.ScopedWasmKeeper = appKeepers.CapabilityKeeper.ScopeToModule(wasmtypes.ModuleName)
 	appKeepers.CapabilityKeeper.Seal()
 
 	appKeepers.CrisisKeeper = crisiskeeper.NewKeeper(
@@ -519,6 +529,50 @@ func NewAppKeeper(
 
 	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 
+	// wasm configuration
+
+	wasmDir := filepath.Join(homePath, "wasm")
+	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
+	if err != nil {
+		panic(fmt.Sprintf("error while reading wasm config: %s", err))
+	}
+
+	// custom tokenfactory messages
+	tfOpts := tfbindings.RegisterCustomPlugins(appKeepers.BankKeeper, &appKeepers.TokenFactoryKeeper)
+	wasmOpts = append(wasmOpts, tfOpts...)
+
+	querierOpts := wasmkeeper.WithQueryPlugins(
+		&wasmkeeper.QueryPlugins{
+			Stargate: wasmkeeper.AcceptListStargateQuerier(
+				AcceptedStargateQueries(),
+				bApp.GRPCQueryRouter(),
+				appCodec,
+			),
+		})
+
+	wasmOpts = append(wasmOpts, querierOpts)
+
+	appKeepers.WasmKeeper = wasmkeeper.NewKeeper(
+		appCodec,
+		keys[wasmtypes.StoreKey],
+		appKeepers.AccountKeeper,
+		appKeepers.BankKeeper,
+		appKeepers.StakingKeeper,
+		distrkeeper.NewQuerier(appKeepers.DistrKeeper),
+		appKeepers.IBCKeeper.ChannelKeeper,
+		appKeepers.IBCKeeper.ChannelKeeper,
+		&appKeepers.IBCKeeper.PortKeeper,
+		appKeepers.ScopedWasmKeeper,
+		appKeepers.TransferKeeper,
+		bApp.MsgServiceRouter(),
+		bApp.GRPCQueryRouter(),
+		wasmDir,
+		wasmConfig,
+		GetWasmCapabilities(),
+		govModAddress,
+		wasmOpts...,
+	)
+
 	return appKeepers
 }
 
@@ -547,6 +601,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(packetforwardtypes.ModuleName)
 	paramsKeeper.Subspace(globalfee.ModuleName)
 	paramsKeeper.Subspace(tokenfactorytypes.ModuleName)
+	paramsKeeper.Subspace(wasmtypes.ModuleName)
 	paramsKeeper.Subspace(alloctypes.ModuleName)
 	paramsKeeper.Subspace(onfttypes.ModuleName)
 	paramsKeeper.Subspace(marketplacetypes.ModuleName)

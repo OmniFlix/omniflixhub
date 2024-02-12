@@ -5,7 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
-	"github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v3/x/alloc/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/spf13/cobra"
 )

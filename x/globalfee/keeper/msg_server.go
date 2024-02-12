@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/OmniFlix/omniflixhub/v2/x/globalfee/types"
+	"github.com/OmniFlix/omniflixhub/v3/x/globalfee/types"
 )
 
 var _ types.MsgServer = msgServer{}
