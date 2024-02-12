@@ -3,7 +3,7 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/OmniFlix/omniflixhub/v2/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v3/x/itc/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
@@ -177,10 +177,10 @@ func (k Keeper) FinalizeAndEndCampaigns(ctx sdk.Context) error {
 
 func (k Keeper) endCampaign(ctx sdk.Context, campaign types.Campaign) {
 	// Transfer Remaining funds to creator
-	moduleAcc := k.GetModuleAccountAddress(ctx)
 	availableTokens := campaign.AvailableTokens
+	moduleAccAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	if availableTokens.IsValid() && availableTokens.Amount != sdk.ZeroInt() {
-		if err := k.bankKeeper.SendCoins(ctx, moduleAcc, campaign.GetCreator(),
+		if err := k.bankKeeper.SendCoins(ctx, moduleAccAddr, campaign.GetCreator(),
 			sdk.NewCoins(sdk.NewCoin(availableTokens.Denom, availableTokens.Amount))); err != nil {
 			panic(err)
 		}
@@ -191,7 +191,7 @@ func (k Keeper) endCampaign(ctx sdk.Context, campaign types.Campaign) {
 			err := k.nftKeeper.TransferOwnership(ctx,
 				campaign.NftDenomId,
 				nft,
-				moduleAcc,
+				moduleAccAddr,
 				campaign.GetCreator(),
 			)
 			if err != nil {

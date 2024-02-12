@@ -9,7 +9,7 @@ import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
 import "OmniFlix/onft/v1beta1/onft.proto";
 
-option go_package = "github.com/OmniFlix/omniflixhub/v2/x/onft/types";
+option go_package = "github.com/OmniFlix/omniflixhub/v3/x/onft/types";
 option (gogoproto.goproto_getters_all) = false;
 
 service Msg {
@@ -20,6 +20,8 @@ service Msg {
   rpc UpdateDenom(MsgUpdateDenom) returns (MsgUpdateDenomResponse);
 
   rpc TransferDenom(MsgTransferDenom) returns (MsgTransferDenomResponse);
+
+  rpc PurgeDenom(MsgPurgeDenom) returns (MsgPurgeDenomResponse);
 
   rpc MintONFT(MsgMintONFT) returns (MsgMintONFTResponse);
 
@@ -83,6 +85,17 @@ message MsgUpdateDenom {
 }
 
 message MsgUpdateDenomResponse {}
+
+message MsgPurgeDenom {
+  option (cosmos.msg.v1.signer) = "sender";
+  option (amino.name)           = "OmniFlix/onft/MsgPurgeDenom";
+  option (gogoproto.equal)      = false;
+
+  string id = 1;
+  string sender = 2;
+}
+
+message MsgPurgeDenomResponse {}
 
 message MsgTransferDenom {
   option (cosmos.msg.v1.signer) = "sender";

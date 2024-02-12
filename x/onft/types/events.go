@@ -4,6 +4,7 @@ const (
 	EventTypeCreateONFTDenom   = "create_onft_denom"
 	EventTypeUpdateONFTDenom   = "update_onft_denom"
 	EventTypeTransferONFTDenom = "transfer_onft_denom"
+	EventTypePurgeONFTDenom    = "purge_onft_denom"
 
 	EventTypeMintONFT     = "mint_onft"
 	EventTypeTransferONFT = "transfer_onft"

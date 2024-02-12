@@ -11,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
 
-	"github.com/OmniFlix/omniflixhub/v2/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v3/x/onft/types"
 )
 
 type Keeper struct {

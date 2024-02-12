@@ -1,13 +1,13 @@
 package v2
 
 import (
-	"github.com/OmniFlix/omniflixhub/v2/app/keepers"
-	"github.com/OmniFlix/omniflixhub/v2/app/upgrades"
-	alloctypes "github.com/OmniFlix/omniflixhub/v2/x/alloc/types"
-	itctypes "github.com/OmniFlix/omniflixhub/v2/x/itc/types"
-	marketplacetypes "github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
-	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
-	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v2/x/tokenfactory/types"
+	"github.com/OmniFlix/omniflixhub/v3/app/keepers"
+	"github.com/OmniFlix/omniflixhub/v3/app/upgrades"
+	alloctypes "github.com/OmniFlix/omniflixhub/v3/x/alloc/types"
+	itctypes "github.com/OmniFlix/omniflixhub/v3/x/itc/types"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/v3/x/marketplace/types"
+	onfttypes "github.com/OmniFlix/omniflixhub/v3/x/onft/types"
+	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"

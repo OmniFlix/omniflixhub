@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package OmniFlix.itc.v1;
 
-option go_package = "github.com/OmniFlix/omniflixhub/v2/x/itc/types";
+option go_package = "github.com/OmniFlix/omniflixhub/v3/x/itc/types";
 option (gogoproto.goproto_getters_all) = false;
 
 

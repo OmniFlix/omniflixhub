@@ -4,13 +4,13 @@ import (
 	"fmt"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
+	onfttypes "github.com/OmniFlix/omniflixhub/v3/x/onft/types"
 
 	errorsmod "cosmossdk.io/errors"
 
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 
-	"github.com/OmniFlix/omniflixhub/v2/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v3/x/marketplace/types"
 	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -119,13 +119,13 @@ func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress
 	if err != nil {
 		return err
 	}
+	moduleAccAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 
-	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, buyer, types.ModuleName, sdk.NewCoins(listingPriceCoin))
+	err = k.bankKeeper.SendCoins(ctx, buyer, moduleAccAddr, sdk.NewCoins(listingPriceCoin))
 	if err != nil {
 		return err
 	}
-	moduelAcc := k.accountKeeper.GetModuleAddress(types.ModuleName)
-	err = k.nftKeeper.TransferOwnership(ctx, listing.GetDenomId(), listing.GetNftId(), moduelAcc, buyer)
+	err = k.nftKeeper.TransferOwnership(ctx, listing.GetDenomId(), listing.GetNftId(), moduleAccAddr, buyer)
 	if err != nil {
 		return err
 	}
@@ -157,7 +157,7 @@ func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress
 			sharePortionCoin := k.GetProportions(listingSaleAmountCoin, share.Weight)
 			sharePortionCoins := sdk.NewCoins(sharePortionCoin)
 			if share.Address == "" {
-				err = k.bankKeeper.SendCoins(ctx, moduelAcc, owner, sharePortionCoins)
+				err = k.bankKeeper.SendCoins(ctx, moduleAccAddr, owner, sharePortionCoins)
 				if err != nil {
 					return err
 				}
@@ -166,21 +166,20 @@ func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress
 				if err != nil {
 					return err
 				}
-				err = k.bankKeeper.SendCoins(
-					ctx, moduelAcc, saleSplitAddr, sharePortionCoins)
+				err = k.bankKeeper.SendCoins(ctx, moduleAccAddr, saleSplitAddr, sharePortionCoins)
 				if err != nil {
 					return err
 				}
-				k.createSplitShareTransferEvent(ctx, moduelAcc, saleSplitAddr, sharePortionCoin)
+				k.createSplitShareTransferEvent(ctx, moduleAccAddr, saleSplitAddr, sharePortionCoin)
 			}
 			remaining = remaining.Sub(sharePortionCoin)
 		}
-		err = k.bankKeeper.SendCoins(ctx, moduelAcc, owner, sdk.NewCoins(remaining))
+		err = k.bankKeeper.SendCoins(ctx, moduleAccAddr, owner, sdk.NewCoins(remaining))
 		if err != nil {
 			return err
 		}
 	} else {
-		err = k.bankKeeper.SendCoins(ctx, moduelAcc, owner, sdk.NewCoins(remaining))
+		err = k.bankKeeper.SendCoins(ctx, moduleAccAddr, owner, sdk.NewCoins(remaining))
 		if err != nil {
 			return err
 		}
@@ -197,14 +196,16 @@ func (k Keeper) GetProportions(totalCoin sdk.Coin, ratio sdk.Dec) sdk.Coin {
 func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) error {
 	distrParams := k.GetMarketplaceDistributionParams(ctx)
 	stakingCommissionCoin := k.GetProportions(marketplaceCoin, distrParams.Staking)
+	moduleAccAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
+	feeCollectorAddr := k.accountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 	if distrParams.Staking.GT(sdk.ZeroDec()) && stakingCommissionCoin.Amount.GT(sdk.ZeroInt()) {
-		err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, authtypes.FeeCollectorName, sdk.NewCoins(stakingCommissionCoin))
+		err := k.bankKeeper.SendCoins(ctx, moduleAccAddr, feeCollectorAddr, sdk.NewCoins(stakingCommissionCoin))
 		if err != nil {
 			return err
 		}
 		k.createSaleCommissionTransferEvent(ctx,
-			k.accountKeeper.GetModuleAddress(types.ModuleName),
-			k.accountKeeper.GetModuleAddress(authtypes.FeeCollectorName),
+			moduleAccAddr,
+			feeCollectorAddr,
 			stakingCommissionCoin,
 		)
 		marketplaceCoin = marketplaceCoin.Sub(stakingCommissionCoin)
@@ -214,13 +215,13 @@ func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) 
 	err := k.distributionKeeper.FundCommunityPool(
 		ctx,
 		sdk.NewCoins(communityPoolCommissionCoin),
-		k.accountKeeper.GetModuleAddress(types.ModuleName),
+		moduleAccAddr,
 	)
 	if err != nil {
 		return err
 	}
 	k.createSaleCommissionTransferEvent(ctx,
-		k.accountKeeper.GetModuleAddress(types.ModuleName),
+		moduleAccAddr,
 		k.accountKeeper.GetModuleAddress("distribution"),
 		communityPoolCommissionCoin,
 	)
@@ -290,15 +291,16 @@ func (k Keeper) PlaceBid(ctx sdk.Context, auction types.AuctionListing, newBid t
 		return errorsmod.Wrapf(types.ErrBidAmountNotEnough,
 			"cannot place bid for given auction %d, required amount to bid is %s", auction.Id, newBidPrice.String())
 	}
-	moduleAcc := k.accountKeeper.GetModuleAddress(types.ModuleName)
+	moduleAccAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
+
 	// Transfer amount from bidder to module account
-	err := k.bankKeeper.SendCoins(ctx, newBid.GetBidder(), moduleAcc, sdk.NewCoins(newBid.Amount))
+	err := k.bankKeeper.SendCoins(ctx, newBid.GetBidder(), moduleAccAddr, sdk.NewCoins(newBid.Amount))
 	if err != nil {
 		return err
 	}
 	// Release previous Bid
 	if bidExists {
-		err = k.bankKeeper.SendCoins(ctx, moduleAcc, prevBid.GetBidder(), sdk.NewCoins(prevBid.Amount))
+		err = k.bankKeeper.SendCoins(ctx, moduleAccAddr, prevBid.GetBidder(), sdk.NewCoins(prevBid.Amount))
 		if err != nil {
 			return err
 		}

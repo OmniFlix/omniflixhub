@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	onfttypes "github.com/OmniFlix/omniflixhub/v2/x/onft/types"
+	onfttypes "github.com/OmniFlix/omniflixhub/v3/x/onft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -38,6 +38,15 @@ func (k Keeper) emitTransferONFTDenomEvent(ctx sdk.Context, denomId, symbol, sen
 			sdk.NewAttribute(onfttypes.AttributeKeySymbol, symbol),
 			sdk.NewAttribute(onfttypes.AttributeKeySender, sender),
 			sdk.NewAttribute(onfttypes.AttributeKeyRecipient, recipient),
+		),
+	)
+}
+
+func (k Keeper) emitPurgeONFTDenomEvent(ctx sdk.Context, denomId string) {
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			onfttypes.EventTypePurgeONFTDenom,
+			sdk.NewAttribute(onfttypes.AttributeKeyDenomID, denomId),
 		),
 	)
 }
