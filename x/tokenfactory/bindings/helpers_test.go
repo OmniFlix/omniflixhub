@@ -19,12 +19,16 @@ import (
 )
 
 func CreateTestInput(t *testing.T) (*app.OmniFlixApp, sdk.Context) {
+	t.Helper()
+
 	omniflix := app.Setup(t)
 	ctx := omniflix.BaseApp.NewContext(false, tmproto.Header{Height: 1, ChainID: "testing", Time: time.Now().UTC()})
 	return omniflix, ctx
 }
 
 func FundAccount(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, acct sdk.AccAddress) {
+	t.Helper()
+
 	err := banktestutil.FundAccount(customApp.AppKeepers.BankKeeper, ctx, acct, sdk.NewCoins(
 		sdk.NewCoin("uflix", sdk.NewInt(10000000000)),
 	))
@@ -49,6 +53,8 @@ func RandomBech32AccountAddress() string {
 }
 
 func storeReflectCode(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, addr sdk.AccAddress) uint64 {
+	t.Helper()
+
 	wasmCode, err := os.ReadFile("./testdata/token_reflect.wasm")
 	require.NoError(t, err)
 
@@ -60,6 +66,8 @@ func storeReflectCode(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp,
 }
 
 func instantiateReflectContract(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, funder sdk.AccAddress) sdk.AccAddress {
+	t.Helper()
+
 	initMsgBz := []byte("{}")
 	contractKeeper := keeper.NewDefaultPermissionKeeper(customApp.AppKeepers.WasmKeeper)
 	codeID := uint64(1)
@@ -70,6 +78,8 @@ func instantiateReflectContract(t *testing.T, ctx sdk.Context, customApp *app.Om
 }
 
 func fundAccount(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, addr sdk.AccAddress, coins sdk.Coins) {
+	t.Helper()
+
 	err := banktestutil.FundAccount(
 		customApp.AppKeepers.BankKeeper,
 		ctx,
@@ -80,6 +90,8 @@ func fundAccount(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, addr
 }
 
 func SetupCustomApp(t *testing.T, addr sdk.AccAddress) (*app.OmniFlixApp, sdk.Context) {
+	t.Helper()
+
 	customApp, ctx := CreateTestInput(t)
 	wasmKeeper := customApp.AppKeepers.WasmKeeper
 
