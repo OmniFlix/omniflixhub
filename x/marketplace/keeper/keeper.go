@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	onfttypes "github.com/OmniFlix/omniflixhub/v3/x/onft/types"
 
 	errorsmod "cosmossdk.io/errors"
@@ -360,6 +362,19 @@ func (k Keeper) TransferRoyalty(
 			return err
 		}
 		k.createRoyaltyShareTransferEvent(ctx, moduleAcc, creator, nftRoyaltyShareCoin)
+	}
+	return nil
+}
+
+func (k Keeper) ValidateSplitShareAddresses(splitShares []types.WeightedAddress) error {
+	for _, share := range splitShares {
+		addr, err := sdk.AccAddressFromBech32(share.Address)
+		if err != nil {
+			return err
+		}
+		if k.bankKeeper.BlockedAddr(addr) {
+			return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "%s is  blocked address, not allowed receive funds", addr)
+		}
 	}
 	return nil
 }
