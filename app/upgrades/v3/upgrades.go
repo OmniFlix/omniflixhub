@@ -25,14 +25,8 @@ func CreateV3UpgradeHandler(
 		}
 
 		params := wasmtypes.DefaultParams()
-		params.CodeUploadAccess = wasmtypes.AccessConfig{
-			Permission: wasmtypes.AccessTypeAnyOfAddresses,
-			Addresses: []string{
-				// test addrs
-				"omniflix18fw35sd99ksgcylrxqz555hk2ffnp9dx3gzv9a",
-				"omniflix1fua9pv84yfqp7gjpv8vmsrygqa9prtsm3y95vm",
-			},
-		}
+		// change this to AllowNoBody for mainnet
+		params.CodeUploadAccess = wasmtypes.AllowEverybody
 		params.InstantiateDefaultPermission = wasmtypes.AccessTypeEverybody
 		if err := keepers.WasmKeeper.SetParams(ctx, params); err != nil {
 			return nil, err
