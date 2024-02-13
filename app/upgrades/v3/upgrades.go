@@ -25,8 +25,8 @@ func CreateV3UpgradeHandler(
 		}
 
 		params := wasmtypes.DefaultParams()
-		// change this to AllowNoBody for mainnet
-		params.CodeUploadAccess = wasmtypes.AllowEverybody
+		// Permissioned cosmwasm
+		params.CodeUploadAccess = wasmtypes.AllowNobody
 		params.InstantiateDefaultPermission = wasmtypes.AccessTypeEverybody
 		if err := keepers.WasmKeeper.SetParams(ctx, params); err != nil {
 			return nil, err
