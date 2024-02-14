@@ -26,7 +26,7 @@ func CreateV3UpgradeHandler(
 
 		params := wasmtypes.DefaultParams()
 		// Permissioned cosmwasm
-		params.CodeUploadAccess = wasmtypes.AllowNobody
+		params.CodeUploadAccess = wasmtypes.AllowEverybody
 		params.InstantiateDefaultPermission = wasmtypes.AccessTypeEverybody
 		if err := keepers.WasmKeeper.SetParams(ctx, params); err != nil {
 			return nil, err
