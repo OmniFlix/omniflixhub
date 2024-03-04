@@ -81,6 +81,9 @@ import (
 	"github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward"
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
 
+	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7"
+	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/types"
+
 	"github.com/OmniFlix/omniflixhub/v3/x/alloc"
 	alloctypes "github.com/OmniFlix/omniflixhub/v3/x/alloc/types"
 
@@ -121,6 +124,7 @@ var (
 		ica.AppModuleBasic{},
 		icq.AppModuleBasic{},
 		packetforward.AppModuleBasic{},
+		ibchooks.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
@@ -243,6 +247,7 @@ func appModules(
 		icq.NewAppModule(app.ICQKeeper, app.GetSubspace(icqtypes.ModuleName)),
 		nfttransfer.NewAppModule(app.IBCNFTTransferKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
+		ibchooks.NewAppModule(app.AccountKeeper),
 		globalfee.NewAppModule(appCodec, app.GlobalFeeKeeper, bondDenom),
 		alloc.NewAppModule(appCodec, app.AllocKeeper, app.GetSubspace(alloctypes.ModuleName)),
 		onft.NewAppModule(
@@ -317,6 +322,7 @@ func orderBeginBlockers() []string {
 		govtypes.ModuleName,
 		paramstypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		ibchookstypes.ModuleName,
 		wasmtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
@@ -352,6 +358,7 @@ func orderEndBlockers() []string {
 		vestingtypes.ModuleName,
 		paramstypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		ibchookstypes.ModuleName,
 		wasmtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
@@ -403,6 +410,7 @@ func orderInitGenesis() []string {
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
+		ibchookstypes.ModuleName,
 		wasmtypes.ModuleName,
 		globalfee.ModuleName,
 		group.ModuleName,
