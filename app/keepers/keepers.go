@@ -16,6 +16,7 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/store/streaming"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	icq "github.com/cosmos/ibc-apps/modules/async-icq/v7"
 	icqkeeper "github.com/cosmos/ibc-apps/modules/async-icq/v7/keeper"
 	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v7/types"
@@ -95,6 +96,10 @@ import (
 	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/keeper"
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
 
+	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7"
+	ibchookskeeper "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/keeper"
+	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/types"
+
 	allockeeper "github.com/OmniFlix/omniflixhub/v3/x/alloc/keeper"
 	alloctypes "github.com/OmniFlix/omniflixhub/v3/x/alloc/types"
 
@@ -146,6 +151,7 @@ type AppKeepers struct {
 	EvidenceKeeper        evidencekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
 	PacketForwardKeeper   *packetforwardkeeper.Keeper
+	IBCHooksKeeper        ibchookskeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
@@ -154,6 +160,7 @@ type AppKeepers struct {
 	TokenFactoryKeeper    tokenfactorykeeper.Keeper
 	IBCNFTTransferKeeper  ibcnfttransferkeeper.Keeper
 	WasmKeeper            wasmkeeper.Keeper
+	ContractKeeper        *wasmkeeper.PermissionedKeeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -162,6 +169,10 @@ type AppKeepers struct {
 	ScopedICQKeeper         capabilitykeeper.ScopedKeeper
 	ScopedNFTTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedWasmKeeper        capabilitykeeper.ScopedKeeper
+
+	// Middleware wrapper
+	Ics20WasmHooks   *ibchooks.WasmHooks
+	HooksICS4Wrapper ibchooks.ICS4Middleware
 
 	AllocKeeper       allockeeper.Keeper
 	ONFTKeeper        onftkeeper.Keeper
@@ -372,6 +383,19 @@ func NewAppKeeper(
 		groupConfig,
 	)
 
+	hooksKeeper := ibchookskeeper.NewKeeper(
+		keys[ibchookstypes.StoreKey],
+	)
+	appKeepers.IBCHooksKeeper = hooksKeeper
+
+	omniflixPrefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
+	wasmHooks := ibchooks.NewWasmHooks(&appKeepers.IBCHooksKeeper, nil, omniflixPrefix) // The contract keeper needs to be set later
+	appKeepers.Ics20WasmHooks = &wasmHooks
+	appKeepers.HooksICS4Wrapper = ibchooks.NewICS4Middleware(
+		appKeepers.IBCKeeper.ChannelKeeper,
+		appKeepers.Ics20WasmHooks,
+	)
+
 	// initialize ibc packet forwarding middleware router
 	appKeepers.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
 		appCodec,
@@ -380,7 +404,8 @@ func NewAppKeeper(
 		appKeepers.IBCKeeper.ChannelKeeper,
 		appKeepers.DistrKeeper,
 		appKeepers.BankKeeper,
-		appKeepers.IBCKeeper.ChannelKeeper,
+		// The ICS4Wrapper is replaced by the HooksICS4Wrapper instead of the channel so that sending can be overridden by the middleware
+		appKeepers.HooksICS4Wrapper,
 		govModAddress,
 	)
 
@@ -389,7 +414,7 @@ func NewAppKeeper(
 		appCodec,
 		appKeepers.keys[ibctransfertypes.StoreKey],
 		appKeepers.GetSubspace(ibctransfertypes.ModuleName),
-		appKeepers.PacketForwardKeeper,
+		&appKeepers.HooksICS4Wrapper,
 		appKeepers.IBCKeeper.ChannelKeeper,
 		&appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.AccountKeeper,
@@ -467,7 +492,7 @@ func NewAppKeeper(
 		appCodec,
 		keys[ibcnfttransfertypes.StoreKey],
 		govModAddress,
-		appKeepers.IBCKeeper.ChannelKeeper,
+		appKeepers.HooksICS4Wrapper,
 		appKeepers.IBCKeeper.ChannelKeeper,
 		&appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.AccountKeeper,
@@ -509,20 +534,21 @@ func NewAppKeeper(
 
 	appKeepers.GovKeeper.SetLegacyRouter(govRouter)
 
-	var ibcStack porttypes.IBCModule
-	ibcStack = transfer.NewIBCModule(appKeepers.TransferKeeper)
-	ibcStack = packetforward.NewIBCMiddleware(
-		ibcStack,
+	var ibcTransferStack porttypes.IBCModule
+	ibcTransferStack = transfer.NewIBCModule(appKeepers.TransferKeeper)
+	ibcTransferStack = packetforward.NewIBCMiddleware(
+		ibcTransferStack,
 		appKeepers.PacketForwardKeeper,
 		0,
 		packetforwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp,
 		packetforwardkeeper.DefaultRefundTransferPacketTimeoutTimestamp,
 	)
+	ibcTransferStack = ibchooks.NewIBCMiddleware(ibcTransferStack, &appKeepers.HooksICS4Wrapper)
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.
-		AddRoute(ibctransfertypes.ModuleName, ibcStack).
+		AddRoute(ibctransfertypes.ModuleName, ibcTransferStack).
 		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(icqtypes.ModuleName, icqModule).
 		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule)
@@ -559,7 +585,7 @@ func NewAppKeeper(
 		appKeepers.BankKeeper,
 		appKeepers.StakingKeeper,
 		distrkeeper.NewQuerier(appKeepers.DistrKeeper),
-		appKeepers.IBCKeeper.ChannelKeeper,
+		&appKeepers.HooksICS4Wrapper,
 		appKeepers.IBCKeeper.ChannelKeeper,
 		&appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.ScopedWasmKeeper,
@@ -572,6 +598,12 @@ func NewAppKeeper(
 		govModAddress,
 		wasmOpts...,
 	)
+	// set the contract keeper for the Ics20WasmHooks
+	appKeepers.ContractKeeper = wasmkeeper.NewDefaultPermissionKeeper(&appKeepers.WasmKeeper)
+	appKeepers.Ics20WasmHooks.ContractKeeper = &appKeepers.WasmKeeper
+
+	ibcRouter.AddRoute(wasmtypes.ModuleName, wasm.NewIBCHandler(appKeepers.WasmKeeper, appKeepers.IBCKeeper.ChannelKeeper, appKeepers.IBCKeeper.ChannelKeeper))
+	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 
 	return appKeepers
 }
