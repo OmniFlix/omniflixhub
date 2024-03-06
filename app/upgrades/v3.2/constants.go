@@ -6,12 +6,12 @@ import (
 	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/types"
 )
 
-const UpgradeName = "v3.2-test"
+const UpgradeName = "v3.2"
 
 var Upgrade = upgrades.Upgrade{
 	UpgradeName:          UpgradeName,
 	CreateUpgradeHandler: CreateV3_2UpgradeHandler,
 	StoreUpgrades: store.StoreUpgrades{
-		Added: []string{ibchookstypes.ModuleName},
+		Added: []string{ibchookstypes.StoreKey},
 	},
 }
