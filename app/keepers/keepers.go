@@ -553,8 +553,6 @@ func NewAppKeeper(
 		AddRoute(icqtypes.ModuleName, icqModule).
 		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule)
 
-	appKeepers.IBCKeeper.SetRouter(ibcRouter)
-
 	// wasm configuration
 
 	wasmDir := filepath.Join(homePath, "wasm")
