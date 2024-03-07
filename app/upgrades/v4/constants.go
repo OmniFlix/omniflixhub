@@ -1,4 +1,4 @@
-package v3_2
+package v4
 
 import (
 	"github.com/OmniFlix/omniflixhub/v3/app/upgrades"
@@ -6,11 +6,11 @@ import (
 	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/types"
 )
 
-const UpgradeName = "v3.2"
+const UpgradeName = "v4"
 
 var Upgrade = upgrades.Upgrade{
 	UpgradeName:          UpgradeName,
-	CreateUpgradeHandler: CreateV3_2UpgradeHandler,
+	CreateUpgradeHandler: CreateV4UpgradeHandler,
 	StoreUpgrades: store.StoreUpgrades{
 		Added: []string{ibchookstypes.StoreKey},
 	},

@@ -1,4 +1,4 @@
-package v3_2
+package v4
 
 import (
 	"github.com/OmniFlix/omniflixhub/v3/app/keepers"
@@ -8,7 +8,7 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
-func CreateV3_2UpgradeHandler(
+func CreateV4UpgradeHandler(
 	mm *module.Manager,
 	cfg module.Configurator,
 	_ upgrades.BaseAppParamManager,
