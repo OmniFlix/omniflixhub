@@ -79,10 +79,6 @@ func ValidateSplitShares(splitShares []WeightedAddress) error {
 }
 
 func ValidateWhiteListAccounts(whitelistAccounts []string) error {
-	if len(whitelistAccounts) > MaxWhitelistAccounts {
-		return errorsmod.Wrapf(ErrInvalidWhitelistAccounts,
-			"number of whitelist accounts are more than the limit, len must be less than or equal to %d ", MaxWhitelistAccounts)
-	}
 	for _, address := range whitelistAccounts {
 		_, err := sdk.AccAddressFromBech32(address)
 		if err != nil {
