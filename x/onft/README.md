@@ -13,15 +13,21 @@ A denom is a collection of NFTs. It is a unique identifier for a collection of N
 message Denom {
   option (gogoproto.equal) = true;
 
-  string id                = 1;
-  string symbol            = 2;
-  string name              = 3;
-  string schema            = 4;
-  string creator           = 5;
-  string description       = 6;
-  string preview_uri       = 7 [
+  string id                                        = 1;
+  string symbol                                    = 2;
+  string name                                      = 3;
+  string schema                                    = 4;
+  string creator                                   = 5;
+  string description                               = 6;
+  string preview_uri                               = 7 [
     (gogoproto.moretags)   = "yaml:\"preview_uri\"",
     (gogoproto.customname) = "PreviewURI"
+  ];
+  string uri                                        = 8;
+  string uri_hash                                   = 9;
+  string data                                       = 10;
+  repeated WeightedAddress royalty_receivers        = 11 [
+    (gogoproto.moretags) = "yaml:\"royalty_receivers\""
   ];
 }
 ```
@@ -64,6 +70,7 @@ message Metadata {
     (gogoproto.moretags)   = "yaml:\"preview_uri\"",
     (gogoproto.customname) = "PreviewURI"
   ];
+  string uri_hash          = 5;
 }
 ```
 ### State
@@ -117,8 +124,11 @@ symbol: denom symbol
 flags:
 name : name of denom/collection 
 description: description for the denom
+uri: class uri (ipfs hash of a json file which contains full collections information)
+uri-hash: sha256 hash of the above file
 preview-uri: display picture url for denom
 schema: json schema for additional properties
+royalty-receivers: list of weighted addresses that will  receive royalty fees when an NFT is sold
 creation-fee: denom creation-fee to create denom
 
 Example:
@@ -126,8 +136,11 @@ Example:
     onftd tx onft create <symbol> \
      --name=<name> \
      --description=<description> \
+     --uri=<class-uri> \
+     --uri-hash<class-uri-hash> \
      --preview-uri=<preview-uri> \
      --schema=<schema> \
+     --royalty-receivers=<address1,weight>,<address2,wight> \ 
      --creation-fee=<creation-fee> \
      --chain-id=<chain-id> \
      --fees=<fee> \
@@ -139,11 +152,11 @@ Example:
 To create an oNFT, you will need to use the "onftd tx onft mint" command with the following flags:
 
 denom-id: the ID of the collection in which you want to mint the NFT
-name: the name of the NFT
-description: a description of the NFT
-media-uri: the IPFS URI of the NFT
-preview-uri: the preview URI of the NFT
-data: any additional properties for the NFT (optional)
+name: name of the NFT
+description: description of the NFT
+media-uri: the IPFS URI of the NFT (can be a image ipfs url or json file ipfs url that contains all the info of the nft)
+preview-uri: the preview URI of the NFT (preview image of the NFT)
+data: any additional properties for the NFT in json string format (optional)
 recipient: the recipient of the NFT (optional, default is the minter of the NFT)
 non-transferable: flag to mint a non-transferable NFT (optional, default is false)
 inextensible: flag to mint an inextensible NFT (optional, default is false)
@@ -157,6 +170,7 @@ onftd tx onft mint <denom-id> \
 --name="NFT name" \
 --description="NFT description" \
 --media-uri="https://ipfs.io/ipfs/...." \
+--uri-hash="uri-hash" \
 --preview-uri="https://ipfs.io/ipfs/...." \
 --data="{}" \
 --recipient="" \
@@ -226,8 +240,16 @@ service Query {
     option (google.api.http).get = "/omniflix/onft/v1beta1/collections/{denom_id}";
   }
 
+  rpc IBCCollection(QueryIBCCollectionRequest) returns (QueryCollectionResponse) {
+    option (google.api.http).get = "/omniflix/onft/v1beta1/collections/ibc/{hash}";
+  }
+
   rpc Denom(QueryDenomRequest) returns (QueryDenomResponse) {
     option (google.api.http).get = "/omniflix/onft/v1beta1/denoms/{denom_id}";
+  }
+
+  rpc IBCDenom(QueryIBCDenomRequest) returns (QueryDenomResponse) {
+    option (google.api.http).get = "/omniflix/onft/v1beta1/denoms/ibc/{hash}";
   }
 
   rpc Denoms(QueryDenomsRequest) returns (QueryDenomsResponse) {
@@ -236,11 +258,20 @@ service Query {
   rpc ONFT(QueryONFTRequest) returns (QueryONFTResponse) {
     option (google.api.http).get = "/omniflix/onft/v1beta1/denoms/{denom_id}/onfts/{id}";
   }
+  rpc IBCDenomONFT(QueryIBCDenomONFTRequest) returns (QueryONFTResponse) {
+    option (google.api.http).get = "/omniflix/onft/v1beta1/denoms/ibc/{hash}/onfts/{id}";
+  }
   rpc OwnerONFTs(QueryOwnerONFTsRequest) returns (QueryOwnerONFTsResponse) {
     option (google.api.http).get = "/omniflix/onft/v1beta1/onfts/{denom_id}/{owner}";
   }
+  rpc OwnerIBCDenomONFTs(QueryOwnerIBCDenomONFTsRequest) returns (QueryOwnerONFTsResponse) {
+    option (google.api.http).get = "/omniflix/onft/v1beta1/onfts/ibc/{hash}/{owner}";
+  }
   rpc Supply(QuerySupplyRequest) returns (QuerySupplyResponse) {
     option (google.api.http).get = "/omniflix/onft/v1beta1/denoms/{denom_id}/supply";
+  }
+  rpc IBCDenomSupply(QueryIBCDenomSupplyRequest) returns (QuerySupplyResponse) {
+    option (google.api.http).get = "/omniflix/onft/v1beta1/denoms/ibc/{hash}/supply";
   }
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/omniflix/onft/v1beta1/params";
