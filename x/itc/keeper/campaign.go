@@ -18,7 +18,6 @@ func (k Keeper) CreateCampaign(
 	ctx sdk.Context,
 	creator sdk.AccAddress,
 	campaign types.Campaign,
-	creationFee sdk.Coin,
 ) error {
 	_, err := k.nftKeeper.GetDenomInfo(ctx, campaign.NftDenomId)
 	if err != nil {
@@ -50,14 +49,6 @@ func (k Keeper) CreateCampaign(
 				campaign.Creator,
 			)
 		}
-	}
-	// cut creation fee amount and fund the community pool
-	if err := k.distributionKeeper.FundCommunityPool(
-		ctx,
-		sdk.NewCoins(creationFee),
-		creator,
-	); err != nil {
-		return err
 	}
 
 	k.SetCampaign(ctx, campaign)
@@ -193,12 +184,18 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 	}
 
 	if campaign.ClaimType == types.CLAIM_TYPE_NFT || campaign.ClaimType == types.CLAIM_TYPE_FT_AND_NFT {
-		campaign.MintCount += 1
+		nftIndex := campaign.NftMintDetails.StartIndex + campaign.MintCount
+		nftTitle := fmt.Sprintf(
+			"%s %s%d",
+			campaign.NftMintDetails.Name,
+			campaign.NftMintDetails.NameDelimeter,
+			nftIndex,
+		)
 		if err := k.nftKeeper.MintONFT(
 			ctx,
 			campaign.NftMintDetails.DenomId,
-			generateClaimNftId(ctx, campaign.Id, campaign.MintCount),
-			campaign.NftMintDetails.Name+fmt.Sprintf("%d", campaign.MintCount),
+			generateClaimNftId(ctx, campaign.Id, nftIndex),
+			nftTitle,
 			campaign.NftMintDetails.Description,
 			campaign.NftMintDetails.MediaUri,
 			campaign.NftMintDetails.UriHash,
@@ -214,6 +211,8 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 			return errorsmod.Wrapf(types.ErrClaimingNFT,
 				"unable to mint nft denomId %s", campaign.NftMintDetails.DenomId)
 		}
+		// set campaign mint count
+		campaign.MintCount += 1
 	}
 	// set claim
 	k.SetClaim(ctx, claim)
