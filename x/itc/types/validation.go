@@ -134,7 +134,7 @@ func validateNFTMintDetails(details *NFTDetails) error {
 	if len(details.NameDelimeter) != 1 {
 		return errorsmod.Wrapf(
 			ErrInvalidNFTMintDetails,
-			"invalid nft mint details, Name delemeter should be a symbol string lenght of one.")
+			"invalid nft mint details, Name delemeter should be a symbol string length of one.")
 	}
 
 	return nil
