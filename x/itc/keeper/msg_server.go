@@ -64,6 +64,7 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 			"given fee (%s) not matched with  campaign creation fee. %s required to create itc campaign",
 			msg.CreationFee.String(), campaignCreationFee.String())
 	}
+
 	if (msg.ClaimType == types.CLAIM_TYPE_FT || msg.ClaimType == types.CLAIM_TYPE_FT_AND_NFT) && msg.Distribution == nil {
 		return nil, errorsmod.Wrapf(
 			types.ErrInvalidNFTMintDetails,
@@ -75,6 +76,15 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 			types.ErrInvalidNFTMintDetails,
 			"nft mint details are required for nft claim type",
 		)
+	}
+
+	// cut creation fee amount and fund the community pool
+	if err := m.distributionKeeper.FundCommunityPool(
+		ctx,
+		sdk.NewCoins(msg.CreationFee),
+		creator,
+	); err != nil {
+		return nil, err
 	}
 
 	availableTokens := msg.Deposit
@@ -95,7 +105,7 @@ func (m msgServer) CreateCampaign(goCtx context.Context,
 		msg.NftMintDetails,
 		msg.Distribution,
 	)
-	err = m.Keeper.CreateCampaign(ctx, creator, campaign, msg.CreationFee)
+	err = m.Keeper.CreateCampaign(ctx, creator, campaign)
 	if err != nil {
 		return nil, err
 	}

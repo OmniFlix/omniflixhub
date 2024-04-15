@@ -25,6 +25,12 @@ func validate(nft *types.NFTDetails) error {
 	if nft.MediaUri == "" {
 		return fmt.Errorf("nft media uri is required")
 	}
+	if nft.StartIndex <= 0 {
+		return fmt.Errorf("start index is required and should be greater than 0")
+	}
+	if nft.NameDelimeter != "" && len(nft.NameDelimeter) > 1 {
+		return fmt.Errorf("name delemeter should be a single character string")
+	}
 	return nil
 }
 

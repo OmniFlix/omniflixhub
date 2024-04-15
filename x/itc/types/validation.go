@@ -120,11 +120,23 @@ func ValidateTokens(tokensA, tokensB sdk.Coin) error {
 }
 
 func validateNFTMintDetails(details *NFTDetails) error {
-	if details == nil || len(details.Name) == 0 || len(details.DenomId) == 0 || len(details.MediaUri) == 0 {
+	if details == nil || len(details.Name) == 0 || len(details.DenomId) == 0 || len(details.MediaUri) == 0 ||
+		details.StartIndex <= 0 || len(details.NameDelimeter) != 1 {
 		return errorsmod.Wrapf(
 			ErrInvalidNFTMintDetails,
 			"invalid nft mint details, details should not be nil and name, media_uri can not be empty.")
 	}
+	if details.StartIndex <= 0 {
+		return errorsmod.Wrapf(
+			ErrInvalidNFTMintDetails,
+			"invalid nft mint details, Start Index should be a possitive number.")
+	}
+	if len(details.NameDelimeter) != 1 {
+		return errorsmod.Wrapf(
+			ErrInvalidNFTMintDetails,
+			"invalid nft mint details, Name delemeter should be a symbol string lenght of one.")
+	}
+
 	return nil
 }
 
