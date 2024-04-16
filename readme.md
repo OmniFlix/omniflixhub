@@ -5,7 +5,7 @@ OmniFlix Hub is the root chain of the OmniFlix Network. Sovereign chains and DAO
 OmniFlix Hub blockchain is built using Cosmos-SDK and CometBFT
 
 ### Hardware Requirements
- - 6+ core CPU (recommended: AMD x86_64)
+ - 6+ core CPUs (recommended: AMD x86_64)
  - 32GB RAM
  - 1TB SSD Storage
 
@@ -24,7 +24,7 @@ wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.21.3
 ```
 git clone https://github.com/Omniflix/omniflixhub.git
 cd omniflixhub
-git checkout v2.0.0
+git checkout v4.0.0
 go mod tidy
 make install
 ```
