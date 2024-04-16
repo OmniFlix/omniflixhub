@@ -188,7 +188,7 @@ func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccA
 		nftTitle := fmt.Sprintf(
 			"%s %s%d",
 			campaign.NftMintDetails.Name,
-			campaign.NftMintDetails.NameDelimeter,
+			campaign.NftMintDetails.NameDelimiter,
 			nftIndex,
 		)
 		if err := k.nftKeeper.MintONFT(
