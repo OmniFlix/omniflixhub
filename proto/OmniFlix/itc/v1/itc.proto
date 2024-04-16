@@ -110,7 +110,7 @@ message NFTDetails {
   string     data = 10;
   string     uri_hash = 11;
   uint64     start_index = 12;
-  string     name_delimeter = 13;
+  string     name_delimiter = 13;
 }
 
 message Claim {
