@@ -356,6 +356,7 @@ func NewAppKeeper(
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper))
 
 	govConfig := govtypes.DefaultConfig()
+	govConfig.MaxMetadataLen = 10200
 
 	govKeeper := govkeeper.NewKeeper(
 		appCodec,
