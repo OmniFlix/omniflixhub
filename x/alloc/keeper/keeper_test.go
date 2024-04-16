@@ -6,14 +6,14 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	"github.com/OmniFlix/omniflixhub/v3/app/apptesting"
-	"github.com/OmniFlix/omniflixhub/v3/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v4/app/apptesting"
+	"github.com/OmniFlix/omniflixhub/v4/x/alloc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/OmniFlix/omniflixhub/v3/app"
+	"github.com/OmniFlix/omniflixhub/v4/app"
 )
 
 type KeeperTestSuite struct {

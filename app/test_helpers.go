@@ -11,8 +11,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/snapshots"
 
-	apphelpers "github.com/OmniFlix/omniflixhub/v3/app/helpers"
-	appparams "github.com/OmniFlix/omniflixhub/v3/app/params"
+	apphelpers "github.com/OmniFlix/omniflixhub/v4/app/helpers"
+	appparams "github.com/OmniFlix/omniflixhub/v4/app/params"
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/crypto"

@@ -7,7 +7,7 @@ import (
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	"github.com/OmniFlix/omniflixhub/v3/x/ics721nft"
+	"github.com/OmniFlix/omniflixhub/v4/x/ics721nft"
 	nfttransfer "github.com/bianjieai/nft-transfer"
 	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
@@ -53,9 +53,9 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
-	"github.com/OmniFlix/omniflixhub/v3/x/globalfee"
-	globalfeekeeper "github.com/OmniFlix/omniflixhub/v3/x/globalfee/keeper"
-	globalfeetypes "github.com/OmniFlix/omniflixhub/v3/x/globalfee/types"
+	"github.com/OmniFlix/omniflixhub/v4/x/globalfee"
+	globalfeekeeper "github.com/OmniFlix/omniflixhub/v4/x/globalfee/keeper"
+	globalfeetypes "github.com/OmniFlix/omniflixhub/v4/x/globalfee/types"
 
 	"github.com/cosmos/cosmos-sdk/x/group"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
@@ -73,8 +73,8 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	tokenfactorykeeper "github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/keeper"
-	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/types"
+	tokenfactorykeeper "github.com/OmniFlix/omniflixhub/v4/x/tokenfactory/keeper"
+	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v4/x/tokenfactory/types"
 
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
@@ -100,17 +100,17 @@ import (
 	ibchookskeeper "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/keeper"
 	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/types"
 
-	allockeeper "github.com/OmniFlix/omniflixhub/v3/x/alloc/keeper"
-	alloctypes "github.com/OmniFlix/omniflixhub/v3/x/alloc/types"
+	allockeeper "github.com/OmniFlix/omniflixhub/v4/x/alloc/keeper"
+	alloctypes "github.com/OmniFlix/omniflixhub/v4/x/alloc/types"
 
-	onftkeeper "github.com/OmniFlix/omniflixhub/v3/x/onft/keeper"
-	onfttypes "github.com/OmniFlix/omniflixhub/v3/x/onft/types"
+	onftkeeper "github.com/OmniFlix/omniflixhub/v4/x/onft/keeper"
+	onfttypes "github.com/OmniFlix/omniflixhub/v4/x/onft/types"
 
-	marketplacekeeper "github.com/OmniFlix/omniflixhub/v3/x/marketplace/keeper"
-	marketplacetypes "github.com/OmniFlix/omniflixhub/v3/x/marketplace/types"
+	marketplacekeeper "github.com/OmniFlix/omniflixhub/v4/x/marketplace/keeper"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/v4/x/marketplace/types"
 
-	itckeeper "github.com/OmniFlix/omniflixhub/v3/x/itc/keeper"
-	itctypes "github.com/OmniFlix/omniflixhub/v3/x/itc/types"
+	itckeeper "github.com/OmniFlix/omniflixhub/v4/x/itc/keeper"
+	itctypes "github.com/OmniFlix/omniflixhub/v4/x/itc/types"
 
 	streampaykeeper "github.com/OmniFlix/streampay/v2/x/streampay/keeper"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
@@ -118,7 +118,7 @@ import (
 	ibcnfttransferkeeper "github.com/bianjieai/nft-transfer/keeper"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
-	tfbindings "github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/bindings"
+	tfbindings "github.com/OmniFlix/omniflixhub/v4/x/tokenfactory/bindings"
 )
 
 var tokenFactoryCapabilities = []string{

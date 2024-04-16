@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/OmniFlix/omniflixhub/v3/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v4/x/onft/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"

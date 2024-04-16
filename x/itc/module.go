@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/OmniFlix/omniflixhub/v3/x/itc/exported"
+	"github.com/OmniFlix/omniflixhub/v4/x/itc/exported"
 
-	"github.com/OmniFlix/omniflixhub/v3/x/itc/client/cli"
+	"github.com/OmniFlix/omniflixhub/v4/x/itc/client/cli"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/spf13/cobra"
 
@@ -16,8 +16,8 @@ import (
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
-	"github.com/OmniFlix/omniflixhub/v3/x/itc/keeper"
-	"github.com/OmniFlix/omniflixhub/v3/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v4/x/itc/keeper"
+	"github.com/OmniFlix/omniflixhub/v4/x/itc/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"

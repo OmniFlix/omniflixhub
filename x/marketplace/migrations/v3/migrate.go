@@ -1,8 +1,8 @@
 package v3
 
 import (
-	"github.com/OmniFlix/omniflixhub/v3/x/marketplace/exported"
-	"github.com/OmniFlix/omniflixhub/v3/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v4/x/marketplace/exported"
+	"github.com/OmniFlix/omniflixhub/v4/x/marketplace/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

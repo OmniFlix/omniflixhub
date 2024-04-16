@@ -10,7 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"github.com/OmniFlix/omniflixhub/v3/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v4/x/itc/types"
 	"github.com/spf13/cobra"
 )
 

@@ -5,8 +5,8 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 
-	onftkeeper "github.com/OmniFlix/omniflixhub/v3/x/onft/keeper"
-	onfttypes "github.com/OmniFlix/omniflixhub/v3/x/onft/types"
+	onftkeeper "github.com/OmniFlix/omniflixhub/v4/x/onft/keeper"
+	onfttypes "github.com/OmniFlix/omniflixhub/v4/x/onft/types"
 	nfttransfer "github.com/bianjieai/nft-transfer/types"
 	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"

@@ -5,7 +5,7 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 
-	"github.com/OmniFlix/omniflixhub/v3/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v4/x/onft/types"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 

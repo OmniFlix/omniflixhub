@@ -4,7 +4,7 @@ package OmniFlix.marketplace.v1beta1;
 import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/OmniFlix/omniflixhub/v3/x/marketplace/types";
+option go_package = "github.com/OmniFlix/omniflixhub/v4/x/marketplace/types";
 option (gogoproto.goproto_getters_all) = false;
 
 

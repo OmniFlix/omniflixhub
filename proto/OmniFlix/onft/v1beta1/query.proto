@@ -7,7 +7,7 @@ import "OmniFlix/onft/v1beta1/onft.proto";
 import "OmniFlix/onft/v1beta1/params.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 
-option go_package = "github.com/OmniFlix/omniflixhub/v3/x/onft/types";
+option go_package = "github.com/OmniFlix/omniflixhub/v4/x/onft/types";
 
 service Query {
   rpc Collection(QueryCollectionRequest) returns (QueryCollectionResponse) {

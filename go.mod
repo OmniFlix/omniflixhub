@@ -1,4 +1,4 @@
-module github.com/OmniFlix/omniflixhub/v3
+module github.com/OmniFlix/omniflixhub/v4
 
 go 1.21
 

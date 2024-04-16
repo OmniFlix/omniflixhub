@@ -3,9 +3,9 @@ package keeper_test
 import (
 	"testing"
 
-	"github.com/OmniFlix/omniflixhub/v3/app/apptesting"
-	"github.com/OmniFlix/omniflixhub/v3/x/onft/keeper"
-	"github.com/OmniFlix/omniflixhub/v3/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v4/app/apptesting"
+	"github.com/OmniFlix/omniflixhub/v4/x/onft/keeper"
+	"github.com/OmniFlix/omniflixhub/v4/x/onft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 )
