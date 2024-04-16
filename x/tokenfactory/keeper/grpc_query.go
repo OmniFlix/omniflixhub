@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/OmniFlix/omniflixhub/v3/x/tokenfactory/types"
+	"github.com/OmniFlix/omniflixhub/v4/x/tokenfactory/types"
 )
 
 var _ types.QueryServer = Keeper{}

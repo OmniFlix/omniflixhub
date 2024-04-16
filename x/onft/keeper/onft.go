@@ -4,8 +4,8 @@ import (
 	"time"
 
 	errorsmod "cosmossdk.io/errors"
-	"github.com/OmniFlix/omniflixhub/v3/x/onft/exported"
-	"github.com/OmniFlix/omniflixhub/v3/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v4/x/onft/exported"
+	"github.com/OmniFlix/omniflixhub/v4/x/onft/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/nft"

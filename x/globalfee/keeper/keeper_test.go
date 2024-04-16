@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	appparams "github.com/OmniFlix/omniflixhub/v3/app/params"
-	globalfeekeeper "github.com/OmniFlix/omniflixhub/v3/x/globalfee/keeper"
-	"github.com/OmniFlix/omniflixhub/v3/x/globalfee/types"
+	appparams "github.com/OmniFlix/omniflixhub/v4/app/params"
+	globalfeekeeper "github.com/OmniFlix/omniflixhub/v4/x/globalfee/keeper"
+	"github.com/OmniFlix/omniflixhub/v4/x/globalfee/types"
 	dbm "github.com/cometbft/cometbft-db"
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"

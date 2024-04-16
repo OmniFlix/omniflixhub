@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"github.com/OmniFlix/omniflixhub/v3/x/globalfee/types"
+	"github.com/OmniFlix/omniflixhub/v4/x/globalfee/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

@@ -2,8 +2,8 @@ package v3
 
 import (
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	"github.com/OmniFlix/omniflixhub/v3/app/keepers"
-	"github.com/OmniFlix/omniflixhub/v3/app/upgrades"
+	"github.com/OmniFlix/omniflixhub/v4/app/keepers"
+	"github.com/OmniFlix/omniflixhub/v4/app/upgrades"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"

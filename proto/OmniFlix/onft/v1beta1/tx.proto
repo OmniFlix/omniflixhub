@@ -9,7 +9,7 @@ import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
 import "OmniFlix/onft/v1beta1/onft.proto";
 
-option go_package = "github.com/OmniFlix/omniflixhub/v3/x/onft/types";
+option go_package = "github.com/OmniFlix/omniflixhub/v4/x/onft/types";
 option (gogoproto.goproto_getters_all) = false;
 
 service Msg {

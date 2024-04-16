@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/OmniFlix/omniflixhub/v3/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v4/x/marketplace/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"

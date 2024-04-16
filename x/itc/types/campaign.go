@@ -4,7 +4,7 @@ import "C"
 import (
 	"time"
 
-	"github.com/OmniFlix/omniflixhub/v3/x/itc/exported"
+	"github.com/OmniFlix/omniflixhub/v4/x/itc/exported"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/gogoproto/proto"
 )

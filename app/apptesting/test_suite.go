@@ -6,7 +6,7 @@ import (
 
 	"cosmossdk.io/math"
 
-	"github.com/OmniFlix/omniflixhub/v3/app"
+	"github.com/OmniFlix/omniflixhub/v4/app"
 
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"

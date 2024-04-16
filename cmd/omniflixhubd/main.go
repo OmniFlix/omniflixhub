@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/OmniFlix/omniflixhub/v3/app"
-	"github.com/OmniFlix/omniflixhub/v3/cmd/omniflixhubd/cmd"
+	"github.com/OmniFlix/omniflixhub/v4/app"
+	"github.com/OmniFlix/omniflixhub/v4/cmd/omniflixhubd/cmd"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 )
 
