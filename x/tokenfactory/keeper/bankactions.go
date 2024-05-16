@@ -78,6 +78,10 @@ func (k Keeper) forceTransfer(ctx sdk.Context, amount sdk.Coin, fromAddr string,
 		return err
 	}
 
+	if k.bankKeeper.BlockedAddr(fromSdkAddr) {
+		return fmt.Errorf("failed to force transfer from a blocked address: %s", fromAddr)
+	}
+
 	if k.bankKeeper.BlockedAddr(toSdkAddr) {
 		return fmt.Errorf("failed to force transfer to blocked address: %s", toSdkAddr)
 	}
