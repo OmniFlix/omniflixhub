@@ -3,10 +3,10 @@ package keeper_test
 import (
 	"fmt"
 
+	"github.com/OmniFlix/omniflixhub/v4/x/tokenfactory/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-
-	"github.com/OmniFlix/omniflixhub/v4/x/tokenfactory/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
 // TestMintDenomMsg tests TypeMsgMint message is emitted on a successful mint
@@ -250,4 +250,39 @@ func (suite *KeeperTestSuite) TestSetDenomMetaDataMsg() {
 			suite.AssertEventEmitted(ctx, types.TypeMsgSetDenomMetadata, tc.expectedMessageEvents)
 		})
 	}
+}
+
+func (s *KeeperTestSuite) TestForceTransferMsg() {
+	// Create a denom
+	s.CreateDefaultDenom()
+
+	s.Run("test force transfer", func() {
+		mintAmt := sdk.NewInt64Coin(s.defaultDenom, 10)
+
+		_, _ = s.msgServer.Mint(sdk.WrapSDKContext(s.Ctx), types.NewMsgMint(s.TestAccs[0].String(), mintAmt))
+
+		govModAcc := s.App.AccountKeeper.GetModuleAccount(s.Ctx, govtypes.ModuleName)
+
+		err := s.App.BankKeeper.SendCoins(s.Ctx, s.TestAccs[0], govModAcc.GetAddress(), sdk.NewCoins(mintAmt))
+		s.Require().NoError(err)
+
+		_, err = s.msgServer.ForceTransfer(s.Ctx, types.NewMsgForceTransfer(s.TestAccs[0].String(), mintAmt, govModAcc.GetAddress().String(), s.TestAccs[1].String()))
+		s.Require().ErrorContains(err, "failed to force transfer from a blocked address")
+	})
+}
+
+func (s *KeeperTestSuite) TestForceTransferMsgAccToModule() {
+	// Create a denom
+	s.CreateDefaultDenom()
+
+	s.Run("test force transfer account to module", func() {
+		mintAmt := sdk.NewInt64Coin(s.defaultDenom, 10)
+
+		_, _ = s.msgServer.Mint(sdk.WrapSDKContext(s.Ctx), types.NewMsgMint(s.TestAccs[0].String(), mintAmt))
+
+		govModAcc := s.App.AccountKeeper.GetModuleAccount(s.Ctx, govtypes.ModuleName)
+
+		_, err := s.msgServer.ForceTransfer(s.Ctx, types.NewMsgForceTransfer(s.TestAccs[0].String(), mintAmt, s.TestAccs[0].String(), govModAcc.GetAddress().String()))
+		s.Require().ErrorContains(err, "failed to force transfer to blocked address")
+	})
 }
