@@ -5,9 +5,9 @@ import (
 	"math/rand"
 	"strings"
 
-	appparams "github.com/OmniFlix/omniflixhub/v4/app/params"
-	"github.com/OmniFlix/omniflixhub/v4/x/onft/keeper"
-	"github.com/OmniFlix/omniflixhub/v4/x/onft/types"
+	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
+	"github.com/OmniFlix/omniflixhub/v5/x/onft/keeper"
+	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"

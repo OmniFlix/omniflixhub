@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	onftkeeper "github.com/OmniFlix/omniflixhub/v4/x/onft/keeper"
-	onfttypes "github.com/OmniFlix/omniflixhub/v4/x/onft/types"
+	onftkeeper "github.com/OmniFlix/omniflixhub/v5/x/onft/keeper"
+	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 
-	"github.com/OmniFlix/omniflixhub/v4/app/apptesting"
-	"github.com/OmniFlix/omniflixhub/v4/x/itc/keeper"
-	"github.com/OmniFlix/omniflixhub/v4/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v5/app/apptesting"
+	"github.com/OmniFlix/omniflixhub/v5/x/itc/keeper"
+	"github.com/OmniFlix/omniflixhub/v5/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 )

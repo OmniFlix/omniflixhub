@@ -11,7 +11,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 
-	globalfeekeeper "github.com/OmniFlix/omniflixhub/v4/x/globalfee/keeper"
+	globalfeekeeper "github.com/OmniFlix/omniflixhub/v5/x/globalfee/keeper"
 )
 
 // FeeWithBypassDecorator checks if the transaction's fee is at least as large

@@ -1,7 +1,7 @@
 package v2_1
 
 import (
-	"github.com/OmniFlix/omniflixhub/v4/app/upgrades"
+	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 )
 

@@ -8,7 +8,7 @@ import "OmniFlix/marketplace/v1beta1/params.proto";
 import "OmniFlix/marketplace/v1beta1/auction.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/OmniFlix/omniflixhub/v4/x/marketplace/types";
+option go_package = "github.com/OmniFlix/omniflixhub/v5/x/marketplace/types";
 
 service Query {
   // Params queries params of the marketplace module.

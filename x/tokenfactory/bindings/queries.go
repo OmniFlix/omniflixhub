@@ -6,8 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
-	bindingstypes "github.com/OmniFlix/omniflixhub/v4/x/tokenfactory/bindings/types"
-	tokenfactorykeeper "github.com/OmniFlix/omniflixhub/v4/x/tokenfactory/keeper"
+	bindingstypes "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/bindings/types"
+	tokenfactorykeeper "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/keeper"
 )
 
 type QueryPlugin struct {

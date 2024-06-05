@@ -7,7 +7,7 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 
-	"github.com/OmniFlix/omniflixhub/v4/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v5/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
