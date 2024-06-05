@@ -34,6 +34,7 @@ import (
 	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
+	feeabstypes "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/types"
 )
 
 func (appKeepers *AppKeepers) GenerateKeys() {
@@ -61,6 +62,7 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		feegrant.StoreKey,
 		wasmtypes.StoreKey,
 		globalfeetypes.StoreKey,
+		feeabstypes.StoreKey,
 		group.StoreKey,
 		tokenfactorytypes.StoreKey,
 		authzkeeper.StoreKey,

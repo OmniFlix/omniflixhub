@@ -15,6 +15,9 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	ibcante "github.com/cosmos/ibc-go/v7/modules/core/ante"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
+
+	feeabsante "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/ante"
+	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/keeper"
 )
 
 // Lower back to 1 mil after https://github.com/cosmos/relayer/issues/1255
@@ -35,6 +38,7 @@ type HandlerOptions struct {
 
 	GlobalFeeKeeper globalfeekeeper.Keeper
 	StakingKeeper   stakingkeeper.Keeper
+	feeabsKeeper    feeabskeeper.Keeper
 }
 
 func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
@@ -68,6 +72,8 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 			options.StakingKeeper,
 			maxBypassMinFeeMsgGasUsage,
 		),
+		feeabsante.NewFeeAbstrationMempoolFeeDecorator(options.feeabsKeeper),
+		feeabsante.NewFeeAbstractionDeductFeeDecorate(options.AccountKeeper, options.BankKeeper, options.feeabsKeeper, options.FeegrantKeeper),
 		ante.NewDeductFeeDecorator(
 			options.AccountKeeper,
 			options.BankKeeper,

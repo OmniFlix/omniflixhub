@@ -84,6 +84,9 @@ import (
 	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7"
 	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/types"
 
+	feeabs "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs"
+	feeabstypes "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/types"
+
 	"github.com/OmniFlix/omniflixhub/v5/x/alloc"
 	alloctypes "github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
 
@@ -134,6 +137,7 @@ var (
 		globalfee.AppModuleBasic{},
 		tokenfactory.AppModuleBasic{},
 		nfttransfer.AppModuleBasic{},
+		feeabs.AppModuleBasic{},
 
 		alloc.AppModuleBasic{},
 		onft.AppModuleBasic{},
@@ -156,6 +160,7 @@ var (
 		icatypes.ModuleName:            nil,
 		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 		globalfee.ModuleName:           nil,
+		feeabstypes.ModuleName:         nil,
 		wasmtypes.ModuleName:           {authtypes.Burner},
 		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		nft.ModuleName:                 nil,
@@ -249,6 +254,7 @@ func appModules(
 		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
 		ibchooks.NewAppModule(app.AccountKeeper),
 		globalfee.NewAppModule(appCodec, app.GlobalFeeKeeper, bondDenom),
+		feeabs.NewAppModule(appCodec, app.FeeabsKeeper),
 		alloc.NewAppModule(appCodec, app.AllocKeeper, app.GetSubspace(alloctypes.ModuleName)),
 		onft.NewAppModule(
 			appCodec,
@@ -341,6 +347,7 @@ func orderBeginBlockers() []string {
 		marketplacetypes.ModuleName,
 		streampaytypes.ModuleName,
 		itctypes.ModuleName,
+		feeabstypes.ModuleName,
 	}
 }
 
@@ -379,6 +386,7 @@ func orderEndBlockers() []string {
 		marketplacetypes.ModuleName,
 		streampaytypes.ModuleName,
 		itctypes.ModuleName,
+		feeabstypes.ModuleName,
 	}
 }
 
@@ -426,5 +434,6 @@ func orderInitGenesis() []string {
 		marketplacetypes.ModuleName,
 		streampaytypes.ModuleName,
 		itctypes.ModuleName,
+		feeabstypes.ModuleName,
 	}
 }

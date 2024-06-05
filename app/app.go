@@ -50,6 +50,8 @@ import (
 	ibcclienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	ibcchanneltypes "github.com/cosmos/ibc-go/v7/modules/core/04-channel/types"
 
+	feeabs "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs"
+
 	"github.com/OmniFlix/omniflixhub/v5/app/keepers"
 	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
 	v012 "github.com/OmniFlix/omniflixhub/v5/app/upgrades/v012"
@@ -82,6 +84,9 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		upgradeclient.LegacyCancelProposalHandler,
 		ibcclientclient.UpdateClientProposalHandler,
 		ibcclientclient.UpgradeProposalHandler,
+		feeabs.UpdateAddHostZoneClientProposalHandler,
+		feeabs.UpdateDeleteHostZoneClientProposalHandler,
+		feeabs.UpdateSetHostZoneClientProposalHandler,
 	)
 
 	return govProposalHandlers

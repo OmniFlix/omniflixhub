@@ -57,6 +57,10 @@ import (
 	globalfeekeeper "github.com/OmniFlix/omniflixhub/v5/x/globalfee/keeper"
 	globalfeetypes "github.com/OmniFlix/omniflixhub/v5/x/globalfee/types"
 
+	feeabs "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs"
+	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/keeper"
+	feeabstypes "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/types"
+
 	"github.com/cosmos/cosmos-sdk/x/group"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
@@ -156,6 +160,7 @@ type AppKeepers struct {
 	AuthzKeeper           authzkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	GlobalFeeKeeper       globalfeekeeper.Keeper
+	FeeabsKeeper          feeabskeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	TokenFactoryKeeper    tokenfactorykeeper.Keeper
 	IBCNFTTransferKeeper  ibcnfttransferkeeper.Keeper
@@ -169,6 +174,7 @@ type AppKeepers struct {
 	ScopedICQKeeper         capabilitykeeper.ScopedKeeper
 	ScopedNFTTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedWasmKeeper        capabilitykeeper.ScopedKeeper
+	ScopedFeeabsKeeper      capabilitykeeper.ScopedKeeper
 
 	// Middleware wrapper
 	Ics20WasmHooks   *ibchooks.WasmHooks
@@ -235,6 +241,7 @@ func NewAppKeeper(
 	appKeepers.ScopedICQKeeper = appKeepers.CapabilityKeeper.ScopeToModule(icqtypes.ModuleName)
 	appKeepers.ScopedNFTTransferKeeper = appKeepers.CapabilityKeeper.ScopeToModule(ibcnfttransfertypes.ModuleName)
 	appKeepers.ScopedWasmKeeper = appKeepers.CapabilityKeeper.ScopeToModule(wasmtypes.ModuleName)
+	appKeepers.ScopedFeeabsKeeper = appKeepers.CapabilityKeeper.ScopeToModule(feeabstypes.ModuleName)
 	appKeepers.CapabilityKeeper.Seal()
 
 	appKeepers.CrisisKeeper = crisiskeeper.NewKeeper(
@@ -602,6 +609,20 @@ func NewAppKeeper(
 	appKeepers.Ics20WasmHooks.ContractKeeper = &appKeepers.WasmKeeper
 
 	ibcRouter.AddRoute(wasmtypes.ModuleName, wasm.NewIBCHandler(appKeepers.WasmKeeper, appKeepers.IBCKeeper.ChannelKeeper, appKeepers.IBCKeeper.ChannelKeeper))
+
+	appKeepers.FeeabsKeeper = feeabskeeper.NewKeeper(
+		appCodec,
+		keys[feeabstypes.StoreKey],
+		appKeepers.GetSubspace(feeabstypes.ModuleName),
+		appKeepers.StakingKeeper,
+		appKeepers.AccountKeeper,
+		appKeepers.BankKeeper,
+		appKeepers.TransferKeeper,
+		appKeepers.IBCKeeper.ChannelKeeper,
+		&appKeepers.IBCKeeper.PortKeeper,
+		appKeepers.ScopedFeeabsKeeper,
+	)
+	ibcRouter.AddRoute(feeabstypes.ModuleName, feeabs.NewIBCModule(appCodec, appKeepers.FeeabsKeeper))
 	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 
 	return appKeepers
