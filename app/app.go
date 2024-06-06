@@ -59,6 +59,7 @@ import (
 	v2_1 "github.com/OmniFlix/omniflixhub/v5/app/upgrades/v2.1"
 	v3 "github.com/OmniFlix/omniflixhub/v5/app/upgrades/v3"
 	v4 "github.com/OmniFlix/omniflixhub/v5/app/upgrades/v4"
+	v5 "github.com/OmniFlix/omniflixhub/v5/app/upgrades/v5"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
@@ -95,7 +96,7 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 var (
 	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome string
-	Upgrades        = []upgrades.Upgrade{v012.Upgrade, v2.Upgrade, v2_1.Upgrade, v3.Upgrade, v4.Upgrade}
+	Upgrades        = []upgrades.Upgrade{v012.Upgrade, v2.Upgrade, v2_1.Upgrade, v3.Upgrade, v4.Upgrade, v5.Upgrade}
 	Forks           []upgrades.Fork
 )
 
