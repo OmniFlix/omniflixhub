@@ -540,8 +540,6 @@ func NewAppKeeper(
 		govModAddress,
 	)
 
-	appKeepers.GovKeeper.SetLegacyRouter(govRouter)
-
 	var ibcTransferStack porttypes.IBCModule
 	ibcTransferStack = transfer.NewIBCModule(appKeepers.TransferKeeper)
 	ibcTransferStack = packetforward.NewIBCMiddleware(
@@ -622,9 +620,12 @@ func NewAppKeeper(
 		&appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.ScopedFeeabsKeeper,
 	)
+	govRouter.AddRoute(feeabstypes.RouterKey, feeabs.NewHostZoneProposal(appKeepers.FeeabsKeeper))
 	ibcRouter.AddRoute(feeabstypes.ModuleName, feeabs.NewIBCModule(appCodec, appKeepers.FeeabsKeeper))
+	// set IBC router
 	appKeepers.IBCKeeper.SetRouter(ibcRouter)
-
+	// set gov router
+	appKeepers.GovKeeper.SetLegacyRouter(govRouter)
 	return appKeepers
 }
 
