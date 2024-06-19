@@ -11,7 +11,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/OmniFlix/omniflixhub/v4/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 )
 
 var _ types.QueryServer = Keeper{}

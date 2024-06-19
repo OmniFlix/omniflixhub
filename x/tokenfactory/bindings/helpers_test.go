@@ -15,7 +15,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/testutil"
 
-	"github.com/OmniFlix/omniflixhub/v4/app"
+	"github.com/OmniFlix/omniflixhub/v5/app"
 )
 
 func CreateTestInput(t *testing.T) (*app.OmniFlixApp, sdk.Context) {

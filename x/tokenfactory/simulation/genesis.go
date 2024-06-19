@@ -6,8 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	appparams "github.com/OmniFlix/omniflixhub/v4/app/params"
-	"github.com/OmniFlix/omniflixhub/v4/x/tokenfactory/types"
+	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
+	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
 )
 
 func RandDenomCreationFeeParam(r *rand.Rand) sdk.Coins {

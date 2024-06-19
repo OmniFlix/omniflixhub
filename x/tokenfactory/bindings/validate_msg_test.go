@@ -8,9 +8,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	wasmbinding "github.com/OmniFlix/omniflixhub/v4/x/tokenfactory/bindings"
-	bindings "github.com/OmniFlix/omniflixhub/v4/x/tokenfactory/bindings/types"
-	"github.com/OmniFlix/omniflixhub/v4/x/tokenfactory/types"
+	wasmbinding "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/bindings"
+	bindings "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/bindings/types"
+	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
 )
 
 func TestCreateDenom(t *testing.T) {
