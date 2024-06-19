@@ -6,7 +6,7 @@ mkdir -p ./tmp-swagger-gen
 
 # Get the paths used repos from go/pkg/mod
 cosmos_sdk_dir=$(go list -f '{{ .Dir }}' -m github.com/cosmos/cosmos-sdk)
-ibc_go=$(go list -f '{{ .Dir }}' -m github.com/cosmos/ibc-go/v7)
+ibc_go=$(go list -f '{{ .Dir }}' -m github.com/cosmos/ibc-go/v8)
 streampay=$(go list -f '{{ .Dir }}' -m github.com/OmniFlix/streampay/v2)
 echo "$cosmos_sdk_dir"/proto
 cd proto
