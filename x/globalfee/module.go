@@ -35,6 +35,12 @@ type AppModuleBasic struct {
 	cdc codec.Codec
 }
 
+// IsAppModule implements the appmodule.AppModule interface.
+func (am AppModule) IsAppModule() {}
+
+// IsOnePerModuleType is a marker function just indicates that this is a one-per-module type.
+func (am AppModule) IsOnePerModuleType() {}
+
 func (am AppModuleBasic) Name() string {
 	return types.ModuleName
 }

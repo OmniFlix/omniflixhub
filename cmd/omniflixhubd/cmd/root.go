@@ -2,28 +2,25 @@ package cmd
 
 import (
 	"errors"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"io"
 	"os"
 
 	tmcfg "github.com/cometbft/cometbft/config"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/debug"
-	"github.com/cosmos/cosmos-sdk/client/pruning"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/prometheus/client_golang/prometheus"
-
-	"github.com/OmniFlix/omniflixhub/v5/app"
-	"github.com/OmniFlix/omniflixhub/v5/app/params"
-	"github.com/cosmos/cosmos-sdk/baseapp"
 
 	"cosmossdk.io/client/v2/autocli"
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/log"
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	dbm "github.com/cometbft/cometbft-db"
+	"github.com/OmniFlix/omniflixhub/v5/app"
+	"github.com/OmniFlix/omniflixhub/v5/app/params"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
-	cosmosdb "github.com/cosmos/cosmos-db"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/keys"
@@ -35,9 +32,9 @@ import (
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	vestingcli "github.com/cosmos/cosmos-sdk/x/auth/vesting/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+	rosettaCmd "github.com/cosmos/rosetta/cmd"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 )
@@ -62,7 +59,19 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithHomeDir(app.DefaultNodeHome).
 		WithViper("")
 
-	tempApp := app.NewOmniFlixApp(log.NewNopLogger(), cosmosdb.Ne(), nil, true, map[int64]bool{}, app.DefaultNodeHome, 5, app.EmptyAppOptions{}, app.EmptyWasmOpts, baseapp.SetChainID("omniflixhub-1"))
+	tempApp := app.NewOmniFlixApp(
+		log.NewNopLogger(),
+		dbm.NewMemDB(),
+		nil,
+		true,
+		map[int64]bool{},
+		app.DefaultNodeHome,
+		5,
+		encodingConfig,
+		app.EmptyAppOptions{},
+		[]wasmkeeper.Option{},
+		baseapp.SetChainID("omniflixhub-1"))
+
 	rootCmd := &cobra.Command{
 		Use:   app.Name + "d",
 		Short: "OmniFlix Hub App",
@@ -87,9 +96,9 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		},
 	}
 
-	initRootCmd(rootCmd, encodingConfig)
+	initRootCmd(rootCmd, encodingConfig, tempApp)
 
-	// must needed as part of cosmos-sdk 0.50.x migration
+	// must need as part of cosmos-sdk 0.50.x migration
 	if err := autoCliOpts(initClientCtx, tempApp).EnhanceRootCommand(rootCmd); err != nil {
 		panic(err)
 	}
@@ -110,14 +119,13 @@ func initCometBftConfig() *tmcfg.Config {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, tempApp *app.OmniFlixApp) {
-	ac := appCreator{encodingConfig}
+	cfg := sdk.GetConfig()
+	cfg.Seal()
 
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(tempApp.ModuleBasics, tempApp.DefaultNodeHome),
+		//genutilcli.InitCmd(),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		addDebugCommands(debug.Cmd()),
-		config.Cmd(),
-		pruning.PruningCmd(ac.newApp),
 	)
 
 	a := appCreator{encodingConfig}
@@ -125,12 +133,14 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, t
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
-		rpc.StatusCommand(),
+		server.StatusCommand(),
 		genesisCommand(encodingConfig),
 		queryCommand(),
 		txCommand(),
-		keys.Commands(app.DefaultNodeHome),
+		keys.Commands(),
 	)
+	// add rosetta
+	rootCmd.AddCommand(rosettaCmd.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Marshaler))
 }
 
 func addModuleInitFlags(startCmd *cobra.Command) {
@@ -158,9 +168,8 @@ func queryCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		authcmd.GetAccountCmd(),
 		rpc.ValidatorCommand(),
-		rpc.BlockCommand(),
+		server.QueryBlockCmd(),
 		authcmd.QueryTxsByEventsCmd(),
 		authcmd.QueryTxCmd(),
 	)
@@ -189,8 +198,6 @@ func txCommand() *cobra.Command {
 		authcmd.GetBroadcastCommand(),
 		authcmd.GetEncodeCommand(),
 		authcmd.GetDecodeCommand(),
-		vestingcli.GetTxCmd(),
-		authcmd.GetAuxToFeeCommand(),
 	)
 
 	app.ModuleBasics.AddTxCommands(cmd)
@@ -287,7 +294,7 @@ func (a appCreator) appExport(
 }
 
 func autoCliOpts(initClientCtx client.Context, tempApp *app.OmniFlixApp) autocli.AppOptions {
-	modules := make(map[string]appmodule.AppModule, 0)
+	modules := make(map[string]appmodule.AppModule)
 	for _, m := range tempApp.ModuleManager().Modules {
 		if moduleWithName, ok := m.(module.HasName); ok {
 			moduleName := moduleWithName.Name()
