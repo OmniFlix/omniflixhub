@@ -4,18 +4,19 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"cosmossdk.io/log"
+	"cosmossdk.io/store/streaming"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/OmniFlix/omniflixhub/v5/x/ics721nft"
 	nfttransfer "github.com/bianjieai/nft-transfer"
-	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	"github.com/cosmos/cosmos-sdk/store/streaming"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	icq "github.com/cosmos/ibc-apps/modules/async-icq/v8"
 	icqkeeper "github.com/cosmos/ibc-apps/modules/async-icq/v8/keeper"
@@ -31,8 +32,8 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
-	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
+	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
+	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 
 	consensusparamkeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
 	consensusparamtypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
@@ -43,11 +44,11 @@ import (
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 
-	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
-	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
+	evidencekeeper "cosmossdk.io/x/evidence/keeper"
+	evidencetypes "cosmossdk.io/x/evidence/types"
 
-	"github.com/cosmos/cosmos-sdk/x/feegrant"
-	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
+	"cosmossdk.io/x/feegrant"
+	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -76,9 +77,9 @@ import (
 	tokenfactorykeeper "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/keeper"
 	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
 
-	"github.com/cosmos/cosmos-sdk/x/upgrade"
-	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"cosmossdk.io/x/upgrade"
+	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 
 	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
@@ -96,9 +97,9 @@ import (
 	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/keeper"
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
 
-	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7"
-	ibchookskeeper "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/keeper"
-	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/types"
+	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8"
+	ibchookskeeper "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8/keeper"
+	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8/types"
 
 	allockeeper "github.com/OmniFlix/omniflixhub/v5/x/alloc/keeper"
 	alloctypes "github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
@@ -222,7 +223,7 @@ func NewAppKeeper(
 	// set the BaseApp's parameter store
 	appKeepers.ConsensusParamsKeeper = consensusparamkeeper.NewKeeper(
 		appCodec,
-		keys[consensusparamtypes.StoreKey],
+		runtime.NewKVStoreService(keys[consensusparamtypes.StoreKey]),
 		govModAddress,
 	)
 	bApp.SetParamStore(&appKeepers.ConsensusParamsKeeper)
@@ -239,7 +240,7 @@ func NewAppKeeper(
 
 	appKeepers.CrisisKeeper = crisiskeeper.NewKeeper(
 		appCodec,
-		keys[crisistypes.StoreKey],
+		runtime.NewKVStoreService(keys[crisistypes.StoreKey]),
 		invCheckPeriod,
 		appKeepers.BankKeeper,
 		authtypes.FeeCollectorName,
@@ -248,7 +249,7 @@ func NewAppKeeper(
 	Bech32AccountAddrPrefix := "omniflix"
 	appKeepers.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec,
-		keys[authtypes.StoreKey],
+		runtime.NewKVStoreService(keys[authtypes.StoreKey]),
 		authtypes.ProtoBaseAccount,
 		maccPerms,
 		Bech32AccountAddrPrefix,
@@ -256,20 +257,21 @@ func NewAppKeeper(
 	)
 	appKeepers.BankKeeper = bankkeeper.NewBaseKeeper(
 		appCodec,
-		keys[banktypes.StoreKey],
+		runtime.NewKVStoreService(keys[banktypes.StoreKey]),
 		appKeepers.AccountKeeper,
 		blockedAddress,
 		govModAddress,
+		logger,
 	)
 	appKeepers.AuthzKeeper = authzkeeper.NewKeeper(
-		keys[authzkeeper.StoreKey],
+		runtime.NewKVStoreService(keys[authzkeeper.StoreKey]),
 		appCodec,
 		bApp.MsgServiceRouter(),
 		appKeepers.AccountKeeper,
 	)
 	appKeepers.FeeGrantKeeper = feegrantkeeper.NewKeeper(
 		appCodec,
-		keys[feegrant.StoreKey],
+		runtime.NewKVStoreService(keys[feegrant.StoreKey]),
 		appKeepers.AccountKeeper,
 	)
 
@@ -282,7 +284,7 @@ func NewAppKeeper(
 	)
 	appKeepers.MintKeeper = mintkeeper.NewKeeper(
 		appCodec,
-		keys[minttypes.StoreKey],
+		runtime.NewKVStoreService(keys[minttypes.StoreKey]),
 		appKeepers.StakingKeeper,
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
@@ -291,7 +293,7 @@ func NewAppKeeper(
 	)
 	appKeepers.DistrKeeper = distrkeeper.NewKeeper(
 		appCodec,
-		keys[distrtypes.StoreKey],
+		runtime.NewKVStoreService(keys[distrtypes.StoreKey]),
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		appKeepers.StakingKeeper,
@@ -301,7 +303,7 @@ func NewAppKeeper(
 	appKeepers.SlashingKeeper = slashingkeeper.NewKeeper(
 		appCodec,
 		legacyAmino,
-		keys[slashingtypes.StoreKey],
+		runtime.NewKVStoreService(keys[slashingtypes.StoreKey]),
 		appKeepers.StakingKeeper,
 		govModAddress,
 	)
@@ -317,7 +319,7 @@ func NewAppKeeper(
 
 	appKeepers.UpgradeKeeper = upgradekeeper.NewKeeper(
 		skipUpgradeHeights,
-		appKeepers.keys[upgradetypes.StoreKey],
+		runtime.NewKVStoreService(appKeepers.keys[upgradetypes.StoreKey]),
 		appCodec,
 		homePath,
 		bApp,
@@ -337,7 +339,7 @@ func NewAppKeeper(
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec,
-		keys[evidencetypes.StoreKey],
+		runtime.NewKVStoreService(keys[evidencetypes.StoreKey]),
 		appKeepers.StakingKeeper,
 		appKeepers.SlashingKeeper,
 	)
@@ -360,7 +362,7 @@ func NewAppKeeper(
 
 	govKeeper := govkeeper.NewKeeper(
 		appCodec,
-		keys[govtypes.StoreKey],
+		runtime.NewKVStoreService(keys[govtypes.StoreKey]),
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		appKeepers.StakingKeeper,
@@ -550,7 +552,7 @@ func NewAppKeeper(
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.
 		AddRoute(ibctransfertypes.ModuleName, ibcTransferStack).
-		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
+		AddRoutte(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(icqtypes.ModuleName, icqModule).
 		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule)
 

@@ -1,9 +1,9 @@
 package v3
 
 import (
+	store "cosmossdk.io/store/types"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
-	store "github.com/cosmos/cosmos-sdk/store/types"
 )
 
 const UpgradeName = "v3"

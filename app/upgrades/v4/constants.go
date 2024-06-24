@@ -1,9 +1,9 @@
 package v4
 
 import (
+	store "cosmossdk.io/store/types"
 	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
-	store "github.com/cosmos/cosmos-sdk/store/types"
-	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/types"
+	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8/types"
 )
 
 const UpgradeName = "v4"

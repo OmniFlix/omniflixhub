@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"github.com/cosmos/cosmos-sdk/x/nft"
+	"cosmossdk.io/x/nft"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

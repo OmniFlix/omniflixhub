@@ -12,6 +12,7 @@ import (
 
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
+	"cosmossdk.io/log"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/OmniFlix/omniflixhub/v5/app/openapiconsole"
 	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
@@ -19,12 +20,11 @@ import (
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	tmjson "github.com/cometbft/cometbft/libs/json"
-	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/grpc/cmtservice"
 	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
-	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -42,14 +42,13 @@ import (
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	"github.com/spf13/cast"
 
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibcclientclient "github.com/cosmos/ibc-go/v8/modules/core/02-client/client"
 	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	ibcchanneltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/OmniFlix/omniflixhub/v5/app/keepers"
 	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
 	v012 "github.com/OmniFlix/omniflixhub/v5/app/upgrades/v012"
@@ -57,7 +56,6 @@ import (
 	v2_1 "github.com/OmniFlix/omniflixhub/v5/app/upgrades/v2.1"
 	v3 "github.com/OmniFlix/omniflixhub/v5/app/upgrades/v3"
 	v4 "github.com/OmniFlix/omniflixhub/v5/app/upgrades/v4"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
 const Name = "omniflixhub"
@@ -76,13 +74,7 @@ var (
 
 func getGovProposalHandlers() []govclient.ProposalHandler {
 	var govProposalHandlers []govclient.ProposalHandler
-	govProposalHandlers = append(govProposalHandlers,
-		paramsclient.ProposalHandler,
-		upgradeclient.LegacyProposalHandler,
-		upgradeclient.LegacyCancelProposalHandler,
-		ibcclientclient.UpdateClientProposalHandler,
-		ibcclientclient.UpgradeProposalHandler,
-	)
+	govProposalHandlers = append(govProposalHandlers, paramsclient.ProposalHandler)
 
 	return govProposalHandlers
 }
@@ -186,6 +178,8 @@ func NewOmniFlixApp(
 
 	app.mm = module.NewManager(appModules(app, encodingConfig, skipGenesisInvariants)...)
 
+	// part of sdk v0.50.x migration
+	app.mm.SetOrderPreBlockers(upgradetypes.ModuleName)
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so to keep the
 	// CanWithdrawInvariant invariant.
@@ -200,6 +194,9 @@ func NewOmniFlixApp(
 	// so that other modules that want to create or claim capabilities afterwards in InitChain
 	// can do so safely.
 	app.mm.SetOrderInitGenesis(orderInitGenesis()...)
+
+	// part of sdk v0.50.x migration
+	app.SetPreBlocker(app.PreBlocker)
 
 	app.mm.RegisterInvariants(app.CrisisKeeper)
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
@@ -273,6 +270,11 @@ func NewOmniFlixApp(
 
 // Name returns the name of the App
 func (app *OmniFlixApp) Name() string { return app.BaseApp.Name() }
+
+// PreBlocker application updates before begin of the block
+func (app *SimApp) PreBlocker(ctx sdk.Context, req *abci.RequestFinalizeBlock) (*sdk.ResponsePreBlock, error) {
+	return app.ModuleManager.PreBlock(ctx, req)
+}
 
 // BeginBlocker application updates every begin block
 func (app *OmniFlixApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
@@ -354,7 +356,7 @@ func (app *OmniFlixApp) RegisterAPIRoutes(apiSvr *api.Server, _ config.APIConfig
 	// Register new tx routes from grpc-gateway.
 	authtx.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	// Register new tendermint queries routes from grpc-gateway.
-	tmservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
+	cmtservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
 	// Register legacy and grpc-gateway routes for all modules.
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
@@ -378,7 +380,7 @@ func (app *OmniFlixApp) SimulationManager() *module.SimulationManager {
 
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *OmniFlixApp) RegisterTendermintService(clientCtx client.Context) {
-	tmservice.RegisterTendermintService(
+	cmtservice.RegisterTendermintService(
 		clientCtx,
 		app.BaseApp.GRPCQueryRouter(),
 		app.interfaceRegistry,

@@ -1,6 +1,7 @@
 package v2
 
 import (
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/OmniFlix/omniflixhub/v5/app/keepers"
 	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
 	alloctypes "github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
@@ -22,7 +23,6 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
 	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"

@@ -9,23 +9,31 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/pruning"
+	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/OmniFlix/omniflixhub/v5/app"
 	"github.com/OmniFlix/omniflixhub/v5/app/params"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 
+	"cosmossdk.io/client/v2/autocli"
+	"cosmossdk.io/core/appmodule"
+	"cosmossdk.io/log"
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	dbm "github.com/cometbft/cometbft-db"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
-	"github.com/cometbft/cometbft/libs/log"
+	cosmosdb "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
+	runtimeservices "github.com/cosmos/cosmos-sdk/runtime/services"
 	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	vestingcli "github.com/cosmos/cosmos-sdk/x/auth/vesting/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
@@ -54,6 +62,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithHomeDir(app.DefaultNodeHome).
 		WithViper("")
 
+	tempApp := app.NewOmniFlixApp(log.NewNopLogger(), cosmosdb.Ne(), nil, true, map[int64]bool{}, app.DefaultNodeHome, 5, app.EmptyAppOptions{}, app.EmptyWasmOpts, baseapp.SetChainID("omniflixhub-1"))
 	rootCmd := &cobra.Command{
 		Use:   app.Name + "d",
 		Short: "OmniFlix Hub App",
@@ -73,19 +82,24 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 				return err
 			}
 			appTemplate, appConfig := initAppConfig()
-			customTMConfig := initTendermintConfig()
+			customTMConfig := initCometBftConfig()
 			return server.InterceptConfigsPreRunHandler(cmd, appTemplate, appConfig, customTMConfig)
 		},
 	}
 
 	initRootCmd(rootCmd, encodingConfig)
 
+	// must needed as part of cosmos-sdk 0.50.x migration
+	if err := autoCliOpts(initClientCtx, tempApp).EnhanceRootCommand(rootCmd); err != nil {
+		panic(err)
+	}
+
 	return rootCmd, encodingConfig
 }
 
-// initTendermintConfig helps to override default Tendermint Config values.
+// initCometBftConfig helps to override default CometBft Config values.
 // return tmcfg.DefaultConfig if no custom configuration is required for the application.
-func initTendermintConfig() *tmcfg.Config {
+func initCometBftConfig() *tmcfg.Config {
 	cfg := tmcfg.DefaultConfig()
 
 	// these values put a higher strain on node memory
@@ -95,11 +109,11 @@ func initTendermintConfig() *tmcfg.Config {
 	return cfg
 }
 
-func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
+func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, tempApp *app.OmniFlixApp) {
 	ac := appCreator{encodingConfig}
 
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
+		genutilcli.InitCmd(tempApp.ModuleBasics, tempApp.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		addDebugCommands(debug.Cmd()),
 		config.Cmd(),
@@ -270,4 +284,25 @@ func (a appCreator) appExport(
 	}
 
 	return anApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
+}
+
+func autoCliOpts(initClientCtx client.Context, tempApp *app.OmniFlixApp) autocli.AppOptions {
+	modules := make(map[string]appmodule.AppModule, 0)
+	for _, m := range tempApp.ModuleManager().Modules {
+		if moduleWithName, ok := m.(module.HasName); ok {
+			moduleName := moduleWithName.Name()
+			if appModule, ok := moduleWithName.(appmodule.AppModule); ok {
+				modules[moduleName] = appModule
+			}
+		}
+	}
+
+	return autocli.AppOptions{
+		Modules:               modules,
+		ModuleOptions:         runtimeservices.ExtractAutoCLIOptions(tempApp.ModuleManager().Modules),
+		AddressCodec:          authcodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
+		ValidatorAddressCodec: authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix()),
+		ConsensusAddressCodec: authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix()),
+		ClientCtx:             initClientCtx,
+	}
 }

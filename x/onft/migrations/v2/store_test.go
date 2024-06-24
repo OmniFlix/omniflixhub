@@ -8,12 +8,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	storetypes "cosmossdk.io/store/types"
 	"github.com/OmniFlix/omniflixhub/v5/app/apptesting"
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/keeper"
 	v2 "github.com/OmniFlix/omniflixhub/v5/x/onft/migrations/v2"
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
 )

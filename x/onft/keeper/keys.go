@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
+	nftkeeper "cosmossdk.io/x/nft/keeper"
 )
 
 func classStoreKey(classID string) []byte {

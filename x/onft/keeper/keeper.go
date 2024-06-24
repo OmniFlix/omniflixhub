@@ -5,13 +5,13 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 
-	"github.com/cometbft/cometbft/libs/log"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	"cosmossdk.io/log"
+	storetypes "cosmossdk.io/store/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
+	nftkeeper "cosmossdk.io/x/nft/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 )

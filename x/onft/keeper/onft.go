@@ -4,11 +4,11 @@ import (
 	"time"
 
 	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/x/nft"
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/exported"
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/nft"
 )
 
 func (k Keeper) MintONFT(

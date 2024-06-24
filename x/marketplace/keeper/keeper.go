@@ -9,10 +9,10 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	storetypes "cosmossdk.io/store/types"
 
+	"cosmossdk.io/log"
 	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
-	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
