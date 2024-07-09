@@ -2,17 +2,16 @@ package keepers
 
 import (
 	"fmt"
+	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
 	"path/filepath"
 
 	"cosmossdk.io/log"
-	"cosmossdk.io/store/streaming"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/OmniFlix/omniflixhub/v5/x/ics721nft"
 	nfttransfer "github.com/bianjieai/nft-transfer"
-	tmos "github.com/cometbft/cometbft/libs/os"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -77,15 +76,12 @@ import (
 	tokenfactorykeeper "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/keeper"
 	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
 
-	"cosmossdk.io/x/upgrade"
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 
 	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibcclient "github.com/cosmos/ibc-go/v8/modules/core/02-client"
-	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
@@ -203,14 +199,6 @@ func NewAppKeeper(
 	keys := appKeepers.GetKVStoreKey()
 	tkeys := appKeepers.GetTransientStoreKey()
 
-	/*
-		configure state listening capabilities using AppOptions
-		we are doing nothing with the returned streamingServices and waitGroup in this case
-	*/
-	if _, _, err := streaming.LoadStreamingServices(bApp, appOpts, appCodec, logger, appKeepers.keys); err != nil {
-		tmos.Exit(err.Error())
-	}
-
 	appKeepers.ParamsKeeper = initParamsKeeper(
 		appCodec,
 		legacyAmino,
@@ -225,8 +213,9 @@ func NewAppKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[consensusparamtypes.StoreKey]),
 		govModAddress,
+		runtime.EventService{},
 	)
-	bApp.SetParamStore(&appKeepers.ConsensusParamsKeeper)
+	bApp.SetParamStore(&appKeepers.ConsensusParamsKeeper.ParamsStore)
 
 	// add capability keeper and ScopeToModule for ibc module
 	appKeepers.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, appKeepers.keys[capabilitytypes.StoreKey], appKeepers.memKeys[capabilitytypes.MemStoreKey])
@@ -245,6 +234,7 @@ func NewAppKeeper(
 		appKeepers.BankKeeper,
 		authtypes.FeeCollectorName,
 		govModAddress,
+		addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
 	)
 	Bech32AccountAddrPrefix := "omniflix"
 	appKeepers.AccountKeeper = authkeeper.NewAccountKeeper(
@@ -252,6 +242,7 @@ func NewAppKeeper(
 		runtime.NewKVStoreService(keys[authtypes.StoreKey]),
 		authtypes.ProtoBaseAccount,
 		maccPerms,
+		addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
 		Bech32AccountAddrPrefix,
 		govModAddress,
 	)
@@ -277,10 +268,12 @@ func NewAppKeeper(
 
 	appKeepers.StakingKeeper = stakingkeeper.NewKeeper(
 		appCodec,
-		keys[stakingtypes.StoreKey],
+		runtime.NewKVStoreService(keys[stakingtypes.StoreKey]),
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		govModAddress,
+		addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
+		addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
 	)
 	appKeepers.MintKeeper = mintkeeper.NewKeeper(
 		appCodec,
@@ -334,6 +327,7 @@ func NewAppKeeper(
 		appKeepers.StakingKeeper,
 		appKeepers.UpgradeKeeper,
 		appKeepers.ScopedIBCKeeper,
+		govModAddress,
 	)
 
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
@@ -342,6 +336,8 @@ func NewAppKeeper(
 		runtime.NewKVStoreService(keys[evidencetypes.StoreKey]),
 		appKeepers.StakingKeeper,
 		appKeepers.SlashingKeeper,
+		addresscodec.NewBech32Codec(sdk.Bech32PrefixAccAddr),
+		runtime.ProvideCometInfoService(),
 	)
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	appKeepers.EvidenceKeeper = *evidenceKeeper
@@ -353,9 +349,11 @@ func NewAppKeeper(
 	govRouter := govv1beta1.NewRouter()
 	govRouter.
 		AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
-		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(appKeepers.ParamsKeeper)).
-		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(appKeepers.UpgradeKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper))
+		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(appKeepers.ParamsKeeper))
+	// UNFORKING v5
+	// Also verify that NewSoftwareUpgradeProposalHandler is okay to remove here, as it should be done with new v1 gov props
+	//AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(appKeepers.UpgradeKeeper)).
+	//AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper))
 
 	govConfig := govtypes.DefaultConfig()
 	govConfig.MaxMetadataLen = 10200
@@ -366,6 +364,7 @@ func NewAppKeeper(
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		appKeepers.StakingKeeper,
+		appKeepers.DistrKeeper,
 		bApp.MsgServiceRouter(),
 		govConfig,
 		govModAddress,
@@ -419,10 +418,11 @@ func NewAppKeeper(
 		appKeepers.GetSubspace(ibctransfertypes.ModuleName),
 		&appKeepers.HooksICS4Wrapper,
 		appKeepers.IBCKeeper.ChannelKeeper,
-		&appKeepers.IBCKeeper.PortKeeper,
+		appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		appKeepers.ScopedTransferKeeper,
+		govModAddress,
 	)
 	// Set TransferKeeper reference in PacketForwardKeeper
 	appKeepers.PacketForwardKeeper.SetTransferKeeper(appKeepers.TransferKeeper)
@@ -433,10 +433,11 @@ func NewAppKeeper(
 		appKeepers.GetSubspace(icahosttypes.SubModuleName),
 		nil,
 		appKeepers.IBCKeeper.ChannelKeeper,
-		&appKeepers.IBCKeeper.PortKeeper,
+		appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.AccountKeeper,
 		appKeepers.ScopedICAHostKeeper,
 		bApp.MsgServiceRouter(),
+		govModAddress,
 	)
 	icaHostIBCModule := icahost.NewIBCModule(appKeepers.ICAHostKeeper)
 
@@ -446,7 +447,7 @@ func NewAppKeeper(
 		appKeepers.keys[icqtypes.StoreKey],
 		appKeepers.IBCKeeper.ChannelKeeper, // may be replaced with middleware
 		appKeepers.IBCKeeper.ChannelKeeper,
-		&appKeepers.IBCKeeper.PortKeeper,
+		appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.ScopedICQKeeper,
 		bApp.GRPCQueryRouter(),
 		govModAddress,
@@ -497,7 +498,7 @@ func NewAppKeeper(
 		govModAddress,
 		appKeepers.HooksICS4Wrapper,
 		appKeepers.IBCKeeper.ChannelKeeper,
-		&appKeepers.IBCKeeper.PortKeeper,
+		appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.AccountKeeper,
 		ics721nft.NewKeeper(appCodec, appKeepers.ONFTKeeper, appKeepers.AccountKeeper, appKeepers.BankKeeper),
 		appKeepers.ScopedNFTTransferKeeper,
@@ -552,7 +553,7 @@ func NewAppKeeper(
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.
 		AddRoute(ibctransfertypes.ModuleName, ibcTransferStack).
-		AddRoutte(icahosttypes.SubModuleName, icaHostIBCModule).
+		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(icqtypes.ModuleName, icqModule).
 		AddRoute(ibcnfttransfertypes.ModuleName, nfttransferIBCModule)
 
@@ -581,14 +582,14 @@ func NewAppKeeper(
 
 	appKeepers.WasmKeeper = wasmkeeper.NewKeeper(
 		appCodec,
-		keys[wasmtypes.StoreKey],
+		runtime.NewKVStoreService(keys[wasmtypes.StoreKey]),
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		appKeepers.StakingKeeper,
 		distrkeeper.NewQuerier(appKeepers.DistrKeeper),
 		&appKeepers.HooksICS4Wrapper,
 		appKeepers.IBCKeeper.ChannelKeeper,
-		&appKeepers.IBCKeeper.PortKeeper,
+		appKeepers.IBCKeeper.PortKeeper,
 		appKeepers.ScopedWasmKeeper,
 		appKeepers.TransferKeeper,
 		bApp.MsgServiceRouter(),

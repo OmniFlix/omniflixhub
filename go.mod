@@ -16,6 +16,7 @@ require (
 	cosmossdk.io/x/upgrade v0.1.1
 	github.com/CosmWasm/wasmd v0.51.0
 	github.com/CosmWasm/wasmvm/v2 v2.0.1
+	github.com/CosmWasm/wasmvm v1.5.2
 	github.com/OmniFlix/streampay/v2 v2.4.2-0.20240624143344-a9c6d8d9b959
 	github.com/bianjieai/nft-transfer v1.1.3-ibc-v7.3.0.0.20240604024247-74d40a1974c2
 	github.com/cometbft/cometbft v0.38.7

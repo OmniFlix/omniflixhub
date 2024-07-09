@@ -1,8 +1,6 @@
 package keepers
 
 import (
-	"strings"
-
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	itctypes "github.com/OmniFlix/omniflixhub/v5/x/itc/types"
 	marketplacetypes "github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
@@ -31,8 +29,8 @@ var wasmCapabilities = []string{
 	"token_factory",
 }
 
-func AcceptedStargateQueries() wasmkeeper.AcceptedStargateQueries {
-	return wasmkeeper.AcceptedStargateQueries{
+func AcceptedStargateQueries() wasmkeeper.AcceptedQueries {
+	return wasmkeeper.AcceptedQueries{
 		// ibc
 		"/ibc.core.client.v1.Query/ClientState":    &ibcclienttypes.QueryClientStateResponse{},
 		"/ibc.core.client.v1.Query/ConsensusState": &ibcclienttypes.QueryConsensusStateResponse{},
@@ -92,6 +90,6 @@ func AcceptedStargateQueries() wasmkeeper.AcceptedStargateQueries {
 	}
 }
 
-func GetWasmCapabilities() string {
-	return strings.Join(wasmCapabilities, ",")
+func GetWasmCapabilities() []string {
+	return wasmCapabilities
 }
