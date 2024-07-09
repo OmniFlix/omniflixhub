@@ -83,7 +83,7 @@ func TestInitExportGenesis(t *testing.T) {
 			src: `{"params":{"minimum_gas_prices":[{"denom":"ALX", "amount":"1"}],"bypass_min_fee_msg_types":[],"max_total_bypass_min_fee_msg_gas_usage":"0"}}`,
 			exp: types.GenesisState{
 				Params: types.Params{
-					MinimumGasPrices:                sdk.NewDecCoins(sdk.NewDecCoin("ALX", sdk.NewInt(1))),
+					MinimumGasPrices:                sdk.NewDecCoins(sdk.NewDecCoin("ALX", sdkmath.NewInt(1))),
 					BypassMinFeeMsgTypes:            []string{},
 					MaxTotalBypassMinFeeMsgGasUsage: uint64(0),
 				},
@@ -94,8 +94,8 @@ func TestInitExportGenesis(t *testing.T) {
 			exp: types.GenesisState{
 				Params: types.Params{
 					MinimumGasPrices: sdk.NewDecCoins(
-						sdk.NewDecCoin("ALX", sdk.NewInt(1)),
-						sdk.NewDecCoinFromDec("BLX", sdk.NewDecWithPrec(1, 3)),
+						sdk.NewDecCoin("ALX", sdkmath.NewInt(1)),
+						sdk.NewDecCoinFromDec("BLX", sdkmath.LegacyNewDecWithPrec(1, 3)),
 					),
 					BypassMinFeeMsgTypes:            []string{},
 					MaxTotalBypassMinFeeMsgGasUsage: uint64(0),
@@ -127,7 +127,7 @@ func TestInitExportGenesis(t *testing.T) {
 	}
 }
 
-func setupTestStore(t *testing.T) (sdk.Context, appparams.EncodingConfig, globalfeekeeper.Keeper) {
+func setupTestStore(t *testing.T) (context.Context, appparams.EncodingConfig, globalfeekeeper.Keeper) {
 	t.Helper()
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)

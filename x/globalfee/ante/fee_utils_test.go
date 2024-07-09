@@ -11,9 +11,9 @@ import (
 func TestContainZeroCoins(t *testing.T) {
 	zeroCoin1 := sdk.NewCoin("photon", sdk.ZeroInt())
 	zeroCoin2 := sdk.NewCoin("uflix", sdk.ZeroInt())
-	coin1 := sdk.NewCoin("photon", sdk.NewInt(1))
-	coin2 := sdk.NewCoin("uflix", sdk.NewInt(2))
-	coin3 := sdk.NewCoin("quark", sdk.NewInt(3))
+	coin1 := sdk.NewCoin("photon", sdkmath.NewInt(1))
+	coin2 := sdk.NewCoin("uflix", sdkmath.NewInt(2))
+	coin3 := sdk.NewCoin("quark", sdkmath.NewInt(3))
 	// coins must be valid !!!
 	coinsEmpty := sdk.Coins{}
 	coinsNonEmpty := sdk.Coins{coin1, coin2}
@@ -60,12 +60,12 @@ func TestCombinedFeeRequirement(t *testing.T) {
 	zeroCoin1 := sdk.NewCoin("photon", sdk.ZeroInt())
 	zeroCoin2 := sdk.NewCoin("stake", sdk.ZeroInt())
 	zeroCoin3 := sdk.NewCoin("quark", sdk.ZeroInt())
-	coin1 := sdk.NewCoin("photon", sdk.NewInt(1))
-	coin2 := sdk.NewCoin("stake", sdk.NewInt(2))
-	coin1High := sdk.NewCoin("photon", sdk.NewInt(10))
-	coin2High := sdk.NewCoin("stake", sdk.NewInt(20))
-	coinNewDenom1 := sdk.NewCoin("Newphoton", sdk.NewInt(1))
-	coinNewDenom2 := sdk.NewCoin("Newstake", sdk.NewInt(1))
+	coin1 := sdk.NewCoin("photon", sdkmath.NewInt(1))
+	coin2 := sdk.NewCoin("stake", sdkmath.NewInt(2))
+	coin1High := sdk.NewCoin("photon", sdkmath.NewInt(10))
+	coin2High := sdk.NewCoin("stake", sdkmath.NewInt(20))
+	coinNewDenom1 := sdk.NewCoin("Newphoton", sdkmath.NewInt(1))
+	coinNewDenom2 := sdk.NewCoin("Newstake", sdkmath.NewInt(1))
 	// coins must be valid !!! and sorted!!!
 	coinsEmpty := sdk.Coins{}
 	coinsNonEmpty := sdk.Coins{coin1, coin2}.Sort()
