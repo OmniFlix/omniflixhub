@@ -1,6 +1,7 @@
 package bindings_test
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"encoding/json"
 	"fmt"
 	"testing"
@@ -71,7 +72,7 @@ func TestMintMsg(t *testing.T) {
 	require.NoError(t, err)
 	sunDenom := fmt.Sprintf("factory/%s/%s", reflect.String(), msg.CreateDenom.Subdenom)
 
-	amount, ok := sdk.NewIntFromString("808010808")
+	amount, ok := sdkmath.NewIntFromString("808010808")
 	require.True(t, ok)
 	msg = bindings.TokenFactoryMsg{MintTokens: &bindings.MintTokens{
 		Denom:         sunDenom,
@@ -200,7 +201,7 @@ func TestForceTransfer(t *testing.T) {
 	require.NoError(t, err)
 	sunDenom := fmt.Sprintf("factory/%s/%s", reflect.String(), msg.CreateDenom.Subdenom)
 
-	amount, ok := sdk.NewIntFromString("808010808")
+	amount, ok := sdkmath.NewIntFromString("808010808")
 	require.True(t, ok)
 
 	// Mint new tokens to lucky
@@ -215,7 +216,7 @@ func TestForceTransfer(t *testing.T) {
 	// Force move 100 tokens from lucky to rcpt
 	msg = bindings.TokenFactoryMsg{ForceTransfer: &bindings.ForceTransfer{
 		Denom:       sunDenom,
-		Amount:      sdk.NewInt(100),
+		Amount:      sdkmath.NewInt(100),
 		FromAddress: lucky.String(),
 		ToAddress:   rcpt.String(),
 	}}
@@ -226,7 +227,7 @@ func TestForceTransfer(t *testing.T) {
 	balances = customApp.AppKeepers.BankKeeper.GetAllBalances(ctx, rcpt)
 	require.Len(t, balances, 1)
 	coin := balances[0]
-	require.Equal(t, sdk.NewInt(100), coin.Amount)
+	require.Equal(t, sdkmath.NewInt(100), coin.Amount)
 }
 
 func TestBurnMsg(t *testing.T) {
@@ -253,7 +254,7 @@ func TestBurnMsg(t *testing.T) {
 	require.NoError(t, err)
 	sunDenom := fmt.Sprintf("factory/%s/%s", reflect.String(), msg.CreateDenom.Subdenom)
 
-	amount, ok := sdk.NewIntFromString("808010809")
+	amount, ok := sdkmath.NewIntFromString("808010809")
 	require.True(t, ok)
 
 	msg = bindings.TokenFactoryMsg{MintTokens: &bindings.MintTokens{
@@ -265,7 +266,7 @@ func TestBurnMsg(t *testing.T) {
 	require.NoError(t, err)
 
 	// can burn from different address with burnFrom
-	amt, ok := sdk.NewIntFromString("1")
+	amt, ok := sdkmath.NewIntFromString("1")
 	require.True(t, ok)
 	msg = bindings.TokenFactoryMsg{BurnTokens: &bindings.BurnTokens{
 		Denom:           sunDenom,
@@ -282,7 +283,7 @@ func TestBurnMsg(t *testing.T) {
 
 	msg = bindings.TokenFactoryMsg{BurnTokens: &bindings.BurnTokens{
 		Denom:           sunDenom,
-		Amount:          amount.Abs().Sub(sdk.NewInt(1)),
+		Amount:          amount.Abs().Sub(sdkmath.NewInt(1)),
 		BurnFromAddress: reflect.String(),
 	}}
 	err = executeCustom(t, ctx, customApp, reflect, lucky, msg, sdk.Coin{})

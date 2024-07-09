@@ -1,17 +1,14 @@
 package bindings_test
 
 import (
-	"os"
-	"testing"
-	"time"
-
+	sdkmath "cosmossdk.io/math"
 	"github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/stretchr/testify/require"
+	"os"
+	"testing"
 
 	"github.com/cometbft/cometbft/crypto"
 	"github.com/cometbft/cometbft/crypto/ed25519"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/testutil"
 
@@ -22,15 +19,15 @@ func CreateTestInput(t *testing.T) (*app.OmniFlixApp, sdk.Context) {
 	t.Helper()
 
 	omniflix := app.Setup(t)
-	ctx := omniflix.BaseApp.NewContext(false, tmproto.Header{Height: 1, ChainID: "testing", Time: time.Now().UTC()})
+	ctx := omniflix.BaseApp.NewContext(false)
 	return omniflix, ctx
 }
 
 func FundAccount(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, acct sdk.AccAddress) {
 	t.Helper()
 
-	err := banktestutil.FundAccount(customApp.AppKeepers.BankKeeper, ctx, acct, sdk.NewCoins(
-		sdk.NewCoin("uflix", sdk.NewInt(10000000000)),
+	err := banktestutil.FundAccount(ctx, customApp.AppKeepers.BankKeeper, acct, sdk.NewCoins(
+		sdk.NewCoin("uflix", sdkmath.NewInt(10000000000)),
 	))
 	require.NoError(t, err)
 }
@@ -81,8 +78,8 @@ func fundAccount(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, addr
 	t.Helper()
 
 	err := banktestutil.FundAccount(
-		customApp.AppKeepers.BankKeeper,
 		ctx,
+		customApp.AppKeepers.BankKeeper,
 		addr,
 		coins,
 	)

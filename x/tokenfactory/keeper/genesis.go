@@ -8,7 +8,7 @@ import (
 
 // InitGenesis initializes the tokenfactory module's state from a provided genesis
 // state.
-func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
+func (k Keeper) InitGenesis(ctx context.Context, genState types.GenesisState) {
 	k.CreateModuleAccount(ctx)
 
 	if genState.Params.DenomCreationFee == nil {
@@ -35,7 +35,7 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 }
 
 // ExportGenesis returns the tokenfactory module's exported genesis.
-func (k Keeper) ExportGenesis(ctx sdk.Context) *types.GenesisState {
+func (k Keeper) ExportGenesis(ctx context.Context) *types.GenesisState {
 	genDenoms := []types.GenesisDenom{}
 	iterator := k.GetAllDenomsIterator(ctx)
 	defer iterator.Close()

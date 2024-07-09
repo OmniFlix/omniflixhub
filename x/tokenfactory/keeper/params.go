@@ -7,7 +7,7 @@ import (
 )
 
 // GetParams returns the total set params.
-func (k Keeper) GetParams(ctx sdk.Context) (p types.Params) {
+func (k Keeper) GetParams(ctx context.Context) (p types.Params) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.ParamsKey)
 	if bz == nil {
@@ -18,7 +18,7 @@ func (k Keeper) GetParams(ctx sdk.Context) (p types.Params) {
 }
 
 // SetParams sets the total set of params.
-func (k Keeper) SetParams(ctx sdk.Context, p types.Params) error {
+func (k Keeper) SetParams(ctx context.Context, p types.Params) error {
 	if err := p.Validate(); err != nil {
 		return err
 	}

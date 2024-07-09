@@ -9,7 +9,7 @@ import (
 )
 
 // GetAuthorityMetadata returns the authority metadata for a specific denom
-func (k Keeper) GetAuthorityMetadata(ctx sdk.Context, denom string) (types.DenomAuthorityMetadata, error) {
+func (k Keeper) GetAuthorityMetadata(ctx context.Context, denom string) (types.DenomAuthorityMetadata, error) {
 	bz := k.GetDenomPrefixStore(ctx, denom).Get([]byte(types.DenomAuthorityMetadataKey))
 
 	metadata := types.DenomAuthorityMetadata{}
@@ -21,7 +21,7 @@ func (k Keeper) GetAuthorityMetadata(ctx sdk.Context, denom string) (types.Denom
 }
 
 // setAuthorityMetadata stores authority metadata for a specific denom
-func (k Keeper) setAuthorityMetadata(ctx sdk.Context, denom string, metadata types.DenomAuthorityMetadata) error {
+func (k Keeper) setAuthorityMetadata(ctx context.Context, denom string, metadata types.DenomAuthorityMetadata) error {
 	err := metadata.Validate()
 	if err != nil {
 		return err
@@ -38,7 +38,7 @@ func (k Keeper) setAuthorityMetadata(ctx sdk.Context, denom string, metadata typ
 	return nil
 }
 
-func (k Keeper) setAdmin(ctx sdk.Context, denom string, admin string) error {
+func (k Keeper) setAdmin(ctx context.Context, denom string, admin string) error {
 	metadata, err := k.GetAuthorityMetadata(ctx, denom)
 	if err != nil {
 		return err

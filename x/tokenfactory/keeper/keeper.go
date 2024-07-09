@@ -7,11 +7,9 @@ import (
 
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
+	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-
-	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
 )
 
 type (
@@ -19,9 +17,9 @@ type (
 		cdc      codec.BinaryCodec
 		storeKey storetypes.StoreKey
 
-		accountKeeper       types.AccountKeeper
-		bankKeeper          types.BankKeeper
-		communityPoolKeeper types.CommunityPoolKeeper
+		accountKeeper types.AccountKeeper
+		bankKeeper    types.BankKeeper
+		distrKeeper   types.DistributionKeeper
 
 		enabledCapabilities []string
 
@@ -37,7 +35,7 @@ func NewKeeper(
 	storeKey storetypes.StoreKey,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
-	communityPoolKeeper types.CommunityPoolKeeper,
+	distrKeeper types.DistributionKeeper,
 	enabledCapabilities []string,
 	authority string,
 ) Keeper {
@@ -45,9 +43,9 @@ func NewKeeper(
 		cdc:      cdc,
 		storeKey: storeKey,
 
-		accountKeeper:       accountKeeper,
-		bankKeeper:          bankKeeper,
-		communityPoolKeeper: communityPoolKeeper,
+		accountKeeper: accountKeeper,
+		bankKeeper:    bankKeeper,
+		distrKeeper:   distrKeeper,
 
 		enabledCapabilities: enabledCapabilities,
 
@@ -61,24 +59,24 @@ func (k Keeper) GetAuthority() string {
 }
 
 // Logger returns a logger for the x/tokenfactory module
-func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+func (k Keeper) Logger(ctx context.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
 // GetDenomPrefixStore returns the substore for a specific denom
-func (k Keeper) GetDenomPrefixStore(ctx sdk.Context, denom string) sdk.KVStore {
+func (k Keeper) GetDenomPrefixStore(ctx context.Context, denom string) storetypes.KVStore {
 	store := ctx.KVStore(k.storeKey)
 	return prefix.NewStore(store, types.GetDenomPrefixStore(denom))
 }
 
 // GetCreatorPrefixStore returns the substore for a specific creator address
-func (k Keeper) GetCreatorPrefixStore(ctx sdk.Context, creator string) sdk.KVStore {
+func (k Keeper) GetCreatorPrefixStore(ctx context.Context, creator string) storetypes.KVStore {
 	store := ctx.KVStore(k.storeKey)
 	return prefix.NewStore(store, types.GetCreatorPrefix(creator))
 }
 
 // GetCreatorsPrefixStore returns the substore that contains a list of creators
-func (k Keeper) GetCreatorsPrefixStore(ctx sdk.Context) sdk.KVStore {
+func (k Keeper) GetCreatorsPrefixStore(ctx context.Context) storetypes.KVStore {
 	store := ctx.KVStore(k.storeKey)
 	return prefix.NewStore(store, types.GetCreatorsPrefix())
 }
@@ -87,7 +85,6 @@ func (k Keeper) GetCreatorsPrefixStore(ctx sdk.Context) sdk.KVStore {
 // This account isn't intended to store any coins,
 // it purely mints and burns them on behalf of the admin of respective denoms,
 // and sends to the relevant address.
-func (k Keeper) CreateModuleAccount(ctx sdk.Context) {
-	moduleAcc := authtypes.NewEmptyModuleAccount(types.ModuleName, authtypes.Minter, authtypes.Burner)
-	k.accountKeeper.SetModuleAccount(ctx, moduleAcc)
+func (k Keeper) CreateModuleAccount(ctx context.Context) {
+	k.accountKeeper.GetModuleAccount(ctx, types.ModuleName)
 }

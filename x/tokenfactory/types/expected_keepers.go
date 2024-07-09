@@ -28,7 +28,7 @@ type AccountKeeper interface {
 	GetModuleAccount(ctx context.Context, moduleName string) sdk.ModuleAccountI
 }
 
-// CommunityPoolKeeper defines the contract needed to be fulfilled for community pool interactions.
-type CommunityPoolKeeper interface {
-	FundCommunityPool(ctx sdk.Context, amount sdk.Coins, sender sdk.AccAddress) error
+// DistributionKeeper defines the contract needed to be fulfilled for community pool interactions.
+type DistributionKeeper interface {
+	FundCommunityPool(ctx context.Context, amount sdk.Coins, sender sdk.AccAddress) error
 }

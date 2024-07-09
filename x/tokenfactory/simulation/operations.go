@@ -25,16 +25,16 @@ const (
 )
 
 type TokenfactoryKeeper interface {
-	GetParams(ctx sdk.Context) (params types.Params)
-	GetAuthorityMetadata(ctx sdk.Context, denom string) (types.DenomAuthorityMetadata, error)
-	GetAllDenomsIterator(ctx sdk.Context) sdk.Iterator
-	GetDenomsFromCreator(ctx sdk.Context, creator string) []string
+	GetParams(ctx context.Context) (params types.Params)
+	GetAuthorityMetadata(ctx context.Context, denom string) (types.DenomAuthorityMetadata, error)
+	GetAllDenomsIterator(ctx context.Context) sdk.Iterator
+	GetDenomsFromCreator(ctx context.Context, creator string) []string
 }
 
 type BankKeeper interface {
 	simulation.BankKeeper
-	GetAllBalances(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
-	GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin
+	GetAllBalances(ctx context.Context, addr sdk.AccAddress) sdk.Coins
+	GetBalance(ctx context.Context, addr sdk.AccAddress, denom string) sdk.Coin
 }
 
 func WeightedOperations(
@@ -131,9 +131,9 @@ func WeightedOperations(
 	}
 }
 
-type DenomSelector = func(*rand.Rand, sdk.Context, TokenfactoryKeeper, string) (string, bool)
+type DenomSelector = func(*rand.Rand, context.Context, TokenfactoryKeeper, string) (string, bool)
 
-func DefaultSimulationDenomSelector(r *rand.Rand, ctx sdk.Context, tfKeeper TokenfactoryKeeper, creator string) (string, bool) {
+func DefaultSimulationDenomSelector(r *rand.Rand, ctx context.Context, tfKeeper TokenfactoryKeeper, creator string) (string, bool) {
 	denoms := tfKeeper.GetDenomsFromCreator(ctx, creator)
 	if len(denoms) == 0 {
 		return "", false
@@ -152,7 +152,7 @@ func SimulateMsgSetDenomMetadata(
 	return func(
 		r *rand.Rand,
 		app *baseapp.BaseApp,
-		ctx sdk.Context,
+		ctx context.Context,
 		accs []simtypes.Account,
 		chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
@@ -206,7 +206,7 @@ func SimulateMsgChangeAdmin(
 	return func(
 		r *rand.Rand,
 		app *baseapp.BaseApp,
-		ctx sdk.Context,
+		ctx context.Context,
 		accs []simtypes.Account,
 		chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
@@ -256,7 +256,7 @@ func SimulateMsgBurn(
 	return func(
 		r *rand.Rand,
 		app *baseapp.BaseApp,
-		ctx sdk.Context,
+		ctx context.Context,
 		accs []simtypes.Account,
 		chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
@@ -310,7 +310,7 @@ func SimulateMsgMint(
 	return func(
 		r *rand.Rand,
 		app *baseapp.BaseApp,
-		ctx sdk.Context,
+		ctx context.Context,
 		accs []simtypes.Account,
 		chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
@@ -352,7 +352,7 @@ func SimulateMsgCreateDenom(tfKeeper TokenfactoryKeeper, ak types.AccountKeeper,
 	return func(
 		r *rand.Rand,
 		app *baseapp.BaseApp,
-		ctx sdk.Context,
+		ctx context.Context,
 		accs []simtypes.Account,
 		chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
@@ -382,7 +382,7 @@ func SimulateMsgCreateDenom(tfKeeper TokenfactoryKeeper, ak types.AccountKeeper,
 func BuildOperationInput(
 	r *rand.Rand,
 	app *baseapp.BaseApp,
-	ctx sdk.Context,
+	ctx context.Context,
 	msg interface {
 		sdk.Msg
 		Type() string

@@ -181,7 +181,7 @@ func (AppModule) ConsensusVersion() uint64 {
 // // GenerateGenesisState creates a randomized GenState of the tokenfactory module.
 // func (am AppModule) SimulatorGenesisState(simState *module.SimulationState, s *simtypes.SimCtx) {
 // 	tfDefaultGen := types.DefaultGenesis()
-// 	tfDefaultGen.Params.DenomCreationFee = sdk.NewCoins(sdk.NewCoin(appparams.BondDenom, sdk.NewInt(10000000)))
+// 	tfDefaultGen.Params.DenomCreationFee = sdk.NewCoins(sdk.NewCoin(appparams.BondDenom, sdkmath.NewInt(10000000)))
 // 	tfDefaultGenJson := simState.Cdc.MustMarshalJSON(tfDefaultGen)
 // 	simState.GenState[types.ModuleName] = tfDefaultGenJson
 // }

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
+	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	bindingstypes "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/bindings/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
