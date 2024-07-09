@@ -26,9 +26,9 @@ type BankKeeper interface {
 
 // NftKeeper methods imported from nft should be defined here
 type NftKeeper interface {
-	GetONFT(ctx context.Context, denomId, onftId string) (nft nft.ONFTI, err error)
-	GetDenomInfo(ctx context.Context, denomId string) (*nftypes.Denom, error)
-	TransferOwnership(ctx context.Context, denomId, nftId string, srcOwner, dstOwner sdk.AccAddress) error
+	GetONFT(ctx sdk.Context, denomId, onftId string) (nft nft.ONFTI, err error)
+	GetDenomInfo(ctx sdk.Context, denomId string) (*nftypes.Denom, error)
+	TransferOwnership(ctx sdk.Context, denomId, nftId string, srcOwner, dstOwner sdk.AccAddress) error
 }
 
 // DistributionKeeper defines the expected distribution keeper

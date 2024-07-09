@@ -1,13 +1,12 @@
 package simulation
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"encoding/json"
 	"fmt"
 	"math/rand"
 	"strings"
 	"time"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
@@ -98,6 +97,6 @@ func RandMetadata(r *rand.Rand) types.Metadata {
 	}
 }
 
-func RandRoyaltyShare(r *rand.Rand) sdk.Dec {
+func RandRoyaltyShare(r *rand.Rand) sdkmath.LegacyDec {
 	return simtypes.RandomDecAmount(r, sdkmath.LegacyNewDecWithPrec(999999999999999999, 18))
 }

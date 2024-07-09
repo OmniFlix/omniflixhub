@@ -1,6 +1,7 @@
 package types
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"time"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/exported"
@@ -13,7 +14,7 @@ var (
 	_ exported.AuctionListingI = &AuctionListing{}
 )
 
-func NewAuctionListing(id uint64, nftId, denomId string, startTime time.Time, endTime *time.Time, startPrice sdk.Coin, incrementPercentage sdk.Dec,
+func NewAuctionListing(id uint64, nftId, denomId string, startTime time.Time, endTime *time.Time, startPrice sdk.Coin, incrementPercentage sdkmath.LegacyDec,
 	owner sdk.AccAddress, whitelistAccounts []string, splitShares []WeightedAddress,
 ) AuctionListing {
 	return AuctionListing{
@@ -50,7 +51,7 @@ func (al AuctionListing) GetStartPrice() sdk.Coin {
 	return al.StartPrice
 }
 
-func (al AuctionListing) GetIncrementPercentage() sdk.Dec {
+func (al AuctionListing) GetIncrementPercentage() sdkmath.LegacyDec {
 	return al.IncrementPercentage
 }
 

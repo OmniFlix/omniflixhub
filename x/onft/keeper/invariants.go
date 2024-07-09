@@ -14,7 +14,7 @@ func RegisterInvariants(ir sdk.InvariantRegistry, k Keeper) {
 
 // SupplyInvariant checks that the total amount of NFTs on collections matches the total amount owned by addresses
 func SupplyInvariant(k Keeper) sdk.Invariant {
-	return func(ctx context.Context) (string, bool) {
+	return func(ctx sdk.Context) (string, bool) {
 		ownersCollectionsSupply := make(map[string]uint64)
 		var msg string
 		count := 0

@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"crypto/sha256"
 	"fmt"
 
@@ -15,7 +16,7 @@ import (
 
 // CreateCampaign ...
 func (k Keeper) CreateCampaign(
-	ctx context.Context,
+	ctx sdk.Context,
 	creator sdk.AccAddress,
 	campaign types.Campaign,
 ) error {
@@ -60,7 +61,7 @@ func (k Keeper) CreateCampaign(
 }
 
 // CancelCampaign ...
-func (k Keeper) CancelCampaign(ctx context.Context, campaignId uint64, creator sdk.AccAddress) error {
+func (k Keeper) CancelCampaign(ctx sdk.Context, campaignId uint64, creator sdk.AccAddress) error {
 	campaign, found := k.GetCampaign(ctx, campaignId)
 	if !found {
 		return errorsmod.Wrapf(types.ErrCampaignDoesNotExists, "campaign %d not exists", campaignId)
@@ -70,7 +71,7 @@ func (k Keeper) CancelCampaign(ctx context.Context, campaignId uint64, creator s
 	}
 
 	// return funds
-	if campaign.AvailableTokens.IsValid() && campaign.AvailableTokens.Amount.GT(sdk.ZeroInt()) {
+	if campaign.AvailableTokens.IsValid() && campaign.AvailableTokens.Amount.GT(sdkmath.ZeroInt()) {
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(
 			ctx,
 			types.ModuleName,
@@ -101,7 +102,7 @@ func (k Keeper) CancelCampaign(ctx context.Context, campaignId uint64, creator s
 }
 
 // Claim ...
-func (k Keeper) Claim(ctx context.Context, campaign types.Campaign, claimer sdk.AccAddress, claim types.Claim) error {
+func (k Keeper) Claim(ctx sdk.Context, campaign types.Campaign, claimer sdk.AccAddress, claim types.Claim) error {
 	// check nft with campaign
 	nft, err := k.nftKeeper.GetONFT(ctx, campaign.NftDenomId, claim.NftId)
 	if err != nil {
@@ -227,7 +228,7 @@ func (k Keeper) Claim(ctx context.Context, campaign types.Campaign, claimer sdk.
 	return nil
 }
 
-func (k Keeper) DepositCampaign(ctx context.Context, campaignId uint64, depositor sdk.AccAddress, amount sdk.Coin) error {
+func (k Keeper) DepositCampaign(ctx sdk.Context, campaignId uint64, depositor sdk.AccAddress, amount sdk.Coin) error {
 	campaign, found := k.GetCampaign(ctx, campaignId)
 	if !found {
 		return errorsmod.Wrapf(types.ErrCampaignDoesNotExists, "campaign id %d not exists", campaignId)
@@ -255,7 +256,7 @@ func (k Keeper) DepositCampaign(ctx context.Context, campaignId uint64, deposito
 	return nil
 }
 
-func generateClaimNftId(ctx context.Context, campaignId, mintCount uint64) string {
+func generateClaimNftId(ctx sdk.Context, campaignId, mintCount uint64) string {
 	lastBlockHash := fmt.Sprintf("%x", ctx.BlockHeader().LastBlockId.Hash)
 	hash := sha256.Sum256([]byte(fmt.Sprintf("%sitc%dmc%d", lastBlockHash, campaignId, mintCount)))
 	return nfttypes.IDPrefix + fmt.Sprintf("%x", hash)[:32]

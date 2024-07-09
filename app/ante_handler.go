@@ -8,6 +8,7 @@ import (
 	globalfeeante "github.com/OmniFlix/omniflixhub/v5/x/globalfee/ante"
 	globalfeekeeper "github.com/OmniFlix/omniflixhub/v5/x/globalfee/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -27,7 +28,7 @@ type HandlerOptions struct {
 
 	GovKeeper         govkeeper.Keeper
 	IBCKeeper         *ibckeeper.Keeper
-	TxCounterStoreKey storetypes.StoreKey
+	TxCounterStoreKey *storetypes.KVStoreKey
 	WasmConfig        wasmtypes.WasmConfig
 	Codec             codec.BinaryCodec
 
@@ -56,7 +57,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(), // Outermost AnteDecorator, SetUpContext must be called first
 		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit),
-		wasmkeeper.NewCountTXDecorator(options.TxCounterStoreKey),
+		wasmkeeper.NewCountTXDecorator(runtime.NewKVStoreService(options.TxCounterStoreKey)),
 		ante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
 		ante.NewValidateBasicDecorator(),
 		ante.NewTxTimeoutHeightDecorator(),

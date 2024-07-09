@@ -10,7 +10,6 @@ import (
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/store/rootmulti"
-	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/crypto/ed25519"
 	tmtypes "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
@@ -80,10 +79,10 @@ func (s *KeeperTestHelper) CreateTestContextWithMultiStore() sdk.Context {
 func (s *KeeperTestHelper) Commit() {
 	oldHeight := s.Ctx.BlockHeight()
 	oldHeader := s.Ctx.BlockHeader()
-	s.App.Commit()
+	// commit, _ := s.App.Commit()
 	newHeader := tmtypes.Header{Height: oldHeight + 1, ChainID: oldHeader.ChainID, Time: oldHeader.Time.Add(time.Second)}
-	s.App.BeginBlock(abci.RequestBeginBlock{Header: newHeader})
-	s.Ctx = s.App.BaseApp.NewContext(false)
+	// s.App.PreBlocker(s.Ctx, abci.Request_Commit{Commit: commit})
+	s.Ctx = s.App.BaseApp.NewContextLegacy(false, newHeader)
 }
 
 // FundAcc funds target address with specified amount.
@@ -171,31 +170,31 @@ func (s *KeeperTestHelper) BeginNewBlock(executeNextEpoch bool) {
 
 // BeginNewBlockWithProposer begins a new block with a proposer.
 func (s *KeeperTestHelper) BeginNewBlockWithProposer(executeNextEpoch bool, proposer sdk.ValAddress) {
-	validator, err := s.App.StakingKeeper.GetValidator(s.Ctx, proposer)
-	s.Assert().NoError(err)
+	//validator, err := s.App.StakingKeeper.GetValidator(s.Ctx, proposer)
+	//s.Assert().NoError(err)
 
-	valConsAddr, err := validator.GetConsAddr()
-	s.Require().NoError(err)
+	//valConsAddr, err := validator.GetConsAddr()
+	//s.Require().NoError(err)
 
-	valAddr := valConsAddr
+	//valAddr := valConsAddr
 
 	newBlockTime := s.Ctx.BlockTime().Add(5 * time.Second)
 
 	header := tmtypes.Header{Height: s.Ctx.BlockHeight() + 1, Time: newBlockTime}
 	newCtx := s.Ctx.WithBlockTime(newBlockTime).WithBlockHeight(s.Ctx.BlockHeight() + 1)
 	s.Ctx = newCtx
-	lastCommitInfo := abci.CommitInfo{
+	/*lastCommitInfo := abci.CommitInfo{
 		Votes: []abci.VoteInfo{{
 			Validator: abci.Validator{Address: valAddr, Power: 1000},
 		}},
-	}
-	s.Ctx = s.App.NewContext(false)
+	}*/
+	s.App.BaseApp.PreBlocker()
+	s.Ctx = s.App.NewContextLegacy(false, header)
 }
 
 // EndBlock ends the block, and runs commit
 func (s *KeeperTestHelper) EndBlock() {
-	reqEndBlock := abci.RequestEndBlock{Height: s.Ctx.BlockHeight()}
-	s.App.EndBlocker(s.Ctx, reqEndBlock)
+	_, _ = s.App.EndBlocker(s.Ctx)
 }
 
 func (s *KeeperTestHelper) RunMsg(msg sdk.Msg) (*sdk.Result, error) {
@@ -210,19 +209,19 @@ func (s *KeeperTestHelper) RunMsg(msg sdk.Msg) (*sdk.Result, error) {
 }
 
 // AllocateRewardsToValidator allocates reward tokens to a distribution module then allocates rewards to the validator address.
-func (s *KeeperTestHelper) AllocateRewardsToValidator(valAddr sdk.ValAddress, rewardAmt math.Int) {
-	validator, found := s.App.StakingKeeper.GetValidator(s.Ctx, valAddr)
-	s.Require().True(found)
+func (s *KeeperTestHelper) AllocateRewardsToValidator(valAddr sdk.ValAddress, rewardAmt sdkmath.Int) {
+	validator, err := s.App.StakingKeeper.GetValidator(s.Ctx, valAddr)
+	s.Require().NoError(err)
 
 	// allocate reward tokens to distribution module
 	coins := sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, rewardAmt)}
-	err := banktestutil.FundModuleAccount(s.App.BankKeeper, s.Ctx, distrtypes.ModuleName, coins)
+	err = banktestutil.FundModuleAccount(s.Ctx, s.App.BankKeeper, distrtypes.ModuleName, coins)
 	s.Require().NoError(err)
 
 	// allocate rewards to validator
 	s.Ctx = s.Ctx.WithBlockHeight(s.Ctx.BlockHeight() + 1)
 	decTokens := sdk.DecCoins{{Denom: sdk.DefaultBondDenom, Amount: sdkmath.LegacyNewDec(20000)}}
-	s.App.DistrKeeper.AllocateTokensToValidator(s.Ctx, validator, decTokens)
+	_ = s.App.DistrKeeper.AllocateTokensToValidator(s.Ctx, validator, decTokens)
 }
 
 // BuildTx builds a transaction.

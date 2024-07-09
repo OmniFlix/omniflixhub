@@ -1,6 +1,7 @@
 package types
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"time"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/exported"
@@ -24,7 +25,7 @@ func UnmarshalNFTMetadata(cdc codec.BinaryCodec, bz []byte) (ONFTMetadata, error
 
 func NewONFT(
 	id string, metadata Metadata, data string, transferable, extensible bool, owner sdk.AccAddress,
-	createdTime time.Time, nsfw bool, royaltyShare sdk.Dec,
+	createdTime time.Time, nsfw bool, royaltyShare sdkmath.LegacyDec,
 ) ONFT {
 	return ONFT{
 		Id:           id,
@@ -92,7 +93,7 @@ func (onft ONFT) IsNSFW() bool {
 	return onft.Nsfw
 }
 
-func (onft ONFT) GetRoyaltyShare() sdk.Dec {
+func (onft ONFT) GetRoyaltyShare() sdkmath.LegacyDec {
 	return onft.RoyaltyShare
 }
 

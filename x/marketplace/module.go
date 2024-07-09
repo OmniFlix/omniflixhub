@@ -2,6 +2,7 @@ package marketplace
 
 import (
 	"context"
+	"cosmossdk.io/core/appmodule"
 	"encoding/json"
 	"fmt"
 
@@ -24,8 +25,9 @@ import (
 )
 
 var (
-	_ module.AppModule      = AppModule{}
-	_ module.AppModuleBasic = AppModuleBasic{}
+	_ appmodule.AppModule    = AppModule{}
+	_ module.AppModuleBasic  = AppModuleBasic{}
+	_ module.HasABCIEndBlock = AppModule{}
 )
 
 // ----------------------------------------------------------------------------
@@ -99,6 +101,12 @@ type AppModule struct {
 	legacySubspace exported.Subspace
 }
 
+func (am AppModule) IsOnePerModuleType() {
+}
+
+func (am AppModule) IsAppModule() {
+}
+
 func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, ss exported.Subspace) AppModule {
 	return AppModule{
 		AppModuleBasic: NewAppModuleBasic(cdc),
@@ -155,10 +163,11 @@ func (AppModule) ConsensusVersion() uint64 {
 }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the marketplace module.
-func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
+func (am AppModule) BeginBlock(_ sdk.Context) {}
 
 // EndBlock executes all ABCI EndBlock logic respective to the marketplace module. It
 // returns no validator updates.
-func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+func (am AppModule) EndBlock(goCtx context.Context) ([]abci.ValidatorUpdate, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
 	return EndBlock(ctx, am.keeper)
 }

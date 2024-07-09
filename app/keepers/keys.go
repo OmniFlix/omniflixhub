@@ -14,7 +14,6 @@ import (
 	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -37,7 +36,7 @@ import (
 )
 
 func (appKeepers *AppKeepers) GenerateKeys() {
-	appKeepers.keys = sdk.NewKVStoreKeys(
+	appKeepers.keys = storetypes.NewKVStoreKeys(
 		authtypes.StoreKey,
 		banktypes.StoreKey,
 		stakingtypes.StoreKey,
@@ -71,10 +70,10 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		itctypes.StoreKey,
 	)
 	// Define transient store keys
-	appKeepers.tkeys = sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
+	appKeepers.tkeys = storetypes.NewTransientStoreKeys(paramstypes.TStoreKey)
 
 	// MemKeys are for information that is stored only in RAM.
-	appKeepers.memKeys = sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
+	appKeepers.memKeys = storetypes.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 }
 
 func (appKeepers *AppKeepers) GetKVStoreKey() map[string]*storetypes.KVStoreKey {

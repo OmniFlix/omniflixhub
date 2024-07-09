@@ -6,7 +6,7 @@ import (
 )
 
 // GetParams gets the parameters for the onft module.
-func (k Keeper) GetParams(ctx context.Context) (params types.Params) {
+func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.ParamsKey)
 	if bz == nil {
@@ -17,7 +17,7 @@ func (k Keeper) GetParams(ctx context.Context) (params types.Params) {
 }
 
 // SetParams sets the parameters for the onft module.
-func (k Keeper) SetParams(ctx context.Context, params types.Params) error {
+func (k Keeper) SetParams(ctx sdk.Context, params types.Params) error {
 	if err := params.ValidateBasic(); err != nil {
 		return err
 	}
@@ -29,7 +29,7 @@ func (k Keeper) SetParams(ctx context.Context, params types.Params) error {
 }
 
 // GetDenomCreationFee returns the current denom creation fee coins list and amounts.
-func (k Keeper) GetDenomCreationFee(ctx context.Context) sdk.Coin {
+func (k Keeper) GetDenomCreationFee(ctx sdk.Context) sdk.Coin {
 	params := k.GetParams(ctx)
 	return params.DenomCreationFee
 }

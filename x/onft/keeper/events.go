@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) emitCreateONFTDenomEvent(ctx context.Context, denomId, symbol, name, creator string) {
+func (k Keeper) emitCreateONFTDenomEvent(ctx sdk.Context, denomId, symbol, name, creator string) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			onfttypes.EventTypeCreateONFTDenom,
@@ -17,7 +17,7 @@ func (k Keeper) emitCreateONFTDenomEvent(ctx context.Context, denomId, symbol, n
 	)
 }
 
-func (k Keeper) emitUpdateONFTDenomEvent(ctx context.Context, denomId, name, description, previewURI, creator string) {
+func (k Keeper) emitUpdateONFTDenomEvent(ctx sdk.Context, denomId, name, description, previewURI, creator string) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			onfttypes.EventTypeUpdateONFTDenom,
@@ -30,7 +30,7 @@ func (k Keeper) emitUpdateONFTDenomEvent(ctx context.Context, denomId, name, des
 	)
 }
 
-func (k Keeper) emitTransferONFTDenomEvent(ctx context.Context, denomId, symbol, sender, recipient string) {
+func (k Keeper) emitTransferONFTDenomEvent(ctx sdk.Context, denomId, symbol, sender, recipient string) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			onfttypes.EventTypeTransferONFTDenom,
@@ -42,7 +42,7 @@ func (k Keeper) emitTransferONFTDenomEvent(ctx context.Context, denomId, symbol,
 	)
 }
 
-func (k Keeper) emitPurgeONFTDenomEvent(ctx context.Context, denomId string) {
+func (k Keeper) emitPurgeONFTDenomEvent(ctx sdk.Context, denomId string) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			onfttypes.EventTypePurgeONFTDenom,
@@ -51,7 +51,7 @@ func (k Keeper) emitPurgeONFTDenomEvent(ctx context.Context, denomId string) {
 	)
 }
 
-func (k Keeper) emitMintONFTEvent(ctx context.Context, nftId, denomId, uri, owner string) {
+func (k Keeper) emitMintONFTEvent(ctx sdk.Context, nftId, denomId, uri, owner string) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			onfttypes.EventTypeMintONFT,
@@ -63,7 +63,7 @@ func (k Keeper) emitMintONFTEvent(ctx context.Context, nftId, denomId, uri, owne
 	)
 }
 
-func (k Keeper) emitTransferONFTEvent(ctx context.Context, nftId, denomId, sender, recipient string) {
+func (k Keeper) emitTransferONFTEvent(ctx sdk.Context, nftId, denomId, sender, recipient string) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			onfttypes.EventTypeTransferONFT,
@@ -75,7 +75,7 @@ func (k Keeper) emitTransferONFTEvent(ctx context.Context, nftId, denomId, sende
 	)
 }
 
-func (k Keeper) emitBurnONFTEvent(ctx context.Context, nftId, denomId, owner string) {
+func (k Keeper) emitBurnONFTEvent(ctx sdk.Context, nftId, denomId, owner string) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			onfttypes.EventTypeBurnONFT,

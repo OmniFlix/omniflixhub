@@ -1,6 +1,7 @@
 package types
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"time"
 
 	errorsmod "cosmossdk.io/errors"
@@ -210,7 +211,7 @@ func (msg MsgBuyNFT) GetSigners() []sdk.AccAddress {
 // Auction messages
 
 func NewMsgCreateAuction(denomId, nftId string, startTime time.Time, duration *time.Duration, startPrice sdk.Coin, owner sdk.AccAddress,
-	incrementPercentage sdk.Dec, whitelistAccounts []string, splitShares []WeightedAddress,
+	incrementPercentage sdkmath.LegacyDec, whitelistAccounts []string, splitShares []WeightedAddress,
 ) *MsgCreateAuction {
 	return &MsgCreateAuction{
 		NftId:               nftId,

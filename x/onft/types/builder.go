@@ -1,6 +1,7 @@
 package types
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
@@ -424,7 +425,7 @@ func (nb NFTBuilder) Build(classId, nftID, nftURI, nftData string) (nft.NFT, err
 		data = string(dataBz)
 	}
 	createdTime, _ := time.Parse(time.RFC3339, createdAt)
-	royalty, _ := sdk.NewDecFromStr(royaltyShare)
+	royalty, _ := sdkmath.LegacyNewDecFromStr(royaltyShare)
 
 	metadata, err := codectypes.NewAnyWithValue(&ONFTMetadata{
 		Name:         name,

@@ -2,7 +2,7 @@ module github.com/OmniFlix/omniflixhub/v5
 
 go 1.22
 
-toolchain go1.22.4
+toolchain go1.22.5
 
 require (
 	cosmossdk.io/client/v2 v2.0.0-beta.1
@@ -15,9 +15,9 @@ require (
 	cosmossdk.io/x/nft v0.1.1
 	cosmossdk.io/x/upgrade v0.1.1
 	github.com/CosmWasm/wasmd v0.51.0
-	github.com/CosmWasm/wasmvm/v2 v2.0.1
 	github.com/CosmWasm/wasmvm v1.5.2
-	github.com/OmniFlix/streampay/v2 v2.4.2-0.20240624143344-a9c6d8d9b959
+	github.com/CosmWasm/wasmvm/v2 v2.0.1
+	github.com/OmniFlix/streampay/v2 v2.4.2-0.20240709201324-767b263c3aa0
 	github.com/bianjieai/nft-transfer v1.1.3-ibc-v7.3.0.0.20240604024247-74d40a1974c2
 	github.com/cometbft/cometbft v0.38.7
 	github.com/cometbft/cometbft-db v0.11.0
@@ -39,7 +39,7 @@ require (
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/exp v0.0.0-20240404231335-c0f41cb1a7a0
+	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842
 	google.golang.org/genproto/googleapis/api v0.0.0-20240318140521-94a12d6c2237
 	google.golang.org/grpc v1.64.0
 	google.golang.org/protobuf v1.34.1
@@ -201,13 +201,13 @@ require (
 	go.opentelemetry.io/otel v1.24.0 // indirect
 	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
-	golang.org/x/crypto v0.22.0 // indirect
-	golang.org/x/net v0.24.0 // indirect
+	golang.org/x/crypto v0.23.0 // indirect
+	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/oauth2 v0.18.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/term v0.19.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/term v0.20.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/api v0.169.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto v0.0.0-20240227224415-6ceb2ff114de // indirect
@@ -230,7 +230,7 @@ replace (
 	// pin the version of goleveldb to v1.0.1-0.20210819022825-2ae1ddf74ef7 required by SDK v47 upgrade guide.
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
-	golang.org/x/exp => golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb
+	golang.org/x/exp => golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842
 
 )
 

@@ -1,6 +1,7 @@
 package exported
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"time"
 
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -23,7 +24,7 @@ type AuctionListingI interface {
 	GetNftId() string
 	GetStartPrice() sdk.Coin
 	GetStartTime() time.Time
-	GetIncrementPercentage() sdk.Dec
+	GetIncrementPercentage() sdkmath.LegacyDec
 	GetOwner() sdk.AccAddress
 	GetSplitShares() interface{}
 	GetStatus() string
@@ -43,6 +44,6 @@ type (
 	//
 	// NOTE: This is used solely for migration of x/params managed parameters.
 	Subspace interface {
-		GetParamSet(ctx context.Context, ps ParamSet)
+		GetParamSet(ctx sdk.Context, ps ParamSet)
 	}
 )

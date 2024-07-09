@@ -1,6 +1,7 @@
 package simulation
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -37,46 +38,46 @@ func WeightedOperations(
 	var weightCreateDenom, weightMint, weightEdit, weightTransfer, weightBurn, weightUpdateDenom, weightTransferDenom int
 
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgCreateDenom, &weightCreateDenom, nil,
+		OpWeightMsgCreateDenom, &weightCreateDenom, nil,
 		func(_ *rand.Rand) {
 			weightCreateDenom = 50
 		},
 	)
 
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgMintONFT, &weightMint, nil,
+		OpWeightMsgMintONFT, &weightMint, nil,
 		func(_ *rand.Rand) {
 			weightMint = 100
 		},
 	)
 
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgEditONFT, &weightEdit, nil,
+		OpWeightMsgEditONFT, &weightEdit, nil,
 		func(_ *rand.Rand) {
 			weightEdit = 50
 		},
 	)
 
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgTransferONFT, &weightTransfer, nil,
+		OpWeightMsgTransferONFT, &weightTransfer, nil,
 		func(_ *rand.Rand) {
 			weightTransfer = 50
 		},
 	)
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgBurnONFT, &weightBurn, nil,
+		OpWeightMsgBurnONFT, &weightBurn, nil,
 		func(_ *rand.Rand) {
 			weightBurn = 10
 		},
 	)
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgTransferDenom, &weightTransferDenom, nil,
+		OpWeightMsgTransferDenom, &weightTransferDenom, nil,
 		func(_ *rand.Rand) {
 			weightTransferDenom = 10
 		},
 	)
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgUpdateDenom, &weightUpdateDenom, nil,
+		OpWeightMsgUpdateDenom, &weightUpdateDenom, nil,
 		func(_ *rand.Rand) {
 			weightUpdateDenom = 10
 		},
@@ -113,7 +114,7 @@ func WeightedOperations(
 // SimulateMsgCreateDenom simulates create denom msg
 func SimulateMsgCreateDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
 	return func(
-		r *rand.Rand, app *baseapp.BaseApp, ctx context.Context, accs []simtypes.Account, chainID string,
+		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (
 		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
 	) {
@@ -157,7 +158,6 @@ func SimulateMsgCreateDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 			TxGen:           appparams.MakeEncodingConfig().TxConfig,
 			Cdc:             nil,
 			Msg:             msg,
-			MsgType:         types.TypeMsgCreateDenom,
 			Context:         ctx,
 			SimAccount:      sender,
 			AccountKeeper:   ak,
@@ -173,7 +173,7 @@ func SimulateMsgCreateDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 // SimulateMsgMintONFT simulates a mint onft transaction
 func SimulateMsgMintONFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
 	return func(
-		r *rand.Rand, app *baseapp.BaseApp, ctx context.Context, accs []simtypes.Account, chainID string,
+		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (
 		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
 	) {
@@ -212,7 +212,6 @@ func SimulateMsgMintONFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankK
 			TxGen:           appparams.MakeEncodingConfig().TxConfig,
 			Cdc:             nil,
 			Msg:             msg,
-			MsgType:         types.TypeMsgMintONFT,
 			Context:         ctx,
 			SimAccount:      sender,
 			AccountKeeper:   ak,
@@ -228,7 +227,7 @@ func SimulateMsgMintONFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankK
 // SimulateMsgTransferONFT simulates the transfer of an nft
 func SimulateMsgTransferONFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
 	return func(
-		r *rand.Rand, app *baseapp.BaseApp, ctx context.Context, accs []simtypes.Account, chainID string,
+		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (
 		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
 	) {
@@ -265,7 +264,6 @@ func SimulateMsgTransferONFT(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 			TxGen:           appparams.MakeEncodingConfig().TxConfig,
 			Cdc:             nil,
 			Msg:             msg,
-			MsgType:         types.TypeMsgTransferONFT,
 			Context:         ctx,
 			SimAccount:      ownerAccount,
 			AccountKeeper:   ak,
@@ -281,7 +279,7 @@ func SimulateMsgTransferONFT(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferONFT, err.Error()), nil, err
 			}
 			if !nft.IsTransferable() {
-				return simtypes.NewOperationMsg(msg, false, "non transferable nft", nil), nil, nil
+				return simtypes.NewOperationMsg(msg, false, "non transferable nft"), nil, nil
 			}
 		}
 		return simOpMsg, fOps, err
@@ -291,7 +289,7 @@ func SimulateMsgTransferONFT(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 // SimulateMsgBurnONFT simulates a burn onft transaction
 func SimulateMsgBurnONFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
 	return func(
-		r *rand.Rand, app *baseapp.BaseApp, ctx context.Context, accs []simtypes.Account, chainID string,
+		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (
 		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
 	) {
@@ -318,7 +316,6 @@ func SimulateMsgBurnONFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankK
 			TxGen:           appparams.MakeEncodingConfig().TxConfig,
 			Cdc:             nil,
 			Msg:             msg,
-			MsgType:         types.TypeMsgBurnONFT,
 			Context:         ctx,
 			SimAccount:      ownerAccount,
 			AccountKeeper:   ak,
@@ -334,7 +331,7 @@ func SimulateMsgBurnONFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankK
 // SimulateMsgTransferDenom simulates a transfer denom transaction
 func SimulateMsgTransferDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
 	return func(
-		r *rand.Rand, app *baseapp.BaseApp, ctx context.Context, accs []simtypes.Account, chainID string,
+		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (
 		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
 	) {
@@ -368,7 +365,6 @@ func SimulateMsgTransferDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.
 			TxGen:           appparams.MakeEncodingConfig().TxConfig,
 			Cdc:             nil,
 			Msg:             msg,
-			MsgType:         types.TypeMsgTransferDenom,
 			Context:         ctx,
 			SimAccount:      ownerAccount,
 			AccountKeeper:   ak,
@@ -384,7 +380,7 @@ func SimulateMsgTransferDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.
 // SimulateMsgUpdateDenom simulates a update denom transaction
 func SimulateMsgUpdateDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
 	return func(
-		r *rand.Rand, app *baseapp.BaseApp, ctx context.Context, accs []simtypes.Account, chainID string,
+		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (
 		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
 	) {
@@ -419,7 +415,6 @@ func SimulateMsgUpdateDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 			TxGen:           appparams.MakeEncodingConfig().TxConfig,
 			Cdc:             nil,
 			Msg:             msg,
-			MsgType:         types.TypeMsgUpdateDenom,
 			Context:         ctx,
 			SimAccount:      ownerAccount,
 			AccountKeeper:   ak,
@@ -432,7 +427,7 @@ func SimulateMsgUpdateDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 	}
 }
 
-func getRandomNFTFromOwner(ctx context.Context, k keeper.Keeper, r *rand.Rand) (address sdk.AccAddress, denomID, nftID string) {
+func getRandomNFTFromOwner(ctx sdk.Context, k keeper.Keeper, r *rand.Rand) (address sdk.AccAddress, denomID, nftID string) {
 	denom, err := getRandomDenom(ctx, k, r)
 	if err != nil {
 		return nil, "", ""
@@ -453,7 +448,7 @@ func getRandomNFTFromOwner(ctx context.Context, k keeper.Keeper, r *rand.Rand) (
 	return _nft.GetOwner(), denomID, nftID
 }
 
-func getRandomDenom(ctx context.Context, k keeper.Keeper, r *rand.Rand) (types.Denom, error) {
+func getRandomDenom(ctx sdk.Context, k keeper.Keeper, r *rand.Rand) (types.Denom, error) {
 	denoms := []string{denomId1, denomId2}
 	i := r.Intn(len(denoms))
 	denom, _ := k.GetDenomInfo(ctx, denoms[i])

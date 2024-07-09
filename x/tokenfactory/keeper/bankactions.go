@@ -1,14 +1,12 @@
 package keeper
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
 )
 
-func (k Keeper) mintTo(ctx context.Context, amount sdk.Coin, mintTo string) error {
+func (k Keeper) mintTo(ctx sdk.Context, amount sdk.Coin, mintTo string) error {
 	// verify that denom is an x/tokenfactory denom
 	_, _, err := types.DeconstructDenom(amount.Denom)
 	if err != nil {
@@ -24,17 +22,19 @@ func (k Keeper) mintTo(ctx context.Context, amount sdk.Coin, mintTo string) erro
 	if err != nil {
 		return err
 	}
+	// TODO: update blocked address to fetch module accounts
+	/*
 
-	if k.bankKeeper.BlockedAddr(addr) {
-		return fmt.Errorf("failed to mint to blocked address: %s", addr)
-	}
+		if k.bankKeeper.BlockedAddr(addr) {
+			return fmt.Errorf("failed to mint to blocked address: %s", addr)
+		}*/
 
 	return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName,
 		addr,
 		sdk.NewCoins(amount))
 }
 
-func (k Keeper) burnFrom(ctx context.Context, amount sdk.Coin, burnFrom string) error {
+func (k Keeper) burnFrom(ctx sdk.Context, amount sdk.Coin, burnFrom string) error {
 	// verify that denom is an x/tokenfactory denom
 	_, _, err := types.DeconstructDenom(amount.Denom)
 	if err != nil {
@@ -46,10 +46,12 @@ func (k Keeper) burnFrom(ctx context.Context, amount sdk.Coin, burnFrom string) 
 		return err
 	}
 
-	if k.bankKeeper.BlockedAddr(addr) {
-		return fmt.Errorf("failed to burn from blocked address: %s", addr)
-	}
-
+	// TODO: update blocked address to fetch module accounts
+	/*
+		if k.bankKeeper.BlockedAddr(addr) {
+			return fmt.Errorf("failed to burn from blocked address: %s", addr)
+		}
+	*/
 	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx,
 		addr,
 		types.ModuleName,
@@ -61,7 +63,7 @@ func (k Keeper) burnFrom(ctx context.Context, amount sdk.Coin, burnFrom string) 
 	return k.bankKeeper.BurnCoins(ctx, types.ModuleName, sdk.NewCoins(amount))
 }
 
-func (k Keeper) forceTransfer(ctx context.Context, amount sdk.Coin, fromAddr string, toAddr string) error {
+func (k Keeper) forceTransfer(ctx sdk.Context, amount sdk.Coin, fromAddr string, toAddr string) error {
 	// verify that denom is an x/tokenfactory denom
 	_, _, err := types.DeconstructDenom(amount.Denom)
 	if err != nil {
@@ -77,14 +79,15 @@ func (k Keeper) forceTransfer(ctx context.Context, amount sdk.Coin, fromAddr str
 	if err != nil {
 		return err
 	}
+	// TODO: update blocked address to fetch module accounts
+	/*
+		if k.bankKeeper.BlockedAddr(fromSdkAddr) {
+			return fmt.Errorf("failed to force transfer from a blocked address: %s", fromAddr)
+		}
 
-	if k.bankKeeper.BlockedAddr(fromSdkAddr) {
-		return fmt.Errorf("failed to force transfer from a blocked address: %s", fromAddr)
-	}
-
-	if k.bankKeeper.BlockedAddr(toSdkAddr) {
-		return fmt.Errorf("failed to force transfer to blocked address: %s", toSdkAddr)
-	}
+		if k.bankKeeper.BlockedAddr(toSdkAddr) {
+			return fmt.Errorf("failed to force transfer to blocked address: %s", toSdkAddr)
+		} */
 
 	return k.bankKeeper.SendCoins(ctx, fromSdkAddr, toSdkAddr, sdk.NewCoins(amount))
 }

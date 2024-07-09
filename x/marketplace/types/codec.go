@@ -4,11 +4,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	"github.com/cosmos/cosmos-sdk/codec/types"
-	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
-	authzcodec "github.com/cosmos/cosmos-sdk/x/authz/codec"
-	govcodec "github.com/cosmos/cosmos-sdk/x/gov/codec"
 	gogotypes "github.com/cosmos/gogoproto/types"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/exported"
@@ -57,6 +54,7 @@ var (
 	ModuleCdc = codec.NewAminoCodec(amino)
 )
 
+/*
 func init() {
 	RegisterLegacyAminoCodec(amino)
 	cryptocodec.RegisterCrypto(amino)
@@ -66,7 +64,7 @@ func init() {
 	// instances.
 	RegisterLegacyAminoCodec(authzcodec.Amino)
 	RegisterLegacyAminoCodec(govcodec.Amino)
-}
+}*/
 
 func MustMarshalListingID(cdc codec.BinaryCodec, listingId string) []byte {
 	listingIdWrap := gogotypes.StringValue{Value: listingId}

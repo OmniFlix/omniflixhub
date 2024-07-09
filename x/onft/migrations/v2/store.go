@@ -14,7 +14,7 @@ import (
 )
 
 // MigrateCollections is used to migrate nft data from onft to x/nft
-func MigrateCollections(ctx context.Context,
+func MigrateCollections(ctx sdk.Context,
 	storeKey storetypes.StoreKey,
 	logger log.Logger,
 	k keeper,
@@ -23,7 +23,7 @@ func MigrateCollections(ctx context.Context,
 	startTime := time.Now()
 
 	store := ctx.KVStore(storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, KeyDenomID(""))
+	iterator := storetypes.KVStorePrefixIterator(store, KeyDenomID(""))
 	defer iterator.Close()
 
 	var (
@@ -80,12 +80,12 @@ func MigrateCollections(ctx context.Context,
 }
 
 func migrateONFT(
-	ctx context.Context,
+	ctx sdk.Context,
 	k keeper,
 	logger log.Logger,
 	denomID string,
 ) (int64, error) {
-	var iterator sdk.Iterator
+	var iterator storetypes.Iterator
 	defer func() {
 		if iterator != nil {
 			_ = iterator.Close()
@@ -95,7 +95,7 @@ func migrateONFT(
 	store := ctx.KVStore(k.storeKey)
 
 	total := int64(0)
-	iterator = sdk.KVStorePrefixIterator(store, KeyONFT(denomID, ""))
+	iterator = storetypes.KVStorePrefixIterator(store, KeyONFT(denomID, ""))
 	for ; iterator.Valid(); iterator.Next() {
 		var oNFT types.ONFT
 		k.cdc.MustUnmarshal(iterator.Value(), &oNFT)

@@ -29,10 +29,10 @@ type BankKeeper interface {
 
 // NftKeeper defines the expected nft keeper
 type NftKeeper interface {
-	GetONFT(ctx context.Context, denomId, onftId string) (nft nft.ONFTI, err error)
-	GetDenomInfo(ctx context.Context, denomId string) (*nfttypes.Denom, error)
+	GetONFT(ctx sdk.Context, denomId, onftId string) (nft nft.ONFTI, err error)
+	GetDenomInfo(ctx sdk.Context, denomId string) (*nfttypes.Denom, error)
 	MintONFT(
-		ctx context.Context,
+		ctx sdk.Context,
 		denomID,
 		nftID,
 		name,
@@ -48,13 +48,13 @@ type NftKeeper interface {
 		royaltyShare sdkmath.LegacyDec,
 		receiver sdk.AccAddress,
 	) error
-	TransferOwnership(ctx context.Context, denomId, nftId string, srcOwner, dstOwner sdk.AccAddress) error
-	BurnONFT(ctx context.Context, denomId, nftId string, owner sdk.AccAddress) error
+	TransferOwnership(ctx sdk.Context, denomId, nftId string, srcOwner, dstOwner sdk.AccAddress) error
+	BurnONFT(ctx sdk.Context, denomId, nftId string, owner sdk.AccAddress) error
 }
 
 type StreamPayKeeper interface {
 	CreateStreamPayment(
-		ctx context.Context,
+		ctx sdk.Context,
 		sender, recipient sdk.AccAddress,
 		amount sdk.Coin,
 		paymentType streampaytypes.StreamType,

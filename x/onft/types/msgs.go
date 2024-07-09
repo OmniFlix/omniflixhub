@@ -1,6 +1,7 @@
 package types
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"strings"
 	"unicode/utf8"
 
@@ -240,7 +241,7 @@ func (msg MsgPurgeDenom) GetSigners() []sdk.AccAddress {
 
 func NewMsgMintONFT(
 	denomId, sender, recipient string, metadata Metadata, data string,
-	transferable, extensible, nsfw bool, royaltyShare sdk.Dec,
+	transferable, extensible, nsfw bool, royaltyShare sdkmath.LegacyDec,
 ) *MsgMintONFT {
 	return &MsgMintONFT{
 		Id:           GenUniqueID(IDPrefix),

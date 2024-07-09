@@ -59,24 +59,24 @@ func (k Keeper) GetAuthority() string {
 }
 
 // Logger returns a logger for the x/tokenfactory module
-func (k Keeper) Logger(ctx context.Context) log.Logger {
+func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
 // GetDenomPrefixStore returns the substore for a specific denom
-func (k Keeper) GetDenomPrefixStore(ctx context.Context, denom string) storetypes.KVStore {
+func (k Keeper) GetDenomPrefixStore(ctx sdk.Context, denom string) storetypes.KVStore {
 	store := ctx.KVStore(k.storeKey)
 	return prefix.NewStore(store, types.GetDenomPrefixStore(denom))
 }
 
 // GetCreatorPrefixStore returns the substore for a specific creator address
-func (k Keeper) GetCreatorPrefixStore(ctx context.Context, creator string) storetypes.KVStore {
+func (k Keeper) GetCreatorPrefixStore(ctx sdk.Context, creator string) storetypes.KVStore {
 	store := ctx.KVStore(k.storeKey)
 	return prefix.NewStore(store, types.GetCreatorPrefix(creator))
 }
 
 // GetCreatorsPrefixStore returns the substore that contains a list of creators
-func (k Keeper) GetCreatorsPrefixStore(ctx context.Context) storetypes.KVStore {
+func (k Keeper) GetCreatorsPrefixStore(ctx sdk.Context) storetypes.KVStore {
 	store := ctx.KVStore(k.storeKey)
 	return prefix.NewStore(store, types.GetCreatorsPrefix())
 }
@@ -85,6 +85,6 @@ func (k Keeper) GetCreatorsPrefixStore(ctx context.Context) storetypes.KVStore {
 // This account isn't intended to store any coins,
 // it purely mints and burns them on behalf of the admin of respective denoms,
 // and sends to the relevant address.
-func (k Keeper) CreateModuleAccount(ctx context.Context) {
+func (k Keeper) CreateModuleAccount(ctx sdk.Context) {
 	k.accountKeeper.GetModuleAccount(ctx, types.ModuleName)
 }

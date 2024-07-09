@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"fmt"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -64,12 +65,12 @@ func (k Keeper) GetAuthority() string {
 }
 
 // Logger returns a module-specific logger.
-func (k Keeper) Logger(ctx context.Context) log.Logger {
+func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("OmniFlix/%s", types.ModuleName))
 }
 
 // AddListing adds a listing in the store and set owner to listing and updates the count
-func (k Keeper) AddListing(ctx context.Context, listing types.Listing) error {
+func (k Keeper) AddListing(ctx sdk.Context, listing types.Listing) error {
 	// check listing already exists
 	if k.HasListing(ctx, listing.GetId()) {
 		return errorsmod.Wrapf(types.ErrListingAlreadyExists, "listing already exists: %s", listing.GetId())
@@ -98,14 +99,14 @@ func (k Keeper) AddListing(ctx context.Context, listing types.Listing) error {
 	return nil
 }
 
-func (k Keeper) DeleteListing(ctx context.Context, listing types.Listing) {
+func (k Keeper) DeleteListing(ctx sdk.Context, listing types.Listing) {
 	k.RemoveListing(ctx, listing.GetId())
 	k.UnsetWithOwner(ctx, listing.GetOwner(), listing.GetId())
 	k.UnsetWithNFTID(ctx, listing.GetNftId())
 	k.UnsetWithPriceDenom(ctx, listing.Price.Denom, listing.GetId())
 }
 
-func (k Keeper) Buy(ctx context.Context, listing types.Listing, buyer sdk.AccAddress) error {
+func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress) error {
 	owner, err := sdk.AccAddressFromBech32(listing.Owner)
 	if err != nil {
 		return err
@@ -132,7 +133,7 @@ func (k Keeper) Buy(ctx context.Context, listing types.Listing, buyer sdk.AccAdd
 	}
 	saleCommission := k.GetSaleCommission(ctx)
 	marketplaceCoin := k.GetProportions(listing.Price, saleCommission)
-	if marketplaceCoin.Amount.GTE(sdk.OneInt()) {
+	if marketplaceCoin.Amount.GTE(sdkmath.OneInt()) {
 		err = k.DistributeCommission(ctx, marketplaceCoin)
 		if err != nil {
 			return err
@@ -140,7 +141,7 @@ func (k Keeper) Buy(ctx context.Context, listing types.Listing, buyer sdk.AccAdd
 		listingSaleAmountCoin = listingPriceCoin.Sub(marketplaceCoin)
 	}
 	// check if it is a valid royalty share
-	if nft.GetRoyaltyShare().GT(sdk.ZeroDec()) && nft.GetRoyaltyShare().LTE(sdk.OneDec()) {
+	if nft.GetRoyaltyShare().GT(sdkmath.LegacyZeroDec()) && nft.GetRoyaltyShare().LTE(sdkmath.LegacyOneDec()) {
 		nftRoyaltyShareCoin := k.GetProportions(listingSaleAmountCoin, nft.GetRoyaltyShare())
 		creator, err := sdk.AccAddressFromBech32(denom.Creator)
 		if err != nil {
@@ -190,16 +191,16 @@ func (k Keeper) Buy(ctx context.Context, listing types.Listing, buyer sdk.AccAdd
 	return nil
 }
 
-func (k Keeper) GetProportions(totalCoin sdk.Coin, ratio sdk.Dec) sdk.Coin {
-	return sdk.NewCoin(totalCoin.Denom, sdk.NewDecFromInt(totalCoin.Amount).Mul(ratio).TruncateInt())
+func (k Keeper) GetProportions(totalCoin sdk.Coin, ratio sdkmath.LegacyDec) sdk.Coin {
+	return sdk.NewCoin(totalCoin.Denom, sdkmath.LegacyNewDecFromInt(totalCoin.Amount).Mul(ratio).TruncateInt())
 }
 
-func (k Keeper) DistributeCommission(ctx context.Context, marketplaceCoin sdk.Coin) error {
+func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) error {
 	distrParams := k.GetMarketplaceDistributionParams(ctx)
 	stakingCommissionCoin := k.GetProportions(marketplaceCoin, distrParams.Staking)
 	moduleAccAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	feeCollectorAddr := k.accountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
-	if distrParams.Staking.GT(sdk.ZeroDec()) && stakingCommissionCoin.Amount.GT(sdk.ZeroInt()) {
+	if distrParams.Staking.GT(sdkmath.LegacyZeroDec()) && stakingCommissionCoin.Amount.GT(sdkmath.ZeroInt()) {
 		err := k.bankKeeper.SendCoins(ctx, moduleAccAddr, feeCollectorAddr, sdk.NewCoins(stakingCommissionCoin))
 		if err != nil {
 			return err
@@ -231,7 +232,7 @@ func (k Keeper) DistributeCommission(ctx context.Context, marketplaceCoin sdk.Co
 }
 
 // CreateAuctionListing creates a auction in the store and set owner to auction and updates the next auction number
-func (k Keeper) CreateAuctionListing(ctx context.Context, auction types.AuctionListing) error {
+func (k Keeper) CreateAuctionListing(ctx sdk.Context, auction types.AuctionListing) error {
 	// check auction already exists or not
 	if k.HasAuctionListing(ctx, auction.GetId()) {
 		return errorsmod.Wrapf(types.ErrListingAlreadyExists, "auction listing already exists: %d", auction.GetId())
@@ -261,7 +262,7 @@ func (k Keeper) CreateAuctionListing(ctx context.Context, auction types.AuctionL
 	return nil
 }
 
-func (k Keeper) CancelAuctionListing(ctx context.Context, auction types.AuctionListing) error {
+func (k Keeper) CancelAuctionListing(ctx sdk.Context, auction types.AuctionListing) error {
 	// Check bid Exists or Not
 	if k.HasBid(ctx, auction.Id) {
 		return errorsmod.Wrapf(types.ErrBidExists, "cannot cancel auction %d, bid exists ", auction.Id)
@@ -281,7 +282,7 @@ func (k Keeper) CancelAuctionListing(ctx context.Context, auction types.AuctionL
 	return nil
 }
 
-func (k Keeper) PlaceBid(ctx context.Context, auction types.AuctionListing, newBid types.Bid) error {
+func (k Keeper) PlaceBid(ctx sdk.Context, auction types.AuctionListing, newBid types.Bid) error {
 	// Check bids of auction
 	newBidPrice := auction.StartPrice
 	prevBid, bidExists := k.GetBid(ctx, auction.Id)
@@ -313,12 +314,12 @@ func (k Keeper) PlaceBid(ctx context.Context, auction types.AuctionListing, newB
 	return nil
 }
 
-func (k Keeper) GetNewBidPrice(denom string, amount sdk.Coin, increment sdk.Dec) sdk.Coin {
-	return sdk.NewCoin(denom, amount.Amount.Add(sdk.NewDecFromInt(amount.Amount).Mul(increment).TruncateInt()))
+func (k Keeper) GetNewBidPrice(denom string, amount sdk.Coin, increment sdkmath.LegacyDec) sdk.Coin {
+	return sdk.NewCoin(denom, amount.Amount.Add(sdkmath.LegacyNewDecFromInt(amount.Amount).Mul(increment).TruncateInt()))
 }
 
 func (k Keeper) TransferRoyalty(
-	ctx context.Context,
+	ctx sdk.Context,
 	nftRoyaltyShareCoin sdk.Coin,
 	royaltyReceivers []*onfttypes.WeightedAddress,
 	creator sdk.AccAddress,
@@ -349,7 +350,7 @@ func (k Keeper) TransferRoyalty(
 			remaining = remaining.Sub(sharePortionCoin)
 		}
 		// sending remaining to creator
-		if remaining.Amount.GT(sdk.ZeroInt()) {
+		if remaining.Amount.GT(sdkmath.ZeroInt()) {
 			err := k.bankKeeper.SendCoins(ctx, moduleAcc, creator, sdk.NewCoins(remaining))
 			if err != nil {
 				return err

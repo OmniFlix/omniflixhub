@@ -1,6 +1,7 @@
 package ante
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"errors"
 
 	tmstrings "github.com/cometbft/cometbft/libs/strings"
@@ -44,7 +45,7 @@ func NewFeeDecorator(bypassMsgTypes []string, gfk globalfeekeeper.Keeper, sk sta
 }
 
 // AnteHandle implements the AnteDecorator interface
-func (mfd FeeDecorator) AnteHandle(ctx context.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx context.Context, err error) {
+func (mfd FeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
 		return ctx, errorsmod.Wrap(sdkerrors.ErrTxDecode, "Tx must implement the sdk.FeeTx interface")
@@ -140,7 +141,7 @@ func (mfd FeeDecorator) AnteHandle(ctx context.Context, tx sdk.Tx, simulate bool
 // (might also return 0denom if globalMinGasPrice is 0)
 // sorted in ascending order.
 // Note that ParamStoreKeyMinGasPrices type requires coins sorted.
-func (mfd FeeDecorator) GetGlobalFee(ctx context.Context, feeTx sdk.FeeTx) (sdk.Coins, error) {
+func (mfd FeeDecorator) GetGlobalFee(ctx sdk.Context, feeTx sdk.FeeTx) (sdk.Coins, error) {
 	var (
 		globalMinGasPrices sdk.DecCoins
 		err                error
@@ -167,7 +168,7 @@ func (mfd FeeDecorator) GetGlobalFee(ctx context.Context, feeTx sdk.FeeTx) (sdk.
 	return requiredGlobalFees.Sort(), nil
 }
 
-func (mfd FeeDecorator) DefaultZeroGlobalFee(ctx context.Context) ([]sdk.DecCoin, error) {
+func (mfd FeeDecorator) DefaultZeroGlobalFee(ctx sdk.Context) ([]sdk.DecCoin, error) {
 	bondDenom := mfd.getBondDenom(ctx)
 	if bondDenom == "" {
 		return nil, errors.New("empty staking bond denomination")
@@ -176,8 +177,9 @@ func (mfd FeeDecorator) DefaultZeroGlobalFee(ctx context.Context) ([]sdk.DecCoin
 	return []sdk.DecCoin{sdk.NewDecCoinFromDec(bondDenom, sdkmath.LegacyNewDec(0))}, nil
 }
 
-func (mfd FeeDecorator) getBondDenom(ctx context.Context) string {
-	return mfd.StakingKeeper.BondDenom(ctx)
+func (mfd FeeDecorator) getBondDenom(ctx sdk.Context) string {
+	bondDenom, _ := mfd.StakingKeeper.BondDenom(ctx)
+	return bondDenom
 }
 
 // ContainsOnlyBypassMinFeeMsgs returns true if all the given msgs type are listed
@@ -195,7 +197,7 @@ func (mfd FeeDecorator) ContainsOnlyBypassMinFeeMsgs(msgs []sdk.Msg) bool {
 
 // GetMinGasPrice returns the validator's minimum gas prices
 // fees given a gas limit
-func GetMinGasPrice(ctx context.Context, gasLimit int64) sdk.Coins {
+func GetMinGasPrice(ctx sdk.Context, gasLimit int64) sdk.Coins {
 	minGasPrices := ctx.MinGasPrices()
 	// special case: if minGasPrices=[], requiredFees=[]
 	if minGasPrices.IsZero() {

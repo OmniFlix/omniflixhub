@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"fmt"
 	"testing"
 	"time"
@@ -144,7 +145,7 @@ func (suite *KeeperTestSuite) createDefaultNftDenom() {
 		[]*onfttypes.WeightedAddress{
 			{
 				Address: suite.TestAccs[0].String(),
-				Weight:  sdk.OneDec(),
+				Weight:  sdkmath.LegacyOneDec(),
 			},
 		},
 	)
@@ -193,7 +194,7 @@ func (suite *KeeperTestSuite) createDefaultMintNftDenom() {
 		[]*onfttypes.WeightedAddress{
 			{
 				Address: suite.TestAccs[0].String(),
-				Weight:  sdk.OneDec(),
+				Weight:  sdkmath.LegacyOneDec(),
 			},
 		},
 	)

@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	sdkmath "cosmossdk.io/math"
 	fmt "fmt"
 	"testing"
 
@@ -177,7 +178,7 @@ func TestMsgMint(t *testing.T) {
 		{
 			name: "zero amount",
 			msg: createMsg(func(msg types.MsgMint) types.MsgMint {
-				msg.Amount = sdk.NewCoin("bitcoin", sdk.ZeroInt())
+				msg.Amount = sdk.NewCoin("bitcoin", sdkmath.ZeroInt())
 				return msg
 			}),
 			expectPass: false,
@@ -246,7 +247,7 @@ func TestMsgBurn(t *testing.T) {
 			name: "zero amount",
 			msg: func() *types.MsgBurn {
 				msg := baseMsg
-				msg.Amount.Amount = sdk.ZeroInt()
+				msg.Amount.Amount = sdkmath.ZeroInt()
 				return msg
 			},
 			expectPass: false,

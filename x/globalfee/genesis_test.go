@@ -1,6 +1,7 @@
 package globalfee
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"testing"
 	"time"
 
@@ -8,8 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"cosmossdk.io/log"
-	dbm "github.com/cometbft/cometbft-db"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	dbm "github.com/cosmos/cosmos-db"
 
 	"cosmossdk.io/store"
 	storetypes "cosmossdk.io/store/types"
@@ -127,12 +128,12 @@ func TestInitExportGenesis(t *testing.T) {
 	}
 }
 
-func setupTestStore(t *testing.T) (context.Context, appparams.EncodingConfig, globalfeekeeper.Keeper) {
+func setupTestStore(t *testing.T) (sdk.Context, appparams.EncodingConfig, globalfeekeeper.Keeper) {
 	t.Helper()
 	db := dbm.NewMemDB()
-	ms := store.NewCommitMultiStore(db)
+	ms := store.NewCommitMultiStore(db, log.NewNopLogger(), nil)
 	encCfg := appparams.MakeEncodingConfig()
-	keyParams := sdk.NewKVStoreKey(types.StoreKey)
+	keyParams := storetypes.NewKVStoreKey(types.StoreKey)
 	ms.MountStoreWithDB(keyParams, storetypes.StoreTypeIAVL, db)
 	require.NoError(t, ms.LoadLatestVersion())
 

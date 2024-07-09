@@ -106,7 +106,7 @@ func NewAppModule(
 	}
 }
 
-func (am AppModule) InitGenesis(ctx context.Context, cdc codec.JSONCodec, gs json.RawMessage) []abci.ValidatorUpdate {
+func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState types.GenesisState
 	cdc.MustUnmarshalJSON(gs, &genesisState)
 	fmt.Println(genesisState)
@@ -116,7 +116,7 @@ func (am AppModule) InitGenesis(ctx context.Context, cdc codec.JSONCodec, gs jso
 	return nil
 }
 
-func (am AppModule) ExportGenesis(ctx context.Context, marshaller codec.JSONCodec) json.RawMessage {
+func (am AppModule) ExportGenesis(ctx sdk.Context, marshaller codec.JSONCodec) json.RawMessage {
 	genState := &types.GenesisState{
 		Params: am.keeper.GetParams(ctx),
 	}
@@ -135,11 +135,12 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewGrpcQuerier(am.keeper))
 }
 
-func (am AppModule) BeginBlock(_ context.Context, _ abci.RequestBeginBlock) {
+func (am AppModule) BeginBlock(_ context.Context) error {
+	return nil
 }
 
-func (am AppModule) EndBlock(_ context.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return nil
+func (am AppModule) EndBlock(_ context.Context) ([]abci.ValidatorUpdate, error) {
+	return []abci.ValidatorUpdate{}, nil
 }
 
 // ConsensusVersion is a sequence number for state-breaking change of the
