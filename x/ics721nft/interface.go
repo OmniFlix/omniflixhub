@@ -1,15 +1,15 @@
 package ics721nft
 
 import (
+	"context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 type (
 	// AccountKeeper defines the contract required for account APIs.
 	AccountKeeper interface {
-		NewAccountWithAddress(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
-		SetAccount(sdk.Context, authtypes.AccountI)
+		NewAccountWithAddress(ctx context.Context, addr sdk.AccAddress) sdk.AccountI
+		SetAccount(context.Context, sdk.AccountI)
 		GetModuleAddress(name string) sdk.AccAddress
 	}
 	BankKeeper interface {

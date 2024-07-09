@@ -45,7 +45,7 @@ func NewKeeper(cdc codec.Codec,
 }
 
 // CreateOrUpdateClass implement the method of ICS721Keeper.CreateOrUpdateClass
-func (k Keeper) CreateOrUpdateClass(ctx sdk.Context,
+func (k Keeper) CreateOrUpdateClass(ctx context.Context,
 	classID,
 	classURI,
 	classData string,
@@ -105,7 +105,7 @@ func (k Keeper) CreateOrUpdateClass(ctx sdk.Context,
 }
 
 // Mint implement the method of ICS721Keeper.Mint
-func (k Keeper) Mint(ctx sdk.Context,
+func (k Keeper) Mint(ctx context.Context,
 	classID,
 	tokenID,
 	tokenURI,
@@ -122,7 +122,7 @@ func (k Keeper) Mint(ctx sdk.Context,
 
 // Transfer implement the method of ICS721Keeper.Transfer
 func (k Keeper) Transfer(
-	ctx sdk.Context,
+	ctx context.Context,
 	classID,
 	tokenID,
 	_ string,
@@ -144,7 +144,7 @@ func (k Keeper) Transfer(
 }
 
 // GetClass implement the method of ICS721Keeper.GetClass
-func (k Keeper) GetClass(ctx sdk.Context, classID string) (nfttransfer.Class, bool) {
+func (k Keeper) GetClass(ctx context.Context, classID string) (nfttransfer.Class, bool) {
 	class, exist := k.nk.GetClass(ctx, classID)
 	if !exist {
 		return nil, false
@@ -163,7 +163,7 @@ func (k Keeper) GetClass(ctx sdk.Context, classID string) (nfttransfer.Class, bo
 }
 
 // GetNFT implement the method of ICS721Keeper.GetNFT
-func (k Keeper) GetNFT(ctx sdk.Context, classID, tokenID string) (nfttransfer.NFT, bool) {
+func (k Keeper) GetNFT(ctx context.Context, classID, tokenID string) (nfttransfer.NFT, bool) {
 	_nft, has := k.nk.GetNFT(ctx, classID, tokenID)
 	if !has {
 		return nil, false
@@ -182,27 +182,27 @@ func (k Keeper) GetNFT(ctx sdk.Context, classID, tokenID string) (nfttransfer.NF
 }
 
 // Burn implement the method of ICS721Keeper.Burn
-func (k Keeper) Burn(ctx sdk.Context, classID string, tokenID string) error {
+func (k Keeper) Burn(ctx context.Context, classID string, tokenID string) error {
 	return k.nk.Burn(ctx, classID, tokenID)
 }
 
 // GetOwner implement the method of ICS721Keeper.GetOwner
-func (k Keeper) GetOwner(ctx sdk.Context, classID string, tokenID string) sdk.AccAddress {
+func (k Keeper) GetOwner(ctx context.Context, classID string, tokenID string) sdk.AccAddress {
 	return k.nk.GetOwner(ctx, classID, tokenID)
 }
 
 // HasClass implement the method of ICS721Keeper.HasClass
-func (k Keeper) HasClass(ctx sdk.Context, classID string) bool {
+func (k Keeper) HasClass(ctx context.Context, classID string) bool {
 	return k.nk.HasClass(ctx, classID)
 }
 
 // Logger returns a module-specific logger.
-func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+func (k Keeper) Logger(ctx context.Context) log.Logger {
 	return ctx.Logger().With("module", "ics721/NFTKeeper")
 }
 
 func (k Keeper) validRoyaltyReceiverAddresses(addresses []*onfttypes.WeightedAddress) bool {
-	weightSum := sdk.NewDec(0)
+	weightSum := sdkmath.LegacyNewDec(0)
 	for _, addr := range addresses {
 		address, err := sdk.AccAddressFromBech32(addr.Address)
 		if err != nil {
@@ -214,10 +214,10 @@ func (k Keeper) validRoyaltyReceiverAddresses(addresses []*onfttypes.WeightedAdd
 		if !addr.Weight.IsPositive() {
 			return false
 		}
-		if addr.Weight.GT(sdk.NewDec(1)) {
+		if addr.Weight.GT(sdkmath.LegacyNewDec(1)) {
 			return false
 		}
 		weightSum = weightSum.Add(addr.Weight)
 	}
-	return weightSum.Equal(sdk.NewDec(1))
+	return weightSum.Equal(sdkmath.LegacyNewDec(1))
 }
