@@ -31,7 +31,7 @@ message AuctionListing {
   string                    owner                = 7;
   string                    increment_percentage = 8 [
     (gogoproto.moretags)   = "yaml:\"increment_percentage\"",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable)   = false
   ];
   repeated string           whitelist_accounts   = 9 [
