@@ -8,7 +8,7 @@ import (
 // NFTKeeper save the denom of class
 type NFTKeeper interface {
 	SaveDenom(
-		ctx sdk.Context,
+		ctx context.Context,
 		id,
 		symbol,
 		name,

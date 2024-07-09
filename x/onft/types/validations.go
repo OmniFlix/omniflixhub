@@ -139,7 +139,7 @@ func ValidateWeightedAddresses(i interface{}) error {
 		return nil
 	}
 
-	weightSum := sdk.NewDec(0)
+	weightSum := sdkmath.LegacyNewDec(0)
 	for i, w := range v {
 		_, err := sdk.AccAddressFromBech32(w.Address)
 		if err != nil {
@@ -148,13 +148,13 @@ func ValidateWeightedAddresses(i interface{}) error {
 		if !w.Weight.IsPositive() {
 			return fmt.Errorf("non-positive weight at %dth", i)
 		}
-		if w.Weight.GT(sdk.NewDec(1)) {
+		if w.Weight.GT(sdkmath.LegacyNewDec(1)) {
 			return fmt.Errorf("more than 1 weight at %dth", i)
 		}
 		weightSum = weightSum.Add(w.Weight)
 	}
 
-	if !weightSum.Equal(sdk.NewDec(1)) {
+	if !weightSum.Equal(sdkmath.LegacyNewDec(1)) {
 		return fmt.Errorf("invalid weight sum: %s", weightSum.String())
 	}
 

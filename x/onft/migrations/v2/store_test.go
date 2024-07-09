@@ -19,7 +19,7 @@ import (
 )
 
 func generateCollectionsData(
-	ctx sdk.Context,
+	ctx context.Context,
 	storeKey storetypes.StoreKey,
 	cdc codec.Codec,
 ) (collections []types.Collection) {
@@ -54,7 +54,7 @@ func generateCollectionsData(
 				Transferable: []bool{true, false}[rand.Intn(2)],
 				Extensible:   []bool{true, false}[rand.Intn(2)],
 				Nsfw:         []bool{true, false}[rand.Intn(2)],
-				RoyaltyShare: sdk.NewDecWithPrec(5, 2),
+				RoyaltyShare: sdkmath.LegacyNewDecWithPrec(5, 2),
 				Data:         fmt.Sprintf("nftData%d", j),
 				Owner:        addrs[rand.Intn(len(addrs))].String(),
 				CreatedAt:    time.Time{},
@@ -70,7 +70,7 @@ func generateCollectionsData(
 	return collections
 }
 
-func check(t *testing.T, ctx sdk.Context, k keeper.Keeper, collections []types.Collection) {
+func check(t *testing.T, ctx context.Context, k keeper.Keeper, collections []types.Collection) {
 	t.Helper()
 
 	for _, collection := range collections {
@@ -81,7 +81,7 @@ func check(t *testing.T, ctx sdk.Context, k keeper.Keeper, collections []types.C
 	keeper.SupplyInvariant(k)
 }
 
-func setDenom(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.Codec, denom types.Denom) {
+func setDenom(ctx context.Context, storeKey storetypes.StoreKey, cdc codec.Codec, denom types.Denom) {
 	store := ctx.KVStore(storeKey)
 	bz := cdc.MustMarshal(&denom)
 	store.Set(v2.KeyDenomID(denom.Id), bz)
@@ -89,7 +89,7 @@ func setDenom(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.Codec, de
 }
 
 func mintONFT(
-	ctx sdk.Context,
+	ctx context.Context,
 	storeKey storetypes.StoreKey,
 	cdc codec.Codec,
 	denomID string,
@@ -101,7 +101,7 @@ func mintONFT(
 }
 
 func setONFT(
-	ctx sdk.Context,
+	ctx context.Context,
 	storeKey storetypes.StoreKey,
 	cdc codec.Codec,
 	denomID string,
@@ -114,7 +114,7 @@ func setONFT(
 }
 
 func setOwner(
-	ctx sdk.Context,
+	ctx context.Context,
 	storeKey storetypes.StoreKey,
 	cdc codec.Codec,
 	denomID, onftID, owner string,
@@ -126,7 +126,7 @@ func setOwner(
 }
 
 func increaseSupply(
-	ctx sdk.Context,
+	ctx context.Context,
 	storeKey storetypes.StoreKey,
 	cdc codec.Codec,
 	denomID string,
@@ -140,7 +140,7 @@ func increaseSupply(
 }
 
 func getTotalSupply(
-	ctx sdk.Context,
+	ctx context.Context,
 	storeKey storetypes.StoreKey,
 	cdc codec.Codec,
 	denomID string,

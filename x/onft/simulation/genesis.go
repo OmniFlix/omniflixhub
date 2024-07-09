@@ -99,5 +99,5 @@ func RandMetadata(r *rand.Rand) types.Metadata {
 }
 
 func RandRoyaltyShare(r *rand.Rand) sdk.Dec {
-	return simtypes.RandomDecAmount(r, sdk.NewDecWithPrec(999999999999999999, 18))
+	return simtypes.RandomDecAmount(r, sdkmath.LegacyNewDecWithPrec(999999999999999999, 18))
 }

@@ -257,7 +257,7 @@ Additional Flags
 			if err != nil {
 				return err
 			}
-			royaltyShare := sdk.NewDec(0)
+			royaltyShare := sdkmath.LegacyNewDec(0)
 			if len(royaltyShareStr) > 0 {
 				royaltyShare, err = sdk.NewDecFromStr(royaltyShareStr)
 				if err != nil {

@@ -15,7 +15,7 @@ const (
 var ParamsKey = []byte{0x07}
 
 func Migrate(
-	ctx sdk.Context,
+	ctx context.Context,
 	storeKey storetypes.StoreKey,
 	legacySubspace exported.Subspace,
 	cdc codec.BinaryCodec,
@@ -38,7 +38,7 @@ func Migrate(
 // and managed by the x/params modules and stores them directly into the onft
 // module state.
 func MigrateParams(
-	ctx sdk.Context,
+	ctx context.Context,
 	legacySubspace exported.Subspace,
 	k keeper,
 ) error {

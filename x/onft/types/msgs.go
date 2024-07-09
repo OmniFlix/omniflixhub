@@ -280,7 +280,7 @@ func (msg MsgMintONFT) ValidateBasic() error {
 	if err := ValidateURI(msg.Metadata.PreviewURI); err != nil {
 		return err
 	}
-	if msg.RoyaltyShare.IsNegative() || msg.RoyaltyShare.GTE(sdk.NewDec(1)) {
+	if msg.RoyaltyShare.IsNegative() || msg.RoyaltyShare.GTE(sdkmath.LegacyNewDec(1)) {
 		return errorsmod.Wrapf(ErrInvalidPercentage, "invalid royalty share percentage decimal value; %d, must be positive and less than 1", msg.RoyaltyShare)
 	}
 

@@ -7,6 +7,6 @@ import (
 )
 
 // GetONFTModuleAccount returns oNFT ModuleAccount
-func (k Keeper) GetONFTModuleAccount(ctx sdk.Context) authtypes.ModuleAccountI {
+func (k Keeper) GetONFTModuleAccount(ctx context.Context) authtypes.ModuleAccountI {
 	return k.accountKeeper.GetModuleAccount(ctx, types.ModuleName)
 }

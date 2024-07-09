@@ -12,7 +12,7 @@ import (
 
 // SaveDenom saves a denom
 func (k Keeper) SaveDenom(
-	ctx sdk.Context,
+	ctx context.Context,
 	id,
 	symbol,
 	name,
@@ -56,7 +56,7 @@ func (k Keeper) SaveDenom(
 
 // TransferDenomOwner transfers the ownership to new address
 func (k Keeper) TransferDenomOwner(
-	ctx sdk.Context,
+	ctx context.Context,
 	denomID string,
 	srcOwner,
 	dstOwner sdk.AccAddress,
@@ -106,11 +106,11 @@ func (k Keeper) TransferDenomOwner(
 	return nil
 }
 
-func (k Keeper) HasDenom(ctx sdk.Context, id string) bool {
+func (k Keeper) HasDenom(ctx context.Context, id string) bool {
 	return k.nk.HasClass(ctx, id)
 }
 
-func (k Keeper) UpdateDenom(ctx sdk.Context, msg *types.MsgUpdateDenom) error {
+func (k Keeper) UpdateDenom(ctx context.Context, msg *types.MsgUpdateDenom) error {
 	denom, err := k.GetDenomInfo(ctx, msg.Id)
 	if err != nil {
 		return err
@@ -161,7 +161,7 @@ func (k Keeper) UpdateDenom(ctx sdk.Context, msg *types.MsgUpdateDenom) error {
 	return k.nk.UpdateClass(ctx, class)
 }
 
-func (k Keeper) GetDenoms(ctx sdk.Context) (denoms []types.Denom, err error) {
+func (k Keeper) GetDenoms(ctx context.Context) (denoms []types.Denom, err error) {
 	classes := k.nk.GetClasses(ctx)
 	for _, class := range classes {
 		var denomMetadata types.DenomMetadata
@@ -184,7 +184,7 @@ func (k Keeper) GetDenoms(ctx sdk.Context) (denoms []types.Denom, err error) {
 	return denoms, nil
 }
 
-func (k Keeper) AuthorizeDenomCreator(ctx sdk.Context, id string, creator sdk.AccAddress) error {
+func (k Keeper) AuthorizeDenomCreator(ctx context.Context, id string, creator sdk.AccAddress) error {
 	denom, err := k.GetDenomInfo(ctx, id)
 	if err != nil {
 		return err
@@ -196,7 +196,7 @@ func (k Keeper) AuthorizeDenomCreator(ctx sdk.Context, id string, creator sdk.Ac
 	return nil
 }
 
-func (k Keeper) HasPermissionToMint(ctx sdk.Context, denomID string, sender sdk.AccAddress) bool {
+func (k Keeper) HasPermissionToMint(ctx context.Context, denomID string, sender sdk.AccAddress) bool {
 	denom, err := k.GetDenomInfo(ctx, denomID)
 	if err != nil {
 		return false
@@ -208,7 +208,7 @@ func (k Keeper) HasPermissionToMint(ctx sdk.Context, denomID string, sender sdk.
 	return false
 }
 
-func (k Keeper) GetDenomInfo(ctx sdk.Context, denomID string) (*types.Denom, error) {
+func (k Keeper) GetDenomInfo(ctx context.Context, denomID string) (*types.Denom, error) {
 	class, ok := k.nk.GetClass(ctx, denomID)
 	if !ok {
 		return nil, errorsmod.Wrapf(types.ErrInvalidDenom, "denom ID %s not exists", denomID)
@@ -235,7 +235,7 @@ func (k Keeper) GetDenomInfo(ctx sdk.Context, denomID string) (*types.Denom, err
 
 // PurgeDenom deletes the denom if no nfts in it
 func (k Keeper) PurgeDenom(
-	ctx sdk.Context,
+	ctx context.Context,
 	denomID string,
 	sender sdk.AccAddress,
 ) error {
@@ -266,7 +266,7 @@ func (k Keeper) PurgeDenom(
 	return nil
 }
 
-func (k Keeper) DeleteDenomFromStore(ctx sdk.Context, denomId string) {
+func (k Keeper) DeleteDenomFromStore(ctx context.Context, denomId string) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(classStoreKey(denomId))
 }

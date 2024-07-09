@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	"fmt"
-
 	errorsmod "cosmossdk.io/errors"
+	"fmt"
+	"github.com/cosmos/cosmos-sdk/runtime"
 
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
@@ -29,7 +29,7 @@ type Keeper struct {
 
 func NewKeeper(
 	cdc codec.BinaryCodec,
-	storeKey storetypes.StoreKey,
+	storeKey *storetypes.KVStoreKey,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 	distrKeeper types.DistributionKeeper,
@@ -46,7 +46,7 @@ func NewKeeper(
 		accountKeeper:      accountKeeper,
 		bankKeeper:         bankKeeper,
 		distributionKeeper: distrKeeper,
-		nk:                 nftkeeper.NewKeeper(storeKey, cdc, accountKeeper, bankKeeper),
+		nk:                 nftkeeper.NewKeeper(runtime.NewKVStoreService(storeKey), cdc, accountKeeper, bankKeeper),
 		authority:          authority,
 	}
 }
@@ -56,7 +56,7 @@ func (k Keeper) GetAuthority() string {
 	return k.authority
 }
 
-func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+func (k Keeper) Logger(ctx context.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("OmniFlix/%s", types.ModuleName))
 }
 

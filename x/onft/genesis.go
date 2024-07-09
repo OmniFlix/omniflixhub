@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
+func InitGenesis(ctx context.Context, k keeper.Keeper, data types.GenesisState) {
 	if err := types.ValidateGenesis(data); err != nil {
 		panic(err.Error())
 	}
@@ -21,7 +21,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	}
 }
 
-func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
+func ExportGenesis(ctx context.Context, k keeper.Keeper) *types.GenesisState {
 	collections, err := k.GetCollections(ctx)
 	if err != nil {
 		panic(err.Error())

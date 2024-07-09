@@ -25,7 +25,7 @@ type keeper struct {
 }
 
 func (k keeper) saveNFT(
-	ctx sdk.Context,
+	ctx context.Context,
 	denomID,
 	nftID,
 	nftName,
@@ -71,13 +71,13 @@ func (k keeper) saveNFT(
 	return nil
 }
 
-func (k keeper) setNFT(ctx sdk.Context, token nft.NFT) {
+func (k keeper) setNFT(ctx context.Context, token nft.NFT) {
 	nftStore := k.getNFTStore(ctx, token.ClassId)
 	bz := k.cdc.MustMarshal(&token)
 	nftStore.Set([]byte(token.Id), bz)
 }
 
-func (k keeper) setOwner(ctx sdk.Context, classID, nftID string, owner sdk.AccAddress) {
+func (k keeper) setOwner(ctx context.Context, classID, nftID string, owner sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set(ownerStoreKey(classID, nftID), owner.Bytes())
 
@@ -85,31 +85,31 @@ func (k keeper) setOwner(ctx sdk.Context, classID, nftID string, owner sdk.AccAd
 	ownerStore.Set([]byte(nftID), nftkeeper.Placeholder)
 }
 
-func (k keeper) incrTotalSupply(ctx sdk.Context, classID string) {
+func (k keeper) incrTotalSupply(ctx context.Context, classID string) {
 	supply := k.GetTotalSupply(ctx, classID) + 1
 	k.updateTotalSupply(ctx, classID, supply)
 }
 
 // GetTotalSupply returns the number of all nfts under the specified classID
-func (k keeper) GetTotalSupply(ctx sdk.Context, classID string) uint64 {
+func (k keeper) GetTotalSupply(ctx context.Context, classID string) uint64 {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(classTotalSupply(classID))
 	return sdk.BigEndianToUint64(bz)
 }
 
-func (k keeper) updateTotalSupply(ctx sdk.Context, classID string, supply uint64) {
+func (k keeper) updateTotalSupply(ctx context.Context, classID string, supply uint64) {
 	store := ctx.KVStore(k.storeKey)
 	supplyKey := classTotalSupply(classID)
 	store.Set(supplyKey, sdk.Uint64ToBigEndian(supply))
 }
 
-func (k keeper) getClassStoreByOwner(ctx sdk.Context, owner sdk.AccAddress, classID string) prefix.Store {
+func (k keeper) getClassStoreByOwner(ctx context.Context, owner sdk.AccAddress, classID string) prefix.Store {
 	store := ctx.KVStore(k.storeKey)
 	key := nftOfClassByOwnerStoreKey(owner, classID)
 	return prefix.NewStore(store, key)
 }
 
-func (k keeper) getNFTStore(ctx sdk.Context, classID string) prefix.Store {
+func (k keeper) getNFTStore(ctx context.Context, classID string) prefix.Store {
 	store := ctx.KVStore(k.storeKey)
 	return prefix.NewStore(store, nftStoreKey(classID))
 }

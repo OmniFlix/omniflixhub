@@ -14,7 +14,7 @@ import (
 )
 
 // MigrateCollections is used to migrate nft data from onft to x/nft
-func MigrateCollections(ctx sdk.Context,
+func MigrateCollections(ctx context.Context,
 	storeKey storetypes.StoreKey,
 	logger log.Logger,
 	k keeper,
@@ -80,7 +80,7 @@ func MigrateCollections(ctx sdk.Context,
 }
 
 func migrateONFT(
-	ctx sdk.Context,
+	ctx context.Context,
 	k keeper,
 	logger log.Logger,
 	denomID string,

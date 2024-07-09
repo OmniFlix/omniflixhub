@@ -12,7 +12,7 @@ import (
 )
 
 func (k Keeper) MintONFT(
-	ctx sdk.Context,
+	ctx context.Context,
 	denomID,
 	nftID,
 	name,
@@ -57,7 +57,7 @@ func (k Keeper) MintONFT(
 	return nil
 }
 
-func (k Keeper) TransferOwnership(ctx sdk.Context, denomID, onftID string, srcOwner, dstOwner sdk.AccAddress) error {
+func (k Keeper) TransferOwnership(ctx context.Context, denomID, onftID string, srcOwner, dstOwner sdk.AccAddress) error {
 	if !k.nk.HasClass(ctx, denomID) {
 		return errorsmod.Wrapf(types.ErrInvalidDenom, "denomID %s not exists", denomID)
 	}
@@ -87,7 +87,7 @@ func (k Keeper) TransferOwnership(ctx sdk.Context, denomID, onftID string, srcOw
 }
 
 func (k Keeper) BurnONFT(
-	ctx sdk.Context,
+	ctx context.Context,
 	denomID,
 	onftID string,
 	owner sdk.AccAddress,
@@ -113,7 +113,7 @@ func (k Keeper) BurnONFT(
 	return nil
 }
 
-func (k Keeper) GetONFT(ctx sdk.Context, denomID, onftID string) (nft exported.ONFTI, err error) {
+func (k Keeper) GetONFT(ctx context.Context, denomID, onftID string) (nft exported.ONFTI, err error) {
 	if !k.nk.HasClass(ctx, denomID) {
 		return nil, errorsmod.Wrapf(types.ErrInvalidDenom, "denomID %s not exists", denomID)
 	}
@@ -148,7 +148,7 @@ func (k Keeper) GetONFT(ctx sdk.Context, denomID, onftID string) (nft exported.O
 	}, nil
 }
 
-func (k Keeper) GetONFTs(ctx sdk.Context, denomID string) (onfts []exported.ONFTI, err error) {
+func (k Keeper) GetONFTs(ctx context.Context, denomID string) (onfts []exported.ONFTI, err error) {
 	nfts := k.nk.GetNFTsOfClass(ctx, denomID)
 	for _, _nft := range nfts {
 
@@ -180,7 +180,7 @@ func (k Keeper) GetONFTs(ctx sdk.Context, denomID string) (onfts []exported.ONFT
 	return onfts, nil
 }
 
-func (k Keeper) GetOwnerONFTs(ctx sdk.Context, denomID string, owner sdk.AccAddress) (onfts []exported.ONFTI, err error) {
+func (k Keeper) GetOwnerONFTs(ctx context.Context, denomID string, owner sdk.AccAddress) (onfts []exported.ONFTI, err error) {
 	nfts := k.nk.GetNFTsOfClassByOwner(ctx, denomID, owner)
 	for _, _nft := range nfts {
 
@@ -213,7 +213,7 @@ func (k Keeper) GetOwnerONFTs(ctx sdk.Context, denomID string, owner sdk.AccAddr
 }
 
 func (k Keeper) Authorize(
-	ctx sdk.Context,
+	ctx context.Context,
 	denomID,
 	onftID string,
 	owner sdk.AccAddress,
@@ -224,6 +224,6 @@ func (k Keeper) Authorize(
 	return nil
 }
 
-func (k Keeper) HasONFT(ctx sdk.Context, denomID, onftID string) bool {
+func (k Keeper) HasONFT(ctx context.Context, denomID, onftID string) bool {
 	return k.nk.HasNFT(ctx, denomID, onftID)
 }

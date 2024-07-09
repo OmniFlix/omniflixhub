@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) SetCollection(ctx sdk.Context, collection types.Collection) error {
+func (k Keeper) SetCollection(ctx context.Context, collection types.Collection) error {
 	denom := collection.Denom
 	creator, err := sdk.AccAddressFromBech32(denom.Creator)
 	if err != nil {
@@ -51,7 +51,7 @@ func (k Keeper) SetCollection(ctx sdk.Context, collection types.Collection) erro
 	return nil
 }
 
-func (k Keeper) GetCollection(ctx sdk.Context, denomID string) (types.Collection, error) {
+func (k Keeper) GetCollection(ctx context.Context, denomID string) (types.Collection, error) {
 	denom, err := k.GetDenomInfo(ctx, denomID)
 	if err != nil {
 		return types.Collection{}, errorsmod.Wrapf(types.ErrInvalidDenom, "denomID %s not existed ", denomID)
@@ -64,7 +64,7 @@ func (k Keeper) GetCollection(ctx sdk.Context, denomID string) (types.Collection
 	return types.NewCollection(*denom, onfts), nil
 }
 
-func (k Keeper) GetCollections(ctx sdk.Context) (collections []types.Collection, err error) {
+func (k Keeper) GetCollections(ctx context.Context) (collections []types.Collection, err error) {
 	for _, class := range k.nk.GetClasses(ctx) {
 		onfts, err := k.GetONFTs(ctx, class.Id)
 		if err != nil {
@@ -81,11 +81,11 @@ func (k Keeper) GetCollections(ctx sdk.Context) (collections []types.Collection,
 	return collections, nil
 }
 
-func (k Keeper) GetTotalSupply(ctx sdk.Context, denomID string) uint64 {
+func (k Keeper) GetTotalSupply(ctx context.Context, denomID string) uint64 {
 	return k.nk.GetTotalSupply(ctx, denomID)
 }
 
 // GetBalance returns the amount of NFTs owned in a class by an account
-func (k Keeper) GetBalance(ctx sdk.Context, id string, owner sdk.AccAddress) (supply uint64) {
+func (k Keeper) GetBalance(ctx context.Context, id string, owner sdk.AccAddress) (supply uint64) {
 	return k.nk.GetBalance(ctx, id, owner)
 }
