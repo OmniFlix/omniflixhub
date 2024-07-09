@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) emitCreateCampaignEvent(ctx sdk.Context, campaign types.Campaign) {
+func (k Keeper) emitCreateCampaignEvent(ctx context.Context, campaign types.Campaign) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeCreateCampaign,
@@ -23,7 +23,7 @@ func (k Keeper) emitCreateCampaignEvent(ctx sdk.Context, campaign types.Campaign
 	)
 }
 
-func (k Keeper) emitDepositCampaignEvent(ctx sdk.Context, campaignId uint64, depositor string, amount sdk.Coin) {
+func (k Keeper) emitDepositCampaignEvent(ctx context.Context, campaignId uint64, depositor string, amount sdk.Coin) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeDepositCampaign,
@@ -34,7 +34,7 @@ func (k Keeper) emitDepositCampaignEvent(ctx sdk.Context, campaignId uint64, dep
 	)
 }
 
-func (k Keeper) emitCancelCampaignEvent(ctx sdk.Context, campaignId uint64, sender string) {
+func (k Keeper) emitCancelCampaignEvent(ctx context.Context, campaignId uint64, sender string) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeCancelCampaign,
@@ -44,7 +44,7 @@ func (k Keeper) emitCancelCampaignEvent(ctx sdk.Context, campaignId uint64, send
 	)
 }
 
-func (k Keeper) emitClaimEvent(ctx sdk.Context, campaign uint64, claimer string, nftId string) {
+func (k Keeper) emitClaimEvent(ctx context.Context, campaign uint64, claimer string, nftId string) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeClaim,
@@ -55,7 +55,7 @@ func (k Keeper) emitClaimEvent(ctx sdk.Context, campaign uint64, claimer string,
 	)
 }
 
-func (k Keeper) emitEndCampaignEvent(ctx sdk.Context, campaignId uint64) {
+func (k Keeper) emitEndCampaignEvent(ctx context.Context, campaignId uint64) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeEndCampaign,

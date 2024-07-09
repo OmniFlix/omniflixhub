@@ -9,7 +9,7 @@ import (
 )
 
 // InitGenesis initializes state
-func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
+func InitGenesis(ctx context.Context, k keeper.Keeper, genState types.GenesisState) {
 	if err := genState.ValidateGenesis(); err != nil {
 		panic(err.Error())
 	}
@@ -35,7 +35,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 }
 
 // ExportGenesis exports state
-func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
+func ExportGenesis(ctx context.Context, k keeper.Keeper) *types.GenesisState {
 	campaigns := k.GetAllCampaigns(ctx)
 	var claims []types.Claim
 	for _, campaign := range campaigns {

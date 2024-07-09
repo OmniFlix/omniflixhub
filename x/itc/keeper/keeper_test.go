@@ -46,7 +46,7 @@ var (
 		MediaUri:     "ipfs://minttesturi",
 		PreviewUri:   "ipfs://minttestpreviewuri",
 		Data:         "{}",
-		RoyaltyShare: sdk.NewDecWithPrec(1, 2),
+		RoyaltyShare: sdkmath.LegacyNewDecWithPrec(1, 2),
 		Transferable: true,
 		Extensible:   true,
 		Nsfw:         false,
@@ -220,7 +220,7 @@ func (suite *KeeperTestSuite) mintNFT(denomId, nftId string) {
 		true,
 		true,
 		false,
-		sdk.NewDecWithPrec(1, 2),
+		sdkmath.LegacyNewDecWithPrec(1, 2),
 	)
 	mintNftMsg.Id = nftId
 	_, _ = suite.nftMsgServer.MintONFT(

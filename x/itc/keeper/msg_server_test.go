@@ -171,7 +171,7 @@ func (suite *KeeperTestSuite) TestCreateCampaign() {
 			nftMintDetails:         nil,
 			distribution:           &defaultDistribution,
 			creator:                suite.TestAccs[0].String(),
-			creationFee:            types.DefaultCampaignCreationFee.SubAmount(sdk.NewInt(1_000_000)),
+			creationFee:            types.DefaultCampaignCreationFee.SubAmount(sdkmath.NewInt(1_000_000)),
 			valid:                  false,
 			expectedMessageEvents:  0,
 			expectedTransferEvents: 0,
@@ -528,7 +528,7 @@ func (suite *KeeperTestSuite) TestUpdateParams() {
 				Authority: suite.App.ItcKeeper.GetAuthority(),
 				Params: types.Params{
 					MaxCampaignDuration: types.DefaultMaxCampaignDuration,
-					CreationFee:         sdk.NewCoin("foo", sdk.NewInt(0)),
+					CreationFee:         sdk.NewCoin("foo", sdkmath.NewInt(0)),
 				},
 			},
 			expectErr: true,

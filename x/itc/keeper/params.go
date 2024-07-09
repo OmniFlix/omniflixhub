@@ -8,7 +8,7 @@ import (
 )
 
 // GetParams gets the parameters for the itc module.
-func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
+func (k Keeper) GetParams(ctx context.Context) (params types.Params) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.ParamsKey)
 	if bz == nil {
@@ -19,7 +19,7 @@ func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
 }
 
 // SetParams sets the parameters for the itc module.
-func (k Keeper) SetParams(ctx sdk.Context, params types.Params) error {
+func (k Keeper) SetParams(ctx context.Context, params types.Params) error {
 	if err := params.ValidateBasic(); err != nil {
 		return err
 	}
@@ -31,13 +31,13 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) error {
 }
 
 // GetMaxCampaignDuration returns the maximum duration allowed to create a campaign.
-func (k Keeper) GetMaxCampaignDuration(ctx sdk.Context) (duration time.Duration) {
+func (k Keeper) GetMaxCampaignDuration(ctx context.Context) (duration time.Duration) {
 	params := k.GetParams(ctx)
 	return params.MaxCampaignDuration
 }
 
 // GetCampaignCreationFee returns the creation fee required to create a campaign.
-func (k Keeper) GetCampaignCreationFee(ctx sdk.Context) (creationFee sdk.Coin) {
+func (k Keeper) GetCampaignCreationFee(ctx context.Context) (creationFee sdk.Coin) {
 	params := k.GetParams(ctx)
 	return params.CreationFee
 }
