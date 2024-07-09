@@ -18,7 +18,7 @@ var ParamsKey = []byte{0x15}
 // and managed by the x/params modules and stores them directly into the x/marketplace
 // module state.
 func Migrate(
-	ctx sdk.Context,
+	ctx context.Context,
 	store sdk.KVStore,
 	legacySubspace exported.Subspace,
 	cdc codec.BinaryCodec,

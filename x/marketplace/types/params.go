@@ -30,10 +30,10 @@ func NewMarketplaceParams(
 // DefaultParams returns default marketplace parameters
 func DefaultParams() Params {
 	return NewMarketplaceParams(
-		sdk.NewDecWithPrec(1, 2), // 1%
+		sdkmath.LegacyNewDecWithPrec(1, 2), // 1%
 		Distribution{
-			Staking:       sdk.NewDecWithPrec(50, 2), // 50%
-			CommunityPool: sdk.NewDecWithPrec(50, 2), // 50%
+			Staking:       sdkmath.LegacyNewDecWithPrec(50, 2), // 50%
+			CommunityPool: sdkmath.LegacyNewDecWithPrec(50, 2), // 50%
 		},
 		DefaultBidClosePeriod,
 		DefaultMaxAuctionDuration,

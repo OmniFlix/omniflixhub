@@ -242,7 +242,7 @@ func (msg MsgCreateAuction) ValidateBasic() error {
 			return err
 		}
 	}
-	if !msg.IncrementPercentage.IsPositive() || !msg.IncrementPercentage.LTE(sdk.NewDec(1)) {
+	if !msg.IncrementPercentage.IsPositive() || !msg.IncrementPercentage.LTE(sdkmath.LegacyNewDec(1)) {
 		return errorsmod.Wrapf(ErrInvalidPercentage, "invalid percentage value (%s)", msg.IncrementPercentage.String())
 	}
 	if err = ValidateSplitShares(msg.SplitShares); err != nil {

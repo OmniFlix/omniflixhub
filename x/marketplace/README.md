@@ -30,7 +30,7 @@ message WeightedAddress {
   string address           = 1 [(gogoproto.moretags) = "yaml:\"address\""];
   string weight            = 2 [
     (gogoproto.moretags)   = "yaml:\"weight\"",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable)   = false
   ];
 }
@@ -67,7 +67,7 @@ message AuctionListing {
   string                    owner                = 7;
   string                    increment_percentage = 8 [
     (gogoproto.moretags)   = "yaml:\"increment_percentage\"",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable)   = false
   ];
   repeated string           whitelist_accounts   = 9 [
@@ -188,7 +188,7 @@ message MsgCreateAuction {
   string increment_percentage = 6 [
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"increment_percentage\"",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec"
   ];
   repeated string whitelist_accounts = 7 [
     (gogoproto.nullable) = false,

@@ -64,12 +64,12 @@ func (k Keeper) GetAuthority() string {
 }
 
 // Logger returns a module-specific logger.
-func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+func (k Keeper) Logger(ctx context.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("OmniFlix/%s", types.ModuleName))
 }
 
 // AddListing adds a listing in the store and set owner to listing and updates the count
-func (k Keeper) AddListing(ctx sdk.Context, listing types.Listing) error {
+func (k Keeper) AddListing(ctx context.Context, listing types.Listing) error {
 	// check listing already exists
 	if k.HasListing(ctx, listing.GetId()) {
 		return errorsmod.Wrapf(types.ErrListingAlreadyExists, "listing already exists: %s", listing.GetId())
@@ -98,14 +98,14 @@ func (k Keeper) AddListing(ctx sdk.Context, listing types.Listing) error {
 	return nil
 }
 
-func (k Keeper) DeleteListing(ctx sdk.Context, listing types.Listing) {
+func (k Keeper) DeleteListing(ctx context.Context, listing types.Listing) {
 	k.RemoveListing(ctx, listing.GetId())
 	k.UnsetWithOwner(ctx, listing.GetOwner(), listing.GetId())
 	k.UnsetWithNFTID(ctx, listing.GetNftId())
 	k.UnsetWithPriceDenom(ctx, listing.Price.Denom, listing.GetId())
 }
 
-func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress) error {
+func (k Keeper) Buy(ctx context.Context, listing types.Listing, buyer sdk.AccAddress) error {
 	owner, err := sdk.AccAddressFromBech32(listing.Owner)
 	if err != nil {
 		return err
@@ -194,7 +194,7 @@ func (k Keeper) GetProportions(totalCoin sdk.Coin, ratio sdk.Dec) sdk.Coin {
 	return sdk.NewCoin(totalCoin.Denom, sdk.NewDecFromInt(totalCoin.Amount).Mul(ratio).TruncateInt())
 }
 
-func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) error {
+func (k Keeper) DistributeCommission(ctx context.Context, marketplaceCoin sdk.Coin) error {
 	distrParams := k.GetMarketplaceDistributionParams(ctx)
 	stakingCommissionCoin := k.GetProportions(marketplaceCoin, distrParams.Staking)
 	moduleAccAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
@@ -231,7 +231,7 @@ func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) 
 }
 
 // CreateAuctionListing creates a auction in the store and set owner to auction and updates the next auction number
-func (k Keeper) CreateAuctionListing(ctx sdk.Context, auction types.AuctionListing) error {
+func (k Keeper) CreateAuctionListing(ctx context.Context, auction types.AuctionListing) error {
 	// check auction already exists or not
 	if k.HasAuctionListing(ctx, auction.GetId()) {
 		return errorsmod.Wrapf(types.ErrListingAlreadyExists, "auction listing already exists: %d", auction.GetId())
@@ -261,7 +261,7 @@ func (k Keeper) CreateAuctionListing(ctx sdk.Context, auction types.AuctionListi
 	return nil
 }
 
-func (k Keeper) CancelAuctionListing(ctx sdk.Context, auction types.AuctionListing) error {
+func (k Keeper) CancelAuctionListing(ctx context.Context, auction types.AuctionListing) error {
 	// Check bid Exists or Not
 	if k.HasBid(ctx, auction.Id) {
 		return errorsmod.Wrapf(types.ErrBidExists, "cannot cancel auction %d, bid exists ", auction.Id)
@@ -281,7 +281,7 @@ func (k Keeper) CancelAuctionListing(ctx sdk.Context, auction types.AuctionListi
 	return nil
 }
 
-func (k Keeper) PlaceBid(ctx sdk.Context, auction types.AuctionListing, newBid types.Bid) error {
+func (k Keeper) PlaceBid(ctx context.Context, auction types.AuctionListing, newBid types.Bid) error {
 	// Check bids of auction
 	newBidPrice := auction.StartPrice
 	prevBid, bidExists := k.GetBid(ctx, auction.Id)
@@ -318,7 +318,7 @@ func (k Keeper) GetNewBidPrice(denom string, amount sdk.Coin, increment sdk.Dec)
 }
 
 func (k Keeper) TransferRoyalty(
-	ctx sdk.Context,
+	ctx context.Context,
 	nftRoyaltyShareCoin sdk.Coin,
 	royaltyReceivers []*onfttypes.WeightedAddress,
 	creator sdk.AccAddress,

@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"cosmossdk.io/store/prefix"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
@@ -34,7 +35,7 @@ func (k Keeper) RemoveBid(ctx sdk.Context, id uint64) {
 // GetAllBids returns all bids
 func (k Keeper) GetAllBids(ctx sdk.Context) (list []types.Bid) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixBidByAuctionId)
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
 
@@ -50,7 +51,7 @@ func (k Keeper) GetAllBids(ctx sdk.Context) (list []types.Bid) {
 // GetBidsByBidder returns all bids of specific bidder
 func (k Keeper) GetBidsByBidder(ctx sdk.Context, bidder sdk.AccAddress) (bids []types.Bid) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, append(types.PrefixBidByBidder, bidder.Bytes()...))
+	iterator := storetypes.KVStorePrefixIterator(store, append(types.PrefixBidByBidder, bidder.Bytes()...))
 
 	defer iterator.Close()
 

@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	storetypes "cosmossdk.io/store/types"
 	"encoding/binary"
 
 	"cosmossdk.io/store/prefix"
@@ -72,7 +73,7 @@ func (k Keeper) RemoveListing(ctx sdk.Context, id string) {
 // GetAllListings returns all listings
 func (k Keeper) GetAllListings(ctx sdk.Context) (list []types.Listing) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixListingId)
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
 
@@ -88,7 +89,7 @@ func (k Keeper) GetAllListings(ctx sdk.Context) (list []types.Listing) {
 // GetListingsByOwner returns all listings of specific owner
 func (k Keeper) GetListingsByOwner(ctx sdk.Context, owner sdk.AccAddress) (listings []types.Listing) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, append(types.PrefixListingOwner, owner.Bytes()...))
+	iterator := storetypes.KVStorePrefixIterator(store, append(types.PrefixListingOwner, owner.Bytes()...))
 
 	defer iterator.Close()
 

@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"time"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
@@ -31,7 +32,7 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) error {
 }
 
 // GetSaleCommission returns the current sale commission of marketplace.
-func (k Keeper) GetSaleCommission(ctx sdk.Context) (percent sdk.Dec) {
+func (k Keeper) GetSaleCommission(ctx sdk.Context) (percent sdkmath.LegacyDec) {
 	params := k.GetParams(ctx)
 	return params.SaleCommission
 }

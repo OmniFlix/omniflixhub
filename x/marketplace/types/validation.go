@@ -64,7 +64,7 @@ func ValidateSplitShares(splitShares []WeightedAddress) error {
 	if len(splitShares) > MaxSplits {
 		return errorsmod.Wrapf(ErrInvalidSplits, "number of splits are more than the limit, len must be less than or equal to %d ", MaxSplits)
 	}
-	totalWeight := sdk.NewDec(0)
+	totalWeight := sdkmath.LegacyNewDec(0)
 	for _, share := range splitShares {
 		_, err := sdk.AccAddressFromBech32(share.Address)
 		if err != nil {
@@ -89,7 +89,7 @@ func ValidateWhiteListAccounts(whitelistAccounts []string) error {
 }
 
 func validateIncrementPercentage(increment sdk.Dec) error {
-	if !increment.IsPositive() || !increment.LTE(sdk.NewDec(1)) {
+	if !increment.IsPositive() || !increment.LTE(sdkmath.LegacyNewDec(1)) {
 		return errorsmod.Wrapf(ErrInvalidPercentage, "invalid percentage value (%s)", increment.String())
 	}
 	return nil
