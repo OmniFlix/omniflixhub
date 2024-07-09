@@ -1,8 +1,6 @@
 package types
 
-import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-)
+import sdkmath "cosmossdk.io/math"
 
 func NewParams(
 	distrProportions DistributionProportions,
@@ -22,11 +20,11 @@ func NewParams(
 func DefaultParams() Params {
 	return Params{
 		DistributionProportions: DistributionProportions{
-			StakingRewards:      sdk.NewDecWithPrec(60, 2), // 60%
-			NftIncentives:       sdk.NewDecWithPrec(15, 2), // 15%
-			NodeHostsIncentives: sdk.NewDecWithPrec(5, 2),  // 5%
-			DeveloperRewards:    sdk.NewDecWithPrec(15, 2), // 15%
-			CommunityPool:       sdk.NewDecWithPrec(5, 2),  // 5%
+			StakingRewards:      sdkmath.LegacyNewDecWithPrec(60, 2), // 60%
+			NftIncentives:       sdkmath.LegacyNewDecWithPrec(15, 2), // 15%
+			NodeHostsIncentives: sdkmath.LegacyNewDecWithPrec(5, 2),  // 5%
+			DeveloperRewards:    sdkmath.LegacyNewDecWithPrec(15, 2), // 15%
+			CommunityPool:       sdkmath.LegacyNewDecWithPrec(5, 2),  // 5%
 		},
 		WeightedDeveloperRewardsReceivers:    []WeightedAddress(nil),
 		WeightedNftIncentivesReceivers:       []WeightedAddress(nil),

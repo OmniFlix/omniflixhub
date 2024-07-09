@@ -1,17 +1,14 @@
 package keeper_test
 
 import (
-	"testing"
-	"time"
-
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
+	sdkmath "cosmossdk.io/math"
 	"github.com/OmniFlix/omniflixhub/v5/app/apptesting"
 	"github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/stretchr/testify/suite"
+	"testing"
 
 	"github.com/OmniFlix/omniflixhub/v5/app"
 )
@@ -26,11 +23,7 @@ type KeeperTestSuite struct {
 
 func (suite *KeeperTestSuite) SetupTest() {
 	suite.app = app.Setup(suite.T())
-	suite.ctx = suite.app.BaseApp.NewContext(false, tmproto.Header{
-		ChainID: app.SimAppChainID,
-		Height:  5,
-		Time:    time.Now().UTC(),
-	})
+	suite.ctx = suite.app.BaseApp.NewContext(false)
 }
 
 func TestKeeperTestSuite(t *testing.T) {
@@ -54,11 +47,11 @@ func (suite *KeeperTestSuite) TestParams() {
 			name: "set invalid params",
 			input: types.Params{
 				DistributionProportions: types.DistributionProportions{
-					StakingRewards:      sdk.NewDecWithPrec(-1, 2),
-					NftIncentives:       sdk.NewDecWithPrec(100, 2),
-					NodeHostsIncentives: sdk.NewDecWithPrec(5, 2),
-					DeveloperRewards:    sdk.NewDecWithPrec(0, 2),
-					CommunityPool:       sdk.NewDecWithPrec(5, 2),
+					StakingRewards:      sdkmath.LegacyNewDecWithPrec(-1, 2),
+					NftIncentives:       sdkmath.LegacyNewDecWithPrec(100, 2),
+					NodeHostsIncentives: sdkmath.LegacyNewDecWithPrec(5, 2),
+					DeveloperRewards:    sdkmath.LegacyNewDecWithPrec(0, 2),
+					CommunityPool:       sdkmath.LegacyNewDecWithPrec(5, 2),
 				},
 			},
 			expectErr: true,
@@ -67,11 +60,11 @@ func (suite *KeeperTestSuite) TestParams() {
 			name: "set full valid params",
 			input: types.Params{
 				DistributionProportions: types.DistributionProportions{
-					StakingRewards:      sdk.NewDecWithPrec(60, 2), // 60%
-					NftIncentives:       sdk.NewDecWithPrec(15, 2), // 15%
-					NodeHostsIncentives: sdk.NewDecWithPrec(5, 2),  // 5%
-					DeveloperRewards:    sdk.NewDecWithPrec(15, 2), // 15%
-					CommunityPool:       sdk.NewDecWithPrec(5, 2),  // 5%
+					StakingRewards:      sdkmath.LegacyNewDecWithPrec(60, 2), // 60%
+					NftIncentives:       sdkmath.LegacyNewDecWithPrec(15, 2), // 15%
+					NodeHostsIncentives: sdkmath.LegacyNewDecWithPrec(5, 2),  // 5%
+					DeveloperRewards:    sdkmath.LegacyNewDecWithPrec(15, 2), // 15%
+					CommunityPool:       sdkmath.LegacyNewDecWithPrec(5, 2),  // 5%
 				},
 			},
 			expectErr: false,
@@ -100,47 +93,47 @@ func (suite *KeeperTestSuite) TestParams() {
 func (suite *KeeperTestSuite) TestDistribution() {
 	suite.SetupTest()
 
-	denom := suite.app.StakingKeeper.BondDenom(suite.ctx)
+	denom, _ := suite.app.StakingKeeper.BondDenom(suite.ctx)
 	allocKeeper := suite.app.AllocKeeper
 	params := suite.app.AllocKeeper.GetParams(suite.ctx)
 	nftIncentivesReceiver := sdk.AccAddress([]byte("addr1a--------------"))
 	nodeHostIncentivesReceiver := sdk.AccAddress([]byte("addr1b--------------"))
 	devRewardsReceiver := sdk.AccAddress([]byte("addr1c--------------"))
-	params.DistributionProportions.StakingRewards = sdk.NewDecWithPrec(60, 2)
-	params.DistributionProportions.NodeHostsIncentives = sdk.NewDecWithPrec(5, 2)
-	params.DistributionProportions.NftIncentives = sdk.NewDecWithPrec(15, 2)
-	params.DistributionProportions.CommunityPool = sdk.NewDecWithPrec(5, 2)
-	params.DistributionProportions.DeveloperRewards = sdk.NewDecWithPrec(15, 2)
+	params.DistributionProportions.StakingRewards = sdkmath.LegacyNewDecWithPrec(60, 2)
+	params.DistributionProportions.NodeHostsIncentives = sdkmath.LegacyNewDecWithPrec(5, 2)
+	params.DistributionProportions.NftIncentives = sdkmath.LegacyNewDecWithPrec(15, 2)
+	params.DistributionProportions.CommunityPool = sdkmath.LegacyNewDecWithPrec(5, 2)
+	params.DistributionProportions.DeveloperRewards = sdkmath.LegacyNewDecWithPrec(15, 2)
 	params.WeightedNftIncentivesReceivers = []types.WeightedAddress{
 		{
 			Address: nftIncentivesReceiver.String(),
-			Weight:  sdk.NewDec(1),
+			Weight:  sdkmath.LegacyNewDec(1),
 		},
 	}
 	params.WeightedNodeHostsIncentivesReceivers = []types.WeightedAddress{
 		{
 			Address: nodeHostIncentivesReceiver.String(),
-			Weight:  sdk.NewDec(1),
+			Weight:  sdkmath.LegacyNewDec(1),
 		},
 	}
 	params.WeightedDeveloperRewardsReceivers = []types.WeightedAddress{
 		{
 			Address: devRewardsReceiver.String(),
-			Weight:  sdk.NewDec(1),
+			Weight:  sdkmath.LegacyNewDec(1),
 		},
 	}
 	err := suite.app.AllocKeeper.SetParams(suite.ctx, params)
 	suite.Require().NoError(err)
-	feePool := suite.app.DistrKeeper.GetFeePool(suite.ctx)
+	distributionModuleAccount := suite.app.DistrKeeper.GetDistributionAccount(suite.ctx)
 	feeCollector := suite.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 	suite.Equal(
 		"0",
 		suite.app.BankKeeper.GetAllBalances(suite.ctx, feeCollector).AmountOf(denom).String())
 	suite.Equal(
-		sdk.NewDec(0),
-		feePool.CommunityPool.AmountOf(denom))
+		sdkmath.LegacyNewDec(0),
+		suite.app.BankKeeper.GetAllBalances(suite.ctx, distributionModuleAccount.GetAddress()).AmountOf(denom).String())
 
-	mintCoin := sdk.NewCoin(denom, sdk.NewInt(100_000))
+	mintCoin := sdk.NewCoin(denom, sdkmath.NewInt(100_000))
 	mintCoins := sdk.Coins{mintCoin}
 	feeCollectorAccount := suite.app.AccountKeeper.GetModuleAccount(suite.ctx, authtypes.FeeCollectorName)
 	suite.Require().NotNil(feeCollectorAccount)
@@ -152,8 +145,9 @@ func (suite *KeeperTestSuite) TestDistribution() {
 		suite.app.BankKeeper.GetAllBalances(suite.ctx, feeCollector).AmountOf(denom).String())
 
 	suite.Equal(
-		sdk.NewDec(0),
-		feePool.CommunityPool.AmountOf(denom))
+		sdkmath.LegacyNewDec(0),
+		suite.app.BankKeeper.GetAllBalances(suite.ctx, distributionModuleAccount.GetAddress()).AmountOf(denom).String(),
+	)
 
 	_ = allocKeeper.DistributeMintedCoins(suite.ctx)
 
@@ -165,18 +159,18 @@ func (suite *KeeperTestSuite) TestDistribution() {
 
 	// remaining going to next module should be 100% - 40% = 60%
 	suite.Equal(
-		sdk.NewDecFromInt(mintCoin.Amount).Mul(sdk.NewDecWithPrec(100, 2).Sub(modulePortion)).RoundInt().String(),
+		sdkmath.LegacyNewDecFromInt(mintCoin.Amount).Mul(sdkmath.LegacyNewDecWithPrec(100, 2).Sub(modulePortion)).RoundInt().String(),
 		suite.app.BankKeeper.GetAllBalances(suite.ctx, feeCollector).AmountOf(denom).String())
 
 	suite.Equal(
-		sdk.NewDecFromInt(mintCoin.Amount).Mul(params.DistributionProportions.DeveloperRewards).TruncateInt(),
+		sdkmath.LegacyNewDecFromInt(mintCoin.Amount).Mul(params.DistributionProportions.DeveloperRewards).TruncateInt(),
 		suite.app.BankKeeper.GetBalance(suite.ctx, devRewardsReceiver, denom).Amount)
 
 	// since the NFT incentives are not setup yet, funds go into the community pool
-	feePool = suite.app.DistrKeeper.GetFeePool(suite.ctx)
+	distributionModuleAccount = suite.app.DistrKeeper.GetDistributionAccount(suite.ctx)
 	communityPoolPortion := params.DistributionProportions.CommunityPool // 5%
 
 	suite.Equal(
-		sdk.NewDecFromInt(mintCoin.Amount).Mul(communityPoolPortion),
-		feePool.CommunityPool.AmountOf(denom))
+		sdkmath.LegacyNewDecFromInt(mintCoin.Amount).Mul(communityPoolPortion),
+		suite.app.BankKeeper.GetAllBalances(suite.ctx, distributionModuleAccount.GetAddress()).AmountOf(denom).String())
 }
