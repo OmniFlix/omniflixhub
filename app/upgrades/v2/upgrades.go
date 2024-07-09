@@ -1,6 +1,8 @@
 package v2
 
 import (
+	"context"
+	sdkmath "cosmossdk.io/math"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/OmniFlix/omniflixhub/v5/app/keepers"
 	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
@@ -35,9 +37,8 @@ func CreateV2UpgradeHandler(
 	bpm upgrades.BaseAppParamManager,
 	keepers *keepers.AppKeepers,
 ) upgradetypes.UpgradeHandler {
-	return func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("running migrations ...")
-
+	return func(context context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx := sdk.UnwrapSDKContext(context)
 		// https://github.com/cosmos/cosmos-sdk/pull/12363/files
 		// Set param key table for params module migration
 		for _, subspace := range keepers.ParamsKeeper.GetSubspaces() {
@@ -93,7 +94,7 @@ func CreateV2UpgradeHandler(
 		// Migrate Tendermint consensus parameters from x/params module to a deprecated x/consensus module.
 		// The old params module is required to still be imported in your app.go in order to handle this migration.
 		baseAppLegacySS := keepers.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
-		baseapp.MigrateParams(ctx, baseAppLegacySS, &keepers.ConsensusParamsKeeper)
+		baseapp.MigrateParams(ctx, baseAppLegacySS, &keepers.ConsensusParamsKeeper.ParamsStore)
 
 		// Run migrations before applying any other state changes.
 		// NOTE: DO NOT PUT ANY STATE CHANGES BEFORE RunMigrations().
@@ -108,15 +109,21 @@ func CreateV2UpgradeHandler(
 		keepers.IBCKeeper.ClientKeeper.SetParams(ctx, params)
 
 		// set proposal's minimum initial deposit to 20%
-		govParams := keepers.GovKeeper.GetParams(ctx)
-		govParams.MinInitialDepositRatio = sdk.NewDec(20).Quo(sdk.NewDec(100)).String()
-		if err := keepers.GovKeeper.SetParams(ctx, govParams); err != nil {
+		govParams, err := keepers.GovKeeper.Params.Get(ctx)
+		if err != nil {
+			return nil, err
+		}
+		govParams.MinInitialDepositRatio = sdkmath.LegacyNewDec(20).Quo(sdkmath.LegacyNewDec(100)).String()
+		if err := keepers.GovKeeper.Params.Set(ctx, govParams); err != nil {
 			return nil, err
 		}
 
 		// set validator's minimum commission to 5%
-		stakingParams := keepers.StakingKeeper.GetParams(ctx)
-		stakingParams.MinCommissionRate = sdk.NewDecWithPrec(5, 2)
+		stakingParams, err := keepers.StakingKeeper.GetParams(ctx)
+		if err != nil {
+			return nil, err
+		}
+		stakingParams.MinCommissionRate = sdkmath.LegacyNewDecWithPrec(5, 2)
 		err = keepers.StakingKeeper.SetParams(ctx, stakingParams)
 		if err != nil {
 			return nil, err
