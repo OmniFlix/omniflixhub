@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"time"
 
-	"cosmossdk.io/math"
+	sdkmath "cosmossdk.io/math"
 
 	"github.com/OmniFlix/omniflixhub/v5/app"
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/store/rootmulti"
-	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/crypto/ed25519"
 	tmtypes "github.com/cometbft/cometbft/proto/tendermint/types"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -30,7 +30,7 @@ import (
 
 var (
 	SecondaryDenom  = "uxflx"
-	SecondaryAmount = sdk.NewInt(100000000)
+	SecondaryAmount = sdkmath.NewInt(100000000)
 )
 
 type KeeperTestHelper struct {
@@ -46,7 +46,7 @@ type KeeperTestHelper struct {
 func (s *KeeperTestHelper) Setup() {
 	t := s.T()
 	s.App = app.Setup(t)
-	s.Ctx = s.App.BaseApp.NewContext(false, tmtypes.Header{Height: 1, ChainID: app.SimAppChainID, Time: time.Now().UTC()})
+	s.Ctx = s.App.BaseApp.NewContext(false)
 	s.QueryHelper = &baseapp.QueryServiceTestHelper{
 		GRPCQueryRouter: s.App.GRPCQueryRouter(),
 		Ctx:             s.Ctx,
@@ -58,23 +58,23 @@ func (s *KeeperTestHelper) Setup() {
 func (s *KeeperTestHelper) SetupTestForInitGenesis() {
 	// Setting to True, leads to init genesis not running
 	s.App = app.Setup(s.T())
-	s.Ctx = s.App.BaseApp.NewContext(true, tmtypes.Header{})
+	s.Ctx = s.App.BaseApp.NewContext(true)
 }
 
 // CreateTestContext creates a test context.
 func (s *KeeperTestHelper) CreateTestContext() sdk.Context {
-	ctx, _ := s.CreateTestContextWithMultiStore()
+	ctx := s.CreateTestContextWithMultiStore()
 	return ctx
 }
 
 // CreateTestContextWithMultiStore creates a test context and returns it together with multi store.
-func (s *KeeperTestHelper) CreateTestContextWithMultiStore() (sdk.Context, sdk.CommitMultiStore) {
+func (s *KeeperTestHelper) CreateTestContextWithMultiStore() sdk.Context {
 	db := dbm.NewMemDB()
 	logger := log.NewNopLogger()
 
-	ms := rootmulti.NewStore(db, logger)
+	ms := rootmulti.NewStore(db, logger, nil)
 
-	return sdk.NewContext(ms, tmtypes.Header{}, false, logger), ms
+	return sdk.NewContext(ms, tmtypes.Header{}, false, logger)
 }
 
 func (s *KeeperTestHelper) Commit() {
@@ -83,18 +83,18 @@ func (s *KeeperTestHelper) Commit() {
 	s.App.Commit()
 	newHeader := tmtypes.Header{Height: oldHeight + 1, ChainID: oldHeader.ChainID, Time: oldHeader.Time.Add(time.Second)}
 	s.App.BeginBlock(abci.RequestBeginBlock{Header: newHeader})
-	s.Ctx = s.App.BaseApp.NewContext(false, newHeader)
+	s.Ctx = s.App.BaseApp.NewContext(false)
 }
 
 // FundAcc funds target address with specified amount.
 func (s *KeeperTestHelper) FundAcc(acc sdk.AccAddress, amounts sdk.Coins) {
-	err := banktestutil.FundAccount(s.App.BankKeeper, s.Ctx, acc, amounts)
+	err := banktestutil.FundAccount(s.Ctx, s.App.BankKeeper, acc, amounts)
 	s.Require().NoError(err)
 }
 
 // FundModuleAcc funds target modules with specified amount.
 func (s *KeeperTestHelper) FundModuleAcc(moduleName string, amounts sdk.Coins) {
-	err := banktestutil.FundModuleAccount(s.App.BankKeeper, s.Ctx, moduleName, amounts)
+	err := banktestutil.FundModuleAccount(s.Ctx, s.App.BankKeeper, moduleName, amounts)
 	s.Require().NoError(err)
 }
 
@@ -107,21 +107,22 @@ func (s *KeeperTestHelper) MintCoins(coins sdk.Coins) {
 func (s *KeeperTestHelper) SetupValidator(bondStatus stakingtypes.BondStatus) sdk.ValAddress {
 	valPub := secp256k1.GenPrivKey().PubKey()
 	valAddr := sdk.ValAddress(valPub.Address())
-	bondDenom := s.App.StakingKeeper.GetParams(s.Ctx).BondDenom
-	selfBond := sdk.NewCoins(sdk.Coin{Amount: sdk.NewInt(100), Denom: bondDenom})
+	bondDenomResp, _ := s.App.StakingKeeper.GetParams(s.Ctx)
+	bondDenom := bondDenomResp.BondDenom
+	selfBond := sdk.NewCoins(sdk.Coin{Amount: sdkmath.NewInt(100), Denom: bondDenom})
 
 	s.FundAcc(sdk.AccAddress(valAddr), selfBond)
 
 	stakingCoin := sdk.NewCoin(sdk.DefaultBondDenom, selfBond[0].Amount)
-	ZeroCommission := stakingtypes.NewCommissionRates(sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec())
-	_, err := stakingtypes.NewMsgCreateValidator(valAddr, valPub, stakingCoin, stakingtypes.Description{}, ZeroCommission, sdk.OneInt())
+	ZeroCommission := stakingtypes.NewCommissionRates(sdkmath.LegacyZeroDec(), sdkmath.LegacyZeroDec(), sdkmath.LegacyZeroDec())
+	_, err := stakingtypes.NewMsgCreateValidator(valAddr.String(), valPub, stakingCoin, stakingtypes.Description{}, ZeroCommission, sdkmath.OneInt())
 	s.Require().NoError(err)
 
-	val, found := s.App.StakingKeeper.GetValidator(s.Ctx, valAddr)
-	s.Require().True(found)
+	val, err := s.App.StakingKeeper.GetValidator(s.Ctx, valAddr)
+	s.Require().NoError(err)
 
 	val = val.UpdateStatus(bondStatus)
-	s.App.StakingKeeper.SetValidator(s.Ctx, val)
+	_ = s.App.StakingKeeper.SetValidator(s.Ctx, val)
 
 	consAddr, err := val.GetConsAddr()
 	s.Suite.Require().NoError(err)
@@ -153,16 +154,16 @@ func (s *KeeperTestHelper) SetupMultipleValidators(numValidator int) []string {
 func (s *KeeperTestHelper) BeginNewBlock(executeNextEpoch bool) {
 	var valAddr []byte
 
-	validators := s.App.StakingKeeper.GetAllValidators(s.Ctx)
+	validators, _ := s.App.StakingKeeper.GetAllValidators(s.Ctx)
 	if len(validators) >= 1 {
 		valAddrFancy, err := validators[0].GetConsAddr()
 		s.Require().NoError(err)
-		valAddr = valAddrFancy.Bytes()
+		valAddr = valAddrFancy
 	} else {
 		valAddrFancy := s.SetupValidator(stakingtypes.Bonded)
 		validator, _ := s.App.StakingKeeper.GetValidator(s.Ctx, valAddrFancy)
 		valAddr2, _ := validator.GetConsAddr()
-		valAddr = valAddr2.Bytes()
+		valAddr = valAddr2
 	}
 
 	s.BeginNewBlockWithProposer(executeNextEpoch, valAddr)
@@ -170,13 +171,13 @@ func (s *KeeperTestHelper) BeginNewBlock(executeNextEpoch bool) {
 
 // BeginNewBlockWithProposer begins a new block with a proposer.
 func (s *KeeperTestHelper) BeginNewBlockWithProposer(executeNextEpoch bool, proposer sdk.ValAddress) {
-	validator, found := s.App.StakingKeeper.GetValidator(s.Ctx, proposer)
-	s.Assert().True(found)
+	validator, err := s.App.StakingKeeper.GetValidator(s.Ctx, proposer)
+	s.Assert().NoError(err)
 
 	valConsAddr, err := validator.GetConsAddr()
 	s.Require().NoError(err)
 
-	valAddr := valConsAddr.Bytes()
+	valAddr := valConsAddr
 
 	newBlockTime := s.Ctx.BlockTime().Add(5 * time.Second)
 
@@ -185,15 +186,10 @@ func (s *KeeperTestHelper) BeginNewBlockWithProposer(executeNextEpoch bool, prop
 	s.Ctx = newCtx
 	lastCommitInfo := abci.CommitInfo{
 		Votes: []abci.VoteInfo{{
-			Validator:       abci.Validator{Address: valAddr, Power: 1000},
-			SignedLastBlock: true,
+			Validator: abci.Validator{Address: valAddr, Power: 1000},
 		}},
 	}
-	reqBeginBlock := abci.RequestBeginBlock{Header: header, LastCommitInfo: lastCommitInfo}
-
-	fmt.Println("beginning block ", s.Ctx.BlockHeight())
-	s.App.BeginBlocker(s.Ctx, reqBeginBlock)
-	s.Ctx = s.App.NewContext(false, reqBeginBlock.Header)
+	s.Ctx = s.App.NewContext(false)
 }
 
 // EndBlock ends the block, and runs commit
@@ -225,7 +221,7 @@ func (s *KeeperTestHelper) AllocateRewardsToValidator(valAddr sdk.ValAddress, re
 
 	// allocate rewards to validator
 	s.Ctx = s.Ctx.WithBlockHeight(s.Ctx.BlockHeight() + 1)
-	decTokens := sdk.DecCoins{{Denom: sdk.DefaultBondDenom, Amount: sdk.NewDec(20000)}}
+	decTokens := sdk.DecCoins{{Denom: sdk.DefaultBondDenom, Amount: sdkmath.LegacyNewDec(20000)}}
 	s.App.DistrKeeper.AllocateTokensToValidator(s.Ctx, validator, decTokens)
 }
 
