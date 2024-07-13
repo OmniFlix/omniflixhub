@@ -153,7 +153,6 @@ func setup(t *testing.T, withGenesis bool, opts ...wasmkeeper.Option) (*OmniFlix
 		map[int64]bool{},
 		DefaultNodeHome,
 		0,
-		encCdc,
 		appOptions,
 		opts,
 		baseApp.SetChainID(SimAppChainID),

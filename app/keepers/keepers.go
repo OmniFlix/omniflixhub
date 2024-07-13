@@ -439,6 +439,7 @@ func NewAppKeeper(
 		bApp.MsgServiceRouter(),
 		govModAddress,
 	)
+	appKeepers.ICAHostKeeper.WithQueryRouter(bApp.GRPCQueryRouter())
 	icaHostIBCModule := icahost.NewIBCModule(appKeepers.ICAHostKeeper)
 
 	// ICQ Keeper

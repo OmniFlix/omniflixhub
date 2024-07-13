@@ -15,7 +15,6 @@ import (
 	"cosmossdk.io/log"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/OmniFlix/omniflixhub/v5/app/openapiconsole"
-	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
 	"github.com/OmniFlix/omniflixhub/v5/docs"
 	abci "github.com/cometbft/cometbft/abci/types"
 	tmjson "github.com/cometbft/cometbft/libs/json"
@@ -87,8 +86,7 @@ var (
 )
 
 var (
-	_ runtime.AppI            = (*OmniFlixApp)(nil)
-	_ servertypes.Application = (*OmniFlixApp)(nil)
+	_ runtime.AppI = (*OmniFlixApp)(nil)
 )
 
 // OmniFlixApp extends an ABCI application, but with most of its parameters exported.
@@ -128,21 +126,23 @@ func NewOmniFlixApp(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig appparams.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	wasmOpts []wasmkeeper.Option,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *OmniFlixApp {
+	encodingConfig := GetEncodingConfig()
 	appCodec := encodingConfig.Marshaler
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
+	txConfig := encodingConfig.TxConfig
 
-	bApp := baseapp.NewBaseApp(Name, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
+	bApp := baseapp.NewBaseApp(Name, logger, db, txConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 
 	app := &OmniFlixApp{
+		AppKeepers:        keepers.AppKeepers{},
 		BaseApp:           bApp,
 		cdc:               cdc,
 		appCodec:          appCodec,
@@ -196,22 +196,30 @@ func NewOmniFlixApp(
 	// can do so safely.
 	app.mm.SetOrderInitGenesis(orderInitGenesis()...)
 
-	// part of sdk v0.50.x migration
-	app.SetPreBlocker(app.PreBlocker)
-
 	app.mm.RegisterInvariants(app.CrisisKeeper)
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
-	app.mm.RegisterServices(app.configurator)
+	err := app.mm.RegisterServices(app.configurator)
+	if err != nil {
+		panic(err)
+	}
+
+	/*app.ModuleBasics = module.NewBasicManagerFromManager(
+		app.mm,
+		map[string]module.AppModuleBasic{
+			"gov": gov.NewAppModuleBasic(
+				[]govclient.ProposalHandler{
+					paramsclient.ProposalHandler,
+				}),
+		},
+	)*/
+
+	app.setupUpgradeHandlers()
+	app.setupUpgradeStoreLoaders()
 
 	// simulations
 	app.sm = module.NewSimulationManager(simulationModules(app, encodingConfig, skipGenesisInvariants)...)
 
 	app.sm.RegisterStoreDecoders()
-
-	// initialize stores
-	app.MountKVStores(app.GetKVStoreKey())
-	app.MountTransientStores(app.GetTransientStoreKey())
-	app.MountMemoryStores(app.GetMemoryStoreKey())
 
 	// SDK v47 - since we do not use dep inject, this gives us access to newer gRPC services.
 	autocliv1.RegisterQueryServer(app.GRPCQueryRouter(), runtimeservices.NewAutoCLIQueryService(app.mm.Modules))
@@ -226,6 +234,11 @@ func NewOmniFlixApp(
 	if err != nil {
 		panic("error while reading wasm config: " + err.Error())
 	}
+
+	// initialize stores
+	app.MountKVStores(app.GetKVStoreKey())
+	app.MountTransientStores(app.GetTransientStoreKey())
+	app.MountMemoryStores(app.GetMemoryStoreKey())
 
 	anteHandler, err := NewAnteHandler(
 		HandlerOptions{
@@ -253,12 +266,12 @@ func NewOmniFlixApp(
 
 	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
+	app.SetPreBlocker(app.PreBlocker)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetAnteHandler(anteHandler)
 	app.SetEndBlocker(app.EndBlocker)
-
-	app.setupUpgradeHandlers()
-	app.setupUpgradeStoreLoaders()
+	app.SetPrecommiter(app.PreCommitter)
+	app.SetPrepareCheckStater(app.PrepareCheckStater)
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -301,6 +314,21 @@ func (app *OmniFlixApp) InitChainer(ctx sdk.Context, req *abci.RequestInitChain)
 	}
 
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
+}
+
+// PreCommitter application updates before the commit of a block after all transactions have been delivered.
+func (app *OmniFlixApp) PreCommitter(ctx sdk.Context) {
+	mm := app.ModuleManager()
+	if err := mm.Precommit(ctx); err != nil {
+		panic(err)
+	}
+}
+
+func (app *OmniFlixApp) PrepareCheckStater(ctx sdk.Context) {
+	mm := app.ModuleManager()
+	if err := mm.PrepareCheckState(ctx); err != nil {
+		panic(err)
+	}
 }
 
 // LoadHeight loads a particular height
