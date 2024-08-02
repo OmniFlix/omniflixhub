@@ -2,8 +2,9 @@ package keepers
 
 import (
 	"fmt"
-	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
 	"path/filepath"
+
+	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
 
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
@@ -207,6 +208,9 @@ func NewAppKeeper(
 	)
 
 	govModAddress := authtypes.NewModuleAddress(govtypes.ModuleName).String()
+	bech32AccountAddressPrefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
+	bech32ValidatorAddressPrefix := sdk.GetConfig().GetBech32ValidatorAddrPrefix()
+	bech32ConsensusAddressPrefix := sdk.GetConfig().GetBech32ConsensusAddrPrefix()
 
 	// set the BaseApp's parameter store
 	appKeepers.ConsensusParamsKeeper = consensusparamkeeper.NewKeeper(
@@ -234,16 +238,15 @@ func NewAppKeeper(
 		appKeepers.BankKeeper,
 		authtypes.FeeCollectorName,
 		govModAddress,
-		addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
+		addresscodec.NewBech32Codec(bech32AccountAddressPrefix),
 	)
-	Bech32AccountAddrPrefix := "omniflix"
 	appKeepers.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[authtypes.StoreKey]),
 		authtypes.ProtoBaseAccount,
 		maccPerms,
-		addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
-		Bech32AccountAddrPrefix,
+		addresscodec.NewBech32Codec(bech32AccountAddressPrefix),
+		bech32AccountAddressPrefix,
 		govModAddress,
 	)
 	appKeepers.BankKeeper = bankkeeper.NewBaseKeeper(
@@ -272,8 +275,8 @@ func NewAppKeeper(
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		govModAddress,
-		addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
-		addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
+		addresscodec.NewBech32Codec(bech32ValidatorAddressPrefix),
+		addresscodec.NewBech32Codec(bech32ConsensusAddressPrefix),
 	)
 	appKeepers.MintKeeper = mintkeeper.NewKeeper(
 		appCodec,
@@ -352,8 +355,8 @@ func NewAppKeeper(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(appKeepers.ParamsKeeper))
 	// UNFORKING v5
 	// Also verify that NewSoftwareUpgradeProposalHandler is okay to remove here, as it should be done with new v1 gov props
-	//AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(appKeepers.UpgradeKeeper)).
-	//AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper))
+	// AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(appKeepers.UpgradeKeeper)).
+	// AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper))
 
 	govConfig := govtypes.DefaultConfig()
 	govConfig.MaxMetadataLen = 10200
@@ -390,8 +393,7 @@ func NewAppKeeper(
 	)
 	appKeepers.IBCHooksKeeper = hooksKeeper
 
-	omniflixPrefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
-	wasmHooks := ibchooks.NewWasmHooks(&appKeepers.IBCHooksKeeper, nil, omniflixPrefix) // The contract keeper needs to be set later
+	wasmHooks := ibchooks.NewWasmHooks(&appKeepers.IBCHooksKeeper, nil, bech32AccountAddressPrefix) // The contract keeper needs to be set later
 	appKeepers.Ics20WasmHooks = &wasmHooks
 	appKeepers.HooksICS4Wrapper = ibchooks.NewICS4Middleware(
 		appKeepers.IBCKeeper.ChannelKeeper,

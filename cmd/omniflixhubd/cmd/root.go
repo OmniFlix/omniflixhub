@@ -2,12 +2,12 @@ package cmd
 
 import (
 	"errors"
-	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/codec/address"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"io"
 	"os"
+
+	"github.com/cosmos/cosmos-sdk/baseapp"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 
 	tmcfg "github.com/cometbft/cometbft/config"
 	"github.com/cosmos/cosmos-sdk/client/config"
@@ -40,14 +40,37 @@ import (
 	rosettaCmd "github.com/cosmos/rosetta/cmd"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // NewRootCmd creates a new root command for omniflixhubd. It is called once in the
 // main function.
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	// Set config for prefixes
-	encodingConfig := app.MakeEncodingConfig()
-	app.SetConfig()
+	encodingConfig := app.GetEncodingConfig()
+
+	initAppOptions := viper.New()
+	tempDir := tempDir()
+	initAppOptions.Set(flags.FlagHome, tempDir)
+
+	tempApp := app.NewOmniFlixApp(
+		log.NewNopLogger(),
+		dbm.NewMemDB(),
+		nil,
+		true,
+		nil,
+		tempDir,
+		0,
+		encodingConfig,
+		initAppOptions,
+		nil,
+		baseapp.SetChainID("omniflixhub-1"),
+	)
+	defer func() {
+		if err := tempApp.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Marshaler).
@@ -59,18 +82,6 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithBroadcastMode(flags.BroadcastSync).
 		WithHomeDir(app.DefaultNodeHome).
 		WithViper("")
-
-	tempApp := app.NewOmniFlixApp(
-		log.NewNopLogger(),
-		dbm.NewMemDB(),
-		nil,
-		true,
-		map[int64]bool{},
-		app.DefaultNodeHome,
-		5,
-		app.EmptyAppOptions{},
-		[]wasmkeeper.Option{},
-		baseapp.SetChainID("omniflixhub-1"))
 
 	rootCmd := &cobra.Command{
 		Use:   app.Name + "d",
@@ -119,11 +130,6 @@ func initCometBftConfig() *tmcfg.Config {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, tempApp *app.OmniFlixApp) {
-	cfg := sdk.GetConfig()
-	cfg.Seal()
-
-	valOperAddressCodec := address.NewBech32Codec(cfg.GetBech32ValidatorAddrPrefix())
-
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(tempApp.ModuleBasics, app.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
@@ -131,7 +137,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, t
 			banktypes.GenesisBalancesIterator{},
 			app.DefaultNodeHome,
 			genutiltypes.DefaultMessageValidator,
-			valOperAddressCodec,
+			encodingConfig.TxConfig.SigningContext().ValidatorAddressCodec(),
 		),
 		genutilcli.MigrateGenesisCmd(genutilcli.MigrationMap),
 		genutilcli.GenTxCmd(
@@ -139,19 +145,22 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, t
 			encodingConfig.TxConfig,
 			banktypes.GenesisBalancesIterator{},
 			app.DefaultNodeHome,
-			valOperAddressCodec,
+			encodingConfig.TxConfig.SigningContext().ValidatorAddressCodec(),
 		),
 		genutilcli.ValidateGenesisCmd(tempApp.ModuleBasics),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		addDebugCommands(debug.Cmd()),
 	)
 
-	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
+	ac := appCreator{
+		encCfg: encodingConfig,
+	}
+
+	server.AddCommands(rootCmd, app.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		server.StatusCommand(),
-		genesisCommand(encodingConfig),
 		queryCommand(),
 		txCommand(tempApp.ModuleBasics),
 		keys.Commands(),
@@ -165,13 +174,14 @@ func addModuleInitFlags(startCmd *cobra.Command) {
 	wasm.AddModuleInitFlags(startCmd)
 }
 
-func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
-	cmd := genutilcli.Commands(encodingConfig.TxConfig, app.ModuleBasics, app.DefaultNodeHome)
-
-	for _, subCmd := range cmds {
-		cmd.AddCommand(subCmd)
+func tempDir() string {
+	dir, err := os.MkdirTemp("", "omniflixhubtemp")
+	if err != nil {
+		dir = app.DefaultNodeHome
 	}
-	return cmd
+	defer os.RemoveAll(dir)
+
+	return dir
 }
 
 func queryCommand() *cobra.Command {
@@ -223,8 +233,12 @@ func txCommand(moduleBasics module.BasicManager) *cobra.Command {
 	return cmd
 }
 
+type appCreator struct {
+	encCfg params.EncodingConfig
+}
+
 // newApp is an AppCreator
-func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
+func (ac appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
 	skipUpgradeHeights := make(map[int64]bool)
 	for _, h := range cast.ToIntSlice(appOpts.Get(server.FlagUnsafeSkipUpgrades)) {
 		skipUpgradeHeights[int64(h)] = true
@@ -245,6 +259,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 		skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
+		ac.encCfg,
 		appOpts,
 		wasmOpts,
 		baseappOptions...,
@@ -252,7 +267,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 }
 
 // appExport creates a new app (optionally at a given height)
-func appExport(
+func (ac appCreator) appExport(
 	logger log.Logger,
 	db dbm.DB,
 	traceStore io.Writer,
@@ -279,6 +294,7 @@ func appExport(
 			map[int64]bool{},
 			homePath,
 			uint(1),
+			ac.encCfg,
 			appOpts,
 			emptyWasmOpts,
 		)
@@ -295,6 +311,7 @@ func appExport(
 			map[int64]bool{},
 			homePath,
 			uint(1),
+			ac.encCfg,
 			appOpts,
 			emptyWasmOpts,
 		)

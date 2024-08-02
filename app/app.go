@@ -15,6 +15,7 @@ import (
 	"cosmossdk.io/log"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/OmniFlix/omniflixhub/v5/app/openapiconsole"
+	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
 	"github.com/OmniFlix/omniflixhub/v5/docs"
 	abci "github.com/cometbft/cometbft/abci/types"
 	tmjson "github.com/cometbft/cometbft/libs/json"
@@ -38,6 +39,7 @@ import (
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
+	"github.com/cosmos/cosmos-sdk/x/gov"
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -85,9 +87,7 @@ var (
 	Forks           []upgrades.Fork
 )
 
-var (
-	_ runtime.AppI = (*OmniFlixApp)(nil)
-)
+var _ runtime.AppI = (*OmniFlixApp)(nil)
 
 // OmniFlixApp extends an ABCI application, but with most of its parameters exported.
 // They are exported for convenience in creating helper functions, as object
@@ -126,11 +126,11 @@ func NewOmniFlixApp(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
+	encodingConfig appparams.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	wasmOpts []wasmkeeper.Option,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *OmniFlixApp {
-	encodingConfig := GetEncodingConfig()
 	appCodec := encodingConfig.Marshaler
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
@@ -202,8 +202,8 @@ func NewOmniFlixApp(
 	if err != nil {
 		panic(err)
 	}
-
-	/*app.ModuleBasics = module.NewBasicManagerFromManager(
+	// Migration check
+	app.ModuleBasics = module.NewBasicManagerFromManager(
 		app.mm,
 		map[string]module.AppModuleBasic{
 			"gov": gov.NewAppModuleBasic(
@@ -211,7 +211,7 @@ func NewOmniFlixApp(
 					paramsclient.ProposalHandler,
 				}),
 		},
-	)*/
+	)
 
 	app.setupUpgradeHandlers()
 	app.setupUpgradeStoreLoaders()
