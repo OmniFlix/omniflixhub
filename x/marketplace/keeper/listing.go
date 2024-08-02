@@ -1,8 +1,9 @@
 package keeper
 
 import (
-	storetypes "cosmossdk.io/store/types"
 	"encoding/binary"
+
+	storetypes "cosmossdk.io/store/types"
 
 	"cosmossdk.io/store/prefix"
 	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"

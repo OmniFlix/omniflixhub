@@ -1,8 +1,9 @@
 package ante
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"errors"
+
+	sdkmath "cosmossdk.io/math"
 
 	tmstrings "github.com/cometbft/cometbft/libs/strings"
 

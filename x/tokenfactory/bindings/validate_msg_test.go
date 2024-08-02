@@ -1,9 +1,10 @@
 package bindings_test
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"fmt"
 	"testing"
+
+	sdkmath "cosmossdk.io/math"
 
 	"github.com/stretchr/testify/require"
 

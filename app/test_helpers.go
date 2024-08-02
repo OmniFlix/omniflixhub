@@ -1,11 +1,12 @@
 package app
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"encoding/json"
 	"path/filepath"
 	"testing"
 	"time"
+
+	sdkmath "cosmossdk.io/math"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 
@@ -133,7 +134,7 @@ func setup(t *testing.T, withGenesis bool, opts ...wasmkeeper.Option) (*OmniFlix
 
 	db := dbm.NewMemDB()
 	nodeHome := t.TempDir()
-	encCdc := MakeEncodingConfig()
+	encCdc := GetEncodingConfig()
 	snapshotDir := filepath.Join(nodeHome, "data", "snapshots")
 
 	snapshotDB, err := dbm.NewDB("metadata", dbm.GoLevelDBBackend, snapshotDir)
@@ -153,6 +154,7 @@ func setup(t *testing.T, withGenesis bool, opts ...wasmkeeper.Option) (*OmniFlix
 		map[int64]bool{},
 		DefaultNodeHome,
 		0,
+		encCdc,
 		appOptions,
 		opts,
 		baseApp.SetChainID(SimAppChainID),

@@ -1,8 +1,9 @@
 package v3_test
 
 import (
-	storetypes "cosmossdk.io/store/types"
 	"testing"
+
+	storetypes "cosmossdk.io/store/types"
 
 	"github.com/stretchr/testify/require"
 

@@ -1,13 +1,14 @@
 package types
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
+
+	sdkmath "cosmossdk.io/math"
 
 	"cosmossdk.io/x/nft"
 	"github.com/cosmos/cosmos-sdk/codec"

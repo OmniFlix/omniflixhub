@@ -1,9 +1,10 @@
 package keeper
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"crypto/sha256"
 	"fmt"
+
+	sdkmath "cosmossdk.io/math"
 
 	errorsmod "cosmossdk.io/errors"
 

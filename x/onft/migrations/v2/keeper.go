@@ -1,10 +1,11 @@
 package v2
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"reflect"
 	"time"
 	"unsafe"
+
+	sdkmath "cosmossdk.io/math"
 
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"

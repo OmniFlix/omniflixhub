@@ -170,13 +170,13 @@ func (s *KeeperTestHelper) BeginNewBlock(executeNextEpoch bool) {
 
 // BeginNewBlockWithProposer begins a new block with a proposer.
 func (s *KeeperTestHelper) BeginNewBlockWithProposer(executeNextEpoch bool, proposer sdk.ValAddress) {
-	//validator, err := s.App.StakingKeeper.GetValidator(s.Ctx, proposer)
-	//s.Assert().NoError(err)
+	// validator, err := s.App.StakingKeeper.GetValidator(s.Ctx, proposer)
+	// s.Assert().NoError(err)
 
-	//valConsAddr, err := validator.GetConsAddr()
-	//s.Require().NoError(err)
+	// valConsAddr, err := validator.GetConsAddr()
+	// s.Require().NoError(err)
 
-	//valAddr := valConsAddr
+	// valAddr := valConsAddr
 
 	newBlockTime := s.Ctx.BlockTime().Add(5 * time.Second)
 

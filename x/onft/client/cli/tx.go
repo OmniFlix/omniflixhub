@@ -1,9 +1,10 @@
 package cli
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"fmt"
 	"strings"
+
+	sdkmath "cosmossdk.io/math"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 	"github.com/cosmos/cosmos-sdk/client"

@@ -2,8 +2,9 @@ package types
 
 import (
 	"context"
-	sdkmath "cosmossdk.io/math"
 	"time"
+
+	sdkmath "cosmossdk.io/math"
 
 	nft "github.com/OmniFlix/omniflixhub/v5/x/onft/exported"
 	nfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"

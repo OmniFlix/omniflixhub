@@ -1,10 +1,11 @@
 package simulation
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"fmt"
 	"math/rand"
 	"strings"
+
+	sdkmath "cosmossdk.io/math"
 
 	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/keeper"

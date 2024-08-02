@@ -1,8 +1,9 @@
 package types
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"time"
+
+	sdkmath "cosmossdk.io/math"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/exported"
 	"github.com/cosmos/cosmos-sdk/codec"

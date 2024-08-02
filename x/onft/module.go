@@ -2,9 +2,10 @@ package onft
 
 import (
 	"context"
-	"cosmossdk.io/core/appmodule"
 	"encoding/json"
 	"fmt"
+
+	"cosmossdk.io/core/appmodule"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/exported"
 

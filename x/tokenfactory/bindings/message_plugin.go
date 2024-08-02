@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"encoding/json"
+
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
@@ -42,7 +43,8 @@ func (m *CustomMessenger) DispatchMsg(
 	ctx sdk.Context,
 	contractAddr sdk.AccAddress,
 	contractIBCPortID string,
-	msg wasmvmtypes.CosmosMsg) ([]sdk.Event, [][]byte, [][]*codectypes.Any, error) {
+	msg wasmvmtypes.CosmosMsg,
+) ([]sdk.Event, [][]byte, [][]*codectypes.Any, error) {
 	if msg.Custom != nil {
 		// only handle the happy path where this is really creating / minting / swapping ...
 		// leave everything else for the wrapped version

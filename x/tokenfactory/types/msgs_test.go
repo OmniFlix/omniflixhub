@@ -1,9 +1,10 @@
 package types_test
 
 import (
-	sdkmath "cosmossdk.io/math"
 	fmt "fmt"
 	"testing"
+
+	sdkmath "cosmossdk.io/math"
 
 	"github.com/stretchr/testify/require"
 

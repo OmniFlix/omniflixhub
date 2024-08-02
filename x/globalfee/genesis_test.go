@@ -1,9 +1,10 @@
 package globalfee
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"testing"
 	"time"
+
+	sdkmath "cosmossdk.io/math"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

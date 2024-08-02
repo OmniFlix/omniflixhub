@@ -1,11 +1,12 @@
 package bindings_test
 
 import (
+	"os"
+	"testing"
+
 	sdkmath "cosmossdk.io/math"
 	"github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/stretchr/testify/require"
-	"os"
-	"testing"
 
 	"github.com/cometbft/cometbft/crypto"
 	"github.com/cometbft/cometbft/crypto/ed25519"

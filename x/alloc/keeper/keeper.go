@@ -1,9 +1,10 @@
 package keeper
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"errors"
 	"fmt"
+
+	sdkmath "cosmossdk.io/math"
 
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"

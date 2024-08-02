@@ -1,8 +1,9 @@
 package ics721nft
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"errors"
+
+	sdkmath "cosmossdk.io/math"
 
 	errorsmod "cosmossdk.io/errors"
 

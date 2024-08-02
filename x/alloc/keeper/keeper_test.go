@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"testing"
+
 	sdkmath "cosmossdk.io/math"
 	"github.com/OmniFlix/omniflixhub/v5/app/apptesting"
 	"github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
@@ -8,7 +10,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/stretchr/testify/suite"
-	"testing"
 
 	"github.com/OmniFlix/omniflixhub/v5/app"
 )
