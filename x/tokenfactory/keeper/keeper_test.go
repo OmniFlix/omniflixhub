@@ -5,8 +5,6 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
@@ -44,7 +42,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 }
 
 func (suite *KeeperTestSuite) CreateDefaultDenom() {
-	res, _ := suite.msgServer.CreateDenom(sdk.WrapSDKContext(suite.Ctx), types.NewMsgCreateDenom(suite.TestAccs[0].String(), "bitcoin"))
+	res, _ := suite.msgServer.CreateDenom(suite.Ctx, types.NewMsgCreateDenom(suite.TestAccs[0].String(), "bitcoin"))
 	suite.defaultDenom = res.GetNewTokenDenom()
 }
 
@@ -56,7 +54,7 @@ func (suite *KeeperTestSuite) TestCreateModuleAccount() {
 	app.AppKeepers.AccountKeeper.RemoveAccount(suite.Ctx, tokenfactoryModuleAccount)
 
 	// ensure module account was removed
-	suite.Ctx = app.BaseApp.NewContext(false, tmproto.Header{ChainID: "testing"})
+	suite.Ctx = app.BaseApp.NewContext(false)
 	tokenfactoryModuleAccount = app.AppKeepers.AccountKeeper.GetAccount(suite.Ctx, app.AppKeepers.AccountKeeper.GetModuleAddress(types.ModuleName))
 	suite.Require().Nil(tokenfactoryModuleAccount)
 

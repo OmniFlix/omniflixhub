@@ -53,7 +53,7 @@ func TestQueryGlobalFeeParamMinGasPrices(t *testing.T) {
 			ctx, _, keeper := setupTestStore(t)
 			spec.setupStore(ctx, keeper)
 			q := globalfeekeeper.NewGrpcQuerier(keeper)
-			gotResp, gotErr := q.Params(sdk.WrapSDKContext(ctx), nil)
+			gotResp, gotErr := q.Params(ctx, nil)
 			require.NoError(t, gotErr)
 			require.NotNil(t, gotResp)
 			assert.Equal(t, spec.expMin, gotResp.Params.MinimumGasPrices)

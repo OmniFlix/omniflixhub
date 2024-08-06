@@ -19,7 +19,7 @@ import (
 func CreateTestInput(t *testing.T) (*app.OmniFlixApp, sdk.Context) {
 	t.Helper()
 
-	omniflix := app.Setup(t)
+	omniflix := app.Setup(false)
 	ctx := omniflix.BaseApp.NewContext(false)
 	return omniflix, ctx
 }

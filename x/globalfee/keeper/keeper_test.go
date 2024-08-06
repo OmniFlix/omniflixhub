@@ -5,23 +5,25 @@ import (
 	"time"
 
 	"cosmossdk.io/log"
-	"cosmossdk.io/store"
+	"cosmossdk.io/store/metrics"
+	rootmulti "cosmossdk.io/store/rootmulti"
 	storetypes "cosmossdk.io/store/types"
 	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
 	globalfeekeeper "github.com/OmniFlix/omniflixhub/v5/x/globalfee/keeper"
 	"github.com/OmniFlix/omniflixhub/v5/x/globalfee/types"
-	dbm "github.com/cometbft/cometbft-db"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	dbm "github.com/cosmos/cosmos-db"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )
 
-func setupTestStore(t *testing.T) (context.Context, appparams.EncodingConfig, globalfeekeeper.Keeper) {
+func setupTestStore(t *testing.T) (sdk.Context, appparams.EncodingConfig, globalfeekeeper.Keeper) {
 	t.Helper()
 	db := dbm.NewMemDB()
-	ms := store.NewCommitMultiStore(db)
+	logger := log.NewNopLogger()
+	ms := rootmulti.NewStore(db, logger, metrics.NewNoOpMetrics())
 	encCfg := appparams.MakeEncodingConfig()
-	keyParams := sdk.NewKVStoreKey(types.StoreKey)
+	keyParams := storetypes.NewKVStoreKey(types.StoreKey)
 	ms.MountStoreWithDB(keyParams, storetypes.StoreTypeIAVL, db)
 	require.NoError(t, ms.LoadLatestVersion())
 

@@ -240,7 +240,7 @@ func (suite *KeeperTestSuite) TestCreateCampaign() {
 			)
 			// Test create campaign message
 			_, err := suite.msgServer.CreateCampaign(
-				sdk.WrapSDKContext(ctx),
+				ctx,
 				createCampaignMsg,
 			)
 			if tc.valid {
@@ -302,7 +302,7 @@ func (suite *KeeperTestSuite) TestCancelCampaign() {
 			)
 
 			_, err := suite.msgServer.CancelCampaign(
-				sdk.WrapSDKContext(ctx),
+				ctx,
 				cancelCampaignMsg,
 			)
 
@@ -423,7 +423,7 @@ func (suite *KeeperTestSuite) TestClaimCampaign() {
 			)
 
 			_, err := suite.msgServer.Claim(
-				sdk.WrapSDKContext(ctx),
+				ctx,
 				claimCampaignMsg,
 			)
 
@@ -498,7 +498,7 @@ func (suite *KeeperTestSuite) TestDepositCampaign() {
 			)
 
 			_, err := suite.msgServer.DepositCampaign(
-				sdk.WrapSDKContext(ctx),
+				ctx,
 				depositCampaignMsg,
 			)
 

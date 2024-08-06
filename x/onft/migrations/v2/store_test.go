@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
+
 	"github.com/stretchr/testify/require"
 
 	storetypes "cosmossdk.io/store/types"
@@ -19,7 +21,7 @@ import (
 )
 
 func generateCollectionsData(
-	ctx context.Context,
+	ctx sdk.Context,
 	storeKey storetypes.StoreKey,
 	cdc codec.Codec,
 ) (collections []types.Collection) {
@@ -70,7 +72,7 @@ func generateCollectionsData(
 	return collections
 }
 
-func check(t *testing.T, ctx context.Context, k keeper.Keeper, collections []types.Collection) {
+func check(t *testing.T, ctx sdk.Context, k keeper.Keeper, collections []types.Collection) {
 	t.Helper()
 
 	for _, collection := range collections {
@@ -81,7 +83,7 @@ func check(t *testing.T, ctx context.Context, k keeper.Keeper, collections []typ
 	keeper.SupplyInvariant(k)
 }
 
-func setDenom(ctx context.Context, storeKey storetypes.StoreKey, cdc codec.Codec, denom types.Denom) {
+func setDenom(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.Codec, denom types.Denom) {
 	store := ctx.KVStore(storeKey)
 	bz := cdc.MustMarshal(&denom)
 	store.Set(v2.KeyDenomID(denom.Id), bz)
@@ -89,7 +91,7 @@ func setDenom(ctx context.Context, storeKey storetypes.StoreKey, cdc codec.Codec
 }
 
 func mintONFT(
-	ctx context.Context,
+	ctx sdk.Context,
 	storeKey storetypes.StoreKey,
 	cdc codec.Codec,
 	denomID string,
@@ -101,7 +103,7 @@ func mintONFT(
 }
 
 func setONFT(
-	ctx context.Context,
+	ctx sdk.Context,
 	storeKey storetypes.StoreKey,
 	cdc codec.Codec,
 	denomID string,
@@ -114,7 +116,7 @@ func setONFT(
 }
 
 func setOwner(
-	ctx context.Context,
+	ctx sdk.Context,
 	storeKey storetypes.StoreKey,
 	cdc codec.Codec,
 	denomID, onftID, owner string,
@@ -126,7 +128,7 @@ func setOwner(
 }
 
 func increaseSupply(
-	ctx context.Context,
+	ctx sdk.Context,
 	storeKey storetypes.StoreKey,
 	cdc codec.Codec,
 	denomID string,
@@ -140,7 +142,7 @@ func increaseSupply(
 }
 
 func getTotalSupply(
-	ctx context.Context,
+	ctx sdk.Context,
 	storeKey storetypes.StoreKey,
 	cdc codec.Codec,
 	denomID string,

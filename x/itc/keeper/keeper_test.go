@@ -78,7 +78,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 func (suite *KeeperTestSuite) CreateDefaultCampaign() {
 	suite.createDefaultNftDenom()
 	_, err := suite.msgServer.CreateCampaign(
-		sdk.WrapSDKContext(suite.Ctx),
+		suite.Ctx,
 		types.NewMsgCreateCampaign(
 			defaultCampaignName,
 			defaultCampaignDescription,
@@ -108,7 +108,7 @@ func (suite *KeeperTestSuite) CreateSecondaryCampaign() {
 	suite.createDefaultMintNftDenom()
 
 	_, _ = suite.msgServer.CreateCampaign(
-		sdk.WrapSDKContext(suite.Ctx),
+		suite.Ctx,
 		types.NewMsgCreateCampaign(
 			secondaryCampaignName,
 			secondaryCampaignDescription,
@@ -153,7 +153,7 @@ func (suite *KeeperTestSuite) createDefaultNftDenom() {
 	createDenomMsg.Id = defaultNftDenomId
 
 	_, _ = suite.nftMsgServer.CreateDenom(
-		sdk.WrapSDKContext(suite.Ctx),
+		suite.Ctx,
 		createDenomMsg,
 	)
 }
@@ -175,7 +175,7 @@ func (suite *KeeperTestSuite) createSecondaryNftDenom() {
 	createDenomMsg.Id = secondaryNftDenomId
 
 	_, _ = suite.nftMsgServer.CreateDenom(
-		sdk.WrapSDKContext(suite.Ctx),
+		suite.Ctx,
 		createDenomMsg,
 	)
 }
@@ -202,7 +202,7 @@ func (suite *KeeperTestSuite) createDefaultMintNftDenom() {
 	createDenomMsg.Id = defaultNftMintDenomId
 
 	_, _ = suite.nftMsgServer.CreateDenom(
-		sdk.WrapSDKContext(suite.Ctx),
+		suite.Ctx,
 		createDenomMsg,
 	)
 }
@@ -226,7 +226,7 @@ func (suite *KeeperTestSuite) mintNFT(denomId, nftId string) {
 	)
 	mintNftMsg.Id = nftId
 	_, _ = suite.nftMsgServer.MintONFT(
-		sdk.WrapSDKContext(suite.Ctx),
+		suite.Ctx,
 		mintNftMsg,
 	)
 }

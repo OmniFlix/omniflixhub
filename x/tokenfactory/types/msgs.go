@@ -44,10 +44,6 @@ func (m MsgCreateDenom) ValidateBasic() error {
 	return nil
 }
 
-func (m MsgCreateDenom) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&m))
-}
-
 func (m MsgCreateDenom) GetSigners() []sdk.AccAddress {
 	sender, _ := sdk.AccAddressFromBech32(m.Sender)
 	return []sdk.AccAddress{sender}
@@ -91,10 +87,6 @@ func (m MsgMint) ValidateBasic() error {
 	}
 
 	return nil
-}
-
-func (m MsgMint) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&m))
 }
 
 func (m MsgMint) GetSigners() []sdk.AccAddress {
@@ -143,10 +135,6 @@ func (m MsgBurn) ValidateBasic() error {
 	return nil
 }
 
-func (m MsgBurn) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&m))
-}
-
 func (m MsgBurn) GetSigners() []sdk.AccAddress {
 	sender, _ := sdk.AccAddressFromBech32(m.Sender)
 	return []sdk.AccAddress{sender}
@@ -188,10 +176,6 @@ func (m MsgForceTransfer) ValidateBasic() error {
 	return nil
 }
 
-func (m MsgForceTransfer) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&m))
-}
-
 func (m MsgForceTransfer) GetSigners() []sdk.AccAddress {
 	sender, _ := sdk.AccAddressFromBech32(m.Sender)
 	return []sdk.AccAddress{sender}
@@ -227,10 +211,6 @@ func (m MsgChangeAdmin) ValidateBasic() error {
 	}
 
 	return nil
-}
-
-func (m MsgChangeAdmin) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&m))
 }
 
 func (m MsgChangeAdmin) GetSigners() []sdk.AccAddress {
@@ -269,21 +249,12 @@ func (m MsgSetDenomMetadata) ValidateBasic() error {
 	return nil
 }
 
-func (m MsgSetDenomMetadata) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&m))
-}
-
 func (m MsgSetDenomMetadata) GetSigners() []sdk.AccAddress {
 	sender, _ := sdk.AccAddressFromBech32(m.Sender)
 	return []sdk.AccAddress{sender}
 }
 
 var _ sdk.Msg = &MsgUpdateParams{}
-
-// GetSignBytes implements the LegacyMsg interface.
-func (m MsgUpdateParams) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&m))
-}
 
 // GetSigners returns the expected signers for a MsgUpdateParams message.
 func (m *MsgUpdateParams) GetSigners() []sdk.AccAddress {

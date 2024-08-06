@@ -96,12 +96,6 @@ func (msg MsgCreateDenom) ValidateBasic() error {
 	return nil
 }
 
-// GetSignBytes Implements Msg.
-func (msg MsgCreateDenom) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg MsgCreateDenom) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -159,12 +153,6 @@ func (msg MsgUpdateDenom) ValidateBasic() error {
 	return nil
 }
 
-// GetSignBytes Implements Msg.
-func (msg MsgUpdateDenom) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg MsgUpdateDenom) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -196,11 +184,6 @@ func (msg MsgTransferDenom) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgTransferDenom) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg MsgTransferDenom) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -225,11 +208,6 @@ func (msg MsgPurgeDenom) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address; %s", err)
 	}
 	return nil
-}
-
-func (msg MsgPurgeDenom) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
 }
 
 func (msg MsgPurgeDenom) GetSigners() []sdk.AccAddress {
@@ -289,11 +267,6 @@ func (msg MsgMintONFT) ValidateBasic() error {
 	return ValidateONFTID(msg.Id)
 }
 
-func (msg MsgMintONFT) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg MsgMintONFT) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -330,11 +303,6 @@ func (msg MsgTransferONFT) ValidateBasic() error {
 	return ValidateONFTID(msg.Id)
 }
 
-func (msg MsgTransferONFT) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg MsgTransferONFT) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -362,11 +330,6 @@ func (msg MsgBurnONFT) ValidateBasic() error {
 	return ValidateONFTID(msg.Id)
 }
 
-func (msg MsgBurnONFT) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg MsgBurnONFT) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -376,11 +339,6 @@ func (msg MsgBurnONFT) GetSigners() []sdk.AccAddress {
 }
 
 // MsgUpdateParams
-
-// GetSignBytes implements the LegacyMsg interface.
-func (m MsgUpdateParams) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&m))
-}
 
 // GetSigners returns the expected signers for a MsgUpdateParams message.
 func (m *MsgUpdateParams) GetSigners() []sdk.AccAddress {

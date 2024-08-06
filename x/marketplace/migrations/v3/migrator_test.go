@@ -3,6 +3,9 @@ package v3_test
 import (
 	"testing"
 
+	storetypes "cosmossdk.io/store/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/marketplace"
@@ -10,7 +13,6 @@ import (
 	v3 "github.com/OmniFlix/omniflixhub/v5/x/marketplace/migrations/v3"
 	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
 	"github.com/cosmos/cosmos-sdk/testutil"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 )
 
@@ -22,7 +24,7 @@ func newMockSubspace(ps types.Params) mockSubspace {
 	return mockSubspace{ps: ps}
 }
 
-func (ms mockSubspace) GetParamSet(ctx context.Context, ps exported.ParamSet) {
+func (ms mockSubspace) GetParamSet(ctx sdk.Context, ps exported.ParamSet) {
 	*ps.(*types.Params) = ms.ps
 }
 
@@ -30,8 +32,8 @@ func TestMigrate(t *testing.T) {
 	encCfg := moduletestutil.MakeTestEncodingConfig(marketplace.AppModuleBasic{})
 	cdc := encCfg.Codec
 
-	storeKey := sdk.NewKVStoreKey(v3.ModuleName)
-	tKey := sdk.NewTransientStoreKey("transient_test")
+	storeKey := storetypes.NewKVStoreKey(v3.ModuleName)
+	tKey := storetypes.NewTransientStoreKey("transient_test")
 	ctx := testutil.DefaultContext(storeKey, tKey)
 	store := ctx.KVStore(storeKey)
 
