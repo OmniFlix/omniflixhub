@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	"github.com/OmniFlix/omniflixhub/v5/app"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -9,6 +10,7 @@ import (
 )
 
 func TestGenesisState_Validate(t *testing.T) {
+	app.SetConfig()
 	for _, tc := range []struct {
 		desc     string
 		genState *types.GenesisState
@@ -40,7 +42,7 @@ func TestGenesisState_Validate(t *testing.T) {
 					{
 						Denom: "factory/omniflix1t7egva48prqmzl59x5ngv4zx0dtrwewcs7ut5e/bitcoin",
 						AuthorityMetadata: types.DenomAuthorityMetadata{
-							Admin: "cosmos1ft6e5esdtdegnvcr3djd3ftk4kwpcr6jta8eyh",
+							Admin: "omniflix1yca6mlzq9xvnmmylw0asfjhz0q483pw57pj79v",
 						},
 					},
 				},

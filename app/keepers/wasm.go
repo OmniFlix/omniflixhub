@@ -21,6 +21,7 @@ var wasmCapabilities = []string{
 	"iterator",
 	"staking",
 	"stargate",
+	"osmosis",
 	"cosmwasm_1_1",
 	"cosmwasm_1_2",
 	"cosmwasm_1_3",

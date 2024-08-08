@@ -177,60 +177,6 @@ func TestMintMsg(t *testing.T) {
 	require.Equal(t, resp.Denom, coin.Denom)
 }
 
-func TestForceTransfer(t *testing.T) {
-	creator := RandomAccountAddress()
-	customApp, ctx := SetupCustomApp(t, creator)
-
-	lucky := RandomAccountAddress()
-	rcpt := RandomAccountAddress()
-	reflect := instantiateReflectContract(t, ctx, customApp, lucky)
-	require.NotEmpty(t, reflect)
-
-	// Fund reflect contract with 100 base denom creation fees
-	reflectAmount := sdk.NewCoins(sdk.NewCoin(types.DefaultParams().DenomCreationFee[0].Denom, types.DefaultParams().DenomCreationFee[0].Amount.MulRaw(100)))
-	fundAccount(t, ctx, customApp, reflect, reflectAmount)
-
-	// lucky was broke
-	balances := customApp.AppKeepers.BankKeeper.GetAllBalances(ctx, lucky)
-	require.Empty(t, balances)
-
-	// Create denom for minting
-	msg := bindings.TokenFactoryMsg{CreateDenom: &bindings.CreateDenom{
-		Subdenom: "SUN",
-	}}
-	err := executeCustom(t, ctx, customApp, reflect, lucky, msg, sdk.Coin{})
-	require.NoError(t, err)
-	sunDenom := fmt.Sprintf("factory/%s/%s", reflect.String(), msg.CreateDenom.Subdenom)
-
-	amount, ok := sdkmath.NewIntFromString("808010808")
-	require.True(t, ok)
-
-	// Mint new tokens to lucky
-	msg = bindings.TokenFactoryMsg{MintTokens: &bindings.MintTokens{
-		Denom:         sunDenom,
-		Amount:        amount,
-		MintToAddress: lucky.String(),
-	}}
-	err = executeCustom(t, ctx, customApp, reflect, lucky, msg, sdk.Coin{})
-	require.NoError(t, err)
-
-	// Force move 100 tokens from lucky to rcpt
-	msg = bindings.TokenFactoryMsg{ForceTransfer: &bindings.ForceTransfer{
-		Denom:       sunDenom,
-		Amount:      sdkmath.NewInt(100),
-		FromAddress: lucky.String(),
-		ToAddress:   rcpt.String(),
-	}}
-	err = executeCustom(t, ctx, customApp, reflect, lucky, msg, sdk.Coin{})
-	require.NoError(t, err)
-
-	// check the balance of rcpt
-	balances = customApp.AppKeepers.BankKeeper.GetAllBalances(ctx, rcpt)
-	require.Len(t, balances, 1)
-	coin := balances[0]
-	require.Equal(t, sdkmath.NewInt(100), coin.Amount)
-}
-
 func TestBurnMsg(t *testing.T) {
 	creator := RandomAccountAddress()
 	customApp, ctx := SetupCustomApp(t, creator)

@@ -1,8 +1,11 @@
 package bindings_test
 
 import (
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"os"
 	"testing"
+	"time"
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/CosmWasm/wasmd/x/wasm/keeper"
@@ -18,9 +21,9 @@ import (
 
 func CreateTestInput(t *testing.T) (*app.OmniFlixApp, sdk.Context) {
 	t.Helper()
-
-	omniflix := app.Setup(false)
-	ctx := omniflix.BaseApp.NewContext(false)
+	tdir, _ := os.MkdirTemp(os.TempDir(), "omniflixhub-test-home")
+	omniflix := app.SetupWithCustomHome(false, tdir)
+	ctx := omniflix.BaseApp.NewContextLegacy(false, tmproto.Header{Height: 1, ChainID: "omniflixhub-1", Time: time.Now().UTC()})
 	return omniflix, ctx
 }
 
@@ -50,17 +53,26 @@ func RandomBech32AccountAddress() string {
 	return RandomAccountAddress().String()
 }
 
-func storeReflectCode(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, addr sdk.AccAddress) uint64 {
+func storeReflectCode(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, addr sdk.AccAddress) {
 	t.Helper()
 
 	wasmCode, err := os.ReadFile("./testdata/token_reflect.wasm")
 	require.NoError(t, err)
 
-	contractKeeper := keeper.NewDefaultPermissionKeeper(customApp.AppKeepers.WasmKeeper)
-	codeID, _, err := contractKeeper.Create(ctx, addr, wasmCode, nil)
+	// Quick hack to allow code upload
+	originalParams := customApp.WasmKeeper.GetParams(ctx)
+	temporaryParams := originalParams
+	temporaryParams.CodeUploadAccess.Permission = wasmtypes.AccessTypeEverybody
+	_ = customApp.WasmKeeper.SetParams(ctx, temporaryParams)
+
+	msg := wasmtypes.MsgStoreCodeFixture(func(m *wasmtypes.MsgStoreCode) {
+		m.WASMByteCode = wasmCode
+		m.Sender = addr.String()
+	})
+	_, err = customApp.MsgServiceRouter().Handler(msg)(ctx, msg)
 	require.NoError(t, err)
 
-	return codeID
+	_ = customApp.WasmKeeper.SetParams(ctx, originalParams)
 }
 
 func instantiateReflectContract(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, funder sdk.AccAddress) sdk.AccAddress {

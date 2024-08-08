@@ -10,12 +10,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"cosmossdk.io/log"
+	"cosmossdk.io/store"
+	metrics2 "cosmossdk.io/store/metrics"
+	storetypes "cosmossdk.io/store/types"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
-
-	"cosmossdk.io/store"
-	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
 	globalfeekeeper "github.com/OmniFlix/omniflixhub/v5/x/globalfee/keeper"
@@ -132,18 +133,21 @@ func TestInitExportGenesis(t *testing.T) {
 func setupTestStore(t *testing.T) (sdk.Context, appparams.EncodingConfig, globalfeekeeper.Keeper) {
 	t.Helper()
 	db := dbm.NewMemDB()
-	ms := store.NewCommitMultiStore(db, log.NewNopLogger(), nil)
+	ms := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics2.NewNoOpMetrics())
 	encCfg := appparams.MakeEncodingConfig()
-	keyParams := storetypes.NewKVStoreKey(types.StoreKey)
+	keyParams := storetypes.NewKVStoreKey(paramstypes.StoreKey)
+	globalfeeKeyStore := storetypes.NewKVStoreKey(types.StoreKey)
+	tkeyParams := storetypes.NewTransientStoreKey(paramstypes.TStoreKey)
 	ms.MountStoreWithDB(keyParams, storetypes.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(globalfeeKeyStore, storetypes.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(tkeyParams, storetypes.StoreTypeTransient, db)
 	require.NoError(t, ms.LoadLatestVersion())
 
-	globalfeeKeeper := globalfeekeeper.NewKeeper(encCfg.Marshaler, keyParams, "omniflix1llyd96levrglxhw6sczgk9wn48t64zkhv4fq0r")
+	globalfeeKeeper := globalfeekeeper.NewKeeper(encCfg.Marshaler, globalfeeKeyStore, "")
 
 	ctx := sdk.NewContext(ms, tmproto.Header{
-		Height:  1234567,
-		Time:    time.Date(2020, time.April, 22, 12, 0, 0, 0, time.UTC),
-		ChainID: "testing",
+		Height: 1234567,
+		Time:   time.Date(2020, time.April, 22, 12, 0, 0, 0, time.UTC),
 	}, false, log.NewNopLogger())
 
 	return ctx, encCfg, globalfeeKeeper

@@ -3,8 +3,6 @@ package globalfee
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
@@ -109,7 +107,6 @@ func NewAppModule(
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState types.GenesisState
 	cdc.MustUnmarshalJSON(gs, &genesisState)
-	fmt.Println(genesisState)
 	if err := am.keeper.SetParams(ctx, genesisState.Params); err != nil {
 		panic(err)
 	}
@@ -117,10 +114,9 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.Ra
 }
 
 func (am AppModule) ExportGenesis(ctx sdk.Context, marshaller codec.JSONCodec) json.RawMessage {
-	genState := &types.GenesisState{
-		Params: am.keeper.GetParams(ctx),
-	}
-	return marshaller.MustMarshalJSON(genState)
+	var genState types.GenesisState
+	genState.Params = am.keeper.GetParams(ctx)
+	return marshaller.MustMarshalJSON(&genState)
 }
 
 func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {
