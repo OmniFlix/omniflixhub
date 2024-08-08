@@ -3,16 +3,18 @@ package keeper
 import (
 	"fmt"
 
+	sdkmath "cosmossdk.io/math"
+
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 
 	errorsmod "cosmossdk.io/errors"
 
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	storetypes "cosmossdk.io/store/types"
 
+	"cosmossdk.io/log"
 	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
-	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -132,7 +134,7 @@ func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress
 	}
 	saleCommission := k.GetSaleCommission(ctx)
 	marketplaceCoin := k.GetProportions(listing.Price, saleCommission)
-	if marketplaceCoin.Amount.GTE(sdk.OneInt()) {
+	if marketplaceCoin.Amount.GTE(sdkmath.OneInt()) {
 		err = k.DistributeCommission(ctx, marketplaceCoin)
 		if err != nil {
 			return err
@@ -140,7 +142,7 @@ func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress
 		listingSaleAmountCoin = listingPriceCoin.Sub(marketplaceCoin)
 	}
 	// check if it is a valid royalty share
-	if nft.GetRoyaltyShare().GT(sdk.ZeroDec()) && nft.GetRoyaltyShare().LTE(sdk.OneDec()) {
+	if nft.GetRoyaltyShare().GT(sdkmath.LegacyZeroDec()) && nft.GetRoyaltyShare().LTE(sdkmath.LegacyOneDec()) {
 		nftRoyaltyShareCoin := k.GetProportions(listingSaleAmountCoin, nft.GetRoyaltyShare())
 		creator, err := sdk.AccAddressFromBech32(denom.Creator)
 		if err != nil {
@@ -190,8 +192,8 @@ func (k Keeper) Buy(ctx sdk.Context, listing types.Listing, buyer sdk.AccAddress
 	return nil
 }
 
-func (k Keeper) GetProportions(totalCoin sdk.Coin, ratio sdk.Dec) sdk.Coin {
-	return sdk.NewCoin(totalCoin.Denom, sdk.NewDecFromInt(totalCoin.Amount).Mul(ratio).TruncateInt())
+func (k Keeper) GetProportions(totalCoin sdk.Coin, ratio sdkmath.LegacyDec) sdk.Coin {
+	return sdk.NewCoin(totalCoin.Denom, sdkmath.LegacyNewDecFromInt(totalCoin.Amount).Mul(ratio).TruncateInt())
 }
 
 func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) error {
@@ -199,7 +201,7 @@ func (k Keeper) DistributeCommission(ctx sdk.Context, marketplaceCoin sdk.Coin) 
 	stakingCommissionCoin := k.GetProportions(marketplaceCoin, distrParams.Staking)
 	moduleAccAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	feeCollectorAddr := k.accountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
-	if distrParams.Staking.GT(sdk.ZeroDec()) && stakingCommissionCoin.Amount.GT(sdk.ZeroInt()) {
+	if distrParams.Staking.GT(sdkmath.LegacyZeroDec()) && stakingCommissionCoin.Amount.GT(sdkmath.ZeroInt()) {
 		err := k.bankKeeper.SendCoins(ctx, moduleAccAddr, feeCollectorAddr, sdk.NewCoins(stakingCommissionCoin))
 		if err != nil {
 			return err
@@ -313,8 +315,8 @@ func (k Keeper) PlaceBid(ctx sdk.Context, auction types.AuctionListing, newBid t
 	return nil
 }
 
-func (k Keeper) GetNewBidPrice(denom string, amount sdk.Coin, increment sdk.Dec) sdk.Coin {
-	return sdk.NewCoin(denom, amount.Amount.Add(sdk.NewDecFromInt(amount.Amount).Mul(increment).TruncateInt()))
+func (k Keeper) GetNewBidPrice(denom string, amount sdk.Coin, increment sdkmath.LegacyDec) sdk.Coin {
+	return sdk.NewCoin(denom, amount.Amount.Add(sdkmath.LegacyNewDecFromInt(amount.Amount).Mul(increment).TruncateInt()))
 }
 
 func (k Keeper) TransferRoyalty(
@@ -349,7 +351,7 @@ func (k Keeper) TransferRoyalty(
 			remaining = remaining.Sub(sharePortionCoin)
 		}
 		// sending remaining to creator
-		if remaining.Amount.GT(sdk.ZeroInt()) {
+		if remaining.Amount.GT(sdkmath.ZeroInt()) {
 			err := k.bankKeeper.SendCoins(ctx, moduleAcc, creator, sdk.NewCoins(remaining))
 			if err != nil {
 				return err

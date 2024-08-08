@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"cosmossdk.io/core/appmodule"
+
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/exported"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/simulation"
@@ -25,7 +27,7 @@ import (
 )
 
 var (
-	_ module.AppModule           = AppModule{}
+	_ appmodule.AppModule        = AppModule{}
 	_ module.AppModuleBasic      = AppModuleBasic{}
 	_ module.AppModuleSimulation = AppModule{}
 )
@@ -36,6 +38,12 @@ const ConsensusVersion = 2
 type AppModuleBasic struct {
 	cdc codec.Codec
 }
+
+// IsAppModule implements the appmodule.AppModule interface.
+func (am AppModule) IsAppModule() {}
+
+// IsOnePerModuleType is a marker function just indicates that this is a one-per-module type.
+func (am AppModule) IsOnePerModuleType() {}
 
 func (AppModuleBasic) Name() string { return types.ModuleName }
 
@@ -137,12 +145,6 @@ func (AppModule) ConsensusVersion() uint64 {
 	return ConsensusVersion
 }
 
-func (AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
-
-func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return []abci.ValidatorUpdate{}
-}
-
 // AppModuleSimulation functions
 
 // GenerateGenesisState creates a randomized GenState of the onft module.
@@ -151,7 +153,8 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 }
 
 // RegisterStoreDecoder registers a decoder for onft module's types
-func (am AppModule) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
+
+func (am AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
 	sdr[types.StoreKey] = simulation.NewDecodeStore(am.cdc)
 }
 

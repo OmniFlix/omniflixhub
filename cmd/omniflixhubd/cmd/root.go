@@ -5,43 +5,72 @@ import (
 	"io"
 	"os"
 
+	"github.com/cosmos/cosmos-sdk/baseapp"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
+
 	tmcfg "github.com/cometbft/cometbft/config"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/debug"
-	"github.com/cosmos/cosmos-sdk/client/pruning"
+	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/OmniFlix/omniflixhub/v5/app"
-	"github.com/OmniFlix/omniflixhub/v5/app/params"
-
+	"cosmossdk.io/client/v2/autocli"
+	"cosmossdk.io/core/appmodule"
+	"cosmossdk.io/log"
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	dbm "github.com/cometbft/cometbft-db"
+	"github.com/OmniFlix/omniflixhub/v5/app"
+	"github.com/OmniFlix/omniflixhub/v5/app/params"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
-	"github.com/cometbft/cometbft/libs/log"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
+	runtimeservices "github.com/cosmos/cosmos-sdk/runtime/services"
 	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	vestingcli "github.com/cosmos/cosmos-sdk/x/auth/vesting/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+	rosettaCmd "github.com/cosmos/rosetta/cmd"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
-
-var ChainID string
 
 // NewRootCmd creates a new root command for omniflixhubd. It is called once in the
 // main function.
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	// Set config for prefixes
-	encodingConfig := app.MakeEncodingConfig()
-	app.SetConfig()
+	encodingConfig := app.GetEncodingConfig()
+
+	initAppOptions := viper.New()
+	tempDir := tempDir()
+	initAppOptions.Set(flags.FlagHome, tempDir)
+
+	tempApp := app.NewOmniFlixApp(
+		log.NewNopLogger(),
+		dbm.NewMemDB(),
+		nil,
+		true,
+		nil,
+		tempDir,
+		0,
+		encodingConfig,
+		initAppOptions,
+		nil,
+		baseapp.SetChainID("omniflixhub-1"),
+	)
+	defer func() {
+		if err := tempApp.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Marshaler).
@@ -73,50 +102,71 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 				return err
 			}
 			appTemplate, appConfig := initAppConfig()
-			customTMConfig := initTendermintConfig()
+			customTMConfig := initCometBftConfig()
 			return server.InterceptConfigsPreRunHandler(cmd, appTemplate, appConfig, customTMConfig)
 		},
 	}
 
-	initRootCmd(rootCmd, encodingConfig)
+	initRootCmd(rootCmd, encodingConfig, tempApp)
+
+	// must need as part of cosmos-sdk 0.50.x migration
+	if err := autoCliOpts(initClientCtx, tempApp).EnhanceRootCommand(rootCmd); err != nil {
+		panic(err)
+	}
 
 	return rootCmd, encodingConfig
 }
 
-// initTendermintConfig helps to override default Tendermint Config values.
+// initCometBftConfig helps to override default CometBft Config values.
 // return tmcfg.DefaultConfig if no custom configuration is required for the application.
-func initTendermintConfig() *tmcfg.Config {
+func initCometBftConfig() *tmcfg.Config {
 	cfg := tmcfg.DefaultConfig()
 
 	// these values put a higher strain on node memory
-	// cfg.P2P.MaxNumInboundPeers = 100
-	// cfg.P2P.MaxNumOutboundPeers = 40
+	cfg.P2P.MaxNumInboundPeers = 100
+	cfg.P2P.MaxNumOutboundPeers = 40
 
 	return cfg
 }
 
-func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
-	ac := appCreator{encodingConfig}
-
+func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, tempApp *app.OmniFlixApp) {
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
+		genutilcli.InitCmd(tempApp.ModuleBasics, app.DefaultNodeHome),
+		tmcli.NewCompletionCmd(rootCmd, true),
+		genutilcli.CollectGenTxsCmd(
+			banktypes.GenesisBalancesIterator{},
+			app.DefaultNodeHome,
+			genutiltypes.DefaultMessageValidator,
+			encodingConfig.TxConfig.SigningContext().ValidatorAddressCodec(),
+		),
+		genutilcli.MigrateGenesisCmd(genutilcli.MigrationMap),
+		genutilcli.GenTxCmd(
+			tempApp.ModuleBasics,
+			encodingConfig.TxConfig,
+			banktypes.GenesisBalancesIterator{},
+			app.DefaultNodeHome,
+			encodingConfig.TxConfig.SigningContext().ValidatorAddressCodec(),
+		),
+		genutilcli.ValidateGenesisCmd(tempApp.ModuleBasics),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		addDebugCommands(debug.Cmd()),
-		config.Cmd(),
-		pruning.PruningCmd(ac.newApp),
 	)
 
-	a := appCreator{encodingConfig}
-	server.AddCommands(rootCmd, app.DefaultNodeHome, a.newApp, a.appExport, addModuleInitFlags)
+	ac := appCreator{
+		encCfg: encodingConfig,
+	}
+
+	server.AddCommands(rootCmd, app.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
-		rpc.StatusCommand(),
-		genesisCommand(encodingConfig),
+		server.StatusCommand(),
 		queryCommand(),
-		txCommand(),
-		keys.Commands(app.DefaultNodeHome),
+		txCommand(tempApp.ModuleBasics),
+		keys.Commands(),
 	)
+	// add rosetta
+	rootCmd.AddCommand(rosettaCmd.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Marshaler))
 }
 
 func addModuleInitFlags(startCmd *cobra.Command) {
@@ -124,13 +174,14 @@ func addModuleInitFlags(startCmd *cobra.Command) {
 	wasm.AddModuleInitFlags(startCmd)
 }
 
-func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
-	cmd := genutilcli.GenesisCoreCommand(encodingConfig.TxConfig, app.ModuleBasics, app.DefaultNodeHome)
-
-	for _, subCmd := range cmds {
-		cmd.AddCommand(subCmd)
+func tempDir() string {
+	dir, err := os.MkdirTemp("", "omniflixhubtemp")
+	if err != nil {
+		dir = app.DefaultNodeHome
 	}
-	return cmd
+	defer os.RemoveAll(dir)
+
+	return dir
 }
 
 func queryCommand() *cobra.Command {
@@ -144,9 +195,8 @@ func queryCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		authcmd.GetAccountCmd(),
 		rpc.ValidatorCommand(),
-		rpc.BlockCommand(),
+		server.QueryBlockCmd(),
 		authcmd.QueryTxsByEventsCmd(),
 		authcmd.QueryTxCmd(),
 	)
@@ -157,7 +207,7 @@ func queryCommand() *cobra.Command {
 	return cmd
 }
 
-func txCommand() *cobra.Command {
+func txCommand(moduleBasics module.BasicManager) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "tx",
 		Short:                      "Transactions subcommands",
@@ -175,11 +225,9 @@ func txCommand() *cobra.Command {
 		authcmd.GetBroadcastCommand(),
 		authcmd.GetEncodeCommand(),
 		authcmd.GetDecodeCommand(),
-		vestingcli.GetTxCmd(),
-		authcmd.GetAuxToFeeCommand(),
 	)
 
-	app.ModuleBasics.AddTxCommands(cmd)
+	moduleBasics.AddTxCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
@@ -190,7 +238,7 @@ type appCreator struct {
 }
 
 // newApp is an AppCreator
-func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
+func (ac appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
 	skipUpgradeHeights := make(map[int64]bool)
 	for _, h := range cast.ToIntSlice(appOpts.Get(server.FlagUnsafeSkipUpgrades)) {
 		skipUpgradeHeights[int64(h)] = true
@@ -211,7 +259,7 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
-		a.encCfg,
+		ac.encCfg,
 		appOpts,
 		wasmOpts,
 		baseappOptions...,
@@ -219,7 +267,7 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 }
 
 // appExport creates a new app (optionally at a given height)
-func (a appCreator) appExport(
+func (ac appCreator) appExport(
 	logger log.Logger,
 	db dbm.DB,
 	traceStore io.Writer,
@@ -246,7 +294,7 @@ func (a appCreator) appExport(
 			map[int64]bool{},
 			homePath,
 			uint(1),
-			a.encCfg,
+			ac.encCfg,
 			appOpts,
 			emptyWasmOpts,
 		)
@@ -263,11 +311,32 @@ func (a appCreator) appExport(
 			map[int64]bool{},
 			homePath,
 			uint(1),
-			a.encCfg,
+			ac.encCfg,
 			appOpts,
 			emptyWasmOpts,
 		)
 	}
 
 	return anApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
+}
+
+func autoCliOpts(initClientCtx client.Context, tempApp *app.OmniFlixApp) autocli.AppOptions {
+	modules := make(map[string]appmodule.AppModule)
+	for _, m := range tempApp.ModuleManager().Modules {
+		if moduleWithName, ok := m.(module.HasName); ok {
+			moduleName := moduleWithName.Name()
+			if appModule, ok := moduleWithName.(appmodule.AppModule); ok {
+				modules[moduleName] = appModule
+			}
+		}
+	}
+
+	return autocli.AppOptions{
+		Modules:               modules,
+		ModuleOptions:         runtimeservices.ExtractAutoCLIOptions(tempApp.ModuleManager().Modules),
+		AddressCodec:          authcodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
+		ValidatorAddressCodec: authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix()),
+		ConsensusAddressCodec: authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix()),
+		ClientCtx:             initClientCtx,
+	}
 }

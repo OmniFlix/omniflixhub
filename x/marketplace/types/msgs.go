@@ -3,6 +3,8 @@ package types
 import (
 	"time"
 
+	sdkmath "cosmossdk.io/math"
+
 	errorsmod "cosmossdk.io/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -68,15 +70,6 @@ func (msg MsgListNFT) ValidateBasic() error {
 	)
 }
 
-// GetSignBytes Implements Msg.
-func (msg MsgListNFT) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(&msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
-}
-
 // GetSigners Implements Msg.
 func (msg MsgListNFT) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Owner)
@@ -104,15 +97,6 @@ func (msg MsgEditListing) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 	return ValidatePrice(msg.Price)
-}
-
-// GetSignBytes Implements Msg.
-func (msg MsgEditListing) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(&msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
 }
 
 // GetSigners Implements Msg.
@@ -145,15 +129,6 @@ func (msg MsgDeListNFT) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 	return nil
-}
-
-// GetSignBytes Implements Msg.
-func (msg MsgDeListNFT) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(&msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
 }
 
 // GetSigners Implements Msg.
@@ -189,15 +164,6 @@ func (msg MsgBuyNFT) ValidateBasic() error {
 	return ValidatePrice(msg.Price)
 }
 
-// GetSignBytes Implements Msg.
-func (msg MsgBuyNFT) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(&msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
-}
-
 // GetSigners Implements Msg.
 func (msg MsgBuyNFT) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Buyer)
@@ -210,7 +176,7 @@ func (msg MsgBuyNFT) GetSigners() []sdk.AccAddress {
 // Auction messages
 
 func NewMsgCreateAuction(denomId, nftId string, startTime time.Time, duration *time.Duration, startPrice sdk.Coin, owner sdk.AccAddress,
-	incrementPercentage sdk.Dec, whitelistAccounts []string, splitShares []WeightedAddress,
+	incrementPercentage sdkmath.LegacyDec, whitelistAccounts []string, splitShares []WeightedAddress,
 ) *MsgCreateAuction {
 	return &MsgCreateAuction{
 		NftId:               nftId,
@@ -242,7 +208,7 @@ func (msg MsgCreateAuction) ValidateBasic() error {
 			return err
 		}
 	}
-	if !msg.IncrementPercentage.IsPositive() || !msg.IncrementPercentage.LTE(sdk.NewDec(1)) {
+	if !msg.IncrementPercentage.IsPositive() || !msg.IncrementPercentage.LTE(sdkmath.LegacyNewDec(1)) {
 		return errorsmod.Wrapf(ErrInvalidPercentage, "invalid percentage value (%s)", msg.IncrementPercentage.String())
 	}
 	if err = ValidateSplitShares(msg.SplitShares); err != nil {
@@ -262,15 +228,6 @@ func (msg MsgCreateAuction) Validate(now time.Time) error {
 		return errorsmod.Wrapf(ErrInvalidStartTime, "start time must be after current time %s", now.String())
 	}
 	return nil
-}
-
-// GetSignBytes Implements Msg.
-func (msg MsgCreateAuction) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(&msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
 }
 
 // GetSigners Implements Msg.
@@ -299,15 +256,6 @@ func (msg MsgCancelAuction) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 	return nil
-}
-
-// GetSignBytes Implements Msg.
-func (msg MsgCancelAuction) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(&msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
 }
 
 // GetSigners Implements Msg.
@@ -342,15 +290,6 @@ func (msg MsgPlaceBid) ValidateBasic() error {
 	return nil
 }
 
-// GetSignBytes Implements Msg.
-func (msg MsgPlaceBid) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(&msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
-}
-
 // GetSigners Implements Msg.
 func (msg MsgPlaceBid) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Bidder)
@@ -358,13 +297,6 @@ func (msg MsgPlaceBid) GetSigners() []sdk.AccAddress {
 		panic(err)
 	}
 	return []sdk.AccAddress{from}
-}
-
-// MsgUpdateParams
-
-// GetSignBytes implements the LegacyMsg interface.
-func (m MsgUpdateParams) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&m))
 }
 
 // GetSigners returns the expected signers for a MsgUpdateParams message.

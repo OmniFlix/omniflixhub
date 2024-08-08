@@ -3,7 +3,6 @@ package globalfee
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
@@ -34,6 +33,12 @@ const ConsensusVersion = 2
 type AppModuleBasic struct {
 	cdc codec.Codec
 }
+
+// IsAppModule implements the appmodule.AppModule interface.
+func (am AppModule) IsAppModule() {}
+
+// IsOnePerModuleType is a marker function just indicates that this is a one-per-module type.
+func (am AppModule) IsOnePerModuleType() {}
 
 func (am AppModuleBasic) Name() string {
 	return types.ModuleName
@@ -103,7 +108,6 @@ func NewAppModule(
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState types.GenesisState
 	cdc.MustUnmarshalJSON(gs, &genesisState)
-	fmt.Println(genesisState)
 	if err := am.keeper.SetParams(ctx, genesisState.Params); err != nil {
 		panic(err)
 	}
@@ -111,10 +115,9 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.Ra
 }
 
 func (am AppModule) ExportGenesis(ctx sdk.Context, marshaller codec.JSONCodec) json.RawMessage {
-	genState := &types.GenesisState{
-		Params: am.keeper.GetParams(ctx),
-	}
-	return marshaller.MustMarshalJSON(genState)
+	var genState types.GenesisState
+	genState.Params = am.keeper.GetParams(ctx)
+	return marshaller.MustMarshalJSON(&genState)
 }
 
 func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {
@@ -129,11 +132,12 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewGrpcQuerier(am.keeper))
 }
 
-func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {
+func (am AppModule) BeginBlock(_ context.Context) error {
+	return nil
 }
 
-func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return nil
+func (am AppModule) EndBlock(_ context.Context) ([]abci.ValidatorUpdate, error) {
+	return []abci.ValidatorUpdate{}, nil
 }
 
 // ConsensusVersion is a sequence number for state-breaking change of the

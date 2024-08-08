@@ -3,9 +3,8 @@ package keeper
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (k Keeper) mintTo(ctx sdk.Context, amount sdk.Coin, mintTo string) error {

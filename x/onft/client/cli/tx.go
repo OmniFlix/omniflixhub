@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	sdkmath "cosmossdk.io/math"
+
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -257,9 +259,9 @@ Additional Flags
 			if err != nil {
 				return err
 			}
-			royaltyShare := sdk.NewDec(0)
+			royaltyShare := sdkmath.LegacyNewDec(0)
 			if len(royaltyShareStr) > 0 {
-				royaltyShare, err = sdk.NewDecFromStr(royaltyShareStr)
+				royaltyShare, err = sdkmath.LegacyNewDecFromStr(royaltyShareStr)
 				if err != nil {
 					return err
 				}
@@ -514,7 +516,7 @@ func parseSplitShares(splitSharesStr string) ([]*types.WeightedAddress, error) {
 		if err != nil {
 			return nil, err
 		}
-		weight, err := sdk.NewDecFromStr(strings.TrimSpace(split[1]))
+		weight, err := sdkmath.LegacyNewDecFromStr(strings.TrimSpace(split[1]))
 		if err != nil {
 			return nil, err
 		}

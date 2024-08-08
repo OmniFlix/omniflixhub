@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
+
 	onftkeeper "github.com/OmniFlix/omniflixhub/v5/x/onft/keeper"
 	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 
@@ -46,7 +48,7 @@ var (
 		MediaUri:     "ipfs://minttesturi",
 		PreviewUri:   "ipfs://minttestpreviewuri",
 		Data:         "{}",
-		RoyaltyShare: sdk.NewDecWithPrec(1, 2),
+		RoyaltyShare: sdkmath.LegacyNewDecWithPrec(1, 2),
 		Transferable: true,
 		Extensible:   true,
 		Nsfw:         false,
@@ -76,7 +78,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 func (suite *KeeperTestSuite) CreateDefaultCampaign() {
 	suite.createDefaultNftDenom()
 	_, err := suite.msgServer.CreateCampaign(
-		sdk.WrapSDKContext(suite.Ctx),
+		suite.Ctx,
 		types.NewMsgCreateCampaign(
 			defaultCampaignName,
 			defaultCampaignDescription,
@@ -106,7 +108,7 @@ func (suite *KeeperTestSuite) CreateSecondaryCampaign() {
 	suite.createDefaultMintNftDenom()
 
 	_, _ = suite.msgServer.CreateCampaign(
-		sdk.WrapSDKContext(suite.Ctx),
+		suite.Ctx,
 		types.NewMsgCreateCampaign(
 			secondaryCampaignName,
 			secondaryCampaignDescription,
@@ -144,14 +146,14 @@ func (suite *KeeperTestSuite) createDefaultNftDenom() {
 		[]*onfttypes.WeightedAddress{
 			{
 				Address: suite.TestAccs[0].String(),
-				Weight:  sdk.OneDec(),
+				Weight:  sdkmath.LegacyOneDec(),
 			},
 		},
 	)
 	createDenomMsg.Id = defaultNftDenomId
 
 	_, _ = suite.nftMsgServer.CreateDenom(
-		sdk.WrapSDKContext(suite.Ctx),
+		suite.Ctx,
 		createDenomMsg,
 	)
 }
@@ -173,7 +175,7 @@ func (suite *KeeperTestSuite) createSecondaryNftDenom() {
 	createDenomMsg.Id = secondaryNftDenomId
 
 	_, _ = suite.nftMsgServer.CreateDenom(
-		sdk.WrapSDKContext(suite.Ctx),
+		suite.Ctx,
 		createDenomMsg,
 	)
 }
@@ -193,14 +195,14 @@ func (suite *KeeperTestSuite) createDefaultMintNftDenom() {
 		[]*onfttypes.WeightedAddress{
 			{
 				Address: suite.TestAccs[0].String(),
-				Weight:  sdk.OneDec(),
+				Weight:  sdkmath.LegacyOneDec(),
 			},
 		},
 	)
 	createDenomMsg.Id = defaultNftMintDenomId
 
 	_, _ = suite.nftMsgServer.CreateDenom(
-		sdk.WrapSDKContext(suite.Ctx),
+		suite.Ctx,
 		createDenomMsg,
 	)
 }
@@ -220,11 +222,11 @@ func (suite *KeeperTestSuite) mintNFT(denomId, nftId string) {
 		true,
 		true,
 		false,
-		sdk.NewDecWithPrec(1, 2),
+		sdkmath.LegacyNewDecWithPrec(1, 2),
 	)
 	mintNftMsg.Id = nftId
 	_, _ = suite.nftMsgServer.MintONFT(
-		sdk.WrapSDKContext(suite.Ctx),
+		suite.Ctx,
 		mintNftMsg,
 	)
 }

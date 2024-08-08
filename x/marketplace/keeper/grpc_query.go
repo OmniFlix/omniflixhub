@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"cosmossdk.io/store/prefix"
 	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	gogotypes "github.com/cosmos/gogoproto/types"

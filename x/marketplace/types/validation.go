@@ -3,6 +3,8 @@ package types
 import (
 	"time"
 
+	sdkmath "cosmossdk.io/math"
+
 	errorsmod "cosmossdk.io/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -64,7 +66,7 @@ func ValidateSplitShares(splitShares []WeightedAddress) error {
 	if len(splitShares) > MaxSplits {
 		return errorsmod.Wrapf(ErrInvalidSplits, "number of splits are more than the limit, len must be less than or equal to %d ", MaxSplits)
 	}
-	totalWeight := sdk.NewDec(0)
+	totalWeight := sdkmath.LegacyNewDec(0)
 	for _, share := range splitShares {
 		_, err := sdk.AccAddressFromBech32(share.Address)
 		if err != nil {
@@ -72,7 +74,7 @@ func ValidateSplitShares(splitShares []WeightedAddress) error {
 		}
 		totalWeight = totalWeight.Add(share.Weight)
 	}
-	if !totalWeight.LTE(sdk.OneDec()) {
+	if !totalWeight.LTE(sdkmath.LegacyOneDec()) {
 		return errorsmod.Wrapf(ErrInvalidSplits, "invalid weights, total sum of weights must be less than %d", 1)
 	}
 	return nil
@@ -88,8 +90,8 @@ func ValidateWhiteListAccounts(whitelistAccounts []string) error {
 	return nil
 }
 
-func validateIncrementPercentage(increment sdk.Dec) error {
-	if !increment.IsPositive() || !increment.LTE(sdk.NewDec(1)) {
+func validateIncrementPercentage(increment sdkmath.LegacyDec) error {
+	if !increment.IsPositive() || !increment.LTE(sdkmath.LegacyNewDec(1)) {
 		return errorsmod.Wrapf(ErrInvalidPercentage, "invalid percentage value (%s)", increment.String())
 	}
 	return nil

@@ -4,16 +4,19 @@ import (
 	"testing"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	dbm "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
+	"cosmossdk.io/log"
+	"cosmossdk.io/store"
+	metrics2 "cosmossdk.io/store/metrics"
+	storetypes "cosmossdk.io/store/types"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
-	"github.com/cosmos/cosmos-sdk/store"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	dbm "github.com/cosmos/cosmos-db"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
 	globalfeekeeper "github.com/OmniFlix/omniflixhub/v5/x/globalfee/keeper"
@@ -83,7 +86,7 @@ func TestInitExportGenesis(t *testing.T) {
 			src: `{"params":{"minimum_gas_prices":[{"denom":"ALX", "amount":"1"}],"bypass_min_fee_msg_types":[],"max_total_bypass_min_fee_msg_gas_usage":"0"}}`,
 			exp: types.GenesisState{
 				Params: types.Params{
-					MinimumGasPrices:                sdk.NewDecCoins(sdk.NewDecCoin("ALX", sdk.NewInt(1))),
+					MinimumGasPrices:                sdk.NewDecCoins(sdk.NewDecCoin("ALX", sdkmath.NewInt(1))),
 					BypassMinFeeMsgTypes:            []string{},
 					MaxTotalBypassMinFeeMsgGasUsage: uint64(0),
 				},
@@ -94,8 +97,8 @@ func TestInitExportGenesis(t *testing.T) {
 			exp: types.GenesisState{
 				Params: types.Params{
 					MinimumGasPrices: sdk.NewDecCoins(
-						sdk.NewDecCoin("ALX", sdk.NewInt(1)),
-						sdk.NewDecCoinFromDec("BLX", sdk.NewDecWithPrec(1, 3)),
+						sdk.NewDecCoin("ALX", sdkmath.NewInt(1)),
+						sdk.NewDecCoinFromDec("BLX", sdkmath.LegacyNewDecWithPrec(1, 3)),
 					),
 					BypassMinFeeMsgTypes:            []string{},
 					MaxTotalBypassMinFeeMsgGasUsage: uint64(0),
@@ -130,18 +133,21 @@ func TestInitExportGenesis(t *testing.T) {
 func setupTestStore(t *testing.T) (sdk.Context, appparams.EncodingConfig, globalfeekeeper.Keeper) {
 	t.Helper()
 	db := dbm.NewMemDB()
-	ms := store.NewCommitMultiStore(db)
+	ms := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics2.NewNoOpMetrics())
 	encCfg := appparams.MakeEncodingConfig()
-	keyParams := sdk.NewKVStoreKey(types.StoreKey)
+	keyParams := storetypes.NewKVStoreKey(paramstypes.StoreKey)
+	globalfeeKeyStore := storetypes.NewKVStoreKey(types.StoreKey)
+	tkeyParams := storetypes.NewTransientStoreKey(paramstypes.TStoreKey)
 	ms.MountStoreWithDB(keyParams, storetypes.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(globalfeeKeyStore, storetypes.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(tkeyParams, storetypes.StoreTypeTransient, db)
 	require.NoError(t, ms.LoadLatestVersion())
 
-	globalfeeKeeper := globalfeekeeper.NewKeeper(encCfg.Marshaler, keyParams, "omniflix1llyd96levrglxhw6sczgk9wn48t64zkhv4fq0r")
+	globalfeeKeeper := globalfeekeeper.NewKeeper(encCfg.Marshaler, globalfeeKeyStore, "")
 
 	ctx := sdk.NewContext(ms, tmproto.Header{
-		Height:  1234567,
-		Time:    time.Date(2020, time.April, 22, 12, 0, 0, 0, time.UTC),
-		ChainID: "testing",
+		Height: 1234567,
+		Time:   time.Date(2020, time.April, 22, 12, 0, 0, 0, time.UTC),
 	}, false, log.NewNopLogger())
 
 	return ctx, encCfg, globalfeeKeeper

@@ -6,14 +6,16 @@ import (
 	"testing"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
+
 	"github.com/stretchr/testify/require"
 
+	storetypes "cosmossdk.io/store/types"
 	"github.com/OmniFlix/omniflixhub/v5/app/apptesting"
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/keeper"
 	v2 "github.com/OmniFlix/omniflixhub/v5/x/onft/migrations/v2"
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
 )
@@ -54,7 +56,7 @@ func generateCollectionsData(
 				Transferable: []bool{true, false}[rand.Intn(2)],
 				Extensible:   []bool{true, false}[rand.Intn(2)],
 				Nsfw:         []bool{true, false}[rand.Intn(2)],
-				RoyaltyShare: sdk.NewDecWithPrec(5, 2),
+				RoyaltyShare: sdkmath.LegacyNewDecWithPrec(5, 2),
 				Data:         fmt.Sprintf("nftData%d", j),
 				Owner:        addrs[rand.Intn(len(addrs))].String(),
 				CreatedAt:    time.Time{},

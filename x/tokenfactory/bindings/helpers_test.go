@@ -5,13 +5,15 @@ import (
 	"testing"
 	"time"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+
+	sdkmath "cosmossdk.io/math"
 	"github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cometbft/cometbft/crypto"
 	"github.com/cometbft/cometbft/crypto/ed25519"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/testutil"
 
@@ -20,17 +22,17 @@ import (
 
 func CreateTestInput(t *testing.T) (*app.OmniFlixApp, sdk.Context) {
 	t.Helper()
-
-	omniflix := app.Setup(t)
-	ctx := omniflix.BaseApp.NewContext(false, tmproto.Header{Height: 1, ChainID: "testing", Time: time.Now().UTC()})
+	tdir, _ := os.MkdirTemp(os.TempDir(), "omniflixhub-test-home")
+	omniflix := app.SetupWithCustomHome(false, tdir)
+	ctx := omniflix.BaseApp.NewContextLegacy(false, tmproto.Header{Height: 1, ChainID: "omniflixhub-1", Time: time.Now().UTC()})
 	return omniflix, ctx
 }
 
 func FundAccount(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, acct sdk.AccAddress) {
 	t.Helper()
 
-	err := banktestutil.FundAccount(customApp.AppKeepers.BankKeeper, ctx, acct, sdk.NewCoins(
-		sdk.NewCoin("uflix", sdk.NewInt(10000000000)),
+	err := banktestutil.FundAccount(ctx, customApp.AppKeepers.BankKeeper, acct, sdk.NewCoins(
+		sdk.NewCoin("uflix", sdkmath.NewInt(10000000000)),
 	))
 	require.NoError(t, err)
 }
@@ -52,17 +54,26 @@ func RandomBech32AccountAddress() string {
 	return RandomAccountAddress().String()
 }
 
-func storeReflectCode(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, addr sdk.AccAddress) uint64 {
+func storeReflectCode(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, addr sdk.AccAddress) {
 	t.Helper()
 
 	wasmCode, err := os.ReadFile("./testdata/token_reflect.wasm")
 	require.NoError(t, err)
 
-	contractKeeper := keeper.NewDefaultPermissionKeeper(customApp.AppKeepers.WasmKeeper)
-	codeID, _, err := contractKeeper.Create(ctx, addr, wasmCode, nil)
+	// Quick hack to allow code upload
+	originalParams := customApp.WasmKeeper.GetParams(ctx)
+	temporaryParams := originalParams
+	temporaryParams.CodeUploadAccess.Permission = wasmtypes.AccessTypeEverybody
+	_ = customApp.WasmKeeper.SetParams(ctx, temporaryParams)
+
+	msg := wasmtypes.MsgStoreCodeFixture(func(m *wasmtypes.MsgStoreCode) {
+		m.WASMByteCode = wasmCode
+		m.Sender = addr.String()
+	})
+	_, err = customApp.MsgServiceRouter().Handler(msg)(ctx, msg)
 	require.NoError(t, err)
 
-	return codeID
+	_ = customApp.WasmKeeper.SetParams(ctx, originalParams)
 }
 
 func instantiateReflectContract(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, funder sdk.AccAddress) sdk.AccAddress {
@@ -81,8 +92,8 @@ func fundAccount(t *testing.T, ctx sdk.Context, customApp *app.OmniFlixApp, addr
 	t.Helper()
 
 	err := banktestutil.FundAccount(
-		customApp.AppKeepers.BankKeeper,
 		ctx,
+		customApp.AppKeepers.BankKeeper,
 		addr,
 		coins,
 	)

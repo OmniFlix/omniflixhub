@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
+
 	"github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
+	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -71,7 +73,7 @@ func TestMintMsg(t *testing.T) {
 	require.NoError(t, err)
 	sunDenom := fmt.Sprintf("factory/%s/%s", reflect.String(), msg.CreateDenom.Subdenom)
 
-	amount, ok := sdk.NewIntFromString("808010808")
+	amount, ok := sdkmath.NewIntFromString("808010808")
 	require.True(t, ok)
 	msg = bindings.TokenFactoryMsg{MintTokens: &bindings.MintTokens{
 		Denom:         sunDenom,
@@ -175,60 +177,6 @@ func TestMintMsg(t *testing.T) {
 	require.Equal(t, resp.Denom, coin.Denom)
 }
 
-func TestForceTransfer(t *testing.T) {
-	creator := RandomAccountAddress()
-	customApp, ctx := SetupCustomApp(t, creator)
-
-	lucky := RandomAccountAddress()
-	rcpt := RandomAccountAddress()
-	reflect := instantiateReflectContract(t, ctx, customApp, lucky)
-	require.NotEmpty(t, reflect)
-
-	// Fund reflect contract with 100 base denom creation fees
-	reflectAmount := sdk.NewCoins(sdk.NewCoin(types.DefaultParams().DenomCreationFee[0].Denom, types.DefaultParams().DenomCreationFee[0].Amount.MulRaw(100)))
-	fundAccount(t, ctx, customApp, reflect, reflectAmount)
-
-	// lucky was broke
-	balances := customApp.AppKeepers.BankKeeper.GetAllBalances(ctx, lucky)
-	require.Empty(t, balances)
-
-	// Create denom for minting
-	msg := bindings.TokenFactoryMsg{CreateDenom: &bindings.CreateDenom{
-		Subdenom: "SUN",
-	}}
-	err := executeCustom(t, ctx, customApp, reflect, lucky, msg, sdk.Coin{})
-	require.NoError(t, err)
-	sunDenom := fmt.Sprintf("factory/%s/%s", reflect.String(), msg.CreateDenom.Subdenom)
-
-	amount, ok := sdk.NewIntFromString("808010808")
-	require.True(t, ok)
-
-	// Mint new tokens to lucky
-	msg = bindings.TokenFactoryMsg{MintTokens: &bindings.MintTokens{
-		Denom:         sunDenom,
-		Amount:        amount,
-		MintToAddress: lucky.String(),
-	}}
-	err = executeCustom(t, ctx, customApp, reflect, lucky, msg, sdk.Coin{})
-	require.NoError(t, err)
-
-	// Force move 100 tokens from lucky to rcpt
-	msg = bindings.TokenFactoryMsg{ForceTransfer: &bindings.ForceTransfer{
-		Denom:       sunDenom,
-		Amount:      sdk.NewInt(100),
-		FromAddress: lucky.String(),
-		ToAddress:   rcpt.String(),
-	}}
-	err = executeCustom(t, ctx, customApp, reflect, lucky, msg, sdk.Coin{})
-	require.NoError(t, err)
-
-	// check the balance of rcpt
-	balances = customApp.AppKeepers.BankKeeper.GetAllBalances(ctx, rcpt)
-	require.Len(t, balances, 1)
-	coin := balances[0]
-	require.Equal(t, sdk.NewInt(100), coin.Amount)
-}
-
 func TestBurnMsg(t *testing.T) {
 	creator := RandomAccountAddress()
 	customApp, ctx := SetupCustomApp(t, creator)
@@ -253,7 +201,7 @@ func TestBurnMsg(t *testing.T) {
 	require.NoError(t, err)
 	sunDenom := fmt.Sprintf("factory/%s/%s", reflect.String(), msg.CreateDenom.Subdenom)
 
-	amount, ok := sdk.NewIntFromString("808010809")
+	amount, ok := sdkmath.NewIntFromString("808010809")
 	require.True(t, ok)
 
 	msg = bindings.TokenFactoryMsg{MintTokens: &bindings.MintTokens{
@@ -265,7 +213,7 @@ func TestBurnMsg(t *testing.T) {
 	require.NoError(t, err)
 
 	// can burn from different address with burnFrom
-	amt, ok := sdk.NewIntFromString("1")
+	amt, ok := sdkmath.NewIntFromString("1")
 	require.True(t, ok)
 	msg = bindings.TokenFactoryMsg{BurnTokens: &bindings.BurnTokens{
 		Denom:           sunDenom,
@@ -282,7 +230,7 @@ func TestBurnMsg(t *testing.T) {
 
 	msg = bindings.TokenFactoryMsg{BurnTokens: &bindings.BurnTokens{
 		Denom:           sunDenom,
-		Amount:          amount.Abs().Sub(sdk.NewInt(1)),
+		Amount:          amount.Abs().Sub(sdkmath.NewInt(1)),
 		BurnFromAddress: reflect.String(),
 	}}
 	err = executeCustom(t, ctx, customApp, reflect, lucky, msg, sdk.Coin{})

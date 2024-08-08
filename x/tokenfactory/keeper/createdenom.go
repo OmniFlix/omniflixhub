@@ -7,7 +7,7 @@ import (
 	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
 )
 
-// ConvertToBaseToken converts a fee amount in a whitelisted fee token to the base fee token amount
+// CreateDenom creates a denom
 func (k Keeper) CreateDenom(ctx sdk.Context, creatorAddr string, subdenom string) (newTokenDenom string, err error) {
 	denom, err := k.validateCreateDenom(ctx, creatorAddr, subdenom)
 	if err != nil {
@@ -84,7 +84,7 @@ func (k Keeper) chargeForCreateDenom(ctx sdk.Context, creatorAddr string, _ stri
 			return err
 		}
 
-		if err := k.communityPoolKeeper.FundCommunityPool(ctx, params.DenomCreationFee, accAddr); err != nil {
+		if err := k.distrKeeper.FundCommunityPool(ctx, params.DenomCreationFee, accAddr); err != nil {
 			return err
 		}
 	}

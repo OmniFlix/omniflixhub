@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cometbft/cometbft/libs/log"
+	"cosmossdk.io/log"
 
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
@@ -23,7 +23,7 @@ func MigrateCollections(ctx sdk.Context,
 	startTime := time.Now()
 
 	store := ctx.KVStore(storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, KeyDenomID(""))
+	iterator := storetypes.KVStorePrefixIterator(store, KeyDenomID(""))
 	defer iterator.Close()
 
 	var (
@@ -85,7 +85,7 @@ func migrateONFT(
 	logger log.Logger,
 	denomID string,
 ) (int64, error) {
-	var iterator sdk.Iterator
+	var iterator storetypes.Iterator
 	defer func() {
 		if iterator != nil {
 			_ = iterator.Close()
@@ -95,7 +95,7 @@ func migrateONFT(
 	store := ctx.KVStore(k.storeKey)
 
 	total := int64(0)
-	iterator = sdk.KVStorePrefixIterator(store, KeyONFT(denomID, ""))
+	iterator = storetypes.KVStorePrefixIterator(store, KeyONFT(denomID, ""))
 	for ; iterator.Valid(); iterator.Next() {
 		var oNFT types.ONFT
 		k.cdc.MustUnmarshal(iterator.Value(), &oNFT)

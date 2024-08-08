@@ -3,6 +3,8 @@ package exported
 import (
 	"time"
 
+	sdkmath "cosmossdk.io/math"
+
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -21,7 +23,7 @@ type ONFTI interface {
 	IsExtensible() bool
 	IsNSFW() bool
 	GetCreatedTime() time.Time
-	GetRoyaltyShare() sdk.Dec
+	GetRoyaltyShare() sdkmath.LegacyDec
 }
 
 type (

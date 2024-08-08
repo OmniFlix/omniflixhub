@@ -3,8 +3,11 @@ package keeper
 import (
 	"fmt"
 
+	sdkmath "cosmossdk.io/math"
+	storetypes "cosmossdk.io/store/types"
+
+	"cosmossdk.io/store/prefix"
 	"github.com/OmniFlix/omniflixhub/v5/x/itc/types"
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
 )
@@ -64,7 +67,7 @@ func (k Keeper) RemoveCampaign(ctx sdk.Context, id uint64) {
 // GetAllCampaigns returns all campaigns
 func (k Keeper) GetAllCampaigns(ctx sdk.Context) (list []types.Campaign) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.PrefixCampaignId)
+	iterator := storetypes.KVStorePrefixIterator(store, types.PrefixCampaignId)
 
 	defer iterator.Close()
 
@@ -80,7 +83,7 @@ func (k Keeper) GetAllCampaigns(ctx sdk.Context) (list []types.Campaign) {
 // GetCampaignsByCreator returns all campaigns created by specific address
 func (k Keeper) GetCampaignsByCreator(ctx sdk.Context, creator sdk.AccAddress) (campaigns []types.Campaign) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, append(types.PrefixCampaignCreator, creator.Bytes()...))
+	iterator := storetypes.KVStorePrefixIterator(store, append(types.PrefixCampaignCreator, creator.Bytes()...))
 
 	defer iterator.Close()
 
@@ -105,7 +108,7 @@ func (k Keeper) SetClaim(ctx sdk.Context, claim types.Claim) {
 
 func (k Keeper) GetClaims(ctx sdk.Context, campaignId uint64) (claims []types.Claim) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store,
+	iterator := storetypes.KVStorePrefixIterator(store,
 		append(types.PrefixClaimByNftId, sdk.Uint64ToBigEndian(campaignId)...))
 
 	defer iterator.Close()
@@ -142,7 +145,7 @@ func (k Keeper) HasClaim(ctx sdk.Context, id uint64, nftId string) bool {
 
 func (k Keeper) RemoveClaims(ctx sdk.Context, campaignId uint64) {
 	store := ctx.KVStore(k.storeKey)
-	iter := sdk.KVStorePrefixIterator(
+	iter := storetypes.KVStorePrefixIterator(
 		prefix.NewStore(store, types.PrefixClaimByNftId),
 		sdk.Uint64ToBigEndian(campaignId),
 	)
@@ -157,7 +160,7 @@ func (k Keeper) RemoveClaims(ctx sdk.Context, campaignId uint64) {
 // FinalizeAndEndCampaigns finalizes and ends and all campaigns that are reached end time
 func (k Keeper) FinalizeAndEndCampaigns(ctx sdk.Context) error {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.PrefixCampaignId)
+	iterator := storetypes.KVStorePrefixIterator(store, types.PrefixCampaignId)
 
 	defer iterator.Close()
 
@@ -179,7 +182,7 @@ func (k Keeper) endCampaign(ctx sdk.Context, campaign types.Campaign) {
 	// Transfer Remaining funds to creator
 	availableTokens := campaign.AvailableTokens
 	moduleAccAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
-	if availableTokens.IsValid() && availableTokens.Amount != sdk.ZeroInt() {
+	if availableTokens.IsValid() && availableTokens.Amount != sdkmath.ZeroInt() {
 		if err := k.bankKeeper.SendCoins(ctx, moduleAccAddr, campaign.GetCreator(),
 			sdk.NewCoins(sdk.NewCoin(availableTokens.Denom, availableTokens.Amount))); err != nil {
 			panic(err)

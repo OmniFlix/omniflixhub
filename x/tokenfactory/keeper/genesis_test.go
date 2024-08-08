@@ -12,21 +12,21 @@ func (suite *KeeperTestSuite) TestGenesis() {
 		Params: types.DefaultParams(),
 		FactoryDenoms: []types.GenesisDenom{
 			{
-				Denom: "factory/cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8/bitcoin",
+				Denom: "factory/omniflix1t7egva48prqmzl59x5ngv4zx0dtrwewcs7ut5e/bitcoin",
 				AuthorityMetadata: types.DenomAuthorityMetadata{
-					Admin: "cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8",
+					Admin: "omniflix1t7egva48prqmzl59x5ngv4zx0dtrwewcs7ut5e",
 				},
 			},
 			{
-				Denom: "factory/cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8/diff-admin",
+				Denom: "factory/omniflix1t7egva48prqmzl59x5ngv4zx0dtrwewcs7ut5e/diff-admin",
 				AuthorityMetadata: types.DenomAuthorityMetadata{
-					Admin: "cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8",
+					Admin: "omniflix1t7egva48prqmzl59x5ngv4zx0dtrwewcs7ut5e",
 				},
 			},
 			{
-				Denom: "factory/cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8/litecoin",
+				Denom: "factory/omniflix1t7egva48prqmzl59x5ngv4zx0dtrwewcs7ut5e/litecoin",
 				AuthorityMetadata: types.DenomAuthorityMetadata{
-					Admin: "cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8",
+					Admin: "omniflix1t7egva48prqmzl59x5ngv4zx0dtrwewcs7ut5e",
 				},
 			},
 		},

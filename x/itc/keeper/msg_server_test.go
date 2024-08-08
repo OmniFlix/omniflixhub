@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
+
 	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
@@ -171,7 +173,7 @@ func (suite *KeeperTestSuite) TestCreateCampaign() {
 			nftMintDetails:         nil,
 			distribution:           &defaultDistribution,
 			creator:                suite.TestAccs[0].String(),
-			creationFee:            types.DefaultCampaignCreationFee.SubAmount(sdk.NewInt(1_000_000)),
+			creationFee:            types.DefaultCampaignCreationFee.SubAmount(sdkmath.NewInt(1_000_000)),
 			valid:                  false,
 			expectedMessageEvents:  0,
 			expectedTransferEvents: 0,
@@ -238,7 +240,7 @@ func (suite *KeeperTestSuite) TestCreateCampaign() {
 			)
 			// Test create campaign message
 			_, err := suite.msgServer.CreateCampaign(
-				sdk.WrapSDKContext(ctx),
+				ctx,
 				createCampaignMsg,
 			)
 			if tc.valid {
@@ -300,7 +302,7 @@ func (suite *KeeperTestSuite) TestCancelCampaign() {
 			)
 
 			_, err := suite.msgServer.CancelCampaign(
-				sdk.WrapSDKContext(ctx),
+				ctx,
 				cancelCampaignMsg,
 			)
 
@@ -421,7 +423,7 @@ func (suite *KeeperTestSuite) TestClaimCampaign() {
 			)
 
 			_, err := suite.msgServer.Claim(
-				sdk.WrapSDKContext(ctx),
+				ctx,
 				claimCampaignMsg,
 			)
 
@@ -496,7 +498,7 @@ func (suite *KeeperTestSuite) TestDepositCampaign() {
 			)
 
 			_, err := suite.msgServer.DepositCampaign(
-				sdk.WrapSDKContext(ctx),
+				ctx,
 				depositCampaignMsg,
 			)
 
@@ -528,7 +530,7 @@ func (suite *KeeperTestSuite) TestUpdateParams() {
 				Authority: suite.App.ItcKeeper.GetAuthority(),
 				Params: types.Params{
 					MaxCampaignDuration: types.DefaultMaxCampaignDuration,
-					CreationFee:         sdk.NewCoin("foo", sdk.NewInt(0)),
+					CreationFee:         sdk.NewCoin("foo", sdkmath.NewInt(0)),
 				},
 			},
 			expectErr: true,

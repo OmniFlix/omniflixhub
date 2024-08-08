@@ -5,13 +5,15 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 
-	"github.com/cometbft/cometbft/libs/log"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
+
+	"cosmossdk.io/log"
+	storetypes "cosmossdk.io/store/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
+	nftkeeper "cosmossdk.io/x/nft/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 )
@@ -29,7 +31,7 @@ type Keeper struct {
 
 func NewKeeper(
 	cdc codec.BinaryCodec,
-	storeKey storetypes.StoreKey,
+	storeKey *storetypes.KVStoreKey,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 	distrKeeper types.DistributionKeeper,
@@ -46,7 +48,7 @@ func NewKeeper(
 		accountKeeper:      accountKeeper,
 		bankKeeper:         bankKeeper,
 		distributionKeeper: distrKeeper,
-		nk:                 nftkeeper.NewKeeper(storeKey, cdc, accountKeeper, bankKeeper),
+		nk:                 nftkeeper.NewKeeper(runtime.NewKVStoreService(storeKey), cdc, accountKeeper, bankKeeper),
 		authority:          authority,
 	}
 }

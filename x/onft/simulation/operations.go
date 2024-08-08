@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"strings"
 
+	sdkmath "cosmossdk.io/math"
+
 	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/keeper"
 	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
@@ -37,46 +39,46 @@ func WeightedOperations(
 	var weightCreateDenom, weightMint, weightEdit, weightTransfer, weightBurn, weightUpdateDenom, weightTransferDenom int
 
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgCreateDenom, &weightCreateDenom, nil,
+		OpWeightMsgCreateDenom, &weightCreateDenom, nil,
 		func(_ *rand.Rand) {
 			weightCreateDenom = 50
 		},
 	)
 
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgMintONFT, &weightMint, nil,
+		OpWeightMsgMintONFT, &weightMint, nil,
 		func(_ *rand.Rand) {
 			weightMint = 100
 		},
 	)
 
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgEditONFT, &weightEdit, nil,
+		OpWeightMsgEditONFT, &weightEdit, nil,
 		func(_ *rand.Rand) {
 			weightEdit = 50
 		},
 	)
 
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgTransferONFT, &weightTransfer, nil,
+		OpWeightMsgTransferONFT, &weightTransfer, nil,
 		func(_ *rand.Rand) {
 			weightTransfer = 50
 		},
 	)
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgBurnONFT, &weightBurn, nil,
+		OpWeightMsgBurnONFT, &weightBurn, nil,
 		func(_ *rand.Rand) {
 			weightBurn = 10
 		},
 	)
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgTransferDenom, &weightTransferDenom, nil,
+		OpWeightMsgTransferDenom, &weightTransferDenom, nil,
 		func(_ *rand.Rand) {
 			weightTransferDenom = 10
 		},
 	)
 	appParams.GetOrGenerate(
-		cdc, OpWeightMsgUpdateDenom, &weightUpdateDenom, nil,
+		OpWeightMsgUpdateDenom, &weightUpdateDenom, nil,
 		func(_ *rand.Rand) {
 			weightUpdateDenom = 10
 		},
@@ -125,7 +127,7 @@ func SimulateMsgCreateDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 		URI := strings.ToLower(simtypes.RandStringOfLength(r, 10))
 		URIHash := strings.ToLower(simtypes.RandStringOfLength(r, 10))
 		sender, _ := simtypes.RandomAcc(r, accs)
-		creationFee := sdk.Coin{Denom: "uflix", Amount: sdk.NewInt(100_000_000)}
+		creationFee := sdk.Coin{Denom: "uflix", Amount: sdkmath.NewInt(100_000_000)}
 
 		msg := types.NewMsgCreateDenom(
 			symbol,
@@ -157,7 +159,6 @@ func SimulateMsgCreateDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 			TxGen:           appparams.MakeEncodingConfig().TxConfig,
 			Cdc:             nil,
 			Msg:             msg,
-			MsgType:         types.TypeMsgCreateDenom,
 			Context:         ctx,
 			SimAccount:      sender,
 			AccountKeeper:   ak,
@@ -212,7 +213,6 @@ func SimulateMsgMintONFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankK
 			TxGen:           appparams.MakeEncodingConfig().TxConfig,
 			Cdc:             nil,
 			Msg:             msg,
-			MsgType:         types.TypeMsgMintONFT,
 			Context:         ctx,
 			SimAccount:      sender,
 			AccountKeeper:   ak,
@@ -265,7 +265,6 @@ func SimulateMsgTransferONFT(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 			TxGen:           appparams.MakeEncodingConfig().TxConfig,
 			Cdc:             nil,
 			Msg:             msg,
-			MsgType:         types.TypeMsgTransferONFT,
 			Context:         ctx,
 			SimAccount:      ownerAccount,
 			AccountKeeper:   ak,
@@ -281,7 +280,7 @@ func SimulateMsgTransferONFT(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferONFT, err.Error()), nil, err
 			}
 			if !nft.IsTransferable() {
-				return simtypes.NewOperationMsg(msg, false, "non transferable nft", nil), nil, nil
+				return simtypes.NewOperationMsg(msg, false, "non transferable nft"), nil, nil
 			}
 		}
 		return simOpMsg, fOps, err
@@ -318,7 +317,6 @@ func SimulateMsgBurnONFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankK
 			TxGen:           appparams.MakeEncodingConfig().TxConfig,
 			Cdc:             nil,
 			Msg:             msg,
-			MsgType:         types.TypeMsgBurnONFT,
 			Context:         ctx,
 			SimAccount:      ownerAccount,
 			AccountKeeper:   ak,
@@ -368,7 +366,6 @@ func SimulateMsgTransferDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.
 			TxGen:           appparams.MakeEncodingConfig().TxConfig,
 			Cdc:             nil,
 			Msg:             msg,
-			MsgType:         types.TypeMsgTransferDenom,
 			Context:         ctx,
 			SimAccount:      ownerAccount,
 			AccountKeeper:   ak,
@@ -419,7 +416,6 @@ func SimulateMsgUpdateDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 			TxGen:           appparams.MakeEncodingConfig().TxConfig,
 			Cdc:             nil,
 			Msg:             msg,
-			MsgType:         types.TypeMsgUpdateDenom,
 			Context:         ctx,
 			SimAccount:      ownerAccount,
 			AccountKeeper:   ak,

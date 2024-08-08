@@ -122,7 +122,7 @@ message MsgCreateAuction {
   string                    increment_percentage = 6 [
     (gogoproto.nullable)   = false,
     (gogoproto.moretags)   = "yaml:\"increment_percentage\"",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec"
   ];
   repeated string           whitelist_accounts   = 7 [
     (gogoproto.nullable) = false,

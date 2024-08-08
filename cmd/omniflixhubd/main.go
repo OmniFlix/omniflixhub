@@ -9,6 +9,8 @@ import (
 )
 
 func main() {
+	app.SetConfig()
+
 	rootCmd, _ := cmd.NewRootCmd()
 	if err := svrcmd.Execute(rootCmd, "", app.DefaultNodeHome); err != nil {
 		os.Exit(1)

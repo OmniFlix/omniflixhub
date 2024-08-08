@@ -4,6 +4,8 @@ import (
 	"crypto/sha256"
 	"fmt"
 
+	sdkmath "cosmossdk.io/math"
+
 	errorsmod "cosmossdk.io/errors"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/itc/types"
@@ -70,7 +72,7 @@ func (k Keeper) CancelCampaign(ctx sdk.Context, campaignId uint64, creator sdk.A
 	}
 
 	// return funds
-	if campaign.AvailableTokens.IsValid() && campaign.AvailableTokens.Amount.GT(sdk.ZeroInt()) {
+	if campaign.AvailableTokens.IsValid() && campaign.AvailableTokens.Amount.GT(sdkmath.ZeroInt()) {
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(
 			ctx,
 			types.ModuleName,

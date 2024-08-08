@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
+
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -252,7 +254,7 @@ func parseSplitShares(splitsharesStr string) ([]types.WeightedAddress, error) {
 		if err != nil {
 			return nil, err
 		}
-		weight, err := sdk.NewDecFromStr(strings.TrimSpace(split[1]))
+		weight, err := sdkmath.LegacyNewDecFromStr(strings.TrimSpace(split[1]))
 		if err != nil {
 			return nil, err
 		}
@@ -352,7 +354,7 @@ func GetCmdCreateAuction() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			increment, err := sdk.NewDecFromStr(incrementStr)
+			increment, err := sdkmath.LegacyNewDecFromStr(incrementStr)
 			if err != nil {
 				return err
 			}

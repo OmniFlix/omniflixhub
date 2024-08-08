@@ -4,10 +4,12 @@ import (
 	"errors"
 	"fmt"
 
+	sdkmath "cosmossdk.io/math"
+
+	"cosmossdk.io/log"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
-	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
@@ -74,7 +76,11 @@ func (k Keeper) GetModuleAccountAddress() sdk.AccAddress {
 // DistributeMintedCoins implements distribution of minted coins from mint to external modules.
 func (k Keeper) DistributeMintedCoins(ctx sdk.Context) error {
 	blockRewardsAddr := k.accountKeeper.GetModuleAccount(ctx, authtypes.FeeCollectorName).GetAddress()
-	blockRewards := k.bankKeeper.GetBalance(ctx, blockRewardsAddr, k.stakingKeeper.BondDenom(ctx))
+	bondDenom, err := k.stakingKeeper.BondDenom(ctx)
+	if err != nil {
+		return err
+	}
+	blockRewards := k.bankKeeper.GetBalance(ctx, blockRewardsAddr, bondDenom)
 
 	params := k.GetParams(ctx)
 	proportions := params.DistributionProportions
@@ -186,9 +192,9 @@ func (k Keeper) distributeCoinToWeightedAddresses(
 	return nil
 }
 
-func getProportionAmount(totalCoin sdk.Coin, ratio sdk.Dec) (sdk.Coin, error) {
-	if ratio.GT(sdk.OneDec()) {
+func getProportionAmount(totalCoin sdk.Coin, ratio sdkmath.LegacyDec) (sdk.Coin, error) {
+	if ratio.GT(sdkmath.LegacyOneDec()) {
 		return sdk.Coin{}, errors.New("ratio cannot be greater than 1")
 	}
-	return sdk.NewCoin(totalCoin.Denom, sdk.NewDecFromInt(totalCoin.Amount).Mul(ratio).TruncateInt()), nil
+	return sdk.NewCoin(totalCoin.Denom, sdkmath.LegacyNewDecFromInt(totalCoin.Amount).Mul(ratio).TruncateInt()), nil
 }

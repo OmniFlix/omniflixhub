@@ -3,8 +3,11 @@ package keeper
 import (
 	"fmt"
 
+	sdkmath "cosmossdk.io/math"
+	storetypes "cosmossdk.io/store/types"
+
+	"cosmossdk.io/store/prefix"
 	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
 )
@@ -76,7 +79,7 @@ func (k Keeper) RemoveAuctionListing(ctx sdk.Context, id uint64) {
 // GetAllAuctionListings returns all auction listings
 func (k Keeper) GetAllAuctionListings(ctx sdk.Context) (list []types.AuctionListing) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixAuctionId)
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
 
@@ -92,7 +95,7 @@ func (k Keeper) GetAllAuctionListings(ctx sdk.Context) (list []types.AuctionList
 // GetAuctionListingsByOwner returns all auction listings of specific owner
 func (k Keeper) GetAuctionListingsByOwner(ctx sdk.Context, owner sdk.AccAddress) (auctionListings []types.AuctionListing) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, append(types.PrefixAuctionOwner, owner.Bytes()...))
+	iterator := storetypes.KVStorePrefixIterator(store, append(types.PrefixAuctionOwner, owner.Bytes()...))
 
 	defer iterator.Close()
 
@@ -175,7 +178,7 @@ func (k Keeper) UnsetActiveAuction(ctx sdk.Context, auctionId uint64) {
 
 func (k Keeper) IterateInactiveAuctions(ctx sdk.Context, fn func(index int, item types.AuctionListing) (stop bool)) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixInactiveAuction)
-	iter := sdk.KVStorePrefixIterator(store, []byte{})
+	iter := storetypes.KVStorePrefixIterator(store, []byte{})
 	defer iter.Close()
 
 	for i := 0; iter.Valid(); iter.Next() {
@@ -192,7 +195,7 @@ func (k Keeper) IterateInactiveAuctions(ctx sdk.Context, fn func(index int, item
 
 func (k Keeper) IterateActiveAuctions(ctx sdk.Context, fn func(index int, item types.AuctionListing) (stop bool)) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixActiveAuction)
-	iter := sdk.KVStorePrefixIterator(store, []byte{})
+	iter := storetypes.KVStorePrefixIterator(store, []byte{})
 	defer iter.Close()
 
 	for i := 0; iter.Valid(); iter.Next() {
@@ -210,7 +213,7 @@ func (k Keeper) IterateActiveAuctions(ctx sdk.Context, fn func(index int, item t
 // UpdateAuctionStatusesAndProcessBids update all auction listings status
 func (k Keeper) UpdateAuctionStatusesAndProcessBids(ctx sdk.Context) error {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixAuctionId)
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
 
@@ -283,14 +286,14 @@ func (k Keeper) processBid(ctx sdk.Context, auction types.AuctionListing, bid ty
 	}
 	saleCommission := k.GetSaleCommission(ctx)
 	marketplaceCoin := k.GetProportions(bid.Amount, saleCommission)
-	if marketplaceCoin.Amount.GTE(sdk.OneInt()) {
+	if marketplaceCoin.Amount.GTE(sdkmath.OneInt()) {
 		err = k.DistributeCommission(ctx, marketplaceCoin)
 		if err != nil {
 			return err
 		}
 		auctionSaleAmountCoin = BidAmountCoin.Sub(marketplaceCoin)
 	}
-	if nft.GetRoyaltyShare().GT(sdk.ZeroDec()) {
+	if nft.GetRoyaltyShare().GT(sdkmath.LegacyZeroDec()) {
 		nftRoyaltyShareCoin := k.GetProportions(auctionSaleAmountCoin, nft.GetRoyaltyShare())
 		creator, err := sdk.AccAddressFromBech32(denom.Creator)
 		if err != nil {

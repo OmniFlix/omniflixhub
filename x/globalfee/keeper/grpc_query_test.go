@@ -3,6 +3,8 @@ package keeper_test
 import (
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -20,20 +22,20 @@ func TestQueryGlobalFeeParamMinGasPrices(t *testing.T) {
 		"single fee coin": {
 			setupStore: func(ctx sdk.Context, k globalfeekeeper.Keeper) {
 				err := k.SetParams(ctx, types.Params{
-					MinimumGasPrices: sdk.NewDecCoins(sdk.NewDecCoin("uflix", sdk.OneInt())),
+					MinimumGasPrices: sdk.NewDecCoins(sdk.NewDecCoin("uflix", sdkmath.OneInt())),
 				})
 				require.NoError(t, err)
 			},
-			expMin: sdk.NewDecCoins(sdk.NewDecCoin("uflix", sdk.OneInt())),
+			expMin: sdk.NewDecCoins(sdk.NewDecCoin("uflix", sdkmath.OneInt())),
 		},
 		"multiple fee coins": {
 			setupStore: func(ctx sdk.Context, k globalfeekeeper.Keeper) {
 				err := k.SetParams(ctx, types.Params{
-					MinimumGasPrices: sdk.NewDecCoins(sdk.NewDecCoin("uflix", sdk.OneInt()), sdk.NewDecCoin("test", sdk.NewInt(2))),
+					MinimumGasPrices: sdk.NewDecCoins(sdk.NewDecCoin("uflix", sdkmath.OneInt()), sdk.NewDecCoin("test", sdkmath.NewInt(2))),
 				})
 				require.NoError(t, err)
 			},
-			expMin: sdk.NewDecCoins(sdk.NewDecCoin("uflix", sdk.OneInt()), sdk.NewDecCoin("test", sdk.NewInt(2))),
+			expMin: sdk.NewDecCoins(sdk.NewDecCoin("uflix", sdkmath.OneInt()), sdk.NewDecCoin("test", sdkmath.NewInt(2))),
 		},
 		"no coins": {
 			setupStore: func(ctx sdk.Context, k globalfeekeeper.Keeper) {
@@ -51,7 +53,7 @@ func TestQueryGlobalFeeParamMinGasPrices(t *testing.T) {
 			ctx, _, keeper := setupTestStore(t)
 			spec.setupStore(ctx, keeper)
 			q := globalfeekeeper.NewGrpcQuerier(keeper)
-			gotResp, gotErr := q.Params(sdk.WrapSDKContext(ctx), nil)
+			gotResp, gotErr := q.Params(ctx, nil)
 			require.NoError(t, gotErr)
 			require.NotNil(t, gotResp)
 			assert.Equal(t, spec.expMin, gotResp.Params.MinimumGasPrices)

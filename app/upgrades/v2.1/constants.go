@@ -1,8 +1,8 @@
 package v2_1
 
 import (
+	store "cosmossdk.io/store/types"
 	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
-	store "github.com/cosmos/cosmos-sdk/store/types"
 )
 
 const UpgradeName = "v2.1"

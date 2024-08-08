@@ -53,7 +53,7 @@ message ONFT {
   string                    royalty_share = 9 [
     (gogoproto.nullable)   = false,
     (gogoproto.moretags)   = "yaml:\"royalty_share\"",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec"
   ];
 }
 

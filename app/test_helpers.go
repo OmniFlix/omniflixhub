@@ -2,35 +2,29 @@ package app
 
 import (
 	"encoding/json"
-	"path/filepath"
-	"testing"
+	"os"
 	"time"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/snapshots"
-
+	"cosmossdk.io/log"
+	sdkmath "cosmossdk.io/math"
 	apphelpers "github.com/OmniFlix/omniflixhub/v5/app/helpers"
-	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
-	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/crypto"
 	"github.com/cometbft/cometbft/crypto/ed25519"
-	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
-	baseApp "github.com/cosmos/cosmos-sdk/baseapp"
+	cosmosdb "github.com/cosmos/cosmos-db"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
-	snapshottypes "github.com/cosmos/cosmos-sdk/snapshots/types"
-	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
+	sims "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/stretchr/testify/require"
 )
 
 // SimAppChainID hardcoded chainID for simulation
@@ -68,165 +62,63 @@ type EmptyAppOptions struct{}
 
 func (EmptyAppOptions) Get(_ string) interface{} { return nil }
 
-func Setup(t *testing.T) *OmniFlixApp {
-	t.Helper()
-
+// SetupWithGenesisValSet initializes a new omniFlixApp with a validator set and genesis accounts
+// that also act as delegators. For simplicity, each validator is bonded with a delegation
+// of one consensus engine unit in the default token of the omniFlixApp from first genesis
+// account. A Nop logger is set in omniFlixApp.
+func GenesisStateWithValSet(omniflixapp *OmniFlixApp) GenesisState {
 	privVal := apphelpers.NewPV()
-	pubKey, err := privVal.GetPubKey()
-	require.NoError(t, err)
-	// create validator set with single validator
+	pubKey, _ := privVal.GetPubKey()
 	validator := tmtypes.NewValidator(pubKey, 1)
 	valSet := tmtypes.NewValidatorSet([]*tmtypes.Validator{validator})
 
 	// generate genesis account
 	senderPrivKey := secp256k1.GenPrivKey()
-	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
-	balance := banktypes.Balance{
-		Address: acc.GetAddress().String(),
-		Coins:   sdk.NewCoins(sdk.NewCoin(appparams.BondDenom, sdk.NewInt(100000000000000))),
-	}
+	senderPrivKey.PubKey().Address()
+	acc := authtypes.NewBaseAccountWithAddress(senderPrivKey.PubKey().Address().Bytes())
 
-	app := SetupWithGenesisValSet(t, valSet, []authtypes.GenesisAccount{acc}, balance)
-
-	return app
-}
-
-// SetupWithGenesisValSet initializes a new omniFlixApp with a validator set and genesis accounts
-// that also act as delegators. For simplicity, each validator is bonded with a delegation
-// of one consensus engine unit in the default token of the omniFlixApp from first genesis
-// account. A Nop logger is set in omniFlixApp.
-func SetupWithGenesisValSet(
-	t *testing.T,
-	valSet *tmtypes.ValidatorSet,
-	genAccs []authtypes.GenesisAccount,
-	balances ...banktypes.Balance,
-) *OmniFlixApp {
-	t.Helper()
-
-	omniflixTestApp, genesisState := setup(t, true)
-	genesisState = genesisStateWithValSet(t, omniflixTestApp, genesisState, valSet, genAccs, balances...)
-
-	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
-	require.NoError(t, err)
-
-	// init chain will set the validator set and initialize the genesis accounts
-	omniflixTestApp.InitChain(
-		abci.RequestInitChain{
-			ChainId:         SimAppChainID,
-			Validators:      []abci.ValidatorUpdate{},
-			ConsensusParams: DefaultConsensusParams,
-			AppStateBytes:   stateBytes,
-			Time:            time.Now().UTC(),
-			InitialHeight:   1,
-		},
-	)
-
-	// commit genesis changes
-	omniflixTestApp.Commit()
-	omniflixTestApp.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
-		ChainID:            SimAppChainID,
-		Height:             omniflixTestApp.LastBlockHeight() + 1,
-		AppHash:            omniflixTestApp.LastCommitID().Hash,
-		ValidatorsHash:     valSet.Hash(),
-		NextValidatorsHash: valSet.Hash(),
-		Time:               time.Now().UTC(),
-	}})
-
-	return omniflixTestApp
-}
-
-func setup(t *testing.T, withGenesis bool, opts ...wasmkeeper.Option) (*OmniFlixApp, GenesisState) {
-	t.Helper()
-
-	db := dbm.NewMemDB()
-	nodeHome := t.TempDir()
-	encCdc := MakeEncodingConfig()
-	snapshotDir := filepath.Join(nodeHome, "data", "snapshots")
-
-	snapshotDB, err := dbm.NewDB("metadata", dbm.GoLevelDBBackend, snapshotDir)
-	require.NoError(t, err)
-	t.Cleanup(func() { snapshotDB.Close() })
-	snapshotStore, err := snapshots.NewStore(snapshotDB, snapshotDir)
-	require.NoError(t, err)
-
-	appOptions := make(simtestutil.AppOptionsMap)
-	appOptions[flags.FlagHome] = nodeHome // ensure unique folder
-
-	app := NewOmniFlixApp(
-		log.NewNopLogger(),
-		db,
-		nil,
-		true,
-		map[int64]bool{},
-		DefaultNodeHome,
-		0,
-		encCdc,
-		appOptions,
-		opts,
-		baseApp.SetChainID(SimAppChainID),
-		baseApp.SetSnapshot(snapshotStore, snapshottypes.SnapshotOptions{KeepRecent: 2}),
-	)
-	if withGenesis {
-		return app, NewDefaultGenesisState(encCdc.Marshaler)
-	}
-
-	return app, GenesisState{}
-}
-
-func genesisStateWithValSet(
-	t *testing.T,
-	app *OmniFlixApp,
-	genesisState GenesisState,
-	valSet *tmtypes.ValidatorSet,
-	genAccs []authtypes.GenesisAccount,
-	balances ...banktypes.Balance,
-) GenesisState {
-	t.Helper()
-	// set genesis accounts
+	//////////////////////
+	balances := []banktypes.Balance{}
+	genesisState := NewDefaultGenesisState()
+	genAccs := []authtypes.GenesisAccount{acc}
 	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
-	genesisState[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(authGenesis)
+	genesisState[authtypes.ModuleName] = encodingConfig.Marshaler.MustMarshalJSON(authGenesis)
 
 	validators := make([]stakingtypes.Validator, 0, len(valSet.Validators))
 	delegations := make([]stakingtypes.Delegation, 0, len(valSet.Validators))
 
 	bondAmt := sdk.DefaultPowerReduction
+	initValPowers := []abci.ValidatorUpdate{}
 
 	for _, val := range valSet.Validators {
-		pk, err := cryptocodec.FromTmPubKeyInterface(val.PubKey)
-		require.NoError(t, err)
-		pkAny, err := codectypes.NewAnyWithValue(pk)
-		require.NoError(t, err)
+		pk, _ := cryptocodec.FromCmtPubKeyInterface(val.PubKey)
+		pkAny, _ := codectypes.NewAnyWithValue(pk)
 		validator := stakingtypes.Validator{
 			OperatorAddress:   sdk.ValAddress(val.Address).String(),
 			ConsensusPubkey:   pkAny,
 			Jailed:            false,
 			Status:            stakingtypes.Bonded,
 			Tokens:            bondAmt,
-			DelegatorShares:   sdk.OneDec(),
+			DelegatorShares:   sdkmath.LegacyOneDec(),
 			Description:       stakingtypes.Description{},
 			UnbondingHeight:   int64(0),
 			UnbondingTime:     time.Unix(0, 0).UTC(),
-			Commission:        stakingtypes.NewCommission(sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec()),
-			MinSelfDelegation: sdk.ZeroInt(),
+			Commission:        stakingtypes.NewCommission(sdkmath.LegacyZeroDec(), sdkmath.LegacyZeroDec(), sdkmath.LegacyZeroDec()),
+			MinSelfDelegation: sdkmath.ZeroInt(),
 		}
 		validators = append(validators, validator)
-		delegations = append(delegations, stakingtypes.NewDelegation(genAccs[0].GetAddress(), val.Address.Bytes(), sdk.OneDec()))
+		delegations = append(delegations, stakingtypes.NewDelegation(genAccs[0].GetAddress().String(), sdk.ValAddress(val.Address).String(), sdkmath.LegacyOneDec()))
 
+		// add initial validator powers so consumer InitGenesis runs correctly
+		pub, _ := val.ToProto()
+		initValPowers = append(initValPowers, abci.ValidatorUpdate{
+			Power:  val.VotingPower,
+			PubKey: pub.PubKey,
+		})
 	}
 	// set validators and delegations
-	defaultStParams := stakingtypes.DefaultParams()
-	stParams := stakingtypes.NewParams(
-		defaultStParams.UnbondingTime,
-		defaultStParams.MaxValidators,
-		defaultStParams.MaxEntries,
-		defaultStParams.HistoricalEntries,
-		appparams.BondDenom,
-		defaultStParams.MinCommissionRate,
-	)
-
-	// set validators and delegations
-	stakingGenesis := stakingtypes.NewGenesisState(stParams, validators, delegations)
-	genesisState[stakingtypes.ModuleName] = app.AppCodec().MustMarshalJSON(stakingGenesis)
+	stakingGenesis := stakingtypes.NewGenesisState(stakingtypes.DefaultParams(), validators, delegations)
+	genesisState[stakingtypes.ModuleName] = encodingConfig.Marshaler.MustMarshalJSON(stakingGenesis)
 
 	totalSupply := sdk.NewCoins()
 	for _, b := range balances {
@@ -236,13 +128,13 @@ func genesisStateWithValSet(
 
 	for range delegations {
 		// add delegated tokens to total supply
-		totalSupply = totalSupply.Add(sdk.NewCoin(appparams.BondDenom, bondAmt))
+		totalSupply = totalSupply.Add(sdk.NewCoin(sdk.DefaultBondDenom, bondAmt))
 	}
 
 	// add bonded amount to bonded pool module account
 	balances = append(balances, banktypes.Balance{
 		Address: authtypes.NewModuleAddress(stakingtypes.BondedPoolName).String(),
-		Coins:   sdk.Coins{sdk.NewCoin(appparams.BondDenom, bondAmt)},
+		Coins:   sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, bondAmt)},
 	})
 
 	// update total supply
@@ -253,10 +145,108 @@ func genesisStateWithValSet(
 		[]banktypes.Metadata{},
 		[]banktypes.SendEnabled{},
 	)
+	genesisState[banktypes.ModuleName] = encodingConfig.Marshaler.MustMarshalJSON(bankGenesis)
 
-	genesisState[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
+	_, err := tmtypes.PB2TM.ValidatorUpdates(initValPowers)
+	if err != nil {
+		panic("failed to get vals")
+	}
 
 	return genesisState
+}
+
+var defaultGenesisStatebytes = []byte{}
+
+// SetupWithCustomHome initializes a new OmniFlixApp with a custom home directory
+func SetupWithCustomHome(isCheckTx bool, dir string) *OmniFlixApp {
+	return SetupWithCustomHomeAndChainId(isCheckTx, dir, "omniflixhub-1")
+}
+
+func SetupWithCustomHomeAndChainId(isCheckTx bool, dir, chainId string) *OmniFlixApp {
+	db := cosmosdb.NewMemDB()
+	app := NewOmniFlixApp(
+		log.NewNopLogger(),
+		db,
+		nil,
+		true,
+		map[int64]bool{},
+		dir,
+		0,
+		encodingConfig,
+		sims.EmptyAppOptions{},
+		[]wasmkeeper.Option{},
+		baseapp.SetChainID(chainId))
+	if !isCheckTx {
+		if len(defaultGenesisStatebytes) == 0 {
+			var err error
+			genesisState := GenesisStateWithValSet(app)
+			defaultGenesisStatebytes, err = json.Marshal(genesisState)
+			if err != nil {
+				panic(err)
+			}
+		}
+
+		_, err := app.InitChain(
+			&abci.RequestInitChain{
+				Validators:      []abci.ValidatorUpdate{},
+				ConsensusParams: sims.DefaultConsensusParams,
+				AppStateBytes:   defaultGenesisStatebytes,
+				ChainId:         chainId,
+			},
+		)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	return app
+}
+
+func Setup(isCheckTx bool) *OmniFlixApp {
+	return SetupWithCustomHome(isCheckTx, DefaultNodeHome)
+}
+
+// SetupTestingAppWithLevelDb initializes a new OmniFlixApp intended for testing,
+// with LevelDB as a db.
+func SetupTestingAppWithLevelDb(isCheckTx bool) (app *OmniFlixApp, cleanupFn func()) {
+	dir, err := os.MkdirTemp(os.TempDir(), "omniflix_leveldb_testing")
+	if err != nil {
+		panic(err)
+	}
+	db, err := cosmosdb.NewGoLevelDB("omniflix_leveldb_testing", dir, nil)
+	if err != nil {
+		panic(err)
+	}
+	app = NewOmniFlixApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, encodingConfig, sims.EmptyAppOptions{}, []wasmkeeper.Option{}, baseapp.SetChainID("omniflixhub-1"))
+	if !isCheckTx {
+		genesisState := GenesisStateWithValSet(app)
+		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
+		if err != nil {
+			panic(err)
+		}
+
+		_, err = app.InitChain(
+			&abci.RequestInitChain{
+				Validators:      []abci.ValidatorUpdate{},
+				ConsensusParams: sims.DefaultConsensusParams,
+				AppStateBytes:   stateBytes,
+				ChainId:         "omniflixhub-1",
+			},
+		)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	cleanupFn = func() {
+		db.Close()
+		err = os.RemoveAll(dir)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	return app, cleanupFn
 }
 
 func keyPubAddr() (crypto.PrivKey, crypto.PubKey, sdk.AccAddress) {

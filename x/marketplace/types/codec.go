@@ -1,17 +1,12 @@
 package types
 
 import (
+	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/exported"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	"github.com/cosmos/cosmos-sdk/codec/types"
-	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
-	authzcodec "github.com/cosmos/cosmos-sdk/x/authz/codec"
-	govcodec "github.com/cosmos/cosmos-sdk/x/gov/codec"
-	gogotypes "github.com/cosmos/gogoproto/types"
-
-	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/exported"
 )
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
@@ -50,31 +45,4 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&AuctionListing{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
-}
-
-var (
-	amino     = codec.NewLegacyAmino()
-	ModuleCdc = codec.NewAminoCodec(amino)
-)
-
-func init() {
-	RegisterLegacyAminoCodec(amino)
-	cryptocodec.RegisterCrypto(amino)
-	sdk.RegisterLegacyAminoCodec(amino)
-	// Register all Amino interfaces and concrete types on the authz Amino codec
-	// so that this can later be used to properly serialize MsgGrant and MsgExec
-	// instances.
-	RegisterLegacyAminoCodec(authzcodec.Amino)
-	RegisterLegacyAminoCodec(govcodec.Amino)
-}
-
-func MustMarshalListingID(cdc codec.BinaryCodec, listingId string) []byte {
-	listingIdWrap := gogotypes.StringValue{Value: listingId}
-	return cdc.MustMarshal(&listingIdWrap)
-}
-
-func MustUnMarshalListingID(cdc codec.BinaryCodec, value []byte) string {
-	var listingIdWrap gogotypes.StringValue
-	cdc.MustUnmarshal(value, &listingIdWrap)
-	return listingIdWrap.Value
 }

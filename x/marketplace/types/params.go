@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkmath "cosmossdk.io/math"
 )
 
 const (
@@ -14,7 +14,7 @@ const (
 )
 
 func NewMarketplaceParams(
-	saleCommission sdk.Dec,
+	saleCommission sdkmath.LegacyDec,
 	distribution Distribution,
 	bidCloseDuration time.Duration,
 	maxAuctionDuration time.Duration,
@@ -30,10 +30,10 @@ func NewMarketplaceParams(
 // DefaultParams returns default marketplace parameters
 func DefaultParams() Params {
 	return NewMarketplaceParams(
-		sdk.NewDecWithPrec(1, 2), // 1%
+		sdkmath.LegacyNewDecWithPrec(1, 2), // 1%
 		Distribution{
-			Staking:       sdk.NewDecWithPrec(50, 2), // 50%
-			CommunityPool: sdk.NewDecWithPrec(50, 2), // 50%
+			Staking:       sdkmath.LegacyNewDecWithPrec(50, 2), // 50%
+			CommunityPool: sdkmath.LegacyNewDecWithPrec(50, 2), // 50%
 		},
 		DefaultBidClosePeriod,
 		DefaultMaxAuctionDuration,
@@ -58,7 +58,7 @@ func (p Params) ValidateBasic() error {
 }
 
 func validateSaleCommission(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(sdkmath.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
@@ -69,7 +69,7 @@ func validateSaleCommission(i interface{}) error {
 	if v.IsNegative() {
 		return fmt.Errorf("sale commission must be positive: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
+	if v.GT(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("sale commission too large: %s", v)
 	}
 
@@ -77,7 +77,7 @@ func validateSaleCommission(i interface{}) error {
 }
 
 func validateStakingDistribution(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(sdkmath.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
@@ -88,7 +88,7 @@ func validateStakingDistribution(i interface{}) error {
 	if v.IsNegative() {
 		return fmt.Errorf("staking distribution value must be positive: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
+	if v.GT(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("staking distribution value too large: %s", v)
 	}
 
@@ -96,7 +96,7 @@ func validateStakingDistribution(i interface{}) error {
 }
 
 func validateCommunityPoolDistribution(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(sdkmath.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
@@ -107,7 +107,7 @@ func validateCommunityPoolDistribution(i interface{}) error {
 	if v.IsNegative() {
 		return fmt.Errorf("community pool distribution value must be positive: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
+	if v.GT(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("community pool distribution value too large: %s", v)
 	}
 
@@ -127,7 +127,7 @@ func validateMarketplaceDistributionParams(i interface{}) error {
 	if err != nil {
 		return err
 	}
-	if !v.Staking.Add(v.CommunityPool).Equal(sdk.OneDec()) {
+	if !v.Staking.Add(v.CommunityPool).Equal(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("marketplace distribtution commission params sum must be equal to : %d", 1)
 	}
 	return nil

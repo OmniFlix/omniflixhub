@@ -3,18 +3,20 @@ package ics721nft
 import (
 	"errors"
 
+	sdkmath "cosmossdk.io/math"
+
 	errorsmod "cosmossdk.io/errors"
 
+	"cosmossdk.io/log"
+	"cosmossdk.io/x/nft"
+	nftkeeper "cosmossdk.io/x/nft/keeper"
 	onftkeeper "github.com/OmniFlix/omniflixhub/v5/x/onft/keeper"
 	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 	nfttransfer "github.com/bianjieai/nft-transfer/types"
-	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/x/nft"
-	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
 	"github.com/cosmos/gogoproto/proto"
 )
 
@@ -202,7 +204,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 func (k Keeper) validRoyaltyReceiverAddresses(addresses []*onfttypes.WeightedAddress) bool {
-	weightSum := sdk.NewDec(0)
+	weightSum := sdkmath.LegacyNewDec(0)
 	for _, addr := range addresses {
 		address, err := sdk.AccAddressFromBech32(addr.Address)
 		if err != nil {
@@ -214,10 +216,10 @@ func (k Keeper) validRoyaltyReceiverAddresses(addresses []*onfttypes.WeightedAdd
 		if !addr.Weight.IsPositive() {
 			return false
 		}
-		if addr.Weight.GT(sdk.NewDec(1)) {
+		if addr.Weight.GT(sdkmath.LegacyNewDec(1)) {
 			return false
 		}
 		weightSum = weightSum.Add(addr.Weight)
 	}
-	return weightSum.Equal(sdk.NewDec(1))
+	return weightSum.Equal(sdkmath.LegacyNewDec(1))
 }

@@ -1,6 +1,7 @@
 package v2
 
 import (
+	storetypes "cosmossdk.io/store/types"
 	"github.com/OmniFlix/omniflixhub/v5/x/itc/exported"
 	"github.com/OmniFlix/omniflixhub/v5/x/itc/types"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -19,7 +20,7 @@ var ParamsKey = []byte{0x12}
 // module state.
 func Migrate(
 	ctx sdk.Context,
-	store sdk.KVStore,
+	store storetypes.KVStore,
 	legacySubspace exported.Subspace,
 	cdc codec.BinaryCodec,
 ) error {

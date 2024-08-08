@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"cosmossdk.io/core/appmodule"
+
 	"github.com/OmniFlix/omniflixhub/v5/x/alloc/exported"
 
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
-
-	abci "github.com/cometbft/cometbft/abci/types"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/alloc/client/cli"
 	"github.com/OmniFlix/omniflixhub/v5/x/alloc/keeper"
@@ -24,8 +24,11 @@ import (
 )
 
 var (
-	_ module.AppModule      = AppModule{}
-	_ module.AppModuleBasic = AppModuleBasic{}
+	_ module.AppModule      = (*AppModule)(nil)
+	_ module.AppModuleBasic = (*AppModule)(nil)
+	_ module.HasGenesis     = (*AppModule)(nil)
+
+	_ appmodule.HasBeginBlocker = (*AppModule)(nil)
 )
 
 // ----------------------------------------------------------------------------
@@ -43,6 +46,12 @@ type AppModuleBasic struct {
 func NewAppModuleBasic(cdc codec.BinaryCodec) AppModuleBasic {
 	return AppModuleBasic{cdc: cdc}
 }
+
+// IsAppModule implements the appmodule.AppModule interface.
+func (am AppModule) IsAppModule() {}
+
+// IsOnePerModuleType is a marker function just indicates that this is a one-per-module type.
+func (am AppModule) IsOnePerModuleType() {}
 
 // Name returns the alloc module's name.
 func (AppModuleBasic) Name() string {
@@ -144,14 +153,12 @@ func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
 
 // InitGenesis performs the alloc module's genesis initialization It returns
 // no validator updates.
-func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.RawMessage) []abci.ValidatorUpdate {
+func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.RawMessage) {
 	var genState types.GenesisState
 	// Initialize global index to index in genesis state
 	cdc.MustUnmarshalJSON(gs, &genState)
 
 	InitGenesis(ctx, am.keeper, genState)
-
-	return []abci.ValidatorUpdate{}
 }
 
 // ExportGenesis returns the alloc module's exported genesis state as raw JSON bytes.
@@ -164,12 +171,8 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 func (AppModule) ConsensusVersion() uint64 { return ConsensusVersion }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the alloc module.
-func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
+func (am AppModule) BeginBlock(ctxx context.Context) error {
+	ctx := sdk.UnwrapSDKContext(ctxx)
 	BeginBlocker(ctx, am.keeper)
-}
-
-// EndBlock executes all ABCI EndBlock logic respective to the alloc module. It
-// returns no validator updates.
-func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return []abci.ValidatorUpdate{}
+	return nil
 }

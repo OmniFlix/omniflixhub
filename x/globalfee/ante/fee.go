@@ -3,6 +3,8 @@ package ante
 import (
 	"errors"
 
+	sdkmath "cosmossdk.io/math"
+
 	tmstrings "github.com/cometbft/cometbft/libs/strings"
 
 	errorsmod "cosmossdk.io/errors"
@@ -158,7 +160,7 @@ func (mfd FeeDecorator) GetGlobalFee(ctx sdk.Context, feeTx sdk.FeeTx) (sdk.Coin
 	requiredGlobalFees := make(sdk.Coins, len(globalMinGasPrices))
 	// Determine the required fees by multiplying each required minimum gas
 	// price by the gas limit, where fee = ceil(minGasPrice * gasLimit).
-	glDec := sdk.NewDec(int64(feeTx.GetGas()))
+	glDec := sdkmath.LegacyNewDec(int64(feeTx.GetGas()))
 	for i, gp := range globalMinGasPrices {
 		fee := gp.Amount.Mul(glDec)
 		requiredGlobalFees[i] = sdk.NewCoin(gp.Denom, fee.Ceil().RoundInt())
@@ -173,11 +175,12 @@ func (mfd FeeDecorator) DefaultZeroGlobalFee(ctx sdk.Context) ([]sdk.DecCoin, er
 		return nil, errors.New("empty staking bond denomination")
 	}
 
-	return []sdk.DecCoin{sdk.NewDecCoinFromDec(bondDenom, sdk.NewDec(0))}, nil
+	return []sdk.DecCoin{sdk.NewDecCoinFromDec(bondDenom, sdkmath.LegacyNewDec(0))}, nil
 }
 
 func (mfd FeeDecorator) getBondDenom(ctx sdk.Context) string {
-	return mfd.StakingKeeper.BondDenom(ctx)
+	bondDenom, _ := mfd.StakingKeeper.BondDenom(ctx)
+	return bondDenom
 }
 
 // ContainsOnlyBypassMinFeeMsgs returns true if all the given msgs type are listed
@@ -205,7 +208,7 @@ func GetMinGasPrice(ctx sdk.Context, gasLimit int64) sdk.Coins {
 	requiredFees := make(sdk.Coins, len(minGasPrices))
 	// Determine the required fees by multiplying each required minimum gas
 	// price by the gas limit, where fee = ceil(minGasPrice * gasLimit).
-	glDec := sdk.NewDec(gasLimit)
+	glDec := sdkmath.LegacyNewDec(gasLimit)
 	for i, gp := range minGasPrices {
 		fee := gp.Amount.Mul(glDec)
 		requiredFees[i] = sdk.NewCoin(gp.Denom, fee.Ceil().RoundInt())

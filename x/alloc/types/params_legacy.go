@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	sdkmath "cosmossdk.io/math"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
@@ -71,7 +73,7 @@ func validateDistributionProportions(i interface{}) error {
 
 	totalProportions := v.StakingRewards.Add(v.NftIncentives).Add(v.NodeHostsIncentives).Add(v.DeveloperRewards).Add(v.CommunityPool)
 
-	if !totalProportions.Equal(sdk.NewDec(1)) {
+	if !totalProportions.Equal(sdkmath.LegacyNewDec(1)) {
 		return errors.New("total distributions ratio should be equal to 100%")
 	}
 
@@ -89,7 +91,7 @@ func validateWeightedAddresses(i interface{}) error {
 		return nil
 	}
 
-	weightSum := sdk.NewDec(0)
+	weightSum := sdkmath.LegacyNewDec(0)
 	for i, w := range v {
 		// we allow address to be "" to go to community pool
 		if w.Address != "" {
@@ -101,13 +103,13 @@ func validateWeightedAddresses(i interface{}) error {
 		if !w.Weight.IsPositive() {
 			return fmt.Errorf("non-positive weight at %dth", i)
 		}
-		if w.Weight.GT(sdk.NewDec(1)) {
+		if w.Weight.GT(sdkmath.LegacyNewDec(1)) {
 			return fmt.Errorf("more than 1 weight at %dth", i)
 		}
 		weightSum = weightSum.Add(w.Weight)
 	}
 
-	if !weightSum.Equal(sdk.NewDec(1)) {
+	if !weightSum.Equal(sdkmath.LegacyNewDec(1)) {
 		return fmt.Errorf("invalid weight sum: %s", weightSum.String())
 	}
 

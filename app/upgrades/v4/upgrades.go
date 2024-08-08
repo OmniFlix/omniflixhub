@@ -1,11 +1,13 @@
 package v4
 
 import (
+	"context"
+
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/OmniFlix/omniflixhub/v5/app/keepers"
 	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
 func CreateV4UpgradeHandler(
@@ -14,8 +16,8 @@ func CreateV4UpgradeHandler(
 	_ upgrades.BaseAppParamManager,
 	keepers *keepers.AppKeepers,
 ) upgradetypes.UpgradeHandler {
-	return func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("running migrations ...")
+	return func(context context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx := sdk.UnwrapSDKContext(context)
 		// Run migrations before applying any other state changes.
 		// NOTE: DO NOT PUT ANY STATE CHANGES BEFORE RunMigrations().
 		versionMap, err := mm.RunMigrations(ctx, cfg, fromVM)

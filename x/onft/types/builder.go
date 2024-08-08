@@ -8,10 +8,12 @@ import (
 	"fmt"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
+
+	"cosmossdk.io/x/nft"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/nft"
 	proto "github.com/cosmos/gogoproto/proto"
 )
 
@@ -424,7 +426,7 @@ func (nb NFTBuilder) Build(classId, nftID, nftURI, nftData string) (nft.NFT, err
 		data = string(dataBz)
 	}
 	createdTime, _ := time.Parse(time.RFC3339, createdAt)
-	royalty, _ := sdk.NewDecFromStr(royaltyShare)
+	royalty, _ := sdkmath.LegacyNewDecFromStr(royaltyShare)
 
 	metadata, err := codectypes.NewAnyWithValue(&ONFTMetadata{
 		Name:         name,

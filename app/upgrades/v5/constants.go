@@ -1,17 +1,16 @@
-package v3
+package v4
 
 import (
 	store "cosmossdk.io/store/types"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
 )
 
-const UpgradeName = "v3"
+const UpgradeName = "v5"
 
 var Upgrade = upgrades.Upgrade{
 	UpgradeName:          UpgradeName,
-	CreateUpgradeHandler: CreateV3UpgradeHandler,
+	CreateUpgradeHandler: CreateV5UpgradeHandler,
 	StoreUpgrades: store.StoreUpgrades{
-		Added: []string{wasmtypes.ModuleName},
+		Added: []string{},
 	},
 }

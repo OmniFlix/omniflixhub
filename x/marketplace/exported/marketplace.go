@@ -3,6 +3,8 @@ package exported
 import (
 	"time"
 
+	sdkmath "cosmossdk.io/math"
+
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -23,7 +25,7 @@ type AuctionListingI interface {
 	GetNftId() string
 	GetStartPrice() sdk.Coin
 	GetStartTime() time.Time
-	GetIncrementPercentage() sdk.Dec
+	GetIncrementPercentage() sdkmath.LegacyDec
 	GetOwner() sdk.AccAddress
 	GetSplitShares() interface{}
 	GetStatus() string

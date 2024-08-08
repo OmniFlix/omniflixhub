@@ -1,29 +1,31 @@
 package types
 
 import (
+	"context"
 	"time"
+
+	sdkmath "cosmossdk.io/math"
 
 	nft "github.com/OmniFlix/omniflixhub/v5/x/onft/exported"
 	nfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 // AccountKeeper defines the expected account keeper
 type AccountKeeper interface {
-	GetAccount(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
-	GetModuleAccount(ctx sdk.Context, name string) authtypes.ModuleAccountI
+	GetAccount(ctx context.Context, addr sdk.AccAddress) sdk.AccountI
+	GetModuleAccount(ctx context.Context, name string) sdk.ModuleAccountI
 	GetModuleAddress(module string) sdk.AccAddress
 }
 
 // BankKeeper defines the expected bank keeper
 type BankKeeper interface {
-	SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
-	SendCoins(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, amount sdk.Coins) error
-	SendCoinsFromModuleToAccount(ctx sdk.Context, formModule string, toAddr sdk.AccAddress, amt sdk.Coins) error
-	SendCoinsFromModuleToModule(ctx sdk.Context, formModule string, toModule string, amt sdk.Coins) error
-	SendCoinsFromAccountToModule(ctx sdk.Context, fromAddr sdk.AccAddress, toModule string, amt sdk.Coins) error
+	SpendableCoins(ctx context.Context, addr sdk.AccAddress) sdk.Coins
+	SendCoins(ctx context.Context, from sdk.AccAddress, to sdk.AccAddress, amount sdk.Coins) error
+	SendCoinsFromModuleToAccount(ctx context.Context, formModule string, toAddr sdk.AccAddress, amt sdk.Coins) error
+	SendCoinsFromModuleToModule(ctx context.Context, formModule string, toModule string, amt sdk.Coins) error
+	SendCoinsFromAccountToModule(ctx context.Context, fromAddr sdk.AccAddress, toModule string, amt sdk.Coins) error
 }
 
 // NftKeeper defines the expected nft keeper
@@ -44,7 +46,7 @@ type NftKeeper interface {
 		transferable,
 		extensible,
 		nsfw bool,
-		royaltyShare sdk.Dec,
+		royaltyShare sdkmath.LegacyDec,
 		receiver sdk.AccAddress,
 	) error
 	TransferOwnership(ctx sdk.Context, denomId, nftId string, srcOwner, dstOwner sdk.AccAddress) error
@@ -65,5 +67,5 @@ type StreamPayKeeper interface {
 
 // DistributionKeeper defines the expected distribution keeper
 type DistributionKeeper interface {
-	FundCommunityPool(ctx sdk.Context, amount sdk.Coins, sender sdk.AccAddress) error
+	FundCommunityPool(ctx context.Context, amount sdk.Coins, sender sdk.AccAddress) error
 }

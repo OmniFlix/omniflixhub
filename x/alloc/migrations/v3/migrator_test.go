@@ -3,6 +3,8 @@ package v3_test
 import (
 	"testing"
 
+	storetypes "cosmossdk.io/store/types"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/OmniFlix/omniflixhub/v5/x/alloc"
@@ -30,8 +32,8 @@ func TestMigrate(t *testing.T) {
 	encCfg := moduletestutil.MakeTestEncodingConfig(alloc.AppModuleBasic{})
 	cdc := encCfg.Codec
 
-	storeKey := sdk.NewKVStoreKey(v3.ModuleName)
-	tKey := sdk.NewTransientStoreKey("transient_test")
+	storeKey := storetypes.NewKVStoreKey(v3.ModuleName)
+	tKey := storetypes.NewTransientStoreKey("transient_test")
 	ctx := testutil.DefaultContext(storeKey, tKey)
 	store := ctx.KVStore(storeKey)
 

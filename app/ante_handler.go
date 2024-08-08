@@ -2,19 +2,20 @@ package app
 
 import (
 	errorsmod "cosmossdk.io/errors"
+	storetypes "cosmossdk.io/store/types"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	globalfeeante "github.com/OmniFlix/omniflixhub/v5/x/globalfee/ante"
 	globalfeekeeper "github.com/OmniFlix/omniflixhub/v5/x/globalfee/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	ibcante "github.com/cosmos/ibc-go/v7/modules/core/ante"
-	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
+	ibcante "github.com/cosmos/ibc-go/v8/modules/core/ante"
+	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 )
 
 // Lower back to 1 mil after https://github.com/cosmos/relayer/issues/1255
@@ -27,7 +28,7 @@ type HandlerOptions struct {
 
 	GovKeeper         govkeeper.Keeper
 	IBCKeeper         *ibckeeper.Keeper
-	TxCounterStoreKey storetypes.StoreKey
+	TxCounterStoreKey *storetypes.KVStoreKey
 	WasmConfig        wasmtypes.WasmConfig
 	Codec             codec.BinaryCodec
 
@@ -56,7 +57,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(), // Outermost AnteDecorator, SetUpContext must be called first
 		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit),
-		wasmkeeper.NewCountTXDecorator(options.TxCounterStoreKey),
+		wasmkeeper.NewCountTXDecorator(runtime.NewKVStoreService(options.TxCounterStoreKey)),
 		ante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
 		ante.NewValidateBasicDecorator(),
 		ante.NewTxTimeoutHeightDecorator(),

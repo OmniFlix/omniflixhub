@@ -108,11 +108,6 @@ func (msg MsgCreateCampaign) ValidateBasic() error {
 	return msg.CreationFee.Validate()
 }
 
-// GetSignBytes Implements Msg.
-func (msg *MsgCreateCampaign) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
-}
-
 // GetSigners Implements Msg.
 func (msg MsgCreateCampaign) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Creator)
@@ -139,11 +134,6 @@ func (msg MsgCancelCampaign) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 	return nil
-}
-
-// GetSignBytes Implements Msg.
-func (msg *MsgCancelCampaign) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 // GetSigners Implements Msg.
@@ -177,11 +167,6 @@ func (msg MsgDepositCampaign) ValidateBasic() error {
 			"amount must be valid and positive (%s)", msg.Amount.String())
 	}
 	return nil
-}
-
-// GetSignBytes Implements Msg.
-func (msg *MsgDepositCampaign) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 // GetSigners Implements Msg.
@@ -219,11 +204,6 @@ func (msg MsgClaim) ValidateBasic() error {
 	return ValidateInteractionType(msg.Interaction)
 }
 
-// GetSignBytes Implements Msg.
-func (msg *MsgClaim) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
-}
-
 // GetSigners Implements Msg.
 func (msg MsgClaim) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Claimer)
@@ -231,11 +211,6 @@ func (msg MsgClaim) GetSigners() []sdk.AccAddress {
 		panic(err)
 	}
 	return []sdk.AccAddress{from}
-}
-
-// GetSignBytes implements the LegacyMsg interface.
-func (m MsgUpdateParams) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&m))
 }
 
 // GetSigners returns the expected signers for a MsgUpdateParams message.

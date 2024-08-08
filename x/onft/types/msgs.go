@@ -4,6 +4,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	sdkmath "cosmossdk.io/math"
+
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -94,12 +96,6 @@ func (msg MsgCreateDenom) ValidateBasic() error {
 	return nil
 }
 
-// GetSignBytes Implements Msg.
-func (msg MsgCreateDenom) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg MsgCreateDenom) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -157,12 +153,6 @@ func (msg MsgUpdateDenom) ValidateBasic() error {
 	return nil
 }
 
-// GetSignBytes Implements Msg.
-func (msg MsgUpdateDenom) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg MsgUpdateDenom) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -194,11 +184,6 @@ func (msg MsgTransferDenom) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgTransferDenom) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg MsgTransferDenom) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -225,11 +210,6 @@ func (msg MsgPurgeDenom) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgPurgeDenom) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg MsgPurgeDenom) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -240,7 +220,7 @@ func (msg MsgPurgeDenom) GetSigners() []sdk.AccAddress {
 
 func NewMsgMintONFT(
 	denomId, sender, recipient string, metadata Metadata, data string,
-	transferable, extensible, nsfw bool, royaltyShare sdk.Dec,
+	transferable, extensible, nsfw bool, royaltyShare sdkmath.LegacyDec,
 ) *MsgMintONFT {
 	return &MsgMintONFT{
 		Id:           GenUniqueID(IDPrefix),
@@ -280,16 +260,11 @@ func (msg MsgMintONFT) ValidateBasic() error {
 	if err := ValidateURI(msg.Metadata.PreviewURI); err != nil {
 		return err
 	}
-	if msg.RoyaltyShare.IsNegative() || msg.RoyaltyShare.GTE(sdk.NewDec(1)) {
+	if msg.RoyaltyShare.IsNegative() || msg.RoyaltyShare.GTE(sdkmath.LegacyNewDec(1)) {
 		return errorsmod.Wrapf(ErrInvalidPercentage, "invalid royalty share percentage decimal value; %d, must be positive and less than 1", msg.RoyaltyShare)
 	}
 
 	return ValidateONFTID(msg.Id)
-}
-
-func (msg MsgMintONFT) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
 }
 
 func (msg MsgMintONFT) GetSigners() []sdk.AccAddress {
@@ -328,11 +303,6 @@ func (msg MsgTransferONFT) ValidateBasic() error {
 	return ValidateONFTID(msg.Id)
 }
 
-func (msg MsgTransferONFT) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg MsgTransferONFT) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -360,11 +330,6 @@ func (msg MsgBurnONFT) ValidateBasic() error {
 	return ValidateONFTID(msg.Id)
 }
 
-func (msg MsgBurnONFT) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(&msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg MsgBurnONFT) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -374,11 +339,6 @@ func (msg MsgBurnONFT) GetSigners() []sdk.AccAddress {
 }
 
 // MsgUpdateParams
-
-// GetSignBytes implements the LegacyMsg interface.
-func (m MsgUpdateParams) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&m))
-}
 
 // GetSigners returns the expected signers for a MsgUpdateParams message.
 func (m *MsgUpdateParams) GetSigners() []sdk.AccAddress {

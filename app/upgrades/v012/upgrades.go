@@ -1,6 +1,9 @@
 package v012
 
 import (
+	"context"
+
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/OmniFlix/omniflixhub/v5/app/keepers"
 	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -9,9 +12,8 @@ import (
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
-	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
+	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
 )
 
 func CreateV012UpgradeHandler(
@@ -20,9 +22,8 @@ func CreateV012UpgradeHandler(
 	bpm upgrades.BaseAppParamManager,
 	keepers *keepers.AppKeepers,
 ) upgradetypes.UpgradeHandler {
-	return func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("running migrations ...")
-
+	return func(context context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx := sdk.UnwrapSDKContext(context)
 		// Run migrations before applying any other state changes.
 		// NOTE: DO NOT PUT ANY STATE CHANGES BEFORE RunMigrations().
 		versionMap, err := mm.RunMigrations(ctx, cfg, fromVM)
