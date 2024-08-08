@@ -9,21 +9,11 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
-	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 )
 
-var (
-	Amino          = codec.NewLegacyAmino()
-	AuthzModuleCdc = codec.NewAminoCodec(Amino)
-)
-
-func init() {
-	cryptocodec.RegisterCrypto(Amino)
-	codec.RegisterEvidences(Amino)
-	sdk.RegisterLegacyAminoCodec(Amino)
-}
+var AuthzModuleCdc = codec.NewLegacyAmino()
 
 func TestMessageAuthzSerialization(t *testing.T, msg sdk.Msg) {
 	someDate := time.Date(1, 1, 1, 1, 1, 1, 1, time.UTC)

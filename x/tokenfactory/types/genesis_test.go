@@ -1,8 +1,9 @@
 package types_test
 
 import (
-	"github.com/OmniFlix/omniflixhub/v5/app"
 	"testing"
+
+	"github.com/OmniFlix/omniflixhub/v5/app"
 
 	"github.com/stretchr/testify/require"
 
