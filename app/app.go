@@ -43,6 +43,9 @@ import (
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	blocksdkabci "github.com/skip-mev/block-sdk/v2/abci"
+	blocksdkblock "github.com/skip-mev/block-sdk/v2/block"
+	blocksdkbase "github.com/skip-mev/block-sdk/v2/block/base"
 	"github.com/spf13/cast"
 
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
@@ -241,6 +244,16 @@ func NewOmniFlixApp(
 	app.MountTransientStores(app.GetTransientStoreKey())
 	app.MountMemoryStores(app.GetMemoryStoreKey())
 
+	// create the lanes
+	baseLane := CreateLanes(app, txConfig)
+	mempool, err := blocksdkblock.NewLanedMempool(app.Logger(), []blocksdkblock.Lane{baseLane})
+	if err != nil {
+		panic(err)
+	}
+
+	// set the mempool first
+	app.SetMempool(mempool)
+
 	anteHandler, err := NewAnteHandler(
 		HandlerOptions{
 			HandlerOptions: ante.HandlerOptions{
@@ -264,6 +277,29 @@ func NewOmniFlixApp(
 	if err != nil {
 		panic(fmt.Errorf("failed to create AnteHandler: %s", err))
 	}
+
+	// update ante-handlers on lanes
+	opt := []blocksdkbase.LaneOption{
+		blocksdkbase.WithAnteHandler(anteHandler),
+	}
+	baseLane.WithOptions(opt...)
+
+	// ABCI handlers
+	// prepare proposal
+	proposalHandler := blocksdkabci.NewDefaultProposalHandler(
+		app.Logger(),
+		txConfig.TxDecoder(),
+		txConfig.TxEncoder(),
+		mempool,
+	)
+
+	// we use the block-sdk's PrepareProposal logic to build blocks
+	app.SetPrepareProposal(proposalHandler.PrepareProposalHandler())
+
+	// we use a no-op ProcessProposal, this way, we accept all proposals in avoidance
+	// of liveness failures due to Prepare / Process inconsistency. In other words,
+	// this ProcessProposal always returns ACCEPT.
+	app.SetProcessProposal(baseapp.NoOpProcessProposal())
 
 	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
