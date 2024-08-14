@@ -1,0 +1,21 @@
+
+name: omniflixhub-tests
+
+on:
+  pull_request:
+    branches:
+      - "main"
+      - "v[0-9]**"
+  push:
+    branches:
+      - "main"
+      - "v[0-9]**"
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 1.22.x
+      - run: go test ./...
