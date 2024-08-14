@@ -262,6 +262,15 @@ func NewOmniFlixApp(
 	app.setupUpgradeHandlers()
 	app.setupUpgradeStoreLoaders()
 
+	if manager := app.SnapshotManager(); manager != nil {
+		err := manager.RegisterExtensions(
+			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), &app.WasmKeeper),
+		)
+		if err != nil {
+			panic(fmt.Errorf("failed to register snapshot extension: %s", err))
+		}
+	}
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(fmt.Sprintf("failed to load latest version: %s", err))
