@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
-	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
+	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	bindingstypes "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/bindings/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -98,8 +98,8 @@ func CustomQuerier(qp *QueryPlugin) func(ctx sdk.Context, request json.RawMessag
 }
 
 // ConvertSdkCoinsToWasmCoins converts sdk type coins to wasm vm type coins
-func ConvertSdkCoinsToWasmCoins(coins []sdk.Coin) wasmvmtypes.Coins {
-	var toSend wasmvmtypes.Coins
+func ConvertSdkCoinsToWasmCoins(coins []sdk.Coin) []wasmvmtypes.Coin {
+	var toSend []wasmvmtypes.Coin
 	for _, coin := range coins {
 		c := ConvertSdkCoinToWasmCoin(coin)
 		toSend = append(toSend, c)
