@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"cosmossdk.io/store/prefix"
@@ -26,7 +25,7 @@ func (k Keeper) Params(c context.Context, req *types.QueryParamsRequest) (*types
 
 func (k Keeper) Listing(goCtx context.Context, req *types.QueryListingRequest) (*types.QueryListingResponse, error) {
 	if req == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "empty request")
+		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -40,7 +39,7 @@ func (k Keeper) Listing(goCtx context.Context, req *types.QueryListingRequest) (
 
 func (k Keeper) Listings(goCtx context.Context, req *types.QueryListingsRequest) (*types.QueryListingsResponse, error) {
 	if req == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "empty request")
+		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -53,7 +52,7 @@ func (k Keeper) Listings(goCtx context.Context, req *types.QueryListingsRequest)
 	if len(req.Owner) > 0 {
 		owner, err = sdk.AccAddressFromBech32(req.Owner)
 		if err != nil {
-			return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("invalid owner address (%s)", err))
+			return nil, status.Errorf(codes.InvalidArgument, "invalid owner address (%s)", err)
 		}
 		listingStore := prefix.NewStore(store, append(types.PrefixListingOwner, owner.Bytes()...))
 		pageRes, err = query.Paginate(listingStore, req.Pagination, func(key []byte, value []byte) error {
@@ -105,7 +104,7 @@ func (k Keeper) ListingsByOwner(goCtx context.Context, req *types.QueryListingsB
 	if len(req.Owner) > 0 {
 		owner, err = sdk.AccAddressFromBech32(req.Owner)
 		if err != nil || owner == nil {
-			return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("invalid owner address (%s)", err))
+			return nil, status.Errorf(codes.InvalidArgument, "invalid owner address (%s)", err)
 		}
 	}
 
@@ -266,7 +265,7 @@ func (k Keeper) AuctionsByOwner(goCtx context.Context, req *types.QueryAuctionsB
 	if len(req.Owner) > 0 {
 		owner, err = sdk.AccAddressFromBech32(req.Owner)
 		if err != nil || owner == nil {
-			return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("invalid owner address (%s)", err))
+			return nil, status.Errorf(codes.InvalidArgument, "invalid owner address (%s)", err)
 		}
 	}
 
@@ -293,7 +292,7 @@ func (k Keeper) AuctionsByOwner(goCtx context.Context, req *types.QueryAuctionsB
 
 func (k Keeper) AuctionsByPriceDenom(goCtx context.Context, req *types.QueryAuctionsByPriceDenomRequest) (*types.QueryAuctionsResponse, error) {
 	if req == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "empty request")
+		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -322,10 +321,10 @@ func (k Keeper) AuctionsByPriceDenom(goCtx context.Context, req *types.QueryAuct
 
 func (k Keeper) AuctionByNftId(goCtx context.Context, req *types.QueryAuctionByNFTIDRequest) (*types.QueryAuctionResponse, error) {
 	if req == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "empty request")
+		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
 	if req.NftId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "need nft id to request")
+		return nil, status.Error(codes.InvalidArgument, "need nft id to request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -339,12 +338,12 @@ func (k Keeper) AuctionByNftId(goCtx context.Context, req *types.QueryAuctionByN
 		}
 		return auction, nil
 	}
-	return nil, status.Errorf(codes.NotFound, "auction not found with given nft id")
+	return nil, status.Error(codes.NotFound, "auction not found with given nft id")
 }
 
 func (k Keeper) Bid(goCtx context.Context, req *types.QueryBidRequest) (*types.QueryBidResponse, error) {
 	if req == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "empty request")
+		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -357,7 +356,7 @@ func (k Keeper) Bid(goCtx context.Context, req *types.QueryBidRequest) (*types.Q
 
 func (k Keeper) Bids(goCtx context.Context, req *types.QueryBidsRequest) (*types.QueryBidsResponse, error) {
 	if req == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "empty request")
+		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
