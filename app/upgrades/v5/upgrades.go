@@ -1,4 +1,4 @@
-package v4
+package v5
 
 import (
 	"context"
@@ -27,6 +27,7 @@ func CreateV5UpgradeHandler(
 		if err != nil {
 			return nil, err
 		}
+
 		// Set Gov Params
 		govParams, err := keepers.GovKeeper.Params.Get(ctx)
 		if err != nil {
