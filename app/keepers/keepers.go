@@ -44,6 +44,9 @@ import (
 	crisiskeeper "github.com/cosmos/cosmos-sdk/x/crisis/keeper"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 
+	circuitkeeper "cosmossdk.io/x/circuit/keeper"
+	circuittypes "cosmossdk.io/x/circuit/types"
+
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 
@@ -155,6 +158,7 @@ type AppKeepers struct {
 	IBCHooksKeeper        ibchookskeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
+	CircuitKeeper         circuitkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	GlobalFeeKeeper       globalfeekeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
@@ -270,6 +274,13 @@ func NewAppKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[feegrant.StoreKey]),
 		appKeepers.AccountKeeper,
+	)
+
+	appKeepers.CircuitKeeper = circuitkeeper.NewKeeper(
+		appCodec,
+		runtime.NewKVStoreService(keys[circuittypes.StoreKey]),
+		govModAddress,
+		addresscodec.NewBech32Codec(bech32AccountAddressPrefix),
 	)
 
 	appKeepers.StakingKeeper = stakingkeeper.NewKeeper(

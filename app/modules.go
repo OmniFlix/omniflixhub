@@ -3,6 +3,7 @@ package app
 // sdk v.50.x migration TODO:Eventually should get rid of this in favor of NewBasicManagerFromManager
 
 import (
+	circuittypes "cosmossdk.io/x/circuit/types"
 	"cosmossdk.io/x/nft"
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
@@ -42,6 +43,8 @@ import (
 
 	"cosmossdk.io/x/feegrant"
 	feegrantmodule "cosmossdk.io/x/feegrant/module"
+
+	"cosmossdk.io/x/circuit"
 
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
@@ -130,6 +133,7 @@ var (
 		ibchooks.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
+		circuit.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
@@ -232,6 +236,7 @@ func appModules(
 		),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+		circuit.NewAppModule(appCodec, app.CircuitKeeper),
 		upgrade.NewAppModule(app.UpgradeKeeper, addresscodec.NewBech32Codec(appparams.Bech32AccountAddrPrefix)),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
@@ -339,6 +344,7 @@ func orderBeginBlockers() []string {
 		authtypes.ModuleName,
 		crisistypes.ModuleName,
 		feegrant.ModuleName,
+		circuittypes.ModuleName,
 		globalfee.ModuleName,
 		tokenfactorytypes.ModuleName,
 		group.ModuleName,
@@ -375,6 +381,7 @@ func orderEndBlockers() []string {
 		distrtypes.ModuleName,
 		ibcexported.ModuleName,
 		feegrant.ModuleName,
+		circuittypes.ModuleName,
 		globalfee.ModuleName,
 		group.ModuleName,
 		tokenfactorytypes.ModuleName,
@@ -415,6 +422,7 @@ func orderInitGenesis() []string {
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
+		circuittypes.ModuleName,
 		ibchookstypes.ModuleName,
 		wasmtypes.ModuleName,
 		globalfee.ModuleName,

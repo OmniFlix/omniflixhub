@@ -3,6 +3,7 @@ package app
 import (
 	errorsmod "cosmossdk.io/errors"
 	storetypes "cosmossdk.io/store/types"
+	circuitante "cosmossdk.io/x/circuit/ante"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	globalfeeante "github.com/OmniFlix/omniflixhub/v5/x/globalfee/ante"
@@ -36,6 +37,7 @@ type HandlerOptions struct {
 
 	GlobalFeeKeeper globalfeekeeper.Keeper
 	StakingKeeper   stakingkeeper.Keeper
+	CircuitKeeper   circuitante.CircuitBreaker
 }
 
 func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
@@ -75,6 +77,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 			options.FeegrantKeeper,
 			options.TxFeeChecker,
 		),
+		circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
 		// SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewSetPubKeyDecorator(options.AccountKeeper),
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
