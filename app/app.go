@@ -263,6 +263,7 @@ func NewOmniFlixApp(
 			BypassMinFeeMsgTypes: GetDefaultBypassFeeMessages(),
 			GlobalFeeKeeper:      app.GlobalFeeKeeper,
 			StakingKeeper:        *app.StakingKeeper,
+			CircuitKeeper:        &app.CircuitKeeper,
 		},
 	)
 	if err != nil {

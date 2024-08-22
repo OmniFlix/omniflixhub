@@ -2,6 +2,7 @@ package keepers
 
 import (
 	storetypes "cosmossdk.io/store/types"
+	circuittypes "cosmossdk.io/x/circuit/types"
 	evidencetypes "cosmossdk.io/x/evidence/types"
 	"cosmossdk.io/x/feegrant"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
@@ -58,6 +59,7 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		capabilitytypes.StoreKey,
 		crisistypes.StoreKey,
 		feegrant.StoreKey,
+		circuittypes.StoreKey,
 		wasmtypes.StoreKey,
 		globalfeetypes.StoreKey,
 		group.StoreKey,
