@@ -119,7 +119,7 @@ func (suite *KeeperTestSuite) CreateSecondaryCampaign() {
 			defaultTokensPerClaim,
 			sdk.NewInt64Coin(
 				defaultTokensPerClaim.Denom,
-				defaultTokensPerClaim.Amount.MulRaw(int64(defaultMaxClaims)).Int64(), //nolint:golint
+				defaultTokensPerClaim.Amount.MulRaw(int64(defaultMaxClaims)).Int64(), //nolint:all
 			),
 			&defaultNftMintDetails,
 			&defaultDistribution,
