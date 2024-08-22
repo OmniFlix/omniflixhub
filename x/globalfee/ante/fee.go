@@ -69,7 +69,7 @@ func (mfd FeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, ne
 	}
 
 	// Get local minimum-gas-prices
-	localFees := GetMinGasPrice(ctx, int64(feeTx.GetGas()))
+	localFees := GetMinGasPrice(ctx, int64(feeTx.GetGas())) //nolint:all
 
 	// CombinedFeeRequirement should never be empty since
 	// global fee is set to its default value, i.e. 0uatom, if empty
@@ -160,7 +160,7 @@ func (mfd FeeDecorator) GetGlobalFee(ctx sdk.Context, feeTx sdk.FeeTx) (sdk.Coin
 	requiredGlobalFees := make(sdk.Coins, len(globalMinGasPrices))
 	// Determine the required fees by multiplying each required minimum gas
 	// price by the gas limit, where fee = ceil(minGasPrice * gasLimit).
-	glDec := sdkmath.LegacyNewDec(int64(feeTx.GetGas()))
+	glDec := sdkmath.LegacyNewDec(int64(feeTx.GetGas())) //nolint:all
 	for i, gp := range globalMinGasPrices {
 		fee := gp.Amount.Mul(glDec)
 		requiredGlobalFees[i] = sdk.NewCoin(gp.Denom, fee.Ceil().RoundInt())
