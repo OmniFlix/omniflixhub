@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/pruning"
+	"github.com/cosmos/cosmos-sdk/client/snapshot"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/OmniFlix/omniflixhub/v4/app"
@@ -104,6 +105,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		addDebugCommands(debug.Cmd()),
 		config.Cmd(),
 		pruning.PruningCmd(ac.newApp),
+		snapshot.Cmd(ac.newApp),
 	)
 
 	a := appCreator{encodingConfig}
