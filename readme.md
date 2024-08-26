@@ -10,7 +10,7 @@ OmniFlix Hub blockchain is built using Cosmos-SDK and CometBFT
  - 1TB SSD Storage
 
 ### Go Requirement
-- go 1.21.3 +
+- go 1.22.5 +
 ```
 sudo rm -rf /usr/local/go
 wget -q -O - https://git.io/vQhTU | bash -s -- --remove
@@ -24,7 +24,7 @@ wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.21.3
 ```
 git clone https://github.com/Omniflix/omniflixhub.git
 cd omniflixhub
-git checkout v4.0.0
+git checkout v4.1.1
 go mod tidy
 make install
 ```
