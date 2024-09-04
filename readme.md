@@ -76,7 +76,7 @@ curl https://raw.githubusercontent.com/OmniFlix/mainnet/main/omniflixhub-1/genes
  - [v2.1]((https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v2.1-upgrade.md)) at block 10678600
  - [v3]((https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v3-upgrade.md)) at block 10872800
  - [v3.3.0]((https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v3.3.0-upgrade.md)) at block 11140000
-  - [v4]((https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v4-upgrade.md)) at block 11914000
+ - [v4]((https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v4-upgrade.md)) at block 11914000
 
 ### Testnets
 
