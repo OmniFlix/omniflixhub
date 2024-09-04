@@ -22,9 +22,10 @@ func ValidateGenesis(data GenesisState) error {
 		if creator.Empty() {
 			return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "missing denom creator")
 		}
-		if err := ValidateDenomID(c.Denom.Id); err != nil {
-			return err
-		}
+		/*
+			if err := ValidateDenomID(c.Denom.Id); err != nil {
+				return err
+			} */
 		if err := ValidateName(c.Denom.Name); err != nil {
 			return err
 		}
