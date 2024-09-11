@@ -9,7 +9,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var maxTotalBypassMinFeeMsgGasUsage = 2_000_000
+var maxTotalBypassMinFeeMsgGasUsage = uint64(2_000_000)
 
 // DefaultParams returns default parameters
 func DefaultParams() Params {
