@@ -346,7 +346,7 @@ func NewModifyDenomMetadataCmd() *cobra.Command {
 					},
 					{
 						Denom:    ticker,
-						Exponent: uint32(exponent), //nolint:all
+						Exponent: uint32(exponent),
 						Aliases:  []string{fullDenom},
 					},
 				},

@@ -36,7 +36,7 @@ func CreateV5UpgradeHandler(
 		govParams.ExpeditedThreshold = "0.7"
 		expeditedVotingPeriod := time.Hour * 24
 		govParams.ExpeditedVotingPeriod = &expeditedVotingPeriod
-		govParams.ExpeditedMinDeposit = sdk.NewCoins(sdk.NewCoin("uflix", sdkmath.NewIntWithDecimal(2500, 6)))
+		govParams.ExpeditedMinDeposit = sdk.NewCoins(sdk.NewCoin("uflix", sdkmath.NewIntWithDecimal(15000, 6)))
 
 		err = keepers.GovKeeper.Params.Set(ctx, govParams)
 		if err != nil {
