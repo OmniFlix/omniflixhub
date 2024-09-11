@@ -16,7 +16,7 @@ func DefaultParams() Params {
 	return Params{
 		MinimumGasPrices:                sdk.DecCoins(nil),
 		BypassMinFeeMsgTypes:            []string{},
-		MaxTotalBypassMinFeeMsgGasUsage: uint64(maxTotalBypassMinFeeMsgGasUsage),
+		MaxTotalBypassMinFeeMsgGasUsage: maxTotalBypassMinFeeMsgGasUsage,
 	}
 }
 
