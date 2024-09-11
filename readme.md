@@ -14,7 +14,7 @@ OmniFlix Hub blockchain is built using Cosmos-SDK and CometBFT
 ```
 sudo rm -rf /usr/local/go
 wget -q -O - https://git.io/vQhTU | bash -s -- --remove
-wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.21.3
+wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.22.5
  ```
 
 ### Installation
@@ -24,7 +24,7 @@ wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.21.3
 ```
 git clone https://github.com/Omniflix/omniflixhub.git
 cd omniflixhub
-git checkout v4.1.1
+git checkout v5.0.0
 go mod tidy
 make install
 ```
@@ -77,6 +77,7 @@ curl https://raw.githubusercontent.com/OmniFlix/mainnet/main/omniflixhub-1/genes
  - [v3]((https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v3-upgrade.md)) at block 10872800
  - [v3.3.0]((https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v3.3.0-upgrade.md)) at block 11140000
  - [v4]((https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v4-upgrade.md)) at block 11914000
+ - [v5](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v5-upgrade.md) at block 13986200
 
 ### Testnets
 
