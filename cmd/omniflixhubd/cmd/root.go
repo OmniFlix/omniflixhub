@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -178,10 +179,7 @@ func addModuleInitFlags(startCmd *cobra.Command) {
 }
 
 func tempDir() string {
-	dir, err := os.MkdirTemp("", "omniflixhubtemp")
-	if err != nil {
-		dir = app.DefaultNodeHome
-	}
+	dir := filepath.Join(os.TempDir(), "."+app.Name+"-temp")
 	defer os.RemoveAll(dir)
 
 	return dir
