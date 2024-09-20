@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -183,14 +182,10 @@ func addModuleInitFlags(startCmd *cobra.Command) {
 }
 
 func tempDir() string {
-<<<<<<< HEAD
-	dir := filepath.Join(os.TempDir(), "."+app.Name+"-temp")
-=======
 	dir, err := os.MkdirTemp("", "."+app.Name+"-temp")
 	if err != nil {
 		panic(fmt.Sprintf("failed creating temp directory: %s", err.Error()))
 	}
->>>>>>> main
 	defer os.RemoveAll(dir)
 
 	return dir
