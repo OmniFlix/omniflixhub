@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 
@@ -71,6 +72,9 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	defer func() {
 		if err := tempApp.Close(); err != nil {
 			panic(err)
+		}
+		if tempDir != app.DefaultNodeHome {
+			os.RemoveAll(tempDir)
 		}
 	}()
 
@@ -178,9 +182,9 @@ func addModuleInitFlags(startCmd *cobra.Command) {
 }
 
 func tempDir() string {
-	dir, err := os.MkdirTemp("", "omniflixhubtemp")
+	dir, err := os.MkdirTemp("", "."+app.Name+"-temp")
 	if err != nil {
-		dir = app.DefaultNodeHome
+		panic(fmt.Sprintf("failed creating temp directory: %s", err.Error()))
 	}
 	defer os.RemoveAll(dir)
 
