@@ -35,6 +35,7 @@ message Denom {
   repeated WeightedAddress royalty_receivers        = 11 [
     (gogoproto.moretags) = "yaml:\"royalty_receivers\""
   ];
+  bool updatable_data                               = 12;
 }
 
 message DenomMetadata {

@@ -29,6 +29,8 @@ service Msg {
 
   rpc BurnONFT(MsgBurnONFT) returns (MsgBurnONFTResponse);
 
+  rpc UpdateONFTData(MsgUpdateONFTData) returns (MsgUpdateONFTDataResponse);
+
   // UpdateParams defines a governance operation for updating the onft module
   // parameters. The authority is hard-coded to the onft module account.
   //
@@ -156,6 +158,20 @@ message MsgBurnONFT {
 }
 
 message MsgBurnONFTResponse {}
+
+message MsgUpdateONFTData {
+  option (cosmos.msg.v1.signer) = "sender";
+  option (amino.name)           = "OmniFlix/onft/MsgUpdateONFTData";
+  option (gogoproto.equal)      = false;
+
+  string id           = 1;
+  string denom_id     = 2 [(gogoproto.moretags) = "yaml:\"denom_id\""];
+  string data         = 3;
+  string sender       = 4;
+}
+
+message MsgUpdateONFTDataResponse {}
+
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
 //
