@@ -188,6 +188,30 @@ func (m msgServer) MintONFT(goCtx context.Context, msg *types.MsgMintONFT) (*typ
 	return &types.MsgMintONFTResponse{}, nil
 }
 
+func (m msgServer) UpdateONFTMetadata(goCtx context.Context, msg *types.MsgUpdateONFTData) (*types.MsgUpdateONFTDataResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	if !m.Keeper.HasPermissionToUpdateData(ctx, msg.DenomId, sender) {
+		return nil, errorsmod.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"%s is not allowed to update nft data for this nft %s",
+			sender.String(),
+			msg.Id,
+		)
+	}
+
+	if err := m.Keeper.UpdateONFTData(ctx, msg.DenomId, msg.Id, msg.Data); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateONFTDataResponse{}, nil
+}
+
 func (m msgServer) TransferONFT(goCtx context.Context,
 	msg *types.MsgTransferONFT,
 ) (*types.MsgTransferONFTResponse, error) {

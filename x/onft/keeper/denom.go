@@ -208,6 +208,18 @@ func (k Keeper) HasPermissionToMint(ctx sdk.Context, denomID string, sender sdk.
 	return false
 }
 
+func (k Keeper) HasPermissionToUpdateData(ctx sdk.Context, denomID string, sender sdk.AccAddress) bool {
+	denom, err := k.GetDenomInfo(ctx, denomID)
+	if err != nil {
+		return false
+	}
+
+	if sender.String() == denom.Creator {
+		return true
+	}
+	return false
+}
+
 func (k Keeper) GetDenomInfo(ctx sdk.Context, denomID string) (*types.Denom, error) {
 	class, ok := k.nk.GetClass(ctx, denomID)
 	if !ok {

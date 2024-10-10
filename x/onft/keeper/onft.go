@@ -115,6 +115,45 @@ func (k Keeper) BurnONFT(
 	return nil
 }
 
+func (k Keeper) UpdateONFTData(ctx sdk.Context, denomID, onftID, data string) error {
+	if !k.nk.HasClass(ctx, denomID) {
+		return errorsmod.Wrapf(types.ErrInvalidDenom, "denomID %s not exists", denomID)
+	}
+	if !k.nk.HasNFT(ctx, denomID, onftID) {
+		return errorsmod.Wrapf(types.ErrInvalidONFT, "nft ID %s not exists", onftID)
+	}
+	_nft, err := k.GetONFT(ctx, denomID, onftID)
+	if err != nil {
+		return err
+	}
+
+	nftMetadata := &types.ONFTMetadata{
+		Name:         _nft.GetName(),
+		Description:  _nft.GetDescription(),
+		PreviewURI:   _nft.GetPreviewURI(),
+		Data:         data,
+		Transferable: _nft.IsTransferable(),
+		Extensible:   _nft.IsExtensible(),
+		Nsfw:         _nft.IsNSFW(),
+		CreatedAt:    _nft.GetCreatedTime(),
+		RoyaltyShare: _nft.GetRoyaltyShare(),
+	}
+
+	newData, err := codectypes.NewAnyWithValue(nftMetadata)
+	if err != nil {
+		return err
+	}
+	updatedNFT := nft.NFT{
+		ClassId: denomID,
+		Id:      onftID,
+		Uri:     _nft.GetMediaURI(),
+		UriHash: _nft.GetURIHash(),
+		Data:    newData,
+	}
+
+	return k.nk.Update(ctx, updatedNFT)
+}
+
 func (k Keeper) GetONFT(ctx sdk.Context, denomID, onftID string) (nft exported.ONFTI, err error) {
 	if !k.nk.HasClass(ctx, denomID) {
 		return nil, errorsmod.Wrapf(types.ErrInvalidDenom, "denomID %s not exists", denomID)
