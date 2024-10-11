@@ -33,4 +33,5 @@ var (
 	ErrDenomIdExists           = errorsmod.Register(ModuleName, 26, "denom exists")
 	ErrInvalidRoyaltyReceivers = errorsmod.Register(ModuleName, 27, "invalid royalty receivers")
 	ErrNotAllowed              = errorsmod.Register(ModuleName, 28, "not allowed ")
+	ErrInvalidData             = errorsmod.Register(ModuleName, 29, "invalid data")
 )

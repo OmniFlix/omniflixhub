@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
 
 	sdkmath "cosmossdk.io/math"
@@ -160,5 +161,12 @@ func ValidateWeightedAddresses(i interface{}) error {
 		return fmt.Errorf("invalid weight sum: %s", weightSum.String())
 	}
 
+	return nil
+}
+
+func ValidateJSONString(data string) error {
+	if !json.Valid([]byte(data)) {
+		return fmt.Errorf("invalid JSON string")
+	}
 	return nil
 }
