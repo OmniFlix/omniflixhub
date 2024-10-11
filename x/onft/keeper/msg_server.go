@@ -188,7 +188,7 @@ func (m msgServer) MintONFT(goCtx context.Context, msg *types.MsgMintONFT) (*typ
 	return &types.MsgMintONFTResponse{}, nil
 }
 
-func (m msgServer) UpdateONFTMetadata(goCtx context.Context, msg *types.MsgUpdateONFTData) (*types.MsgUpdateONFTDataResponse, error) {
+func (m msgServer) UpdateONFTData(goCtx context.Context, msg *types.MsgUpdateONFTData) (*types.MsgUpdateONFTDataResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
