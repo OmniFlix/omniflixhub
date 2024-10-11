@@ -22,6 +22,7 @@ const (
 	FlagURI              = "uri"
 	FlagURIHash          = "uri-hash"
 	FlagRoyaltyReceivers = "royalty-receivers"
+	FlagUpdatableData    = "updatable-data"
 )
 
 var (
@@ -49,6 +50,7 @@ func init() {
 	FsCreateDenom.String(FlagURI, "", "uri for denom")
 	FsCreateDenom.String(FlagURIHash, "", "uri hash for denom")
 	FsCreateDenom.String(FlagData, "", "json data of the denom")
+	FsCreateDenom.Bool(FlagUpdatableData, false, "allows updates to the nft data if true")
 
 	FsTransferDenom.String(FlagRecipient, "", "recipient of the denom")
 

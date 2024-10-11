@@ -46,7 +46,7 @@ func GetCmdCreateDenom() *cobra.Command {
 Example:
 $ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<description>
 --uri=<uri> --uri-hash=<uri hash> --preview-uri=<preview-uri> --royalty-receivers=<"addr1:weight,addr2:weight"> 
---creation-fee <fee> --chain-id=<chain-id> --from=<key-name> --fees=<fee>`,
+--updatable-data --creation-fee <fee> --chain-id=<chain-id> --from=<key-name> --fees=<fee>`,
 				version.AppName,
 			),
 		),
@@ -112,6 +112,11 @@ $ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<desc
 				}
 			}
 
+			updatableData, err := cmd.Flags().GetBool(FlagUpdatableData)
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgCreateDenom(
 				symbol,
 				denomName,
@@ -124,6 +129,7 @@ $ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<desc
 				clientCtx.GetFromAddress().String(),
 				creationFee,
 				royaltyReceivers,
+				updatableData,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
