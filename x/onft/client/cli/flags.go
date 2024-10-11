@@ -26,13 +26,14 @@ const (
 )
 
 var (
-	FsCreateDenom   = flag.NewFlagSet("", flag.ContinueOnError)
-	FsUpdateDenom   = flag.NewFlagSet("", flag.ContinueOnError)
-	FsTransferDenom = flag.NewFlagSet("", flag.ContinueOnError)
-	FsMintONFT      = flag.NewFlagSet("", flag.ContinueOnError)
-	FsTransferONFT  = flag.NewFlagSet("", flag.ContinueOnError)
-	FsQuerySupply   = flag.NewFlagSet("", flag.ContinueOnError)
-	FsQueryOwner    = flag.NewFlagSet("", flag.ContinueOnError)
+	FsCreateDenom    = flag.NewFlagSet("", flag.ContinueOnError)
+	FsUpdateDenom    = flag.NewFlagSet("", flag.ContinueOnError)
+	FsTransferDenom  = flag.NewFlagSet("", flag.ContinueOnError)
+	FsMintONFT       = flag.NewFlagSet("", flag.ContinueOnError)
+	FsTransferONFT   = flag.NewFlagSet("", flag.ContinueOnError)
+	FsUpdateONFTData = flag.NewFlagSet("", flag.ContinueOnError)
+	FsQuerySupply    = flag.NewFlagSet("", flag.ContinueOnError)
+	FsQueryOwner     = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -67,6 +68,9 @@ func init() {
 	FsMintONFT.String(FlagURIHash, "", "uri hash for the nft")
 
 	FsTransferONFT.String(FlagRecipient, "", "Receiver of the onft. default value is sender address of transaction")
+
+	FsUpdateONFTData.String(FlagData, "", "custom data of onft")
+
 	FsQuerySupply.String(FlagOwner, "", "The owner of a nft")
 	FsQueryOwner.String(FlagDenomID, "", "id of the denom")
 }

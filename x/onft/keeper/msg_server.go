@@ -94,6 +94,7 @@ func (m msgServer) CreateDenom(goCtx context.Context, msg *types.MsgCreateDenom)
 		msg.UriHash,
 		msg.Data,
 		msg.RoyaltyReceivers,
+		msg.UpdatableData,
 	); err != nil {
 		return nil, err
 	}
