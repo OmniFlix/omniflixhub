@@ -48,6 +48,7 @@ message DenomMetadata {
   repeated WeightedAddress royalty_receivers       = 7 [
     (gogoproto.moretags) = "yaml:\"royalty_receivers\""
   ];
+  bool updatable_data = 8;
 }
 
 //ASSET or ONFT

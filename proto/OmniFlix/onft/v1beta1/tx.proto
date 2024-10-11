@@ -64,6 +64,7 @@ message MsgCreateDenom {
   repeated WeightedAddress royalty_receivers = 12 [
     (gogoproto.moretags) = "yaml:\"royalty_receivers\""
   ];
+  bool updatable_data = 13;
 }
 
 message MsgCreateDenomResponse {}
