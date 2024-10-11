@@ -24,6 +24,7 @@ func (k Keeper) SaveDenom(
 	uriHash,
 	data string,
 	royaltyReceivers []*types.WeightedAddress,
+	updatableData bool,
 ) error {
 	denomMetadata := &types.DenomMetadata{
 		Creator:          creator.String(),
@@ -31,6 +32,7 @@ func (k Keeper) SaveDenom(
 		PreviewUri:       previewUri,
 		Data:             data,
 		RoyaltyReceivers: royaltyReceivers,
+		UpdatableData:    updatableData,
 	}
 	metadata, err := codectypes.NewAnyWithValue(denomMetadata)
 	if err != nil {
@@ -83,6 +85,7 @@ func (k Keeper) TransferDenomOwner(
 		PreviewUri:       denom.PreviewURI,
 		Data:             denom.Data,
 		RoyaltyReceivers: denom.RoyaltyReceivers,
+		UpdatableData:    denom.UpdatableData,
 	}
 	data, err := codectypes.NewAnyWithValue(denomMetadata)
 	if err != nil {
@@ -131,6 +134,7 @@ func (k Keeper) UpdateDenom(ctx sdk.Context, msg *types.MsgUpdateDenom) error {
 		PreviewUri:       denom.PreviewURI,
 		Data:             denom.Data,
 		RoyaltyReceivers: denom.RoyaltyReceivers,
+		UpdatableData:    denom.UpdatableData,
 	}
 	if msg.PreviewURI != types.DoNotModify {
 		denomMetadata.PreviewUri = msg.PreviewURI
@@ -242,6 +246,7 @@ func (k Keeper) GetDenomInfo(ctx sdk.Context, denomID string) (*types.Denom, err
 		UriHash:          class.UriHash,
 		Data:             denomMetadata.Data,
 		RoyaltyReceivers: denomMetadata.RoyaltyReceivers,
+		UpdatableData:    denomMetadata.UpdatableData,
 	}, nil
 }
 

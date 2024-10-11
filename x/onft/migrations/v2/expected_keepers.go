@@ -20,5 +20,6 @@ type NFTKeeper interface {
 		uriHash,
 		data string,
 		royaltyReceivers []*onfttypes.WeightedAddress,
+		updatableData bool,
 	) error
 }

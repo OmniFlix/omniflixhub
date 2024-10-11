@@ -59,6 +59,7 @@ func MigrateCollections(ctx sdk.Context,
 			denom.UriHash,
 			denom.Data,
 			denom.RoyaltyReceivers,
+			denom.UpdatableData,
 		); err != nil {
 			return err
 		}

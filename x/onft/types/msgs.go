@@ -38,6 +38,7 @@ func NewMsgCreateDenom(
 	name, schema, description, uri, uriHash, previewUri, data, sender string,
 	creationFee sdk.Coin,
 	royaltyReceivers []*WeightedAddress,
+	updatableData bool,
 ) *MsgCreateDenom {
 	return &MsgCreateDenom{
 		Sender:           sender,
@@ -52,6 +53,7 @@ func NewMsgCreateDenom(
 		Data:             data,
 		CreationFee:      creationFee,
 		RoyaltyReceivers: royaltyReceivers,
+		UpdatableData:    updatableData,
 	}
 }
 
