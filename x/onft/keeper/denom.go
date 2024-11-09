@@ -218,9 +218,10 @@ func (k Keeper) HasPermissionToUpdateData(ctx sdk.Context, denomID string, sende
 		return false
 	}
 
-	if sender.String() == denom.Creator {
+	if denom.UpdatableData && sender.String() == denom.Creator {
 		return true
 	}
+
 	return false
 }
 

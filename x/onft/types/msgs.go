@@ -358,12 +358,12 @@ func (m *MsgUpdateParams) ValidateBasic() error {
 	return m.Params.ValidateBasic()
 }
 
-func NewMsgUpdateONFTData(denomId, id, sender, data string) *MsgUpdateONFTData {
+func NewMsgUpdateONFTData(denomId, id, data, sender string) *MsgUpdateONFTData {
 	return &MsgUpdateONFTData{
 		Id:      id,
 		DenomId: denomId,
-		Sender:  sender,
 		Data:    data,
+		Sender:  sender,
 	}
 }
 
