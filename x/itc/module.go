@@ -164,3 +164,13 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 
 // ConsensusVersion implements ConsensusVersion.
 func (AppModule) ConsensusVersion() uint64 { return ConsensusVersion }
+
+// BeginBlock executes all ABCI BeginBlock logic respective to the marketplace module.
+func (am AppModule) BeginBlock(_ sdk.Context) {}
+
+// EndBlock executes all ABCI EndBlock logic respective to the marketplace module. It
+// returns no validator updates.
+func (am AppModule) EndBlock(goCtx context.Context) ([]abci.ValidatorUpdate, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	return EndBlock(ctx, am.keeper)
+}
