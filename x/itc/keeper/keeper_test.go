@@ -149,6 +149,7 @@ func (suite *KeeperTestSuite) createDefaultNftDenom() {
 				Weight:  sdkmath.LegacyOneDec(),
 			},
 		},
+		false,
 	)
 	createDenomMsg.Id = defaultNftDenomId
 
@@ -171,6 +172,7 @@ func (suite *KeeperTestSuite) createSecondaryNftDenom() {
 		suite.TestAccs[0].String(),
 		onfttypes.DefaultDenomCreationFee,
 		nil,
+		false,
 	)
 	createDenomMsg.Id = secondaryNftDenomId
 
@@ -198,6 +200,7 @@ func (suite *KeeperTestSuite) createDefaultMintNftDenom() {
 				Weight:  sdkmath.LegacyOneDec(),
 			},
 		},
+		false,
 	)
 	createDenomMsg.Id = defaultNftMintDenomId
 

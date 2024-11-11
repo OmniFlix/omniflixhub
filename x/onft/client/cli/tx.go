@@ -33,6 +33,7 @@ func NewTxCmd() *cobra.Command {
 		GetCmdMintONFT(),
 		GetCmdTransferONFT(),
 		GetCmdBurnONFT(),
+		GetCmdUpdateONFTData(),
 	)
 
 	return txCmd
@@ -46,7 +47,7 @@ func GetCmdCreateDenom() *cobra.Command {
 Example:
 $ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<description>
 --uri=<uri> --uri-hash=<uri hash> --preview-uri=<preview-uri> --royalty-receivers=<"addr1:weight,addr2:weight"> 
---creation-fee <fee> --chain-id=<chain-id> --from=<key-name> --fees=<fee>`,
+--updatable-data --creation-fee <fee> --chain-id=<chain-id> --from=<key-name> --fees=<fee>`,
 				version.AppName,
 			),
 		),
@@ -112,6 +113,11 @@ $ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<desc
 				}
 			}
 
+			updatableData, err := cmd.Flags().GetBool(FlagUpdatableData)
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgCreateDenom(
 				symbol,
 				denomName,
@@ -124,6 +130,7 @@ $ %s tx onft create [symbol] --name=<name> --schema=<schema> --description=<desc
 				clientCtx.GetFromAddress().String(),
 				creationFee,
 				royaltyReceivers,
+				updatableData,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -500,6 +507,50 @@ $ %s tx onft purge-denom [denom-id] --from=<key-name> --chain-id=<chain-id> --fe
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func GetCmdUpdateONFTData() *cobra.Command {
+	cmd := &cobra.Command{
+		Use: "update-onft-data [denom-id] [onft-id] --data <new-data-json-string>",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Update the data of an oNFT.
+Example:
+$ %s tx onft update-onft-data [denom-id] [onft-id] --data <new-data-json-string> --from=<key-name> --chain-id=<chain-id> --fees=<fee>`,
+				version.AppName,
+			),
+		),
+		Args: cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			denomId := args[0]
+			onftId := args[1]
+
+			data, err := cmd.Flags().GetString(FlagData)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgUpdateONFTData(
+				denomId,
+				onftId,
+				data,
+				clientCtx.GetFromAddress().String(),
+			)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+	cmd.Flags().AddFlagSet(FsUpdateONFTData)
+	_ = cmd.MarkFlagRequired(FlagData)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd

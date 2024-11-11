@@ -141,6 +141,7 @@ func SimulateMsgCreateDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 			sender.Address.String(),
 			creationFee,
 			nil,
+			false,
 		)
 		msg.Id = denomId
 		denom, _ := k.GetDenomInfo(ctx, msg.Id)
