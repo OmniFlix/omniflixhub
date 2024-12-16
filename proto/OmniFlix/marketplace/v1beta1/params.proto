@@ -26,6 +26,16 @@ message Params {
     (gogoproto.stdduration) = true,
     (gogoproto.nullable) = false
   ];
+  google.protobuf.Duration bid_extension_window   = 5 [
+    (gogoproto.moretags)   = "yaml:\"bid_extension_window\"",
+    (gogoproto.stdduration) = true,
+    (gogoproto.nullable) = false
+  ];
+  google.protobuf.Duration bid_extension_duration   = 6 [
+    (gogoproto.moretags)   = "yaml:\"bid_extension_duration\"",
+    (gogoproto.stdduration) = true,
+    (gogoproto.nullable) = false
+  ];
 }
 
 message Distribution {
