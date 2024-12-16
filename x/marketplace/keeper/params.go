@@ -55,3 +55,15 @@ func (k Keeper) GetMaxAuctionDuration(ctx sdk.Context) (duration time.Duration) 
 	params := k.GetParams(ctx)
 	return params.MaxAuctionDuration
 }
+
+// GetBidExtensionWindow returns the bid extension window duration for auctions.
+func (k Keeper) GetBidExtensionWindow(ctx sdk.Context) (duration time.Duration) {
+	params := k.GetParams(ctx)
+	return params.BidExtensionWindow
+}
+
+// GetBidExtensionDuration returns the bid extension duration for the auctions.
+func (k Keeper) GetBidExtensionDuration(ctx sdk.Context) (duration time.Duration) {
+	params := k.GetParams(ctx)
+	return params.BidExtensionDuration
+}

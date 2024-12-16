@@ -9,8 +9,11 @@ import (
 
 const (
 	// DefaultBidClosePeriod Default period for closing bids for an auction
-	DefaultBidClosePeriod     time.Duration = time.Hour * 12      // 12 Hours
-	DefaultMaxAuctionDuration time.Duration = time.Hour * 24 * 90 // 90 Days
+	DefaultBidClosePeriod        time.Duration = time.Hour * 12      // 12 Hours
+	DefaultMaxAuctionDuration    time.Duration = time.Hour * 24 * 90 // 90 Days
+	DefaultBidExtenstionWindow   time.Duration = time.Minute * 15    // 15 minutes
+	DefaultBidExtenstionDuration time.Duration = time.Minute * 5     // 5 minutes
+
 )
 
 func NewMarketplaceParams(
@@ -18,12 +21,16 @@ func NewMarketplaceParams(
 	distribution Distribution,
 	bidCloseDuration time.Duration,
 	maxAuctionDuration time.Duration,
+	bidExtensionWindow time.Duration,
+	bidExtensionDuration time.Duration,
 ) Params {
 	return Params{
-		SaleCommission:     saleCommission,
-		Distribution:       distribution,
-		BidCloseDuration:   bidCloseDuration,
-		MaxAuctionDuration: maxAuctionDuration,
+		SaleCommission:       saleCommission,
+		Distribution:         distribution,
+		BidCloseDuration:     bidCloseDuration,
+		MaxAuctionDuration:   maxAuctionDuration,
+		BidExtensionWindow:   bidExtensionWindow,
+		BidExtensionDuration: bidExtensionDuration,
 	}
 }
 
@@ -37,6 +44,8 @@ func DefaultParams() Params {
 		},
 		DefaultBidClosePeriod,
 		DefaultMaxAuctionDuration,
+		DefaultBidExtenstionWindow,
+		DefaultBidExtenstionDuration,
 	)
 }
 
@@ -52,6 +61,15 @@ func (p Params) ValidateBasic() error {
 		return err
 	}
 	if err := validateMaxAuctionDuration(p.MaxAuctionDuration); err != nil {
+		return err
+	}
+	if err := validateMaxAuctionDuration(p.MaxAuctionDuration); err != nil {
+		return err
+	}
+	if err := validateBidExtensionWindow(p.MaxAuctionDuration); err != nil {
+		return err
+	}
+	if err := validateBidExtensionDuration(p.MaxAuctionDuration); err != nil {
 		return err
 	}
 	return nil
@@ -153,6 +171,28 @@ func validateMaxAuctionDuration(d interface{}) error {
 	}
 	if v.Seconds() <= 0 {
 		return fmt.Errorf("max auction duration must be positive: %f", v.Seconds())
+	}
+	return nil
+}
+
+func validateBidExtensionWindow(d interface{}) error {
+	v, ok := d.(time.Duration)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", d)
+	}
+	if v.Seconds() <= 0 {
+		return fmt.Errorf("bid extension window must be positive: %f", v.Seconds())
+	}
+	return nil
+}
+
+func validateBidExtensionDuration(d interface{}) error {
+	v, ok := d.(time.Duration)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", d)
+	}
+	if v.Seconds() <= 0 {
+		return fmt.Errorf("bid extension duration must be positive: %f", v.Seconds())
 	}
 	return nil
 }
