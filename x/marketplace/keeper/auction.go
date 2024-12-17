@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"time"
 
 	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
@@ -217,33 +218,75 @@ func (k Keeper) UpdateAuctionStatusesAndProcessBids(ctx sdk.Context) error {
 
 	defer iterator.Close()
 
+	// Get auction parameters
+	bidCloseDuration := k.GetBidCloseDuration(ctx)
+	bidExtensionWindow := k.GetBidExtensionWindow(ctx)     // Time window before auction end to trigger extension
+	bidExtensionDuration := k.GetBidExtensionDuration(ctx) // Duration to extend the auction
+
 	for ; iterator.Valid(); iterator.Next() {
 		var auction types.AuctionListing
 		k.cdc.MustUnmarshal(iterator.Value(), &auction)
 
-		// if auction is active
+		// Check if the auction is active
 		if auction.StartTime.Before(ctx.BlockTime()) {
 
 			durationFromStartTime := ctx.BlockTime().Sub(auction.StartTime)
-			bidCloseDuration := k.GetBidCloseDuration(ctx)
 			bid, found := k.GetBid(ctx, auction.GetId())
 
-			// if auction has ended
-			if auction.EndTime != nil && auction.EndTime.Before(ctx.BlockTime()) ||
-				auction.EndTime == nil && durationFromStartTime > bidCloseDuration {
+			// Update auction end time if necessary
+			if auction.EndTime != nil && found && k.extendAuctionIfNeeded(&auction, bid, bidExtensionWindow, bidExtensionDuration) {
+				k.SetAuctionListing(ctx, auction)
+				continue
+			}
 
-				// process bid if found else return NFT to owner
-				if found {
+			// Check if the auction has ended
+			if auction.EndTime != nil {
+				// If the auction has an end time, check for dynamic extensions
+				// TODO: check if it is needed or not
+				if auction.EndTime.Before(ctx.BlockTime()) {
+					if k.extendAuctionIfNeeded(&auction, bid, bidExtensionWindow, bidExtensionDuration) {
+						k.SetAuctionListing(ctx, auction)
+						continue // Skip processing as the auction is extended
+					} else if !found {
+						// Return NFT to owner if no bids are found
+						err := k.returnNftToOwner(
+							ctx,
+							auction.GetDenomId(),
+							auction.GetNftId(),
+							k.accountKeeper.GetModuleAddress(types.ModuleName),
+							auction.GetOwner(),
+						)
+						if err != nil {
+							return err
+						}
+						// Emit events
+						k.RemoveAuctionListing(ctx, auction.GetId())
+						k.removeAuctionEvent(ctx, auction)
+					} else {
+						err := k.processBid(ctx, auction, bid)
+						if err != nil {
+							return err
+						}
+						// Emit events
+						k.processBidEvent(ctx, auction, bid)
+						k.RemoveAuctionListing(ctx, auction.GetId())
+						k.RemoveBid(ctx, auction.GetId())
+					}
+				}
+			} else if auction.EndTime == nil {
+				// Process auction without a predefined end time
+				if found && ctx.BlockTime().Sub(bid.Time) > bidCloseDuration {
+					// Close auction if duration from last bid exceeds bidCloseDuration
 					err := k.processBid(ctx, auction, bid)
 					if err != nil {
 						return err
 					}
-					// emit events
+					// Emit events
 					k.processBidEvent(ctx, auction, bid)
 					k.RemoveAuctionListing(ctx, auction.GetId())
 					k.RemoveBid(ctx, auction.GetId())
-
-				} else {
+				} else if !found && durationFromStartTime > bidCloseDuration {
+					// No bids placed within bidCloseDuration; return NFT to owner
 					err := k.returnNftToOwner(
 						ctx,
 						auction.GetDenomId(),
@@ -254,7 +297,7 @@ func (k Keeper) UpdateAuctionStatusesAndProcessBids(ctx sdk.Context) error {
 					if err != nil {
 						return err
 					}
-					// emit events
+					// Emit events
 					k.RemoveAuctionListing(ctx, auction.GetId())
 					k.removeAuctionEvent(ctx, auction)
 				}
@@ -347,4 +390,13 @@ func (k Keeper) returnNftToOwner(ctx sdk.Context, denomId, nftId string, moduleA
 		return err
 	}
 	return nil
+}
+
+func (k Keeper) extendAuctionIfNeeded(auction *types.AuctionListing, bid types.Bid, bidExtensionWindow, bidExtensionDuration time.Duration) bool {
+	if auction.EndTime != nil && auction.EndTime.Sub(bid.Time) <= bidExtensionWindow {
+		newEndTime := auction.EndTime.Add(bidExtensionDuration)
+		auction.EndTime = &newEndTime
+		return true
+	}
+	return false
 }
