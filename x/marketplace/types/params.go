@@ -11,8 +11,8 @@ const (
 	// DefaultBidClosePeriod Default period for closing bids for an auction
 	DefaultBidClosePeriod        time.Duration = time.Hour * 12      // 12 Hours
 	DefaultMaxAuctionDuration    time.Duration = time.Hour * 24 * 90 // 90 Days
-	DefaultBidExtenstionWindow   time.Duration = time.Minute * 15    // 15 minutes
-	DefaultBidExtenstionDuration time.Duration = time.Minute * 5     // 5 minutes
+	DefaultBidExtenstionWindow   time.Duration = time.Minute * 5     // 5 minutes
+	DefaultBidExtenstionDuration time.Duration = time.Minute * 15    // 15 minutes
 
 )
 
