@@ -6,12 +6,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func EndBlock(ctx sdk.Context, k keeper.Keeper) []abcitypes.ValidatorUpdate {
+func EndBlock(ctx sdk.Context, k keeper.Keeper) ([]abcitypes.ValidatorUpdate, error) {
 	log := k.Logger(ctx)
 	err := k.FinalizeAndEndCampaigns(ctx)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	log.Info("Updated and processed campaigns .. ")
-	return []abcitypes.ValidatorUpdate{}
+	return []abcitypes.ValidatorUpdate{}, nil
 }
