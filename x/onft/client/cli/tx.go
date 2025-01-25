@@ -6,7 +6,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"

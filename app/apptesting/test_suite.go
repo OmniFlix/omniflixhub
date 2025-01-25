@@ -11,7 +11,7 @@ import (
 	coreheader "cosmossdk.io/core/header"
 	sdkmath "cosmossdk.io/math"
 
-	"github.com/OmniFlix/omniflixhub/v5/app"
+	"github.com/OmniFlix/omniflixhub/v6/app"
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/store/rootmulti"

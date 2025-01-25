@@ -7,8 +7,8 @@ import (
 	"cosmossdk.io/x/nft"
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
-	"github.com/OmniFlix/omniflixhub/v5/x/globalfee"
+	appparams "github.com/OmniFlix/omniflixhub/v6/app/params"
+	"github.com/OmniFlix/omniflixhub/v6/x/globalfee"
 	nfttransfer "github.com/bianjieai/nft-transfer"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
@@ -66,8 +66,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory"
-	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/tokenfactory"
+	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/types"
 
 	"cosmossdk.io/x/upgrade"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
@@ -90,17 +90,17 @@ import (
 	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8"
 	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8/types"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/alloc"
-	alloctypes "github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/alloc"
+	alloctypes "github.com/OmniFlix/omniflixhub/v6/x/alloc/types"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/onft"
-	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft"
+	onfttypes "github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/marketplace"
-	marketplacetypes "github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/marketplace"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/v6/x/marketplace/types"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/itc"
-	itctypes "github.com/OmniFlix/omniflixhub/v5/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc"
+	itctypes "github.com/OmniFlix/omniflixhub/v6/x/itc/types"
 
 	"github.com/OmniFlix/streampay/v2/x/streampay"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"

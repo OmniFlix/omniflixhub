@@ -4,7 +4,7 @@ import (
 	"context"
 
 	errorsmod "cosmossdk.io/errors"
-	"github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/alloc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )

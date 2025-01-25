@@ -3,7 +3,7 @@ package keeper
 import (
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
-	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/marketplace/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
 )

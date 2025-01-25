@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 )
 
 const (

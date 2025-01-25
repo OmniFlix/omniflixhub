@@ -26,10 +26,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/client/cli"
-	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/keeper"
-	simulation "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/simulation"
-	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/client/cli"
+	"github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/keeper"
+	simulation "github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/simulation"
+	"github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/types"
 )
 
 var (

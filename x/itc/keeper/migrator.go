@@ -1,8 +1,8 @@
 package keeper
 
 import (
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/exported"
-	v2 "github.com/OmniFlix/omniflixhub/v5/x/itc/migrations/v2"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/exported"
+	v2 "github.com/OmniFlix/omniflixhub/v6/x/itc/migrations/v2"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

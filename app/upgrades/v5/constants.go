@@ -3,7 +3,7 @@ package v5
 import (
 	store "cosmossdk.io/store/types"
 	circuittypes "cosmossdk.io/x/circuit/types"
-	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
+	"github.com/OmniFlix/omniflixhub/v6/app/upgrades"
 )
 
 const UpgradeName = "v5"

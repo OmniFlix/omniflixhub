@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"github.com/OmniFlix/omniflixhub/v5/app/keepers"
+	"github.com/OmniFlix/omniflixhub/v6/app/keepers"
 )
 
 // BaseAppParamManager defines an interface that BaseApp is expected to full-fill,

@@ -7,18 +7,18 @@ import (
 
 	"cosmossdk.io/core/appmodule"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/exported"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/exported"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/simulation"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/simulation"
 	abci "github.com/cometbft/cometbft/abci/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/gogoproto/grpc"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/client/cli"
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/keeper"
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/client/cli"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/keeper"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"

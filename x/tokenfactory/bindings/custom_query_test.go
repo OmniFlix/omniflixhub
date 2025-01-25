@@ -10,8 +10,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/OmniFlix/omniflixhub/v5/app"
-	bindings "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/bindings/types"
+	"github.com/OmniFlix/omniflixhub/v6/app"
+	bindings "github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/bindings/types"
 )
 
 func TestQueryFullDenom(t *testing.T) {

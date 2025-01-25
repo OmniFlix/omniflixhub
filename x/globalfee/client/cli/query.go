@@ -6,7 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/globalfee/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/globalfee/types"
 )
 
 func GetQueryCmd() *cobra.Command {

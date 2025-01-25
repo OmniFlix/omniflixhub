@@ -8,7 +8,7 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/marketplace/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"golang.org/x/exp/slices"
 )

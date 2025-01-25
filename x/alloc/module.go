@@ -7,15 +7,15 @@ import (
 
 	"cosmossdk.io/core/appmodule"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/alloc/exported"
+	"github.com/OmniFlix/omniflixhub/v6/x/alloc/exported"
 
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/alloc/client/cli"
-	"github.com/OmniFlix/omniflixhub/v5/x/alloc/keeper"
-	"github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/alloc/client/cli"
+	"github.com/OmniFlix/omniflixhub/v6/x/alloc/keeper"
+	"github.com/OmniFlix/omniflixhub/v6/x/alloc/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"

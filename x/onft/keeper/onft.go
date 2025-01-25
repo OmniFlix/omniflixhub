@@ -7,8 +7,8 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/x/nft"
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/exported"
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/exported"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

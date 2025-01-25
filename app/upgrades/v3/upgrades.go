@@ -5,8 +5,8 @@ import (
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	"github.com/OmniFlix/omniflixhub/v5/app/keepers"
-	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
+	"github.com/OmniFlix/omniflixhub/v6/app/keepers"
+	"github.com/OmniFlix/omniflixhub/v6/app/upgrades"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 )

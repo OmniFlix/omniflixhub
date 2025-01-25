@@ -7,7 +7,7 @@ import (
 
 	"cosmossdk.io/log"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

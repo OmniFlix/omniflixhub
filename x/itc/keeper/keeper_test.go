@@ -7,12 +7,12 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 
-	onftkeeper "github.com/OmniFlix/omniflixhub/v5/x/onft/keeper"
-	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	onftkeeper "github.com/OmniFlix/omniflixhub/v6/x/onft/keeper"
+	onfttypes "github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 
-	"github.com/OmniFlix/omniflixhub/v5/app/apptesting"
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/keeper"
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v6/app/apptesting"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/keeper"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 )

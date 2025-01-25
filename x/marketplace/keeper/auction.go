@@ -7,7 +7,7 @@ import (
 	storetypes "cosmossdk.io/store/types"
 
 	"cosmossdk.io/store/prefix"
-	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/marketplace/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
 )

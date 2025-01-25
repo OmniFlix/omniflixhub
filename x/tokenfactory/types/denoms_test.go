@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/types"
 )
 
 func TestDeconstructDenom(t *testing.T) {
