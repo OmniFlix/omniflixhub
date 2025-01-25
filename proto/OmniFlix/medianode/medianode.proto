@@ -1,0 +1,39 @@
+syntax = "proto3";
+package OmniFlix.medianode.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/v6/x/medianode/types";
+
+// HardwareSpecs defines the hardware specifications of a media node
+message HardwareSpecs {
+  int64 cpus = 1 [(gogoproto.jsontag) = "cpus"];         // Number of CPUs
+  int64 ram = 2 [(gogoproto.jsontag) = "ram"];           // RAM in MB
+  int64 storage = 3 [(gogoproto.jsontag) = "storage"];   // Stora                                                 ge in MB
+}
+
+// MediaNode defines the structure for a media node
+message MediaNode {
+  uint64 id = 1 [(gogoproto.jsontag) = "id"];
+  string url = 2 [(gogoproto.jsontag) = "url"];
+  string owner = 3 [(gogoproto.moretags) = "yaml:\"owner\"", (gogoproto.jsontag) = "owner"];
+  HardwareSpecs hardware_specs = 4 [(gogoproto.nullable) = false];
+  cosmos.base.v1beta1.Coin lease_amount_per_day = 5 [(gogoproto.nullable) = false];
+  bool leased = 8 [(gogoproto.jsontag) = "leased"];
+  google.protobuf.Timestamp created_at = 6 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp updated_at = 7 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  
+}
+
+// Lease defines the structure for a media node lease
+message Lease {
+  uint64 media_node_id = 1 [(gogoproto.jsontag) = "media_node_id"];
+  string leased_to = 2 [(gogoproto.moretags) = "yaml:\"leased_to\"", (gogoproto.jsontag) = "leased_to"];
+  cosmos.base.v1beta1.Coin lease_amount = 3 [(gogoproto.nullable) = false];
+  google.protobuf.Timestamp leased_at = 4 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  uint64 leased_days = 5 [(gogoproto.jsontag) = "leased_days"];
+  google.protobuf.Timestamp lease_expiry = 6 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  string lease_status = 7 [(gogoproto.jsontag) = "lease_status"];
+}

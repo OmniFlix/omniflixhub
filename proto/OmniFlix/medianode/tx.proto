@@ -1,0 +1,69 @@
+syntax = "proto3";
+package OmniFlix.medianode.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "OmniFlix/medianode/v1/medianode.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/v6/x/medianode/types";
+
+// Msg defines the medianode Msg service.
+service Msg {
+  // RegisterMediaNode registers a new media node
+  rpc RegisterMediaNode(MsgRegisterMediaNode) returns (MsgRegisterMediaNodeResponse);
+  // UpdateMediaNode updates an existing media node
+  rpc UpdateMediaNode(MsgUpdateMediaNode) returns (MsgUpdateMediaNodeResponse);
+  // LeaseMediaNode creates a new lease for a media node
+  rpc LeaseMediaNode(MsgLeaseMediaNode) returns (MsgLeaseMediaNodeResponse);
+  // CancelLease cancels an active lease
+  rpc CancelLease(MsgCancelLease) returns (MsgCancelLeaseResponse);
+}
+
+// MsgRegisterMediaNode represents a message to register a new media node
+message MsgRegisterMediaNode {
+  string creator = 1;
+  string url = 2;
+  HardwareSpecs hardware_specs = 3 [(gogoproto.nullable) = false];
+  cosmos.base.v1beta1.Coin lease_amount_per_day = 4 [(gogoproto.nullable) = false];
+}
+
+// MsgRegisterMediaNodeResponse defines the response for registering a media node
+message MsgRegisterMediaNodeResponse {
+  uint64 id = 1;
+}
+
+// MsgUpdateMediaNode represents a message to update an existing media node
+message MsgUpdateMediaNode {
+  string creator = 1;
+  uint64 id = 2;
+  string url = 3;
+  HardwareSpecs hardware_specs = 4 [(gogoproto.nullable) = false];
+  cosmos.base.v1beta1.Coin lease_amount_per_day = 5 [(gogoproto.nullable) = false];
+}
+
+// MsgUpdateMediaNodeResponse defines the response for updating a media node
+message MsgUpdateMediaNodeResponse {
+}
+
+// MsgLeaseMediaNode represents a message to lease a media node
+message MsgLeaseMediaNode {
+  string creator = 1;
+  uint64 media_node_id = 2;
+  uint64 lease_days = 3;
+}
+
+// MsgLeaseMediaNodeResponse defines the response for leasing a media node
+message MsgLeaseMediaNodeResponse {
+}
+
+// MsgCancelLease represents a message to cancel an active lease
+message MsgCancelLease {
+  string creator = 1;
+  uint64 media_node_id = 2;
+}
+
+// MsgCancelLeaseResponse defines the response for canceling a lease
+message MsgCancelLeaseResponse {
+  bool success = 1;
+  cosmos.base.v1beta1.Coin refund_amount = 2 [(gogoproto.nullable) = false];
+}
