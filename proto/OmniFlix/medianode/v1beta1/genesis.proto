@@ -2,7 +2,7 @@ syntax = "proto3";
 package OmniFlix.medianode.v1beta1;
 
 import "gogoproto/gogo.proto";
-import "OmniFlix/medianode/v1/medianode.proto";
+import "OmniFlix/medianode/v1beta1/medianode.proto";
 
 option go_package = "github.com/OmniFlix/omniflixhub/v6/x/medianode/types";
 

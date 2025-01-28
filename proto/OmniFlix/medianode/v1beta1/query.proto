@@ -4,7 +4,7 @@ package OmniFlix.medianode.v1beta1;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "OmniFlix/medianode/v1/medianode.proto";
+import "OmniFlix/medianode/v1beta1/medianode.proto";
 
 option go_package = "github.com/OmniFlix/omniflixhub/v6/x/medianode/types";
 
