@@ -17,4 +17,9 @@ var (
 	ErrInvalidLeaseStatus     = errorsmod.Register(ModuleName, 10, "invalid lease status")
 	ErrUnauthorized           = errorsmod.Register(ModuleName, 11, "unauthorized operation")
 	ErrLeaseExpired           = errorsmod.Register(ModuleName, 12, "lease has expired")
+
+	// Additional errors needed for keeper functions
+	ErrMediaNodeExists       = errorsmod.Register(ModuleName, 13, "media node already exists")
+	ErrMediaNodeDoesNotExist = errorsmod.Register(ModuleName, 14, "media node does not exist")
+	ErrMediaNodeNotLeased    = errorsmod.Register(ModuleName, 15, "media node is not leased")
 )

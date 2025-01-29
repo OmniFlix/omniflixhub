@@ -31,3 +31,8 @@ func NewMediaNode(
 		UpdatedAt:         updatedAt,
 	}
 }
+
+// IsLeased returns true if the media node is currently leased
+func (m MediaNode) IsLeased() bool {
+	return m.Leased
+}

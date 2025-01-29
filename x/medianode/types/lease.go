@@ -11,6 +11,12 @@ var (
 	_ proto.Message = &Lease{}
 )
 
+const (
+	LEASE_STATUS_ACTIVE    = "ACTIVE"
+	LEASE_STATUS_EXPIRED   = "EXPIRED"
+	LEASE_STATUS_CANCELLED = "CANCELLED"
+)
+
 func NewLease(
 	id uint64,
 	mediaNodeId uint64,
