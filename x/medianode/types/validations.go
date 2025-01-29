@@ -102,16 +102,13 @@ func (l Lease) Validate() error {
 }
 
 // ValidateLeaseStatus validates the lease status string
-func ValidateLeaseStatus(status string) error {
-	validStatuses := map[string]bool{
-		"ACTIVE":    true,
-		"EXPIRED":   true,
-		"CANCELLED": true,
-	}
-
-	if !validStatuses[status] {
+func ValidateLeaseStatus(status LeaseStatus) error {
+	switch status {
+	case LeaseStatus_LEASE_STATUS_ACTIVE,
+		LeaseStatus_LEASE_STATUS_CANCELLED,
+		LeaseStatus_LEASE_STATUS_EXPIRED:
+		return nil
+	default:
 		return fmt.Errorf("invalid lease status: %s", status)
 	}
-
-	return nil
 }

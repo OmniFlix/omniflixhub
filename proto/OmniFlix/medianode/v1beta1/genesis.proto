@@ -9,23 +9,23 @@ option go_package = "github.com/OmniFlix/omniflixhub/v6/x/medianode/types";
 // GenesisState defines the medianode module's genesis state
 message GenesisState {
   // params defines all the parameters of the module
-  Params params = 1 [(gogoproto.nullable) = false];
+  Params params                    = 1 [(gogoproto.nullable) = false];
   
   // media_nodes is the list of registered media nodes
-  repeated MediaNode media_nodes = 2 [(gogoproto.nullable) = false];
+  repeated MediaNode media_nodes   = 2 [(gogoproto.nullable) = false];
   
   // leases is the list of active leases
-  repeated Lease leases = 3 [(gogoproto.nullable) = false];
+  repeated Lease leases            = 3 [(gogoproto.nullable) = false];
   
   // last_node_id is the last used media node ID
-  uint64 last_node_id = 4;
+  uint64 last_node_id              = 4;
 }
 
 // Params defines the parameters for the medianode module
 message Params {
   // minimum_lease_days defines the minimum number of days for a lease
-  uint64 minimum_lease_days = 1;
+  uint64 minimum_lease_days        = 1;
   
   // maximum_lease_days defines the maximum number of days for a lease
-  uint64 maximum_lease_days = 2;
+  uint64 maximum_lease_days        = 2;
 }

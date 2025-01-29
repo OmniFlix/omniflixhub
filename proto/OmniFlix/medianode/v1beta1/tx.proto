@@ -21,20 +21,18 @@ service Msg {
 
 // MsgRegisterMediaNode represents a message to register a new media node
 message MsgRegisterMediaNode {
-  string creator = 1;
+  string sender = 1;
   string url = 2;
   HardwareSpecs hardware_specs = 3 [(gogoproto.nullable) = false];
   cosmos.base.v1beta1.Coin lease_amount_per_day = 4 [(gogoproto.nullable) = false];
 }
 
 // MsgRegisterMediaNodeResponse defines the response for registering a media node
-message MsgRegisterMediaNodeResponse {
-  uint64 id = 1;
-}
+message MsgRegisterMediaNodeResponse {}
 
 // MsgUpdateMediaNode represents a message to update an existing media node
 message MsgUpdateMediaNode {
-  string creator = 1;
+  string sender = 1;
   uint64 id = 2;
   string url = 3;
   HardwareSpecs hardware_specs = 4 [(gogoproto.nullable) = false];
@@ -47,7 +45,7 @@ message MsgUpdateMediaNodeResponse {
 
 // MsgLeaseMediaNode represents a message to lease a media node
 message MsgLeaseMediaNode {
-  string creator = 1;
+  string sender = 1;
   uint64 media_node_id = 2;
   uint64 lease_days = 3;
 }
@@ -58,12 +56,9 @@ message MsgLeaseMediaNodeResponse {
 
 // MsgCancelLease represents a message to cancel an active lease
 message MsgCancelLease {
-  string creator = 1;
+  string sender = 1;
   uint64 media_node_id = 2;
 }
 
 // MsgCancelLeaseResponse defines the response for canceling a lease
-message MsgCancelLeaseResponse {
-  bool success = 1;
-  cosmos.base.v1beta1.Coin refund_amount = 2 [(gogoproto.nullable) = false];
-}
+message MsgCancelLeaseResponse {}

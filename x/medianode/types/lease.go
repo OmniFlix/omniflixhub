@@ -29,20 +29,3 @@ func NewLease(
 		LeaseStatus: status,
 	}
 }
-
-func (l Lease) GetMediaNodeId() uint64 {
-	return l.MediaNodeId
-}
-
-func (l Lease) GetLessee() sdk.AccAddress {
-	lessee, _ := sdk.AccAddressFromBech32(l.GetLeasedTo())
-	return lessee
-}
-
-func (l Lease) GetLeasedAt() time.Time {
-	return l.LeasedAt
-}
-
-func (l Lease) GetLeaseExpiry() time.Time {
-	return l.LeaseExpiry
-}
