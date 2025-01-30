@@ -4,6 +4,19 @@ import (
 	"fmt"
 )
 
+func NewGenesisState(campaigns []MediaNode,
+	claims []Lease,
+	nextMediaNodeNumber uint64,
+	params Params,
+) *GenesisState {
+	return &GenesisState{
+		MediaNodes: campaigns,
+		Leases:     claims,
+		Params:     params,
+		LastNodeId: nextMediaNodeNumber,
+	}
+}
+
 // DefaultGenesis returns default genesis state as raw bytes for the medianode
 // module.
 func DefaultGenesis() *GenesisState {

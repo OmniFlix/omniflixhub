@@ -48,6 +48,7 @@ func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId uint64, sender sdk.AccA
 	mediaNode.Leased = false
 	lease.LeaseStatus = types.LeaseStatus_LEASE_STATUS_CANCELLED
 	k.SetMediaNode(ctx, mediaNode)
+	k.SetLease(ctx, lease)
 	return nil
 }
 
