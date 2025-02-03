@@ -1,0 +1,54 @@
+syntax = "proto3";
+package OmniFlix.medianode.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "OmniFlix/medianode/v1beta1/medianode.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/v6/x/medianode/types";
+
+
+// Params defines the parameters for the medianode module
+message Params {
+  // minimum_lease_days defines the minimum number of days for a lease
+  uint64 minimum_lease_days                  = 1;
+  
+  // maximum_lease_days defines the maximum number of days for a lease
+  uint64 maximum_lease_days                  = 2;
+
+  cosmos.base.v1beta1.Coin min_deposit       = 3 [
+    (gogoproto.moretags)   = "yaml:\"min_deposit\"",
+    (gogoproto.nullable)   = false
+  ];
+
+  string initial_deposit_percentage          = 4 [
+    (gogoproto.moretags)   = "yaml:\"initial_deposit_percentage\"",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable)   = false
+  ];
+
+  string lease_commission                    = 5 [
+    (gogoproto.moretags)   = "yaml:\"lease_commission\"",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable)   = false
+  ];
+
+  Distribution commission_distribution        = 6 [
+    (gogoproto.moretags)   = "yaml:\"commission_distribution\"",
+     (gogoproto.nullable) = false
+  ];
+
+}
+
+message Distribution {
+  string staking        = 1 [
+    (gogoproto.moretags)   = "yaml:\"staking\"",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable)   = false
+  ];
+  string community_pool = 2 [
+    (gogoproto.moretags)   = "yaml:\"community_pool\"",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable)   = false
+  ];
+}

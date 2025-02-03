@@ -7,9 +7,11 @@ import (
 	context "context"
 	fmt "fmt"
 	types "github.com/cosmos/cosmos-sdk/types"
+	_ "github.com/cosmos/cosmos-sdk/types/msgservice"
+	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
 	_ "github.com/cosmos/gogoproto/gogoproto"
-	grpc1 "github.com/cosmos/gogoproto/grpc"
-	proto "github.com/cosmos/gogoproto/proto"
+	grpc1 "github.com/gogo/protobuf/grpc"
+	proto "github.com/gogo/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -31,10 +33,11 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // MsgRegisterMediaNode represents a message to register a new media node
 type MsgRegisterMediaNode struct {
-	Sender            string        `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
-	Url               string        `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
-	HardwareSpecs     HardwareSpecs `protobuf:"bytes,3,opt,name=hardware_specs,json=hardwareSpecs,proto3" json:"hardware_specs"`
-	LeaseAmountPerDay types.Coin    `protobuf:"bytes,4,opt,name=lease_amount_per_day,json=leaseAmountPerDay,proto3" json:"lease_amount_per_day"`
+	Url           string        `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	HardwareSpecs HardwareSpecs `protobuf:"bytes,2,opt,name=hardware_specs,json=hardwareSpecs,proto3" json:"hardware_specs"`
+	PricePerDay   types.Coin    `protobuf:"bytes,3,opt,name=price_per_day,json=pricePerDay,proto3" json:"price_per_day"`
+	Deposit       *types.Coin   `protobuf:"bytes,4,opt,name=deposit,proto3" json:"deposit,omitempty"`
+	Sender        string        `protobuf:"bytes,5,opt,name=sender,proto3" json:"sender,omitempty"`
 }
 
 func (m *MsgRegisterMediaNode) Reset()         { *m = MsgRegisterMediaNode{} }
@@ -70,13 +73,6 @@ func (m *MsgRegisterMediaNode) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRegisterMediaNode proto.InternalMessageInfo
 
-func (m *MsgRegisterMediaNode) GetSender() string {
-	if m != nil {
-		return m.Sender
-	}
-	return ""
-}
-
 func (m *MsgRegisterMediaNode) GetUrl() string {
 	if m != nil {
 		return m.Url
@@ -91,15 +87,31 @@ func (m *MsgRegisterMediaNode) GetHardwareSpecs() HardwareSpecs {
 	return HardwareSpecs{}
 }
 
-func (m *MsgRegisterMediaNode) GetLeaseAmountPerDay() types.Coin {
+func (m *MsgRegisterMediaNode) GetPricePerDay() types.Coin {
 	if m != nil {
-		return m.LeaseAmountPerDay
+		return m.PricePerDay
 	}
 	return types.Coin{}
 }
 
+func (m *MsgRegisterMediaNode) GetDeposit() *types.Coin {
+	if m != nil {
+		return m.Deposit
+	}
+	return nil
+}
+
+func (m *MsgRegisterMediaNode) GetSender() string {
+	if m != nil {
+		return m.Sender
+	}
+	return ""
+}
+
 // MsgRegisterMediaNodeResponse defines the response for registering a media node
 type MsgRegisterMediaNodeResponse struct {
+	MediaNodeId uint64 `protobuf:"varint,1,opt,name=media_node_id,json=mediaNodeId,proto3" json:"media_node_id,omitempty"`
+	Status      string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
 }
 
 func (m *MsgRegisterMediaNodeResponse) Reset()         { *m = MsgRegisterMediaNodeResponse{} }
@@ -135,13 +147,26 @@ func (m *MsgRegisterMediaNodeResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRegisterMediaNodeResponse proto.InternalMessageInfo
 
-// MsgUpdateMediaNode represents a message to update an existing media node
+func (m *MsgRegisterMediaNodeResponse) GetMediaNodeId() uint64 {
+	if m != nil {
+		return m.MediaNodeId
+	}
+	return 0
+}
+
+func (m *MsgRegisterMediaNodeResponse) GetStatus() string {
+	if m != nil {
+		return m.Status
+	}
+	return ""
+}
+
+// MsgUpdateMediaNode represents a message to update an existing media node only if it's not leased
 type MsgUpdateMediaNode struct {
-	Sender            string        `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
-	Id                uint64        `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
-	Url               string        `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
-	HardwareSpecs     HardwareSpecs `protobuf:"bytes,4,opt,name=hardware_specs,json=hardwareSpecs,proto3" json:"hardware_specs"`
-	LeaseAmountPerDay types.Coin    `protobuf:"bytes,5,opt,name=lease_amount_per_day,json=leaseAmountPerDay,proto3" json:"lease_amount_per_day"`
+	Id            uint64        `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	HardwareSpecs HardwareSpecs `protobuf:"bytes,2,opt,name=hardware_specs,json=hardwareSpecs,proto3" json:"hardware_specs"`
+	PricePerDay   types.Coin    `protobuf:"bytes,3,opt,name=price_per_day,json=pricePerDay,proto3" json:"price_per_day"`
+	Sender        string        `protobuf:"bytes,4,opt,name=sender,proto3" json:"sender,omitempty"`
 }
 
 func (m *MsgUpdateMediaNode) Reset()         { *m = MsgUpdateMediaNode{} }
@@ -177,25 +202,11 @@ func (m *MsgUpdateMediaNode) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateMediaNode proto.InternalMessageInfo
 
-func (m *MsgUpdateMediaNode) GetSender() string {
-	if m != nil {
-		return m.Sender
-	}
-	return ""
-}
-
 func (m *MsgUpdateMediaNode) GetId() uint64 {
 	if m != nil {
 		return m.Id
 	}
 	return 0
-}
-
-func (m *MsgUpdateMediaNode) GetUrl() string {
-	if m != nil {
-		return m.Url
-	}
-	return ""
 }
 
 func (m *MsgUpdateMediaNode) GetHardwareSpecs() HardwareSpecs {
@@ -205,11 +216,18 @@ func (m *MsgUpdateMediaNode) GetHardwareSpecs() HardwareSpecs {
 	return HardwareSpecs{}
 }
 
-func (m *MsgUpdateMediaNode) GetLeaseAmountPerDay() types.Coin {
+func (m *MsgUpdateMediaNode) GetPricePerDay() types.Coin {
 	if m != nil {
-		return m.LeaseAmountPerDay
+		return m.PricePerDay
 	}
 	return types.Coin{}
+}
+
+func (m *MsgUpdateMediaNode) GetSender() string {
+	if m != nil {
+		return m.Sender
+	}
+	return ""
 }
 
 // MsgUpdateMediaNodeResponse defines the response for updating a media node
@@ -251,9 +269,10 @@ var xxx_messageInfo_MsgUpdateMediaNodeResponse proto.InternalMessageInfo
 
 // MsgLeaseMediaNode represents a message to lease a media node
 type MsgLeaseMediaNode struct {
-	Sender      string `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
-	MediaNodeId uint64 `protobuf:"varint,2,opt,name=media_node_id,json=mediaNodeId,proto3" json:"media_node_id,omitempty"`
-	LeaseDays   uint64 `protobuf:"varint,3,opt,name=lease_days,json=leaseDays,proto3" json:"lease_days,omitempty"`
+	MediaNodeId uint64     `protobuf:"varint,1,opt,name=media_node_id,json=mediaNodeId,proto3" json:"media_node_id,omitempty"`
+	LeaseDays   uint64     `protobuf:"varint,2,opt,name=lease_days,json=leaseDays,proto3" json:"lease_days,omitempty"`
+	Amount      types.Coin `protobuf:"bytes,3,opt,name=amount,proto3" json:"amount"`
+	Sender      string     `protobuf:"bytes,4,opt,name=sender,proto3" json:"sender,omitempty"`
 }
 
 func (m *MsgLeaseMediaNode) Reset()         { *m = MsgLeaseMediaNode{} }
@@ -289,13 +308,6 @@ func (m *MsgLeaseMediaNode) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgLeaseMediaNode proto.InternalMessageInfo
 
-func (m *MsgLeaseMediaNode) GetSender() string {
-	if m != nil {
-		return m.Sender
-	}
-	return ""
-}
-
 func (m *MsgLeaseMediaNode) GetMediaNodeId() uint64 {
 	if m != nil {
 		return m.MediaNodeId
@@ -310,8 +322,23 @@ func (m *MsgLeaseMediaNode) GetLeaseDays() uint64 {
 	return 0
 }
 
+func (m *MsgLeaseMediaNode) GetAmount() types.Coin {
+	if m != nil {
+		return m.Amount
+	}
+	return types.Coin{}
+}
+
+func (m *MsgLeaseMediaNode) GetSender() string {
+	if m != nil {
+		return m.Sender
+	}
+	return ""
+}
+
 // MsgLeaseMediaNodeResponse defines the response for leasing a media node
 type MsgLeaseMediaNodeResponse struct {
+	Lease *Lease `protobuf:"bytes,1,opt,name=lease,proto3" json:"lease,omitempty"`
 }
 
 func (m *MsgLeaseMediaNodeResponse) Reset()         { *m = MsgLeaseMediaNodeResponse{} }
@@ -347,10 +374,17 @@ func (m *MsgLeaseMediaNodeResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgLeaseMediaNodeResponse proto.InternalMessageInfo
 
+func (m *MsgLeaseMediaNodeResponse) GetLease() *Lease {
+	if m != nil {
+		return m.Lease
+	}
+	return nil
+}
+
 // MsgCancelLease represents a message to cancel an active lease
 type MsgCancelLease struct {
-	Sender      string `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
-	MediaNodeId uint64 `protobuf:"varint,2,opt,name=media_node_id,json=mediaNodeId,proto3" json:"media_node_id,omitempty"`
+	MediaNodeId uint64 `protobuf:"varint,1,opt,name=media_node_id,json=mediaNodeId,proto3" json:"media_node_id,omitempty"`
+	Sender      string `protobuf:"bytes,2,opt,name=sender,proto3" json:"sender,omitempty"`
 }
 
 func (m *MsgCancelLease) Reset()         { *m = MsgCancelLease{} }
@@ -386,18 +420,18 @@ func (m *MsgCancelLease) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCancelLease proto.InternalMessageInfo
 
-func (m *MsgCancelLease) GetSender() string {
-	if m != nil {
-		return m.Sender
-	}
-	return ""
-}
-
 func (m *MsgCancelLease) GetMediaNodeId() uint64 {
 	if m != nil {
 		return m.MediaNodeId
 	}
 	return 0
+}
+
+func (m *MsgCancelLease) GetSender() string {
+	if m != nil {
+		return m.Sender
+	}
+	return ""
 }
 
 // MsgCancelLeaseResponse defines the response for canceling a lease
@@ -437,6 +471,128 @@ func (m *MsgCancelLeaseResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCancelLeaseResponse proto.InternalMessageInfo
 
+// MsgDepositMediaNode represents a message to deposit funds for a media node
+type MsgDepositMediaNode struct {
+	MediaNodeId uint64     `protobuf:"varint,1,opt,name=media_node_id,json=mediaNodeId,proto3" json:"media_node_id,omitempty"`
+	Amount      types.Coin `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount"`
+	Sender      string     `protobuf:"bytes,3,opt,name=sender,proto3" json:"sender,omitempty"`
+}
+
+func (m *MsgDepositMediaNode) Reset()         { *m = MsgDepositMediaNode{} }
+func (m *MsgDepositMediaNode) String() string { return proto.CompactTextString(m) }
+func (*MsgDepositMediaNode) ProtoMessage()    {}
+func (*MsgDepositMediaNode) Descriptor() ([]byte, []int) {
+	return fileDescriptor_256d46440b2f0bcd, []int{8}
+}
+func (m *MsgDepositMediaNode) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDepositMediaNode) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDepositMediaNode.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDepositMediaNode) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDepositMediaNode.Merge(m, src)
+}
+func (m *MsgDepositMediaNode) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDepositMediaNode) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDepositMediaNode.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDepositMediaNode proto.InternalMessageInfo
+
+func (m *MsgDepositMediaNode) GetMediaNodeId() uint64 {
+	if m != nil {
+		return m.MediaNodeId
+	}
+	return 0
+}
+
+func (m *MsgDepositMediaNode) GetAmount() types.Coin {
+	if m != nil {
+		return m.Amount
+	}
+	return types.Coin{}
+}
+
+func (m *MsgDepositMediaNode) GetSender() string {
+	if m != nil {
+		return m.Sender
+	}
+	return ""
+}
+
+// MsgDepositMediaNodeResponse defines the response for depositing funds for a media node
+type MsgDepositMediaNodeResponse struct {
+	MedianodeId     uint64      `protobuf:"varint,1,opt,name=medianode_id,json=medianodeId,proto3" json:"medianode_id,omitempty"`
+	TotalDeposit    *types.Coin `protobuf:"bytes,2,opt,name=total_deposit,json=totalDeposit,proto3" json:"total_deposit,omitempty"`
+	MedianodeStatus string      `protobuf:"bytes,3,opt,name=medianode_status,json=medianodeStatus,proto3" json:"medianode_status,omitempty"`
+}
+
+func (m *MsgDepositMediaNodeResponse) Reset()         { *m = MsgDepositMediaNodeResponse{} }
+func (m *MsgDepositMediaNodeResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgDepositMediaNodeResponse) ProtoMessage()    {}
+func (*MsgDepositMediaNodeResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_256d46440b2f0bcd, []int{9}
+}
+func (m *MsgDepositMediaNodeResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDepositMediaNodeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDepositMediaNodeResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDepositMediaNodeResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDepositMediaNodeResponse.Merge(m, src)
+}
+func (m *MsgDepositMediaNodeResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDepositMediaNodeResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDepositMediaNodeResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDepositMediaNodeResponse proto.InternalMessageInfo
+
+func (m *MsgDepositMediaNodeResponse) GetMedianodeId() uint64 {
+	if m != nil {
+		return m.MedianodeId
+	}
+	return 0
+}
+
+func (m *MsgDepositMediaNodeResponse) GetTotalDeposit() *types.Coin {
+	if m != nil {
+		return m.TotalDeposit
+	}
+	return nil
+}
+
+func (m *MsgDepositMediaNodeResponse) GetMedianodeStatus() string {
+	if m != nil {
+		return m.MedianodeStatus
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*MsgRegisterMediaNode)(nil), "OmniFlix.medianode.v1beta1.MsgRegisterMediaNode")
 	proto.RegisterType((*MsgRegisterMediaNodeResponse)(nil), "OmniFlix.medianode.v1beta1.MsgRegisterMediaNodeResponse")
@@ -446,6 +602,8 @@ func init() {
 	proto.RegisterType((*MsgLeaseMediaNodeResponse)(nil), "OmniFlix.medianode.v1beta1.MsgLeaseMediaNodeResponse")
 	proto.RegisterType((*MsgCancelLease)(nil), "OmniFlix.medianode.v1beta1.MsgCancelLease")
 	proto.RegisterType((*MsgCancelLeaseResponse)(nil), "OmniFlix.medianode.v1beta1.MsgCancelLeaseResponse")
+	proto.RegisterType((*MsgDepositMediaNode)(nil), "OmniFlix.medianode.v1beta1.MsgDepositMediaNode")
+	proto.RegisterType((*MsgDepositMediaNodeResponse)(nil), "OmniFlix.medianode.v1beta1.MsgDepositMediaNodeResponse")
 }
 
 func init() {
@@ -453,42 +611,57 @@ func init() {
 }
 
 var fileDescriptor_256d46440b2f0bcd = []byte{
-	// 547 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x54, 0xcf, 0x6e, 0xd3, 0x30,
-	0x1c, 0x6e, 0xda, 0x32, 0x69, 0xbf, 0x6a, 0x85, 0x46, 0xd5, 0xd4, 0x85, 0x11, 0xa6, 0x70, 0x19,
-	0x93, 0x48, 0x58, 0x81, 0x89, 0x2b, 0xdb, 0x84, 0x40, 0x5a, 0xc6, 0x14, 0x04, 0x07, 0x2e, 0x91,
-	0x5b, 0x9b, 0xd4, 0x52, 0x63, 0x47, 0x71, 0x5a, 0x9a, 0x13, 0xaf, 0xc0, 0x63, 0xed, 0xb8, 0x23,
-	0x27, 0x84, 0xda, 0x0b, 0xe2, 0x09, 0x38, 0xa2, 0xb8, 0x49, 0xd6, 0xb5, 0xa3, 0xa1, 0xa0, 0xdd,
-	0x1c, 0xfb, 0xfb, 0xe3, 0xef, 0xb3, 0x63, 0x78, 0xf0, 0xc6, 0x67, 0xf4, 0x65, 0x9f, 0x8e, 0x2c,
-	0x9f, 0x60, 0x8a, 0x18, 0xc7, 0xc4, 0x1a, 0xee, 0x77, 0x48, 0x84, 0xf6, 0xad, 0x68, 0x64, 0x06,
-	0x21, 0x8f, 0xb8, 0xaa, 0x65, 0x20, 0x33, 0x07, 0x99, 0x29, 0x48, 0x6b, 0x7a, 0xdc, 0xe3, 0x12,
-	0x66, 0x25, 0xa3, 0x29, 0x43, 0xd3, 0xbb, 0x5c, 0xf8, 0x5c, 0x58, 0x1d, 0x24, 0x2e, 0xf5, 0xba,
-	0x9c, 0xb2, 0x74, 0x7d, 0x6f, 0x89, 0xed, 0xa5, 0x87, 0xc4, 0x1a, 0x3f, 0x15, 0x68, 0xda, 0xc2,
-	0x73, 0x88, 0x47, 0x45, 0x44, 0x42, 0x3b, 0x59, 0x3e, 0xe5, 0x98, 0xa8, 0x9b, 0xb0, 0x26, 0x08,
-	0xc3, 0x24, 0x6c, 0x29, 0x3b, 0xca, 0xee, 0xba, 0x93, 0x7e, 0xa9, 0x77, 0xa0, 0x32, 0x08, 0xfb,
-	0xad, 0xb2, 0x9c, 0x4c, 0x86, 0xea, 0x7b, 0xa8, 0xf7, 0x50, 0x88, 0x3f, 0xa1, 0x90, 0xb8, 0x22,
-	0x20, 0x5d, 0xd1, 0xaa, 0xec, 0x28, 0xbb, 0xb5, 0xf6, 0x43, 0xf3, 0xcf, 0xc9, 0xcc, 0x57, 0x29,
-	0xe3, 0x6d, 0x42, 0x38, 0xac, 0x9e, 0x7f, 0xbb, 0x5f, 0x72, 0x36, 0x7a, 0xb3, 0x93, 0xea, 0x19,
-	0x34, 0xfb, 0x04, 0x09, 0xe2, 0x22, 0x9f, 0x0f, 0x58, 0xe4, 0x06, 0x24, 0x74, 0x31, 0x8a, 0x5b,
-	0x55, 0xa9, 0xbe, 0x65, 0x4e, 0x5b, 0x30, 0x93, 0x16, 0x72, 0xd9, 0x23, 0x4e, 0x59, 0xaa, 0xd6,
-	0x90, 0xe4, 0x17, 0x92, 0x7b, 0x46, 0xc2, 0x63, 0x14, 0x1b, 0x3a, 0x6c, 0x5f, 0x97, 0xd5, 0x21,
-	0x22, 0xe0, 0x4c, 0x10, 0xe3, 0x97, 0x02, 0xaa, 0x2d, 0xbc, 0x77, 0x01, 0x46, 0x11, 0x29, 0xae,
-	0xa2, 0x0e, 0x65, 0x8a, 0x65, 0x13, 0x55, 0xa7, 0x4c, 0x71, 0x56, 0x4d, 0x65, 0x59, 0x35, 0xd5,
-	0x1b, 0xad, 0xe6, 0xd6, 0x3f, 0x57, 0xb3, 0x0d, 0xda, 0x62, 0xf2, 0xbc, 0x18, 0x06, 0x0d, 0x5b,
-	0x78, 0x27, 0x09, 0xab, 0xb8, 0x16, 0x03, 0x36, 0x64, 0x28, 0x37, 0x49, 0xe5, 0xe6, 0x0d, 0xd5,
-	0xfc, 0x8c, 0xf9, 0x1a, 0xab, 0xf7, 0x00, 0xa6, 0x01, 0x30, 0x8a, 0xa7, 0xf7, 0xa5, 0xea, 0xac,
-	0xcb, 0x99, 0x63, 0x14, 0x0b, 0xe3, 0x2e, 0x6c, 0x2d, 0xf8, 0xe5, 0x9b, 0x39, 0x81, 0xba, 0x2d,
-	0xbc, 0x23, 0xc4, 0xba, 0xa4, 0x2f, 0x21, 0xff, 0xb3, 0x13, 0xa3, 0x05, 0x9b, 0x57, 0xd5, 0x32,
-	0x9f, 0xf6, 0x8f, 0x0a, 0x54, 0x6c, 0xe1, 0xa9, 0x9f, 0xa1, 0xb1, 0xf8, 0x7b, 0x3c, 0x5e, 0x76,
-	0x82, 0xd7, 0x5d, 0x32, 0xed, 0xf9, 0xaa, 0x8c, 0x6c, 0x23, 0x6a, 0x0c, 0xb7, 0xe7, 0xaf, 0xa4,
-	0x59, 0x20, 0x36, 0x87, 0xd7, 0x0e, 0x56, 0xc3, 0xe7, 0xd6, 0x43, 0xa8, 0xcf, 0x9d, 0xfa, 0xa3,
-	0x02, 0xa5, 0xab, 0x70, 0xed, 0xd9, 0x4a, 0xf0, 0xdc, 0xd7, 0x87, 0xda, 0xec, 0x01, 0xef, 0x15,
-	0xa8, 0xcc, 0x60, 0xb5, 0xf6, 0xdf, 0x63, 0x33, 0xbb, 0xc3, 0xd3, 0xf3, 0xb1, 0xae, 0x5c, 0x8c,
-	0x75, 0xe5, 0xfb, 0x58, 0x57, 0xbe, 0x4c, 0xf4, 0xd2, 0xc5, 0x44, 0x2f, 0x7d, 0x9d, 0xe8, 0xa5,
-	0x0f, 0x4f, 0x3d, 0x1a, 0xf5, 0x06, 0x1d, 0xb3, 0xcb, 0x7d, 0x2b, 0x7f, 0x56, 0xb9, 0xcf, 0xe8,
-	0xc7, 0x3e, 0x1d, 0xf5, 0x06, 0x1d, 0x6b, 0x78, 0x60, 0xcd, 0xbe, 0xb3, 0x51, 0x1c, 0x10, 0xd1,
-	0x59, 0x93, 0x8f, 0xeb, 0x93, 0xdf, 0x01, 0x00, 0x00, 0xff, 0xff, 0xae, 0x1f, 0x4c, 0xc0, 0x01,
-	0x06, 0x00, 0x00,
+	// 787 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0xb1, 0x6f, 0xd3, 0x4e,
+	0x14, 0x8e, 0x93, 0xb4, 0x3f, 0xf5, 0xa5, 0x49, 0x5b, 0xff, 0xaa, 0x92, 0xba, 0x25, 0x6d, 0xc3,
+	0xd2, 0x06, 0xd5, 0xa6, 0x29, 0xb4, 0x88, 0x81, 0xa1, 0xad, 0x10, 0x48, 0xa4, 0x20, 0x17, 0x18,
+	0xba, 0x44, 0x97, 0xf8, 0x70, 0x2c, 0xc5, 0x3e, 0xcb, 0xe7, 0x84, 0x46, 0x02, 0x21, 0x21, 0x26,
+	0x26, 0xfe, 0x0f, 0x96, 0x4e, 0xac, 0xac, 0x1d, 0xcb, 0xc6, 0x84, 0x50, 0x2b, 0xd1, 0x7f, 0x03,
+	0xf9, 0xec, 0x9c, 0x1d, 0xa7, 0x6d, 0x12, 0x26, 0x96, 0xc4, 0xbe, 0xfb, 0xde, 0xfb, 0xde, 0xf7,
+	0xbd, 0xbb, 0x27, 0xc3, 0xad, 0x67, 0xa6, 0x65, 0x3c, 0x6a, 0x1a, 0x47, 0x8a, 0x89, 0x35, 0x03,
+	0x59, 0x44, 0xc3, 0x4a, 0x7b, 0xa3, 0x86, 0x5d, 0xb4, 0xa1, 0xb8, 0x47, 0xb2, 0xed, 0x10, 0x97,
+	0x88, 0x52, 0x17, 0x24, 0x73, 0x90, 0x1c, 0x80, 0xa4, 0x59, 0x9d, 0xe8, 0x84, 0xc1, 0x14, 0xef,
+	0xc9, 0x8f, 0x90, 0x6e, 0xd4, 0x09, 0x35, 0x09, 0x55, 0x4c, 0xaa, 0x2b, 0xed, 0x0d, 0xef, 0x2f,
+	0xd8, 0x28, 0x04, 0x1b, 0x35, 0x44, 0x43, 0xa2, 0x3a, 0x31, 0xac, 0x60, 0x7f, 0x06, 0x99, 0x86,
+	0x45, 0x14, 0xf6, 0x1b, 0x2c, 0x95, 0xae, 0x29, 0x31, 0xac, 0x87, 0x61, 0x8b, 0xdf, 0x92, 0x30,
+	0x5b, 0xa1, 0xba, 0x8a, 0x75, 0x83, 0xba, 0xd8, 0xa9, 0x78, 0xdb, 0xfb, 0x44, 0xc3, 0xe2, 0x34,
+	0xa4, 0x5a, 0x4e, 0x33, 0x2f, 0x2c, 0x0b, 0xab, 0x13, 0xaa, 0xf7, 0x28, 0xbe, 0x82, 0x5c, 0x03,
+	0x39, 0xda, 0x1b, 0xe4, 0xe0, 0x2a, 0xb5, 0x71, 0x9d, 0xe6, 0x93, 0xcb, 0xc2, 0x6a, 0xa6, 0xbc,
+	0x26, 0x5f, 0xad, 0x56, 0x7e, 0x1c, 0x44, 0x1c, 0x78, 0x01, 0x3b, 0xe9, 0x93, 0x9f, 0x4b, 0x09,
+	0x35, 0xdb, 0x88, 0x2e, 0x8a, 0xbb, 0x90, 0xb5, 0x1d, 0xa3, 0x8e, 0xab, 0x36, 0x76, 0xaa, 0x1a,
+	0xea, 0xe4, 0x53, 0x2c, 0xed, 0xbc, 0xec, 0x2b, 0x97, 0x3d, 0xe5, 0x3c, 0xdf, 0x2e, 0x31, 0xac,
+	0x20, 0x4d, 0x86, 0x45, 0x3d, 0xc7, 0xce, 0x1e, 0xea, 0x88, 0x9b, 0xf0, 0x9f, 0x86, 0x6d, 0x42,
+	0x0d, 0x37, 0x9f, 0x1e, 0x10, 0xae, 0x76, 0x91, 0xe2, 0x1c, 0x8c, 0x53, 0x6c, 0x69, 0xd8, 0xc9,
+	0x8f, 0x31, 0x99, 0xc1, 0xdb, 0x83, 0xdb, 0x1f, 0x2e, 0x8e, 0x4b, 0xc1, 0xcb, 0xa7, 0x8b, 0xe3,
+	0xd2, 0x02, 0x37, 0xd4, 0x09, 0x7c, 0x5a, 0xe7, 0x4a, 0x8b, 0x87, 0xb0, 0x78, 0x99, 0x81, 0x2a,
+	0xa6, 0x36, 0xb1, 0x28, 0x16, 0x8b, 0x90, 0x65, 0xe0, 0xaa, 0x87, 0xae, 0x1a, 0x1a, 0xb3, 0x34,
+	0xad, 0x66, 0xcc, 0x2e, 0xf2, 0x89, 0xc6, 0x0a, 0x71, 0x91, 0xdb, 0xf2, 0x2d, 0xf5, 0x0a, 0x61,
+	0x6f, 0xc5, 0x8f, 0x49, 0x10, 0x2b, 0x54, 0x7f, 0x69, 0x6b, 0xc8, 0xc5, 0x61, 0x6f, 0x72, 0x90,
+	0xe4, 0x79, 0x92, 0x86, 0xf6, 0x6f, 0x77, 0x26, 0x34, 0x39, 0xdd, 0x63, 0xf2, 0x5a, 0xcc, 0xe4,
+	0x79, 0x6e, 0x72, 0x8b, 0xc9, 0x8d, 0x58, 0xbc, 0x08, 0x52, 0xbf, 0x0b, 0x5d, 0x83, 0x8b, 0xdf,
+	0x05, 0x98, 0xa9, 0x50, 0xfd, 0x29, 0x46, 0x34, 0xe2, 0xd1, 0x30, 0xb6, 0xdf, 0x04, 0x68, 0x7a,
+	0x51, 0x9e, 0x36, 0xdf, 0xb3, 0xb4, 0x3a, 0xc1, 0x56, 0xf6, 0x50, 0x87, 0x8a, 0xdb, 0x30, 0x8e,
+	0x4c, 0xd2, 0xb2, 0xdc, 0x61, 0x75, 0x07, 0xf0, 0x2b, 0x25, 0xaf, 0xc6, 0x24, 0xe7, 0xb9, 0x64,
+	0x46, 0x1a, 0x51, 0xfc, 0x02, 0xe6, 0xfb, 0x24, 0xf1, 0x13, 0xb5, 0x0d, 0x63, 0x0c, 0xcf, 0x24,
+	0x65, 0xca, 0x2b, 0xd7, 0x75, 0x99, 0xa5, 0x50, 0x7d, 0x7c, 0xf1, 0x1d, 0xe4, 0x2a, 0x54, 0xdf,
+	0x45, 0x56, 0x1d, 0x37, 0xd9, 0xc6, 0xd0, 0x87, 0xd3, 0x57, 0x93, 0xec, 0x51, 0xa3, 0xc4, 0xd4,
+	0x2c, 0x71, 0x35, 0x75, 0xc6, 0x10, 0xca, 0x59, 0xf7, 0xe9, 0xf3, 0x30, 0xd7, 0x4b, 0xcf, 0x5b,
+	0xf8, 0x55, 0x80, 0xff, 0x2b, 0x54, 0xdf, 0xf3, 0xef, 0xe5, 0x68, 0x4d, 0x0c, 0xbb, 0x94, 0xfc,
+	0xdb, 0x2e, 0xa5, 0x7a, 0x74, 0x95, 0x62, 0xba, 0xf8, 0x30, 0x57, 0x82, 0xb9, 0x11, 0xe9, 0xd3,
+	0x17, 0x01, 0x16, 0x2e, 0x29, 0x9c, 0xb7, 0x6a, 0x05, 0x26, 0x39, 0x38, 0x5e, 0xbf, 0xe5, 0xd7,
+	0xff, 0x10, 0xb2, 0x2e, 0x71, 0x51, 0xb3, 0xda, 0x9d, 0x5f, 0x83, 0x64, 0xa8, 0x93, 0x0c, 0x1f,
+	0x70, 0x8a, 0x6b, 0x30, 0x1d, 0x52, 0x04, 0x53, 0xc4, 0x17, 0x34, 0xc5, 0xd7, 0x0f, 0xd8, 0x72,
+	0xf9, 0x77, 0x1a, 0x52, 0x15, 0xaa, 0x8b, 0xef, 0x61, 0xa6, 0x7f, 0xe0, 0xdf, 0xb9, 0xee, 0x18,
+	0x5d, 0x36, 0xe1, 0xa4, 0xfb, 0xa3, 0x46, 0x70, 0x5b, 0x3a, 0x30, 0x15, 0x9f, 0x69, 0xf2, 0x80,
+	0x64, 0x31, 0xbc, 0xb4, 0x35, 0x1a, 0x9e, 0x53, 0xb7, 0x21, 0x17, 0x9b, 0x14, 0xeb, 0x03, 0x32,
+	0xf5, 0xc2, 0xa5, 0x7b, 0x23, 0xc1, 0x39, 0xaf, 0x09, 0x99, 0xe8, 0xc5, 0x2b, 0x0d, 0xc8, 0x12,
+	0xc1, 0x4a, 0xe5, 0xe1, 0xb1, 0x9c, 0xee, 0x2d, 0x4c, 0xf7, 0xdd, 0x26, 0x65, 0x40, 0x9e, 0x78,
+	0x80, 0xb4, 0x3d, 0x62, 0x40, 0x97, 0x7d, 0x67, 0xff, 0xe4, 0xac, 0x20, 0x9c, 0x9e, 0x15, 0x84,
+	0x5f, 0x67, 0x05, 0xe1, 0xf3, 0x79, 0x21, 0x71, 0x7a, 0x5e, 0x48, 0xfc, 0x38, 0x2f, 0x24, 0x0e,
+	0xef, 0xea, 0x86, 0xdb, 0x68, 0xd5, 0xe4, 0x3a, 0x31, 0x15, 0x7e, 0xaf, 0x88, 0x69, 0x19, 0xaf,
+	0x9b, 0xc6, 0x51, 0xa3, 0x55, 0x53, 0xda, 0x5b, 0x4a, 0xf4, 0xbb, 0xc5, 0xed, 0xd8, 0x98, 0xd6,
+	0xc6, 0xd9, 0xc7, 0xca, 0xe6, 0x9f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xd3, 0xcf, 0x59, 0xcb, 0x7d,
+	0x09, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -511,6 +684,8 @@ type MsgClient interface {
 	LeaseMediaNode(ctx context.Context, in *MsgLeaseMediaNode, opts ...grpc.CallOption) (*MsgLeaseMediaNodeResponse, error)
 	// CancelLease cancels an active lease
 	CancelLease(ctx context.Context, in *MsgCancelLease, opts ...grpc.CallOption) (*MsgCancelLeaseResponse, error)
+	// DepositMediaNode deposits funds for a media node
+	DepositMediaNode(ctx context.Context, in *MsgDepositMediaNode, opts ...grpc.CallOption) (*MsgDepositMediaNodeResponse, error)
 }
 
 type msgClient struct {
@@ -557,6 +732,15 @@ func (c *msgClient) CancelLease(ctx context.Context, in *MsgCancelLease, opts ..
 	return out, nil
 }
 
+func (c *msgClient) DepositMediaNode(ctx context.Context, in *MsgDepositMediaNode, opts ...grpc.CallOption) (*MsgDepositMediaNodeResponse, error) {
+	out := new(MsgDepositMediaNodeResponse)
+	err := c.cc.Invoke(ctx, "/OmniFlix.medianode.v1beta1.Msg/DepositMediaNode", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// RegisterMediaNode registers a new media node
@@ -567,6 +751,8 @@ type MsgServer interface {
 	LeaseMediaNode(context.Context, *MsgLeaseMediaNode) (*MsgLeaseMediaNodeResponse, error)
 	// CancelLease cancels an active lease
 	CancelLease(context.Context, *MsgCancelLease) (*MsgCancelLeaseResponse, error)
+	// DepositMediaNode deposits funds for a media node
+	DepositMediaNode(context.Context, *MsgDepositMediaNode) (*MsgDepositMediaNodeResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -584,6 +770,9 @@ func (*UnimplementedMsgServer) LeaseMediaNode(ctx context.Context, req *MsgLease
 }
 func (*UnimplementedMsgServer) CancelLease(ctx context.Context, req *MsgCancelLease) (*MsgCancelLeaseResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelLease not implemented")
+}
+func (*UnimplementedMsgServer) DepositMediaNode(ctx context.Context, req *MsgDepositMediaNode) (*MsgDepositMediaNodeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DepositMediaNode not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -662,6 +851,24 @@ func _Msg_CancelLease_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_DepositMediaNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDepositMediaNode)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).DepositMediaNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/OmniFlix.medianode.v1beta1.Msg/DepositMediaNode",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).DepositMediaNode(ctx, req.(*MsgDepositMediaNode))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "OmniFlix.medianode.v1beta1.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -681,6 +888,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CancelLease",
 			Handler:    _Msg_CancelLease_Handler,
+		},
+		{
+			MethodName: "DepositMediaNode",
+			Handler:    _Msg_DepositMediaNode_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -707,8 +918,27 @@ func (m *MsgRegisterMediaNode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.Sender) > 0 {
+		i -= len(m.Sender)
+		copy(dAtA[i:], m.Sender)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Sender)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.Deposit != nil {
+		{
+			size, err := m.Deposit.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
 	{
-		size, err := m.LeaseAmountPerDay.MarshalToSizedBuffer(dAtA[:i])
+		size, err := m.PricePerDay.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -716,7 +946,7 @@ func (m *MsgRegisterMediaNode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintTx(dAtA, i, uint64(size))
 	}
 	i--
-	dAtA[i] = 0x22
+	dAtA[i] = 0x1a
 	{
 		size, err := m.HardwareSpecs.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
@@ -726,18 +956,11 @@ func (m *MsgRegisterMediaNode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintTx(dAtA, i, uint64(size))
 	}
 	i--
-	dAtA[i] = 0x1a
+	dAtA[i] = 0x12
 	if len(m.Url) > 0 {
 		i -= len(m.Url)
 		copy(dAtA[i:], m.Url)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Url)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Sender) > 0 {
-		i -= len(m.Sender)
-		copy(dAtA[i:], m.Sender)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Sender)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -764,6 +987,18 @@ func (m *MsgRegisterMediaNodeResponse) MarshalToSizedBuffer(dAtA []byte) (int, e
 	_ = i
 	var l int
 	_ = l
+	if len(m.Status) > 0 {
+		i -= len(m.Status)
+		copy(dAtA[i:], m.Status)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Status)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.MediaNodeId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.MediaNodeId))
+		i--
+		dAtA[i] = 0x8
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -787,8 +1022,15 @@ func (m *MsgUpdateMediaNode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.Sender) > 0 {
+		i -= len(m.Sender)
+		copy(dAtA[i:], m.Sender)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Sender)))
+		i--
+		dAtA[i] = 0x22
+	}
 	{
-		size, err := m.LeaseAmountPerDay.MarshalToSizedBuffer(dAtA[:i])
+		size, err := m.PricePerDay.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -796,7 +1038,7 @@ func (m *MsgUpdateMediaNode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintTx(dAtA, i, uint64(size))
 	}
 	i--
-	dAtA[i] = 0x2a
+	dAtA[i] = 0x1a
 	{
 		size, err := m.HardwareSpecs.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
@@ -806,25 +1048,11 @@ func (m *MsgUpdateMediaNode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintTx(dAtA, i, uint64(size))
 	}
 	i--
-	dAtA[i] = 0x22
-	if len(m.Url) > 0 {
-		i -= len(m.Url)
-		copy(dAtA[i:], m.Url)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Url)))
-		i--
-		dAtA[i] = 0x1a
-	}
+	dAtA[i] = 0x12
 	if m.Id != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.Id))
 		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.Sender) > 0 {
-		i -= len(m.Sender)
-		copy(dAtA[i:], m.Sender)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Sender)))
-		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -872,22 +1100,32 @@ func (m *MsgLeaseMediaNode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.LeaseDays != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.LeaseDays))
-		i--
-		dAtA[i] = 0x18
-	}
-	if m.MediaNodeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.MediaNodeId))
-		i--
-		dAtA[i] = 0x10
-	}
 	if len(m.Sender) > 0 {
 		i -= len(m.Sender)
 		copy(dAtA[i:], m.Sender)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Sender)))
 		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x22
+	}
+	{
+		size, err := m.Amount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	if m.LeaseDays != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.LeaseDays))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.MediaNodeId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.MediaNodeId))
+		i--
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -912,6 +1150,18 @@ func (m *MsgLeaseMediaNodeResponse) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	_ = i
 	var l int
 	_ = l
+	if m.Lease != nil {
+		{
+			size, err := m.Lease.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -935,17 +1185,17 @@ func (m *MsgCancelLease) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.MediaNodeId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.MediaNodeId))
-		i--
-		dAtA[i] = 0x10
-	}
 	if len(m.Sender) > 0 {
 		i -= len(m.Sender)
 		copy(dAtA[i:], m.Sender)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Sender)))
 		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x12
+	}
+	if m.MediaNodeId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.MediaNodeId))
+		i--
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -973,6 +1223,98 @@ func (m *MsgCancelLeaseResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgDepositMediaNode) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDepositMediaNode) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDepositMediaNode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Sender) > 0 {
+		i -= len(m.Sender)
+		copy(dAtA[i:], m.Sender)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Sender)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	{
+		size, err := m.Amount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if m.MediaNodeId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.MediaNodeId))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDepositMediaNodeResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDepositMediaNodeResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDepositMediaNodeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.MedianodeStatus) > 0 {
+		i -= len(m.MedianodeStatus)
+		copy(dAtA[i:], m.MedianodeStatus)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.MedianodeStatus)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.TotalDeposit != nil {
+		{
+			size, err := m.TotalDeposit.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.MedianodeId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.MedianodeId))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -990,18 +1332,22 @@ func (m *MsgRegisterMediaNode) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Sender)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
 	l = len(m.Url)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
 	l = m.HardwareSpecs.Size()
 	n += 1 + l + sovTx(uint64(l))
-	l = m.LeaseAmountPerDay.Size()
+	l = m.PricePerDay.Size()
 	n += 1 + l + sovTx(uint64(l))
+	if m.Deposit != nil {
+		l = m.Deposit.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Sender)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -1011,6 +1357,13 @@ func (m *MsgRegisterMediaNodeResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
+	if m.MediaNodeId != 0 {
+		n += 1 + sovTx(uint64(m.MediaNodeId))
+	}
+	l = len(m.Status)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -1020,21 +1373,17 @@ func (m *MsgUpdateMediaNode) Size() (n int) {
 	}
 	var l int
 	_ = l
+	if m.Id != 0 {
+		n += 1 + sovTx(uint64(m.Id))
+	}
+	l = m.HardwareSpecs.Size()
+	n += 1 + l + sovTx(uint64(l))
+	l = m.PricePerDay.Size()
+	n += 1 + l + sovTx(uint64(l))
 	l = len(m.Sender)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.Id != 0 {
-		n += 1 + sovTx(uint64(m.Id))
-	}
-	l = len(m.Url)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = m.HardwareSpecs.Size()
-	n += 1 + l + sovTx(uint64(l))
-	l = m.LeaseAmountPerDay.Size()
-	n += 1 + l + sovTx(uint64(l))
 	return n
 }
 
@@ -1053,15 +1402,17 @@ func (m *MsgLeaseMediaNode) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Sender)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
 	if m.MediaNodeId != 0 {
 		n += 1 + sovTx(uint64(m.MediaNodeId))
 	}
 	if m.LeaseDays != 0 {
 		n += 1 + sovTx(uint64(m.LeaseDays))
+	}
+	l = m.Amount.Size()
+	n += 1 + l + sovTx(uint64(l))
+	l = len(m.Sender)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
 }
@@ -1072,6 +1423,10 @@ func (m *MsgLeaseMediaNodeResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
+	if m.Lease != nil {
+		l = m.Lease.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -1081,12 +1436,12 @@ func (m *MsgCancelLease) Size() (n int) {
 	}
 	var l int
 	_ = l
+	if m.MediaNodeId != 0 {
+		n += 1 + sovTx(uint64(m.MediaNodeId))
+	}
 	l = len(m.Sender)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
-	}
-	if m.MediaNodeId != 0 {
-		n += 1 + sovTx(uint64(m.MediaNodeId))
 	}
 	return n
 }
@@ -1097,6 +1452,44 @@ func (m *MsgCancelLeaseResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
+	return n
+}
+
+func (m *MsgDepositMediaNode) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.MediaNodeId != 0 {
+		n += 1 + sovTx(uint64(m.MediaNodeId))
+	}
+	l = m.Amount.Size()
+	n += 1 + l + sovTx(uint64(l))
+	l = len(m.Sender)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgDepositMediaNodeResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.MedianodeId != 0 {
+		n += 1 + sovTx(uint64(m.MedianodeId))
+	}
+	if m.TotalDeposit != nil {
+		l = m.TotalDeposit.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.MedianodeStatus)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -1137,38 +1530,6 @@ func (m *MsgRegisterMediaNode) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Sender = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Url", wireType)
 			}
 			var stringLen uint64
@@ -1199,7 +1560,7 @@ func (m *MsgRegisterMediaNode) Unmarshal(dAtA []byte) error {
 			}
 			m.Url = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field HardwareSpecs", wireType)
 			}
@@ -1232,9 +1593,9 @@ func (m *MsgRegisterMediaNode) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 4:
+		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LeaseAmountPerDay", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PricePerDay", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1261,9 +1622,77 @@ func (m *MsgRegisterMediaNode) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.LeaseAmountPerDay.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.PricePerDay.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Deposit", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Deposit == nil {
+				m.Deposit = &types.Coin{}
+			}
+			if err := m.Deposit.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Sender = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1315,6 +1744,57 @@ func (m *MsgRegisterMediaNodeResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgRegisterMediaNodeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MediaNodeId", wireType)
+			}
+			m.MediaNodeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MediaNodeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Status = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -1366,38 +1846,6 @@ func (m *MsgUpdateMediaNode) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Sender = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
 			}
@@ -1416,39 +1864,7 @@ func (m *MsgUpdateMediaNode) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Url", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Url = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field HardwareSpecs", wireType)
 			}
@@ -1481,9 +1897,9 @@ func (m *MsgUpdateMediaNode) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
+		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LeaseAmountPerDay", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PricePerDay", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1510,9 +1926,41 @@ func (m *MsgUpdateMediaNode) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.LeaseAmountPerDay.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.PricePerDay.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Sender = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1615,6 +2063,77 @@ func (m *MsgLeaseMediaNode) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MediaNodeId", wireType)
+			}
+			m.MediaNodeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MediaNodeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LeaseDays", wireType)
+			}
+			m.LeaseDays = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.LeaseDays |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Amount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
 			}
@@ -1646,44 +2165,6 @@ func (m *MsgLeaseMediaNode) Unmarshal(dAtA []byte) error {
 			}
 			m.Sender = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MediaNodeId", wireType)
-			}
-			m.MediaNodeId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.MediaNodeId |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LeaseDays", wireType)
-			}
-			m.LeaseDays = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.LeaseDays |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -1734,6 +2215,42 @@ func (m *MsgLeaseMediaNodeResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgLeaseMediaNodeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Lease", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Lease == nil {
+				m.Lease = &Lease{}
+			}
+			if err := m.Lease.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -1785,6 +2302,25 @@ func (m *MsgCancelLease) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MediaNodeId", wireType)
+			}
+			m.MediaNodeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MediaNodeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
 			}
@@ -1816,25 +2352,6 @@ func (m *MsgCancelLease) Unmarshal(dAtA []byte) error {
 			}
 			m.Sender = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MediaNodeId", wireType)
-			}
-			m.MediaNodeId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.MediaNodeId |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -1885,6 +2402,277 @@ func (m *MsgCancelLeaseResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgCancelLeaseResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDepositMediaNode) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDepositMediaNode: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDepositMediaNode: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MediaNodeId", wireType)
+			}
+			m.MediaNodeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MediaNodeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Amount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Sender = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDepositMediaNodeResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDepositMediaNodeResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDepositMediaNodeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MedianodeId", wireType)
+			}
+			m.MedianodeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MedianodeId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TotalDeposit", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.TotalDeposit == nil {
+				m.TotalDeposit = &types.Coin{}
+			}
+			if err := m.TotalDeposit.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MedianodeStatus", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.MedianodeStatus = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])

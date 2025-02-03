@@ -7,8 +7,8 @@ import (
 	fmt "fmt"
 	types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/cosmos/gogoproto/gogoproto"
-	proto "github.com/cosmos/gogoproto/proto"
-	github_com_gogo_protobuf_types "github.com/cosmos/gogoproto/types"
+	proto "github.com/gogo/protobuf/proto"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
 	io "io"
 	math "math"
@@ -28,14 +28,45 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type Status int32
+
+const (
+	STATUS_UNSPECIFIED Status = 0
+	STATUS_PENDING     Status = 1
+	STATUS_ACTIVE      Status = 2
+	STATUS_CLOSED      Status = 3
+)
+
+var Status_name = map[int32]string{
+	0: "STATUS_UNSPECIFIED",
+	1: "STATUS_PENDING",
+	2: "STATUS_ACTIVE",
+	3: "STATUS_CLOSED",
+}
+
+var Status_value = map[string]int32{
+	"STATUS_UNSPECIFIED": 0,
+	"STATUS_PENDING":     1,
+	"STATUS_ACTIVE":      2,
+	"STATUS_CLOSED":      3,
+}
+
+func (x Status) String() string {
+	return proto.EnumName(Status_name, int32(x))
+}
+
+func (Status) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_42ab915c4f0f53d0, []int{0}
+}
+
 // LeaseStatus defines the status of a lease
 type LeaseStatus int32
 
 const (
-	LeaseStatus_LEASE_STATUS_UNSPECIFIED LeaseStatus = 0
-	LeaseStatus_LEASE_STATUS_ACTIVE      LeaseStatus = 1
-	LeaseStatus_LEASE_STATUS_EXPIRED     LeaseStatus = 2
-	LeaseStatus_LEASE_STATUS_CANCELLED   LeaseStatus = 3
+	LEASE_STATUS_UNSPECIFIED LeaseStatus = 0
+	LEASE_STATUS_ACTIVE      LeaseStatus = 1
+	LEASE_STATUS_EXPIRED     LeaseStatus = 2
+	LEASE_STATUS_CANCELLED   LeaseStatus = 3
 )
 
 var LeaseStatus_name = map[int32]string{
@@ -57,7 +88,7 @@ func (x LeaseStatus) String() string {
 }
 
 func (LeaseStatus) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_42ab915c4f0f53d0, []int{0}
+	return fileDescriptor_42ab915c4f0f53d0, []int{1}
 }
 
 // HardwareSpecs defines the hardware specifications of a media node
@@ -100,44 +131,64 @@ func (m *HardwareSpecs) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_HardwareSpecs proto.InternalMessageInfo
 
-func (m *HardwareSpecs) GetCpus() int64 {
-	if m != nil {
-		return m.Cpus
-	}
-	return 0
+// Deposit defines the structure for a deposit made to a media node
+type Deposit struct {
+	Amount      types.Coin `protobuf:"bytes,1,opt,name=amount,proto3" json:"amount"`
+	Depositor   string     `protobuf:"bytes,2,opt,name=depositor,proto3" json:"depositor,omitempty" yaml:"depositor"`
+	DepositedAt time.Time  `protobuf:"bytes,3,opt,name=deposited_at,json=depositedAt,proto3,stdtime" json:"deposited_at"`
 }
 
-func (m *HardwareSpecs) GetRam() int64 {
-	if m != nil {
-		return m.Ram
+func (m *Deposit) Reset()         { *m = Deposit{} }
+func (m *Deposit) String() string { return proto.CompactTextString(m) }
+func (*Deposit) ProtoMessage()    {}
+func (*Deposit) Descriptor() ([]byte, []int) {
+	return fileDescriptor_42ab915c4f0f53d0, []int{1}
+}
+func (m *Deposit) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Deposit) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Deposit.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
 	}
-	return 0
+}
+func (m *Deposit) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Deposit.Merge(m, src)
+}
+func (m *Deposit) XXX_Size() int {
+	return m.Size()
+}
+func (m *Deposit) XXX_DiscardUnknown() {
+	xxx_messageInfo_Deposit.DiscardUnknown(m)
 }
 
-func (m *HardwareSpecs) GetStorage() int64 {
-	if m != nil {
-		return m.Storage
-	}
-	return 0
-}
+var xxx_messageInfo_Deposit proto.InternalMessageInfo
 
 // MediaNode defines the structure for a media node
 type MediaNode struct {
-	Id                uint64        `protobuf:"varint,1,opt,name=id,proto3" json:"id"`
-	Url               string        `protobuf:"bytes,2,opt,name=url,proto3" json:"url"`
-	Owner             string        `protobuf:"bytes,3,opt,name=owner,proto3" json:"owner" yaml:"owner"`
-	HardwareSpecs     HardwareSpecs `protobuf:"bytes,4,opt,name=hardware_specs,json=hardwareSpecs,proto3" json:"hardware_specs"`
-	LeaseAmountPerDay types.Coin    `protobuf:"bytes,5,opt,name=lease_amount_per_day,json=leaseAmountPerDay,proto3" json:"lease_amount_per_day"`
-	Leased            bool          `protobuf:"varint,6,opt,name=leased,proto3" json:"leased"`
-	CreatedAt         time.Time     `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
-	UpdatedAt         time.Time     `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
+	Id            uint64        `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Url           string        `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	HardwareSpecs HardwareSpecs `protobuf:"bytes,3,opt,name=hardware_specs,json=hardwareSpecs,proto3" json:"hardware_specs" yaml:"hardware_specs"`
+	Owner         string        `protobuf:"bytes,4,opt,name=owner,proto3" json:"owner,omitempty"`
+	PricePerDay   types.Coin    `protobuf:"bytes,5,opt,name=price_per_day,json=pricePerDay,proto3" json:"price_per_day" yaml:"price_per_day"`
+	Status        Status        `protobuf:"varint,6,opt,name=status,proto3,enum=OmniFlix.medianode.v1beta1.Status" json:"status,omitempty"`
+	Leased        bool          `protobuf:"varint,7,opt,name=leased,proto3" json:"leased,omitempty"`
+	RegisteredAt  time.Time     `protobuf:"bytes,8,opt,name=registered_at,json=registeredAt,proto3,stdtime" json:"registered_at"`
+	Deposits      []*Deposit    `protobuf:"bytes,9,rep,name=deposits,proto3" json:"deposits,omitempty"`
 }
 
 func (m *MediaNode) Reset()         { *m = MediaNode{} }
 func (m *MediaNode) String() string { return proto.CompactTextString(m) }
 func (*MediaNode) ProtoMessage()    {}
 func (*MediaNode) Descriptor() ([]byte, []int) {
-	return fileDescriptor_42ab915c4f0f53d0, []int{1}
+	return fileDescriptor_42ab915c4f0f53d0, []int{2}
 }
 func (m *MediaNode) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -166,78 +217,25 @@ func (m *MediaNode) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MediaNode proto.InternalMessageInfo
 
-func (m *MediaNode) GetId() uint64 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
-}
-
-func (m *MediaNode) GetUrl() string {
-	if m != nil {
-		return m.Url
-	}
-	return ""
-}
-
-func (m *MediaNode) GetOwner() string {
-	if m != nil {
-		return m.Owner
-	}
-	return ""
-}
-
-func (m *MediaNode) GetHardwareSpecs() HardwareSpecs {
-	if m != nil {
-		return m.HardwareSpecs
-	}
-	return HardwareSpecs{}
-}
-
-func (m *MediaNode) GetLeaseAmountPerDay() types.Coin {
-	if m != nil {
-		return m.LeaseAmountPerDay
-	}
-	return types.Coin{}
-}
-
-func (m *MediaNode) GetLeased() bool {
-	if m != nil {
-		return m.Leased
-	}
-	return false
-}
-
-func (m *MediaNode) GetCreatedAt() time.Time {
-	if m != nil {
-		return m.CreatedAt
-	}
-	return time.Time{}
-}
-
-func (m *MediaNode) GetUpdatedAt() time.Time {
-	if m != nil {
-		return m.UpdatedAt
-	}
-	return time.Time{}
-}
-
 // Lease defines the structure for a media node lease
 type Lease struct {
-	MediaNodeId uint64      `protobuf:"varint,1,opt,name=media_node_id,json=mediaNodeId,proto3" json:"media_node_id"`
-	LeasedTo    string      `protobuf:"bytes,2,opt,name=leased_to,json=leasedTo,proto3" json:"leased_to" yaml:"leased_to"`
-	LeaseAmount types.Coin  `protobuf:"bytes,3,opt,name=lease_amount,json=leaseAmount,proto3" json:"lease_amount"`
-	LeasedAt    time.Time   `protobuf:"bytes,4,opt,name=leased_at,json=leasedAt,proto3,stdtime" json:"leased_at"`
-	LeasedDays  uint64      `protobuf:"varint,5,opt,name=leased_days,json=leasedDays,proto3" json:"leased_days"`
-	LeaseExpiry time.Time   `protobuf:"bytes,6,opt,name=lease_expiry,json=leaseExpiry,proto3,stdtime" json:"lease_expiry"`
-	LeaseStatus LeaseStatus `protobuf:"varint,7,opt,name=lease_status,json=leaseStatus,proto3,enum=OmniFlix.medianode.v1beta1.LeaseStatus" json:"lease_status"`
+	MediaNodeId      uint64      `protobuf:"varint,1,opt,name=media_node_id,json=mediaNodeId,proto3" json:"media_node_id,omitempty" yaml:"media_node_id"`
+	Leasee           string      `protobuf:"bytes,2,opt,name=leasee,proto3" json:"leasee,omitempty"`
+	PricePerDay      types.Coin  `protobuf:"bytes,3,opt,name=price_per_day,json=pricePerDay,proto3" json:"price_per_day" yaml:"price_per_day"`
+	TotalLeaseAmount types.Coin  `protobuf:"bytes,4,opt,name=total_lease_amount,json=totalLeaseAmount,proto3" json:"total_lease_amount"`
+	SettledAmount    *types.Coin `protobuf:"bytes,5,opt,name=settled_amount,json=settledAmount,proto3" json:"settled_amount,omitempty" yaml:"settled_amount"`
+	StartTime        *time.Time  `protobuf:"bytes,6,opt,name=start_time,json=startTime,proto3,stdtime" json:"start_time,omitempty" yaml:"start_time"`
+	LeasedDays       uint64      `protobuf:"varint,7,opt,name=leased_days,json=leasedDays,proto3" json:"leased_days,omitempty" yaml:"leased_days"`
+	Expiry           time.Time   `protobuf:"bytes,8,opt,name=expiry,proto3,stdtime" json:"expiry"`
+	Status           LeaseStatus `protobuf:"varint,9,opt,name=status,proto3,enum=OmniFlix.medianode.v1beta1.LeaseStatus" json:"status"`
+	LastSettledAt    *time.Time  `protobuf:"bytes,10,opt,name=last_settled_at,json=lastSettledAt,proto3,stdtime" json:"last_settled_at,omitempty" yaml:"last_settled_at"`
 }
 
 func (m *Lease) Reset()         { *m = Lease{} }
 func (m *Lease) String() string { return proto.CompactTextString(m) }
 func (*Lease) ProtoMessage()    {}
 func (*Lease) Descriptor() ([]byte, []int) {
-	return fileDescriptor_42ab915c4f0f53d0, []int{2}
+	return fileDescriptor_42ab915c4f0f53d0, []int{3}
 }
 func (m *Lease) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -266,58 +264,11 @@ func (m *Lease) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Lease proto.InternalMessageInfo
 
-func (m *Lease) GetMediaNodeId() uint64 {
-	if m != nil {
-		return m.MediaNodeId
-	}
-	return 0
-}
-
-func (m *Lease) GetLeasedTo() string {
-	if m != nil {
-		return m.LeasedTo
-	}
-	return ""
-}
-
-func (m *Lease) GetLeaseAmount() types.Coin {
-	if m != nil {
-		return m.LeaseAmount
-	}
-	return types.Coin{}
-}
-
-func (m *Lease) GetLeasedAt() time.Time {
-	if m != nil {
-		return m.LeasedAt
-	}
-	return time.Time{}
-}
-
-func (m *Lease) GetLeasedDays() uint64 {
-	if m != nil {
-		return m.LeasedDays
-	}
-	return 0
-}
-
-func (m *Lease) GetLeaseExpiry() time.Time {
-	if m != nil {
-		return m.LeaseExpiry
-	}
-	return time.Time{}
-}
-
-func (m *Lease) GetLeaseStatus() LeaseStatus {
-	if m != nil {
-		return m.LeaseStatus
-	}
-	return LeaseStatus_LEASE_STATUS_UNSPECIFIED
-}
-
 func init() {
+	proto.RegisterEnum("OmniFlix.medianode.v1beta1.Status", Status_name, Status_value)
 	proto.RegisterEnum("OmniFlix.medianode.v1beta1.LeaseStatus", LeaseStatus_name, LeaseStatus_value)
 	proto.RegisterType((*HardwareSpecs)(nil), "OmniFlix.medianode.v1beta1.HardwareSpecs")
+	proto.RegisterType((*Deposit)(nil), "OmniFlix.medianode.v1beta1.Deposit")
 	proto.RegisterType((*MediaNode)(nil), "OmniFlix.medianode.v1beta1.MediaNode")
 	proto.RegisterType((*Lease)(nil), "OmniFlix.medianode.v1beta1.Lease")
 }
@@ -327,54 +278,65 @@ func init() {
 }
 
 var fileDescriptor_42ab915c4f0f53d0 = []byte{
-	// 747 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0x4d, 0x4f, 0xdb, 0x4a,
-	0x14, 0x8d, 0x93, 0x10, 0x92, 0x09, 0xf0, 0xc2, 0x3c, 0xc4, 0x33, 0x11, 0xca, 0xf0, 0x22, 0x3d,
-	0x3d, 0x1e, 0x0b, 0xfb, 0x41, 0x3f, 0x16, 0x5d, 0x54, 0xb2, 0x13, 0xd3, 0x46, 0x4a, 0xd3, 0xc8,
-	0x09, 0xa8, 0xaa, 0x2a, 0x59, 0x93, 0x78, 0x48, 0x2c, 0xc5, 0x19, 0xcb, 0x1e, 0x03, 0xe9, 0xaf,
-	0xe0, 0x5f, 0x95, 0x25, 0xcb, 0xae, 0xdc, 0x0a, 0x76, 0x5e, 0xf2, 0x0b, 0x2a, 0x8f, 0xed, 0x7c,
-	0x2c, 0x5a, 0xd1, 0xcd, 0x78, 0xe6, 0x9e, 0x7b, 0xcf, 0x99, 0x39, 0xf7, 0xca, 0xe0, 0xe8, 0xbd,
-	0x3d, 0xb5, 0x4e, 0x27, 0xd6, 0xb5, 0x6c, 0x13, 0xd3, 0xc2, 0x53, 0x6a, 0x12, 0xf9, 0xf2, 0x78,
-	0x40, 0x18, 0x3e, 0x5e, 0x44, 0x24, 0xc7, 0xa5, 0x8c, 0xc2, 0x6a, 0x9a, 0x2b, 0x2d, 0x90, 0x24,
-	0xb7, 0xba, 0x33, 0xa2, 0x23, 0xca, 0xd3, 0xe4, 0x68, 0x17, 0x57, 0x54, 0xd1, 0x88, 0xd2, 0xd1,
-	0x84, 0xc8, 0xfc, 0x34, 0xf0, 0x2f, 0x64, 0x66, 0xd9, 0xc4, 0x63, 0xd8, 0x76, 0x92, 0x84, 0xda,
-	0x90, 0x7a, 0x36, 0xf5, 0xe4, 0x01, 0xf6, 0x16, 0xba, 0x43, 0x6a, 0x4d, 0x63, 0xbc, 0x4e, 0xc1,
-	0xe6, 0x5b, 0xec, 0x9a, 0x57, 0xd8, 0x25, 0x3d, 0x87, 0x0c, 0x3d, 0xb8, 0x0f, 0xf2, 0x43, 0xc7,
-	0xf7, 0x44, 0xe1, 0x40, 0x38, 0xcc, 0xa9, 0xc5, 0x30, 0x40, 0xfc, 0xac, 0xf3, 0x15, 0xee, 0x81,
-	0x9c, 0x8b, 0x6d, 0x31, 0xcb, 0xc1, 0xf5, 0x30, 0x40, 0xd1, 0x51, 0x8f, 0x16, 0xf8, 0x0f, 0x58,
-	0xf7, 0x18, 0x75, 0xf1, 0x88, 0x88, 0x39, 0x0e, 0x97, 0xc3, 0x00, 0xa5, 0x21, 0x3d, 0xdd, 0xd4,
-	0xbf, 0xe4, 0x40, 0xe9, 0x5d, 0xf4, 0xba, 0x0e, 0x35, 0x09, 0xdc, 0x05, 0x59, 0xcb, 0xe4, 0x5a,
-	0x79, 0xb5, 0x10, 0x06, 0x28, 0x6b, 0x99, 0x7a, 0xd6, 0x32, 0x23, 0x1d, 0xdf, 0x9d, 0x70, 0x9d,
-	0x52, 0xac, 0xe3, 0xbb, 0x13, 0x3d, 0x5a, 0xa0, 0x0c, 0xd6, 0xe8, 0xd5, 0x94, 0xb8, 0x5c, 0xa5,
-	0xa4, 0xee, 0x85, 0x01, 0x8a, 0x03, 0x8f, 0x01, 0xda, 0x98, 0x61, 0x7b, 0xf2, 0xaa, 0xce, 0x8f,
-	0x75, 0x3d, 0x0e, 0xc3, 0x73, 0xb0, 0x35, 0x4e, 0x9e, 0x68, 0x78, 0xd1, 0x1b, 0xc5, 0xfc, 0x81,
-	0x70, 0x58, 0x3e, 0xf9, 0x4f, 0xfa, 0xb9, 0xdd, 0xd2, 0x8a, 0x29, 0x6a, 0xfe, 0x36, 0x40, 0x19,
-	0x7d, 0x73, 0xbc, 0xe2, 0x54, 0x17, 0xec, 0x4c, 0x08, 0xf6, 0x88, 0x81, 0x6d, 0xea, 0x4f, 0x99,
-	0xe1, 0x10, 0xd7, 0x30, 0xf1, 0x4c, 0x5c, 0xe3, 0xec, 0x7b, 0x52, 0xec, 0xbc, 0x14, 0x39, 0x3f,
-	0xa7, 0x6d, 0x50, 0x6b, 0x9a, 0xb0, 0x6d, 0xf3, 0x62, 0x85, 0xd7, 0x76, 0x89, 0xdb, 0xc4, 0x33,
-	0x58, 0x07, 0x05, 0x1e, 0x34, 0xc5, 0xc2, 0x81, 0x70, 0x58, 0x54, 0x41, 0x18, 0xa0, 0x24, 0xa2,
-	0x27, 0x5f, 0xd8, 0x00, 0x60, 0xe8, 0x12, 0xcc, 0x88, 0x69, 0x60, 0x26, 0xae, 0x73, 0xad, 0xaa,
-	0x14, 0x8f, 0x81, 0x94, 0x8e, 0x81, 0xd4, 0x4f, 0xc7, 0x40, 0x2d, 0x46, 0x62, 0x37, 0xdf, 0x90,
-	0xa0, 0x97, 0x92, 0x3a, 0x85, 0x45, 0x24, 0xbe, 0x63, 0xa6, 0x24, 0xc5, 0xdf, 0x21, 0x49, 0xea,
-	0x14, 0x56, 0x0f, 0x72, 0x60, 0xad, 0x1d, 0x5d, 0x0a, 0xbe, 0x00, 0x9b, 0xdc, 0x41, 0x23, 0xb2,
-	0xd0, 0x98, 0x37, 0x74, 0x3b, 0x0c, 0xd0, 0x2a, 0xa0, 0x97, 0xed, 0xb4, 0xf5, 0x2d, 0x13, 0xbe,
-	0x06, 0xa5, 0xf8, 0x51, 0x06, 0xa3, 0x49, 0xab, 0xff, 0x0e, 0x03, 0xb4, 0x08, 0x3e, 0x06, 0xa8,
-	0x12, 0x77, 0x74, 0x1e, 0xaa, 0xeb, 0xc5, 0x78, 0xdf, 0xa7, 0x50, 0x05, 0x1b, 0xcb, 0x0d, 0xe0,
-	0x03, 0xf1, 0x04, 0xe3, 0xcb, 0x4b, 0xc6, 0x43, 0x65, 0x7e, 0x07, 0xcc, 0x92, 0xb9, 0x78, 0x9a,
-	0x11, 0xc9, 0x35, 0x14, 0x06, 0xff, 0x07, 0xe5, 0x84, 0xc2, 0xc4, 0x33, 0x8f, 0xb7, 0x3f, 0xaf,
-	0xfe, 0x11, 0x06, 0x68, 0x39, 0xac, 0x83, 0xf8, 0xd0, 0xc4, 0x33, 0x0f, 0xbe, 0x49, 0x2f, 0x4e,
-	0xae, 0x1d, 0xcb, 0x9d, 0xf1, 0x6e, 0x3f, 0x55, 0x37, 0x26, 0xd5, 0x78, 0x21, 0xfc, 0x94, 0x12,
-	0x79, 0x0c, 0x33, 0xdf, 0xe3, 0xe3, 0xb0, 0x75, 0xf2, 0xef, 0xaf, 0x06, 0x9b, 0x77, 0xac, 0xc7,
-	0xd3, 0xd5, 0x4a, 0x18, 0xa0, 0x15, 0x82, 0x84, 0x3d, 0x86, 0x8f, 0x3e, 0x83, 0xf2, 0x52, 0x36,
-	0xdc, 0x07, 0x62, 0x5b, 0x53, 0x7a, 0x9a, 0xd1, 0xeb, 0x2b, 0xfd, 0xb3, 0x9e, 0x71, 0xd6, 0xe9,
-	0x75, 0xb5, 0x46, 0xeb, 0xb4, 0xa5, 0x35, 0x2b, 0x19, 0xf8, 0x17, 0xf8, 0x73, 0x05, 0x55, 0x1a,
-	0xfd, 0xd6, 0xb9, 0x56, 0x11, 0xa0, 0x08, 0x76, 0x56, 0x00, 0xed, 0x43, 0xb7, 0xa5, 0x6b, 0xcd,
-	0x4a, 0x16, 0x56, 0xc1, 0xee, 0x0a, 0xd2, 0x50, 0x3a, 0x0d, 0xad, 0xdd, 0xd6, 0x9a, 0x95, 0x9c,
-	0xda, 0xb9, 0xbd, 0xaf, 0x09, 0x77, 0xf7, 0x35, 0xe1, 0xfb, 0x7d, 0x4d, 0xb8, 0x79, 0xa8, 0x65,
-	0xee, 0x1e, 0x6a, 0x99, 0xaf, 0x0f, 0xb5, 0xcc, 0xc7, 0xe7, 0x23, 0x8b, 0x8d, 0xfd, 0x81, 0x34,
-	0xa4, 0xb6, 0x3c, 0xff, 0xb7, 0x52, 0x7b, 0x6a, 0x5d, 0x4c, 0xac, 0xeb, 0xb1, 0x3f, 0x90, 0x2f,
-	0x5f, 0xca, 0xcb, 0x3f, 0x5b, 0x36, 0x73, 0x88, 0x37, 0x28, 0x70, 0x53, 0x9f, 0xfd, 0x08, 0x00,
-	0x00, 0xff, 0xff, 0xf3, 0x34, 0x87, 0x86, 0x8f, 0x05, 0x00, 0x00,
+	// 927 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0x5f, 0x6f, 0xda, 0x56,
+	0x14, 0xc7, 0x40, 0x08, 0x1c, 0x0a, 0xa3, 0x77, 0x2c, 0x73, 0x50, 0x66, 0x47, 0x9e, 0xa6, 0x65,
+	0x79, 0x30, 0x2a, 0x9b, 0x56, 0xa9, 0xaa, 0x34, 0xf1, 0xc7, 0xed, 0xd0, 0x28, 0x8d, 0x0c, 0xad,
+	0xa6, 0xf6, 0xc1, 0xba, 0xe0, 0x5b, 0x62, 0x09, 0x73, 0x91, 0xef, 0xa5, 0x0d, 0xfb, 0x14, 0xfd,
+	0x46, 0x7b, 0xcd, 0x63, 0x1e, 0xf7, 0xc4, 0xd6, 0x64, 0x4f, 0x79, 0x5b, 0x3e, 0xc1, 0xe4, 0xeb,
+	0x8b, 0x89, 0xb5, 0x2d, 0x59, 0xa4, 0xbe, 0xa0, 0x7b, 0xfe, 0xfc, 0xce, 0xbf, 0xdf, 0x39, 0x18,
+	0x0e, 0x9f, 0xfb, 0x33, 0xef, 0xc9, 0xd4, 0x3b, 0xa9, 0xfb, 0xc4, 0xf5, 0xf0, 0x8c, 0xba, 0xa4,
+	0xfe, 0xf6, 0xc1, 0x88, 0x70, 0xfc, 0x60, 0xa3, 0x31, 0xe7, 0x01, 0xe5, 0x14, 0xd5, 0xd6, 0xbe,
+	0xe6, 0xc6, 0x22, 0x7d, 0x6b, 0xd5, 0x09, 0x9d, 0x50, 0xe1, 0x56, 0x0f, 0x5f, 0x11, 0xa2, 0xa6,
+	0x4f, 0x28, 0x9d, 0x4c, 0x49, 0x5d, 0x48, 0xa3, 0xc5, 0x9b, 0x3a, 0xf7, 0x7c, 0xc2, 0x38, 0xf6,
+	0xe7, 0xd2, 0x41, 0x1b, 0x53, 0xe6, 0x53, 0x56, 0x1f, 0x61, 0xb6, 0xc9, 0x3b, 0xa6, 0xde, 0x2c,
+	0xb2, 0x1b, 0x14, 0x4a, 0x3f, 0xe2, 0xc0, 0x7d, 0x87, 0x03, 0x32, 0x98, 0x93, 0x31, 0x43, 0x7b,
+	0x90, 0x1d, 0xcf, 0x17, 0x4c, 0x55, 0xf6, 0x95, 0x83, 0x4c, 0x2b, 0x7f, 0xb9, 0xd2, 0x85, 0x6c,
+	0x8b, 0x5f, 0xb4, 0x0b, 0x99, 0x00, 0xfb, 0x6a, 0x5a, 0x18, 0xb7, 0x2f, 0x57, 0x7a, 0x28, 0xda,
+	0xe1, 0x0f, 0xfa, 0x0a, 0xb6, 0x19, 0xa7, 0x01, 0x9e, 0x10, 0x35, 0x23, 0xcc, 0xc5, 0xcb, 0x95,
+	0xbe, 0x56, 0xd9, 0xeb, 0x87, 0xf1, 0xab, 0x02, 0xdb, 0x1d, 0x32, 0xa7, 0xcc, 0xe3, 0xe8, 0x21,
+	0xe4, 0xb0, 0x4f, 0x17, 0x33, 0x2e, 0xb2, 0x15, 0x1b, 0xbb, 0x66, 0x54, 0xad, 0x19, 0x56, 0xbb,
+	0xee, 0xdc, 0x6c, 0x53, 0x6f, 0xd6, 0xca, 0x9e, 0xae, 0xf4, 0x94, 0x2d, 0xdd, 0x51, 0x03, 0x0a,
+	0x6e, 0x14, 0x83, 0x06, 0xa2, 0x98, 0x42, 0xab, 0x7a, 0xb5, 0xd2, 0x2b, 0x4b, 0xec, 0x4f, 0x1f,
+	0x19, 0xb1, 0xc9, 0xb0, 0x37, 0x6e, 0xe8, 0x29, 0xdc, 0x93, 0x02, 0x71, 0x1d, 0xcc, 0x45, 0x91,
+	0xc5, 0x46, 0xcd, 0x8c, 0x26, 0x68, 0xae, 0x27, 0x68, 0x0e, 0xd7, 0x13, 0x6c, 0xe5, 0xc3, 0x9c,
+	0xef, 0x7f, 0xd7, 0x15, 0xbb, 0x18, 0x23, 0x9b, 0xdc, 0xf8, 0x2b, 0x03, 0x85, 0x67, 0x21, 0x3f,
+	0x7d, 0xea, 0x12, 0x54, 0x86, 0xb4, 0xe7, 0x8a, 0xfa, 0xb3, 0x76, 0xda, 0x73, 0x51, 0x05, 0x32,
+	0x8b, 0x60, 0x1a, 0x15, 0x65, 0x87, 0x4f, 0x44, 0xa1, 0x7c, 0x2c, 0x47, 0xec, 0xb0, 0x70, 0xc6,
+	0x32, 0xf5, 0x37, 0xe6, 0x7f, 0xd3, 0x6d, 0x26, 0x48, 0x69, 0x7d, 0x11, 0x56, 0x72, 0xb5, 0xd2,
+	0x3f, 0x8b, 0x1a, 0x4c, 0x86, 0x33, 0xec, 0xd2, 0x71, 0x82, 0xc2, 0x2a, 0x6c, 0xd1, 0x77, 0x33,
+	0x12, 0xa8, 0x59, 0x51, 0x44, 0x24, 0xa0, 0xd7, 0x50, 0x9a, 0x07, 0xde, 0x98, 0x38, 0x73, 0x12,
+	0x38, 0x2e, 0x5e, 0xaa, 0x5b, 0xb7, 0xcd, 0x7c, 0x4f, 0x66, 0xad, 0x46, 0x59, 0x13, 0x68, 0xc3,
+	0x2e, 0x0a, 0xf9, 0x88, 0x04, 0x1d, 0xbc, 0x44, 0x8f, 0x20, 0xc7, 0x38, 0xe6, 0x0b, 0xa6, 0xe6,
+	0xf6, 0x95, 0x83, 0x72, 0xc3, 0xb8, 0xa9, 0xb7, 0x81, 0xf0, 0xb4, 0x25, 0x02, 0xed, 0x40, 0x6e,
+	0x4a, 0x30, 0x23, 0xae, 0xba, 0xbd, 0xaf, 0x1c, 0xe4, 0x6d, 0x29, 0xa1, 0x2e, 0x94, 0x02, 0x32,
+	0xf1, 0x18, 0x27, 0x41, 0xc4, 0x58, 0xfe, 0x0e, 0x8c, 0xdd, 0xdb, 0x40, 0x9b, 0x1c, 0xfd, 0x00,
+	0x79, 0xc9, 0x20, 0x53, 0x0b, 0xfb, 0x99, 0x83, 0x62, 0xe3, 0xcb, 0x9b, 0x0a, 0x94, 0xfb, 0x69,
+	0xc7, 0x20, 0xe3, 0xcf, 0x2d, 0xd8, 0xea, 0x85, 0x65, 0xa1, 0xc7, 0x50, 0x12, 0x00, 0x27, 0x44,
+	0x38, 0x6b, 0xea, 0x5b, 0xea, 0x66, 0x4e, 0x09, 0xb3, 0x61, 0x17, 0xfd, 0xf5, 0xae, 0x74, 0xdd,
+	0xb8, 0x57, 0x22, 0x17, 0x44, 0x4a, 0xff, 0x24, 0x27, 0xf3, 0x11, 0xc9, 0x79, 0x06, 0x88, 0x53,
+	0x8e, 0xa7, 0x8e, 0x48, 0xe6, 0xc8, 0x93, 0xcb, 0xfe, 0xbf, 0x93, 0xab, 0x08, 0xa8, 0xe8, 0xbd,
+	0x19, 0x1d, 0xdf, 0x6b, 0x28, 0x33, 0xc2, 0xf9, 0x34, 0x24, 0x25, 0x0a, 0x75, 0xeb, 0x26, 0xed,
+	0x6e, 0x76, 0x37, 0x09, 0x35, 0xec, 0x92, 0x54, 0xc8, 0xe0, 0x43, 0x00, 0xc6, 0x71, 0xc0, 0x9d,
+	0xf0, 0x8f, 0x4c, 0x2c, 0xd3, 0xcd, 0x8c, 0x87, 0x91, 0xef, 0xcb, 0xc8, 0x31, 0xce, 0x10, 0x2b,
+	0x50, 0x10, 0x8a, 0xd0, 0x15, 0x3d, 0x84, 0x62, 0xb4, 0x54, 0xe1, 0x74, 0x98, 0xd8, 0xb3, 0x6c,
+	0x6b, 0xe7, 0x6a, 0xa5, 0xa3, 0x08, 0x7a, 0xcd, 0x68, 0xd8, 0x10, 0x49, 0x1d, 0xbc, 0x64, 0xe8,
+	0x31, 0xe4, 0xc8, 0xc9, 0xdc, 0x0b, 0x96, 0x77, 0x5a, 0x3e, 0x89, 0x41, 0x3f, 0xc5, 0x57, 0x51,
+	0x10, 0x57, 0xf1, 0xf5, 0x4d, 0x4b, 0x27, 0x46, 0x1c, 0x9d, 0x46, 0x0b, 0x2e, 0x57, 0xba, 0x84,
+	0xc6, 0x67, 0x32, 0x82, 0x4f, 0xa6, 0x98, 0x71, 0x27, 0x1e, 0x20, 0x57, 0xe1, 0xd6, 0x9a, 0xb4,
+	0xab, 0x95, 0xbe, 0x23, 0x7b, 0x4c, 0x82, 0xa3, 0x19, 0x95, 0x42, 0xed, 0x40, 0x32, 0xc0, 0x0f,
+	0x5f, 0x41, 0x6e, 0xb0, 0x3e, 0x4a, 0x34, 0x18, 0x36, 0x87, 0x2f, 0x06, 0xce, 0x8b, 0xfe, 0xe0,
+	0xc8, 0x6a, 0x77, 0x9f, 0x74, 0xad, 0x4e, 0x25, 0x85, 0x10, 0x94, 0xa5, 0xfe, 0xc8, 0xea, 0x77,
+	0xba, 0xfd, 0xa7, 0x15, 0x05, 0xdd, 0x87, 0x92, 0xd4, 0x35, 0xdb, 0xc3, 0xee, 0x4b, 0xab, 0x92,
+	0xbe, 0xa6, 0x6a, 0xf7, 0x9e, 0x0f, 0xac, 0x4e, 0x25, 0x73, 0xf8, 0x0b, 0x14, 0xaf, 0xb5, 0x88,
+	0xf6, 0x40, 0xed, 0x59, 0xcd, 0x81, 0xe5, 0xfc, 0x6b, 0x9a, 0xcf, 0xe1, 0xd3, 0x84, 0x55, 0x06,
+	0x56, 0x90, 0x0a, 0xd5, 0x84, 0xc1, 0xfa, 0xf9, 0xa8, 0x6b, 0x5b, 0x9d, 0x4a, 0x1a, 0xd5, 0x60,
+	0x27, 0x61, 0x69, 0x37, 0xfb, 0x6d, 0xab, 0xd7, 0x0b, 0x73, 0xb7, 0x5e, 0x9e, 0x7e, 0xd0, 0x52,
+	0x67, 0x1f, 0xb4, 0xd4, 0xe9, 0xb9, 0xa6, 0x9c, 0x9d, 0x6b, 0xca, 0x1f, 0xe7, 0x9a, 0xf2, 0xfe,
+	0x42, 0x4b, 0x9d, 0x5d, 0x68, 0xa9, 0xdf, 0x2e, 0xb4, 0xd4, 0xab, 0xef, 0x26, 0x1e, 0x3f, 0x5e,
+	0x8c, 0xcc, 0x31, 0xf5, 0xeb, 0xf1, 0x17, 0x9b, 0xfa, 0x33, 0xef, 0xcd, 0xd4, 0x3b, 0x39, 0x5e,
+	0x8c, 0xea, 0x6f, 0xbf, 0xaf, 0x5f, 0xff, 0x84, 0xf3, 0xe5, 0x9c, 0xb0, 0x51, 0x4e, 0x8c, 0xfc,
+	0xdb, 0xbf, 0x03, 0x00, 0x00, 0xff, 0xff, 0x7c, 0x56, 0x03, 0x70, 0xe5, 0x07, 0x00, 0x00,
 }
 
 func (m *HardwareSpecs) Marshal() (dAtA []byte, err error) {
@@ -415,6 +377,54 @@ func (m *HardwareSpecs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *Deposit) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Deposit) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Deposit) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	n1, err1 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.DepositedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.DepositedAt):])
+	if err1 != nil {
+		return 0, err1
+	}
+	i -= n1
+	i = encodeVarintMedianode(dAtA, i, uint64(n1))
+	i--
+	dAtA[i] = 0x1a
+	if len(m.Depositor) > 0 {
+		i -= len(m.Depositor)
+		copy(dAtA[i:], m.Depositor)
+		i = encodeVarintMedianode(dAtA, i, uint64(len(m.Depositor)))
+		i--
+		dAtA[i] = 0x12
+	}
+	{
+		size, err := m.Amount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMedianode(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
 func (m *MediaNode) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -435,22 +445,28 @@ func (m *MediaNode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	n1, err1 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt):])
-	if err1 != nil {
-		return 0, err1
+	if len(m.Deposits) > 0 {
+		for iNdEx := len(m.Deposits) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Deposits[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintMedianode(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x4a
+		}
 	}
-	i -= n1
-	i = encodeVarintMedianode(dAtA, i, uint64(n1))
+	n3, err3 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.RegisteredAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.RegisteredAt):])
+	if err3 != nil {
+		return 0, err3
+	}
+	i -= n3
+	i = encodeVarintMedianode(dAtA, i, uint64(n3))
 	i--
 	dAtA[i] = 0x42
-	n2, err2 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt):])
-	if err2 != nil {
-		return 0, err2
-	}
-	i -= n2
-	i = encodeVarintMedianode(dAtA, i, uint64(n2))
-	i--
-	dAtA[i] = 0x3a
 	if m.Leased {
 		i--
 		if m.Leased {
@@ -459,10 +475,15 @@ func (m *MediaNode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0
 		}
 		i--
+		dAtA[i] = 0x38
+	}
+	if m.Status != 0 {
+		i = encodeVarintMedianode(dAtA, i, uint64(m.Status))
+		i--
 		dAtA[i] = 0x30
 	}
 	{
-		size, err := m.LeaseAmountPerDay.MarshalToSizedBuffer(dAtA[:i])
+		size, err := m.PricePerDay.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -471,6 +492,13 @@ func (m *MediaNode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x2a
+	if len(m.Owner) > 0 {
+		i -= len(m.Owner)
+		copy(dAtA[i:], m.Owner)
+		i = encodeVarintMedianode(dAtA, i, uint64(len(m.Owner)))
+		i--
+		dAtA[i] = 0x22
+	}
 	{
 		size, err := m.HardwareSpecs.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
@@ -480,14 +508,7 @@ func (m *MediaNode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintMedianode(dAtA, i, uint64(size))
 	}
 	i--
-	dAtA[i] = 0x22
-	if len(m.Owner) > 0 {
-		i -= len(m.Owner)
-		copy(dAtA[i:], m.Owner)
-		i = encodeVarintMedianode(dAtA, i, uint64(len(m.Owner)))
-		i--
-		dAtA[i] = 0x1a
-	}
+	dAtA[i] = 0x1a
 	if len(m.Url) > 0 {
 		i -= len(m.Url)
 		copy(dAtA[i:], m.Url)
@@ -523,34 +544,68 @@ func (m *Lease) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.LeaseStatus != 0 {
-		i = encodeVarintMedianode(dAtA, i, uint64(m.LeaseStatus))
+	if m.LastSettledAt != nil {
+		n6, err6 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastSettledAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastSettledAt):])
+		if err6 != nil {
+			return 0, err6
+		}
+		i -= n6
+		i = encodeVarintMedianode(dAtA, i, uint64(n6))
 		i--
-		dAtA[i] = 0x38
+		dAtA[i] = 0x52
 	}
-	n5, err5 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.LeaseExpiry, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.LeaseExpiry):])
-	if err5 != nil {
-		return 0, err5
+	if m.Status != 0 {
+		i = encodeVarintMedianode(dAtA, i, uint64(m.Status))
+		i--
+		dAtA[i] = 0x48
 	}
-	i -= n5
-	i = encodeVarintMedianode(dAtA, i, uint64(n5))
+	n7, err7 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Expiry, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.Expiry):])
+	if err7 != nil {
+		return 0, err7
+	}
+	i -= n7
+	i = encodeVarintMedianode(dAtA, i, uint64(n7))
 	i--
-	dAtA[i] = 0x32
+	dAtA[i] = 0x42
 	if m.LeasedDays != 0 {
 		i = encodeVarintMedianode(dAtA, i, uint64(m.LeasedDays))
 		i--
-		dAtA[i] = 0x28
+		dAtA[i] = 0x38
 	}
-	n6, err6 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.LeasedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.LeasedAt):])
-	if err6 != nil {
-		return 0, err6
+	if m.StartTime != nil {
+		n8, err8 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.StartTime, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartTime):])
+		if err8 != nil {
+			return 0, err8
+		}
+		i -= n8
+		i = encodeVarintMedianode(dAtA, i, uint64(n8))
+		i--
+		dAtA[i] = 0x32
 	}
-	i -= n6
-	i = encodeVarintMedianode(dAtA, i, uint64(n6))
+	if m.SettledAmount != nil {
+		{
+			size, err := m.SettledAmount.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMedianode(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2a
+	}
+	{
+		size, err := m.TotalLeaseAmount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMedianode(dAtA, i, uint64(size))
+	}
 	i--
 	dAtA[i] = 0x22
 	{
-		size, err := m.LeaseAmount.MarshalToSizedBuffer(dAtA[:i])
+		size, err := m.PricePerDay.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -559,10 +614,10 @@ func (m *Lease) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x1a
-	if len(m.LeasedTo) > 0 {
-		i -= len(m.LeasedTo)
-		copy(dAtA[i:], m.LeasedTo)
-		i = encodeVarintMedianode(dAtA, i, uint64(len(m.LeasedTo)))
+	if len(m.Leasee) > 0 {
+		i -= len(m.Leasee)
+		copy(dAtA[i:], m.Leasee)
+		i = encodeVarintMedianode(dAtA, i, uint64(len(m.Leasee)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -603,6 +658,23 @@ func (m *HardwareSpecs) Size() (n int) {
 	return n
 }
 
+func (m *Deposit) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.Amount.Size()
+	n += 1 + l + sovMedianode(uint64(l))
+	l = len(m.Depositor)
+	if l > 0 {
+		n += 1 + l + sovMedianode(uint64(l))
+	}
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.DepositedAt)
+	n += 1 + l + sovMedianode(uint64(l))
+	return n
+}
+
 func (m *MediaNode) Size() (n int) {
 	if m == nil {
 		return 0
@@ -616,21 +688,28 @@ func (m *MediaNode) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovMedianode(uint64(l))
 	}
+	l = m.HardwareSpecs.Size()
+	n += 1 + l + sovMedianode(uint64(l))
 	l = len(m.Owner)
 	if l > 0 {
 		n += 1 + l + sovMedianode(uint64(l))
 	}
-	l = m.HardwareSpecs.Size()
+	l = m.PricePerDay.Size()
 	n += 1 + l + sovMedianode(uint64(l))
-	l = m.LeaseAmountPerDay.Size()
-	n += 1 + l + sovMedianode(uint64(l))
+	if m.Status != 0 {
+		n += 1 + sovMedianode(uint64(m.Status))
+	}
 	if m.Leased {
 		n += 2
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.RegisteredAt)
 	n += 1 + l + sovMedianode(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
-	n += 1 + l + sovMedianode(uint64(l))
+	if len(m.Deposits) > 0 {
+		for _, e := range m.Deposits {
+			l = e.Size()
+			n += 1 + l + sovMedianode(uint64(l))
+		}
+	}
 	return n
 }
 
@@ -643,21 +722,33 @@ func (m *Lease) Size() (n int) {
 	if m.MediaNodeId != 0 {
 		n += 1 + sovMedianode(uint64(m.MediaNodeId))
 	}
-	l = len(m.LeasedTo)
+	l = len(m.Leasee)
 	if l > 0 {
 		n += 1 + l + sovMedianode(uint64(l))
 	}
-	l = m.LeaseAmount.Size()
+	l = m.PricePerDay.Size()
 	n += 1 + l + sovMedianode(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.LeasedAt)
+	l = m.TotalLeaseAmount.Size()
 	n += 1 + l + sovMedianode(uint64(l))
+	if m.SettledAmount != nil {
+		l = m.SettledAmount.Size()
+		n += 1 + l + sovMedianode(uint64(l))
+	}
+	if m.StartTime != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartTime)
+		n += 1 + l + sovMedianode(uint64(l))
+	}
 	if m.LeasedDays != 0 {
 		n += 1 + sovMedianode(uint64(m.LeasedDays))
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.LeaseExpiry)
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Expiry)
 	n += 1 + l + sovMedianode(uint64(l))
-	if m.LeaseStatus != 0 {
-		n += 1 + sovMedianode(uint64(m.LeaseStatus))
+	if m.Status != 0 {
+		n += 1 + sovMedianode(uint64(m.Status))
+	}
+	if m.LastSettledAt != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastSettledAt)
+		n += 1 + l + sovMedianode(uint64(l))
 	}
 	return n
 }
@@ -775,6 +866,154 @@ func (m *HardwareSpecs) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *Deposit) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowMedianode
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Deposit: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Deposit: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMedianode
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Amount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Depositor", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMedianode
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Depositor = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DepositedAt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMedianode
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.DepositedAt, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipMedianode(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *MediaNode) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -857,38 +1096,6 @@ func (m *MediaNode) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Owner", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMedianode
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthMedianode
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMedianode
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Owner = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field HardwareSpecs", wireType)
 			}
 			var msglen int
@@ -920,9 +1127,41 @@ func (m *MediaNode) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Owner", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMedianode
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Owner = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LeaseAmountPerDay", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PricePerDay", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -949,11 +1188,30 @@ func (m *MediaNode) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.LeaseAmountPerDay.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.PricePerDay.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			m.Status = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMedianode
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Status |= Status(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 7:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Leased", wireType)
 			}
@@ -973,9 +1231,9 @@ func (m *MediaNode) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.Leased = bool(v != 0)
-		case 7:
+		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RegisteredAt", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1002,13 +1260,13 @@ func (m *MediaNode) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.RegisteredAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 8:
+		case 9:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Deposits", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1035,7 +1293,8 @@ func (m *MediaNode) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			m.Deposits = append(m.Deposits, &Deposit{})
+			if err := m.Deposits[len(m.Deposits)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1110,7 +1369,7 @@ func (m *Lease) Unmarshal(dAtA []byte) error {
 			}
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LeasedTo", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Leasee", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1138,11 +1397,11 @@ func (m *Lease) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.LeasedTo = string(dAtA[iNdEx:postIndex])
+			m.Leasee = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LeaseAmount", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PricePerDay", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1169,13 +1428,13 @@ func (m *Lease) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.LeaseAmount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.PricePerDay.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LeasedAt", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TotalLeaseAmount", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1202,11 +1461,83 @@ func (m *Lease) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.LeasedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.TotalLeaseAmount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SettledAmount", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMedianode
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SettledAmount == nil {
+				m.SettledAmount = &types.Coin{}
+			}
+			if err := m.SettledAmount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StartTime", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMedianode
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.StartTime == nil {
+				m.StartTime = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.StartTime, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LeasedDays", wireType)
 			}
@@ -1225,9 +1556,9 @@ func (m *Lease) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 6:
+		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LeaseExpiry", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Expiry", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1254,15 +1585,15 @@ func (m *Lease) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.LeaseExpiry, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.Expiry, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 7:
+		case 9:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LeaseStatus", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
-			m.LeaseStatus = 0
+			m.Status = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowMedianode
@@ -1272,11 +1603,47 @@ func (m *Lease) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.LeaseStatus |= LeaseStatus(b&0x7F) << shift
+				m.Status |= LeaseStatus(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LastSettledAt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMedianode
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMedianode
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.LastSettledAt == nil {
+				m.LastSettledAt = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.LastSettledAt, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipMedianode(dAtA[iNdEx:])

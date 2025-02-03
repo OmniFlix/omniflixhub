@@ -2,7 +2,9 @@ syntax = "proto3";
 package OmniFlix.medianode.v1beta1;
 
 import "gogoproto/gogo.proto";
+import "cosmos/msg/v1/msg.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "amino/amino.proto";
 import "OmniFlix/medianode/v1beta1/medianode.proto";
 
 option go_package = "github.com/OmniFlix/omniflixhub/v6/x/medianode/types";
@@ -17,26 +19,38 @@ service Msg {
   rpc LeaseMediaNode(MsgLeaseMediaNode) returns (MsgLeaseMediaNodeResponse);
   // CancelLease cancels an active lease
   rpc CancelLease(MsgCancelLease) returns (MsgCancelLeaseResponse);
+  // DepositMediaNode deposits funds for a media node
+  rpc DepositMediaNode(MsgDepositMediaNode) returns (MsgDepositMediaNodeResponse);
 }
 
 // MsgRegisterMediaNode represents a message to register a new media node
 message MsgRegisterMediaNode {
-  string sender = 1;
-  string url = 2;
-  HardwareSpecs hardware_specs = 3 [(gogoproto.nullable) = false];
-  cosmos.base.v1beta1.Coin lease_amount_per_day = 4 [(gogoproto.nullable) = false];
+  option (amino.name) = "OmniFlix/register-medianode";
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string url = 1;
+  HardwareSpecs hardware_specs = 2 [(gogoproto.nullable) = false];
+  cosmos.base.v1beta1.Coin price_per_day = 3 [(gogoproto.nullable) = false];
+  cosmos.base.v1beta1.Coin deposit = 4;
+  string sender = 5;
 }
 
 // MsgRegisterMediaNodeResponse defines the response for registering a media node
-message MsgRegisterMediaNodeResponse {}
+message MsgRegisterMediaNodeResponse {
+  uint64 media_node_id = 1; // ID of the registered media node
+  string status = 2;         // Status of the registration
+}
 
-// MsgUpdateMediaNode represents a message to update an existing media node
+
+// MsgUpdateMediaNode represents a message to update an existing media node only if it's not leased
 message MsgUpdateMediaNode {
-  string sender = 1;
-  uint64 id = 2;
-  string url = 3;
-  HardwareSpecs hardware_specs = 4 [(gogoproto.nullable) = false];
-  cosmos.base.v1beta1.Coin lease_amount_per_day = 5 [(gogoproto.nullable) = false];
+  option (amino.name) = "OmniFlix/update-medianode";
+  option (cosmos.msg.v1.signer) = "sender";
+
+  uint64 id = 1;
+  HardwareSpecs hardware_specs = 2 [(gogoproto.nullable) = false];
+  cosmos.base.v1beta1.Coin price_per_day = 3 [(gogoproto.nullable) = false];
+  string sender = 4;
 }
 
 // MsgUpdateMediaNodeResponse defines the response for updating a media node
@@ -45,20 +59,45 @@ message MsgUpdateMediaNodeResponse {
 
 // MsgLeaseMediaNode represents a message to lease a media node
 message MsgLeaseMediaNode {
-  string sender = 1;
-  uint64 media_node_id = 2;
-  uint64 lease_days = 3;
+  option (amino.name) = "OmniFlix/lease-medianode";
+  option (cosmos.msg.v1.signer) = "sender";
+
+  uint64 media_node_id             = 1;
+  uint64 lease_days                = 2;
+  cosmos.base.v1beta1.Coin amount  = 3 [(gogoproto.nullable) = false];
+  string sender                    = 4;
 }
 
 // MsgLeaseMediaNodeResponse defines the response for leasing a media node
 message MsgLeaseMediaNodeResponse {
+  Lease lease = 1;
 }
 
 // MsgCancelLease represents a message to cancel an active lease
 message MsgCancelLease {
-  string sender = 1;
-  uint64 media_node_id = 2;
+  option (amino.name) = "OmniFlix/cancel-medianode-lease";
+  option (cosmos.msg.v1.signer) = "sender";
+
+  uint64 media_node_id = 1;
+  string sender = 2;
 }
 
 // MsgCancelLeaseResponse defines the response for canceling a lease
 message MsgCancelLeaseResponse {}
+
+// MsgDepositMediaNode represents a message to deposit funds for a media node
+message MsgDepositMediaNode {
+  option (amino.name) = "OmniFlix/deposit-medianode";
+  option (cosmos.msg.v1.signer) = "sender";
+
+  uint64 media_node_id = 1;         // ID of the media node
+  cosmos.base.v1beta1.Coin amount = 2 [(gogoproto.nullable) = false]; // Amount to deposit
+  string sender = 3;                // Address of the sender
+}
+
+// MsgDepositMediaNodeResponse defines the response for depositing funds for a media node
+message MsgDepositMediaNodeResponse {
+  uint64 medianode_id = 1;
+  cosmos.base.v1beta1.Coin total_deposit = 2;
+  string medianode_status  = 3;
+}

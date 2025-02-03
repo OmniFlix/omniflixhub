@@ -1,4 +1,4 @@
-package itc
+package medianode
 
 import (
 	"github.com/OmniFlix/omniflixhub/v6/x/medianode/keeper"
