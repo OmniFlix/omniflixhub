@@ -5,6 +5,7 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/log"
+	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/OmniFlix/omniflixhub/v6/x/medianode/types"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -68,7 +69,7 @@ func (k Keeper) UpdateMediaNode(ctx sdk.Context, mediaNode types.MediaNode, owne
 		return errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %d does not exist", mediaNode.Id)
 	}
 
-	existingOwner, err := sdk.AccAddressFromBech32(existingNode.GetOwner())
+	existingOwner, err := sdk.AccAddressFromBech32(existingNode.Owner)
 	if err != nil {
 		return err
 	}
@@ -95,8 +96,8 @@ func (k Keeper) LeaseMediaNode(ctx sdk.Context, mediaNodeId uint64, leaseDays ui
 
 	// Calculate total lease amount
 	totalLeaseAmount := sdk.NewCoin(
-		mediaNode.LeaseAmountPerDay.Denom,
-		mediaNode.LeaseAmountPerDay.Amount.MulRaw(int64(leaseDays)),
+		mediaNode.PricePerDay.Denom,
+		mediaNode.PricePerDay.Amount.MulRaw(int64(leaseDays)),
 	)
 
 	// Transfer tokens from lessee to module account
@@ -111,6 +112,45 @@ func (k Keeper) LeaseMediaNode(ctx sdk.Context, mediaNodeId uint64, leaseDays ui
 
 	// Update media node lease details
 	mediaNode.Leased = true
+	k.SetMediaNode(ctx, mediaNode)
+
+	return nil
+}
+
+// DepositMediaNode allows a user to deposit a media node
+func (k Keeper) DepositMediaNode(ctx sdk.Context, mediaNodeId uint64, amount sdk.Coin, sender sdk.AccAddress) error {
+	mediaNode, found := k.GetMediaNode(ctx, mediaNodeId)
+	if !found {
+		return errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %d does not exist", mediaNodeId)
+	}
+
+	// Allow deposit only if the media node status is PENDING
+	if mediaNode.Status != types.STATUS_PENDING {
+		return errorsmod.Wrapf(types.ErrInvalidMediaNodeStatus, "media node %d is not in PENDING status", mediaNodeId)
+	}
+
+	// Create a deposit object
+	deposit := types.Deposit{
+		Depositor:   sender.String(),
+		DepositedAt: ctx.BlockTime(),
+		Amount:      amount,
+	}
+
+	// Update the media node's deposits
+	mediaNode.Deposits = append(mediaNode.Deposits, &deposit)
+
+	// Calculate total deposits
+	totalDeposits := sdk.NewCoin(mediaNode.PricePerDay.Denom, sdkmath.ZeroInt())
+	for _, d := range mediaNode.Deposits {
+		totalDeposits = totalDeposits.Add(d.Amount)
+	}
+
+	// Check if total deposits meet or exceed the required minimum deposit
+	minDeposit := k.GetMinDeposit(ctx) // Assuming this method exists
+	if totalDeposits.IsGTE(minDeposit) {
+		mediaNode.Status = types.STATUS_ACTIVE // Change status to ACTIVE
+	}
+
 	k.SetMediaNode(ctx, mediaNode)
 
 	return nil

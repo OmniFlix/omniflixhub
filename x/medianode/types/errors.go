@@ -19,7 +19,8 @@ var (
 	ErrLeaseExpired           = errorsmod.Register(ModuleName, 12, "lease has expired")
 
 	// Additional errors needed for keeper functions
-	ErrMediaNodeExists       = errorsmod.Register(ModuleName, 13, "media node already exists")
-	ErrMediaNodeDoesNotExist = errorsmod.Register(ModuleName, 14, "media node does not exist")
-	ErrMediaNodeNotLeased    = errorsmod.Register(ModuleName, 15, "media node is not leased")
+	ErrMediaNodeExists        = errorsmod.Register(ModuleName, 13, "media node already exists")
+	ErrMediaNodeDoesNotExist  = errorsmod.Register(ModuleName, 14, "media node does not exist")
+	ErrMediaNodeNotLeased     = errorsmod.Register(ModuleName, 15, "media node is not leased")
+	ErrInvalidMediaNodeStatus = errorsmod.Register(ModuleName, 16, "media node status not allows deposit")
 )

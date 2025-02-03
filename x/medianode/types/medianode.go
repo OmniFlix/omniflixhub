@@ -16,11 +16,12 @@ func NewMediaNode(
 	leaseAmountPerDay sdk.Coin,
 ) MediaNode {
 	return MediaNode{
-		Url:               url,
-		Owner:             owner,
-		HardwareSpecs:     hardwareSpecs,
-		LeaseAmountPerDay: leaseAmountPerDay,
-		Leased:            false,
+		Url:           url,
+		HardwareSpecs: hardwareSpecs,
+		PricePerDay:   leaseAmountPerDay,
+		Leased:        false,
+		Owner:         owner,
+		Deposits:      []*Deposit{},
 	}
 }
 

@@ -35,7 +35,7 @@ func (m msgServer) RegisterMediaNode(goCtx context.Context, msg *types.MsgRegist
 	}
 
 	// Create and store the media node
-	mediaNode := types.NewMediaNode(msg.Url, sender.String(), msg.HardwareSpecs, msg.LeaseAmountPerDay)
+	mediaNode := types.NewMediaNode(msg.Url, sender.String(), msg.HardwareSpecs, msg.PricePerDay)
 	if err := m.Keeper.RegisterMediaNode(ctx, mediaNode); err != nil {
 		return nil, err
 	}
@@ -62,9 +62,6 @@ func (m msgServer) UpdateMediaNode(goCtx context.Context, msg *types.MsgUpdateMe
 	if !found {
 		return nil, errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "not found")
 	}
-
-	// Update the media node with new values
-	existingMediaNode.Url = msg.Url
 
 	m.Keeper.UpdateMediaNode(ctx, existingMediaNode, sender)
 
@@ -108,4 +105,26 @@ func (m msgServer) CancelLease(goCtx context.Context, msg *types.MsgCancelLease)
 	}
 
 	return &types.MsgCancelLeaseResponse{}, nil
+}
+
+// DepositMediaNode handles depositing to a media node
+func (m msgServer) DepositMediaNode(goCtx context.Context, msg *types.MsgDepositMediaNode) (*types.MsgDepositMediaNodeResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	// Validate the deposit details
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
+	// Deposit to the media node
+	if err := m.Keeper.DepositMediaNode(ctx, msg.MediaNodeId, msg.Amount, sender); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgDepositMediaNodeResponse{}, nil
 }

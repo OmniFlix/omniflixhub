@@ -21,16 +21,16 @@ func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId uint64, sender sdk.AccA
 		return errorsmod.Wrapf(types.ErrLeaseNotFound, "lease for media node %d does not exist", mediaNodeId)
 	}
 
-	if sender.String() != lease.LeasedTo {
+	if sender.String() != lease.Leasee {
 		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", sender.String())
 	}
 
 	// Calculate remaining lease days and refund amount
-	remainingDays := uint64(ctx.BlockTime().Sub(lease.LeasedAt).Hours() / 24)
+	remainingDays := uint64(ctx.BlockTime().Sub(*lease.StartTime).Hours() / 24)
 	if remainingDays > 0 {
 		refundAmount := sdk.NewCoin(
-			mediaNode.LeaseAmountPerDay.Denom,
-			mediaNode.LeaseAmountPerDay.Amount.MulRaw(int64(remainingDays)),
+			mediaNode.PricePerDay.Denom,
+			mediaNode.PricePerDay.Amount.MulRaw(int64(remainingDays)),
 		)
 
 		// Return remaining funds to lessee
@@ -46,7 +46,7 @@ func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId uint64, sender sdk.AccA
 
 	// Clear lease
 	mediaNode.Leased = false
-	lease.LeaseStatus = types.LeaseStatus_LEASE_STATUS_CANCELLED
+	lease.Status = types.LEASE_STATUS_CANCELLED
 	k.SetMediaNode(ctx, mediaNode)
 	k.SetLease(ctx, lease)
 	return nil

@@ -37,10 +37,10 @@ func (m MediaNode) Validate() error {
 	}
 
 	// Validate lease amount
-	if !m.LeaseAmountPerDay.IsValid() {
+	if !m.PricePerDay.IsValid() {
 		return fmt.Errorf("invalid lease amount per day")
 	}
-	if m.LeaseAmountPerDay.IsZero() {
+	if m.PricePerDay.IsZero() {
 		return fmt.Errorf("lease amount per day cannot be zero")
 	}
 
@@ -67,20 +67,20 @@ func (l Lease) Validate() error {
 		return fmt.Errorf("media node ID cannot be 0")
 	}
 
-	if l.LeasedTo == "" {
+	if l.Leasee == "" {
 		return fmt.Errorf("leased to address cannot be empty")
 	}
 
 	// Validate leasedTo address format
-	if _, err := sdk.AccAddressFromBech32(l.LeasedTo); err != nil {
+	if _, err := sdk.AccAddressFromBech32(l.Leasee); err != nil {
 		return fmt.Errorf("invalid leased to address: %w", err)
 	}
 
 	// Validate lease amount
-	if !l.LeaseAmount.IsValid() {
+	if !l.TotalLeaseAmount.IsValid() {
 		return fmt.Errorf("invalid lease amount")
 	}
-	if l.LeaseAmount.IsZero() {
+	if l.TotalLeaseAmount.IsZero() {
 		return fmt.Errorf("lease amount cannot be zero")
 	}
 
@@ -89,12 +89,12 @@ func (l Lease) Validate() error {
 	}
 
 	// Validate lease status
-	if err := ValidateLeaseStatus(l.LeaseStatus); err != nil {
+	if err := ValidateLeaseStatus(l.Status); err != nil {
 		return fmt.Errorf("invalid lease status: %w", err)
 	}
 
 	// Validate lease expiry is after leased at time
-	if !l.LeaseExpiry.After(l.LeasedAt) {
+	if !l.Expiry.After(*l.StartTime) {
 		return fmt.Errorf("lease expiry must be after leased at time")
 	}
 
@@ -104,9 +104,9 @@ func (l Lease) Validate() error {
 // ValidateLeaseStatus validates the lease status string
 func ValidateLeaseStatus(status LeaseStatus) error {
 	switch status {
-	case LeaseStatus_LEASE_STATUS_ACTIVE,
-		LeaseStatus_LEASE_STATUS_CANCELLED,
-		LeaseStatus_LEASE_STATUS_EXPIRED:
+	case LEASE_STATUS_ACTIVE,
+		LEASE_STATUS_CANCELLED,
+		LEASE_STATUS_EXPIRED:
 		return nil
 	default:
 		return fmt.Errorf("invalid lease status: %s", status)
