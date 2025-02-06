@@ -41,7 +41,8 @@ message MediaNode {
   Status status                                   = 6; 
   bool leased                                     = 7;
   google.protobuf.Timestamp registered_at         = 8 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
-  repeated Deposit deposits                       = 9; 
+  repeated Deposit deposits                       = 9;
+  google.protobuf.Timestamp closed_at             = 10 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false]; 
 
 }
 // LeaseStatus defines the status of a lease

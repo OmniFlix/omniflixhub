@@ -14,6 +14,7 @@ const (
 	TypeMsgLeaseMediaNode    = "lease_media_node"
 	TypeMsgCancelLease       = "cancel_lease"
 	TypeMsgDepositMediaNode  = "deposit_media_node"
+	TypeMsgCloseMediaNode    = "close_media_node"
 )
 
 var (
@@ -177,6 +178,33 @@ func (msg MsgDepositMediaNode) ValidateBasic() error {
 }
 
 func (msg MsgDepositMediaNode) GetSigners() []sdk.AccAddress {
+	from, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
+}
+
+func NewMsgCloseMediaNode(mediaNodeId uint64, sender string) *MsgCloseMediaNode {
+	return &MsgCloseMediaNode{
+		MediaNodeId: mediaNodeId,
+		Sender:      sender,
+	}
+}
+
+func (msg MsgCloseMediaNode) Route() string { return MsgRoute }
+
+func (msg MsgCloseMediaNode) Type() string { return TypeMsgCloseMediaNode }
+
+func (msg MsgCloseMediaNode) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+	}
+	return nil
+}
+
+func (msg MsgCloseMediaNode) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		panic(err)

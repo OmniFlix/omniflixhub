@@ -5,6 +5,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "OmniFlix/medianode/v1beta1/medianode.proto";
+import "OmniFlix/medianode/v1beta1/params.proto";
 
 option go_package = "github.com/OmniFlix/omniflixhub/v6/x/medianode/types";
 
@@ -20,11 +21,6 @@ service Query {
     option (google.api.http).get = "/omniflix/medianode/v1beta1/nodes";
   }
 
-  // MediaNodesByOwner returns all media nodes owned by an address
-  rpc MediaNodesByOwner(QueryMediaNodesByOwnerRequest) returns (QueryMediaNodesByOwnerResponse) {
-    option (google.api.http).get = "/omniflix/medianode/v1beta1/nodes/owner/{owner}";
-  }
-
   // Lease returns lease details for a media node
   rpc Lease(QueryLeaseRequest) returns (QueryLeaseResponse) {
     option (google.api.http).get = "/omniflix/medianode/v1beta1/lease/{media_node_id}";
@@ -38,6 +34,10 @@ service Query {
   // AvailableNodes returns all unlocked media nodes
   rpc AvailableNodes(QueryAvailableNodesRequest) returns (QueryAvailableNodesResponse) {
     option (google.api.http).get = "/omniflix/medianode/v1beta1/nodes/available";
+  }
+  // Params returns all parameters of media node module
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/omniflix/medianode/v1beta1/params";
   }
 }
 
@@ -105,4 +105,13 @@ message QueryAvailableNodesRequest {
 message QueryAvailableNodesResponse {
   repeated MediaNode media_nodes = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryParamsRequest is the request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is the response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params defines the parameters of the module.
+  Params params = 1 [(gogoproto.nullable) = false];
 }

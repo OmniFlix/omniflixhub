@@ -94,6 +94,11 @@ func (k Keeper) LeaseMediaNode(ctx sdk.Context, mediaNodeId uint64, leaseDays ui
 		return errorsmod.Wrapf(types.ErrMediaNodeAlreadyLeased, "media node %d is already leased", mediaNodeId)
 	}
 
+	// Allow leasing only if the media node status is ACTIVE
+	if mediaNode.Status != types.STATUS_ACTIVE {
+		return errorsmod.Wrapf(types.ErrInvalidMediaNodeStatus, "media node %d is not in ACTIVE status", mediaNodeId)
+	}
+
 	// Calculate total lease amount
 	totalLeaseAmount := sdk.NewCoin(
 		mediaNode.PricePerDay.Denom,
@@ -151,6 +156,76 @@ func (k Keeper) DepositMediaNode(ctx sdk.Context, mediaNodeId uint64, amount sdk
 		mediaNode.Status = types.STATUS_ACTIVE // Change status to ACTIVE
 	}
 
+	k.SetMediaNode(ctx, mediaNode)
+
+	return nil
+}
+
+// CancelLease cancels an existing lease for a media node
+func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId uint64, sender sdk.AccAddress) error {
+	mediaNode, found := k.GetMediaNode(ctx, mediaNodeId)
+	if !found {
+		return errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %d does not exist", mediaNodeId)
+	}
+	lease, found := k.GetMediaNodeLease(ctx, mediaNodeId)
+	if !found {
+		return errorsmod.Wrapf(types.ErrLeaseNotFound, "lease for media node %d does not exist", mediaNodeId)
+	}
+
+	if lease.Status != types.LEASE_STATUS_ACTIVE {
+		return errorsmod.Wrapf(types.ErrLeaseNotActive, "lease for media node %d is not active", mediaNodeId)
+	}
+
+	if sender.String() != lease.Leasee {
+		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", sender.String())
+	}
+
+	// Calculate remaining lease days and refund amount
+	remainingDays := uint64(ctx.BlockTime().Sub(*lease.StartTime).Hours() / 24)
+	if remainingDays > 0 {
+		refundAmount := sdk.NewCoin(
+			mediaNode.PricePerDay.Denom,
+			mediaNode.PricePerDay.Amount.MulRaw(int64(remainingDays)),
+		)
+
+		// Return remaining funds to lessee
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(
+			ctx,
+			types.ModuleName,
+			sender,
+			sdk.NewCoins(refundAmount),
+		); err != nil {
+			return err
+		}
+	}
+
+	// Clear lease
+	mediaNode.Leased = false
+	lease.Status = types.LEASE_STATUS_CANCELLED
+	k.SetMediaNode(ctx, mediaNode)
+	k.SetLease(ctx, lease)
+	return nil
+}
+
+// CloseMediaNode closes an existing media node
+func (k Keeper) CloseMediaNode(ctx sdk.Context, mediaNodeId uint64, owner sdk.AccAddress) error {
+	mediaNode, found := k.GetMediaNode(ctx, mediaNodeId)
+	if !found {
+		return errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %d does not exist", mediaNodeId)
+	}
+
+	existingOwner, err := sdk.AccAddressFromBech32(mediaNode.Owner)
+	if err != nil {
+		return err
+	}
+
+	if !owner.Equals(existingOwner) {
+		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", owner.String())
+	}
+
+	// Update media node status to CLOSED
+	mediaNode.Status = types.STATUS_CLOSED
+	mediaNode.ClosedAt = ctx.BlockTime()
 	k.SetMediaNode(ctx, mediaNode)
 
 	return nil

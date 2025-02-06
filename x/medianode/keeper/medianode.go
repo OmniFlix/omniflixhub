@@ -3,54 +3,10 @@ package keeper
 import (
 	"fmt"
 
-	errorsmod "cosmossdk.io/errors"
 	"github.com/OmniFlix/omniflixhub/v6/x/medianode/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	gogotypes "github.com/cosmos/gogoproto/types"
 )
-
-// CancelLease cancels an existing lease for a media node
-func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId uint64, sender sdk.AccAddress) error {
-	mediaNode, found := k.GetMediaNode(ctx, mediaNodeId)
-	if !found {
-		return errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %d does not exist", mediaNodeId)
-	}
-	lease, found := k.GetMediaNodeLease(ctx, mediaNodeId)
-	if !found {
-		return errorsmod.Wrapf(types.ErrLeaseNotFound, "lease for media node %d does not exist", mediaNodeId)
-	}
-
-	if sender.String() != lease.Leasee {
-		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", sender.String())
-	}
-
-	// Calculate remaining lease days and refund amount
-	remainingDays := uint64(ctx.BlockTime().Sub(*lease.StartTime).Hours() / 24)
-	if remainingDays > 0 {
-		refundAmount := sdk.NewCoin(
-			mediaNode.PricePerDay.Denom,
-			mediaNode.PricePerDay.Amount.MulRaw(int64(remainingDays)),
-		)
-
-		// Return remaining funds to lessee
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(
-			ctx,
-			types.ModuleName,
-			sender,
-			sdk.NewCoins(refundAmount),
-		); err != nil {
-			return err
-		}
-	}
-
-	// Clear lease
-	mediaNode.Leased = false
-	lease.Status = types.LEASE_STATUS_CANCELLED
-	k.SetMediaNode(ctx, mediaNode)
-	k.SetLease(ctx, lease)
-	return nil
-}
 
 // SetMediaNode stores the media node in state
 func (k Keeper) SetMediaNode(ctx sdk.Context, mediaNode types.MediaNode) {
