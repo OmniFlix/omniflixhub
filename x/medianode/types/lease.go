@@ -15,7 +15,7 @@ func NewLease(
 	id uint64,
 	mediaNodeId uint64,
 	lessee string,
-	startTime *time.Time,
+	startTime time.Time,
 	leasedDays uint64,
 	totalAmount sdk.Coin,
 	active bool,

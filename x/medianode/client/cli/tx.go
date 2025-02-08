@@ -33,17 +33,17 @@ func GetTxCmd() *cobra.Command {
 // GetCmdRegisterMediaNode implements the register-media-node command
 func GetCmdRegisterMediaNode() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "register-media-node",
+		Use:   "register",
 		Short: "registers a new media node",
-		Long:  "register a new media node with the specified URL, hardware specifications, and amount\n",
+		Long:  "register a new media node with the specified URL, hardware specifications, and lease price per day\n",
 		Example: fmt.Sprintf(
-			"$ %s tx itc register-media-node [url] [hardwarespecs] --amount=<amount> "+
+			"$ %s tx itc register [url] --hardware-specs=<hardwarespecs> --amount=<amount> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
 			version.AppName,
 		),
-		Args: cobra.ExactArgs(2), // Expecting 2 positional arguments
+		Args: cobra.ExactArgs(1), // Expecting 1 positional argument
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -51,20 +51,24 @@ func GetCmdRegisterMediaNode() *cobra.Command {
 			}
 
 			url := args[0]
-			hardwareSpecs, err := ParseHardwareSpecs(args[1])
+			hardwareSpecsStr, err := cmd.Flags().GetString(FlagHardwareSpecs)
 			if err != nil {
 				return err
 			}
-			amountStr, err := cmd.Flags().GetString(FlagLeaseAmount)
+			hardwareSpecs, err := ParseHardwareSpecs(hardwareSpecsStr)
 			if err != nil {
 				return err
 			}
-			amount, err := sdk.ParseCoinNormalized(amountStr)
+			priceStr, err := cmd.Flags().GetString(FlagPricePerDay)
+			if err != nil {
+				return err
+			}
+			price, err := sdk.ParseCoinNormalized(priceStr)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgRegisterMediaNode(url, hardwareSpecs, amount, clientCtx.GetFromAddress().String())
+			msg := types.NewMsgRegisterMediaNode(url, hardwareSpecs, price, clientCtx.GetFromAddress().String())
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -75,7 +79,8 @@ func GetCmdRegisterMediaNode() *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsRegisterMediaNode) // Assuming FsRegisterMediaNode is defined elsewhere
-	_ = cmd.MarkFlagRequired(FlagLeaseAmount)
+	_ = cmd.MarkFlagRequired(FlagHardwareSpecs)
+	_ = cmd.MarkFlagRequired(FlagPricePerDay)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd

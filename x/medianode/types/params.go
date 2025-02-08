@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"time"
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/types"
@@ -16,6 +17,7 @@ var (
 	KeyInitialDepositPercentage = []byte("InitialDepositPercentage")
 	KeyLeaseCommission          = []byte("LeaseCommission")
 	KeyCommissionDistribution   = []byte("CommissionDistribution")
+	KeyDepositReleasePeriod     = []byte("DepositReleasePeriod")
 )
 
 var (
@@ -24,6 +26,7 @@ var (
 	defaultMinDeposit               = types.NewCoin("uflix", sdkmath.NewInt(1000))
 	defaultStakingDistribtionPerc   = sdkmath.LegacyMustNewDecFromStr("0.5")
 	defaultCPDistributionPerc       = sdkmath.LegacyMustNewDecFromStr("0.5")
+	defaultDepositReleasePeriod     = time.Hour * 24 * 7
 )
 
 // ParamTable for medianode module
@@ -43,6 +46,7 @@ func DefaultParams() Params {
 			Staking:       defaultStakingDistribtionPerc,
 			CommunityPool: defaultCPDistributionPerc,
 		},
+		DepositReleasePeriod: defaultDepositReleasePeriod,
 	}
 }
 

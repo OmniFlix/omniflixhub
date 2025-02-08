@@ -13,6 +13,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	legacy.RegisterAminoMsg(cdc, &MsgUpdateMediaNode{}, "OmniFlix/medianode/MsgUpdateMediaNode")
 	legacy.RegisterAminoMsg(cdc, &MsgLeaseMediaNode{}, "OmniFlix/medianode/MsgLeaseMediaNode")
 	legacy.RegisterAminoMsg(cdc, &MsgCancelLease{}, "OmniFlix/medianode/MsgCancelLease")
+	legacy.RegisterAminoMsg(cdc, &MsgCancelLease{}, "OmniFlix/medianode/MsgCloseLease")
 
 	cdc.RegisterConcrete(&MediaNode{}, "OmniFlix/medianode/MediaNode", nil)
 	cdc.RegisterConcrete(&Lease{}, "OmniFlix/medianode/Lease", nil)
@@ -24,6 +25,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgUpdateMediaNode{},
 		&MsgLeaseMediaNode{},
 		&MsgCancelLease{},
+		&MsgCloseMediaNode{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

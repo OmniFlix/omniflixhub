@@ -24,4 +24,5 @@ var (
 	ErrMediaNodeNotLeased     = errorsmod.Register(ModuleName, 15, "media node is not leased")
 	ErrInvalidMediaNodeStatus = errorsmod.Register(ModuleName, 16, "media node status not allows deposit")
 	ErrLeaseNotActive         = errorsmod.Register(ModuleName, 18, "lease not in active state")
+	ErrInsufficientDeposit    = errorsmod.Register(ModuleName, 19, "insufficient deposit")
 )

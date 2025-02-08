@@ -6,6 +6,7 @@ import (
 
 const (
 	FlagURL           = "url"
+	FlagPricePerDay   = "price-per-day"
 	FlagLeaseAmount   = "lease-amount"
 	FlagLeaseDays     = "lease-days"
 	FlagHardwareSpecs = "hardware-specs"
@@ -18,13 +19,14 @@ var (
 	FsUpdateMediaNode   = flag.NewFlagSet("", flag.ContinueOnError)
 	FsLeaseMediaNode    = flag.NewFlagSet("", flag.ContinueOnError)
 	FsCancelLease       = flag.NewFlagSet("", flag.ContinueOnError)
+	FsCloseMediaNode    = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
 	// Register flags for registering a media node
 	FsRegisterMediaNode.String(FlagURL, "", "URL of the media node")
 	FsRegisterMediaNode.String(FlagHardwareSpecs, "", "Hardware specifications of the media node")
-	FsRegisterMediaNode.String(FlagLeaseAmount, "", "Lease amount per day")
+	FsRegisterMediaNode.String(FlagPricePerDay, "", "Lease price per day")
 
 	// Register flags for updating a media node
 	FsUpdateMediaNode.String(FlagURL, "", "New URL of the media node")
@@ -33,5 +35,6 @@ func init() {
 
 	// Register flags for leasing a media node
 	FsLeaseMediaNode.Uint64(FlagLeaseDays, 0, "Number of days to lease the media node")
+	FsLeaseMediaNode.String(FlagLeaseAmount, "", "lease amount paying")
 
 }

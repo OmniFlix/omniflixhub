@@ -4,6 +4,7 @@ import (
 	"context"
 
 	errorsmod "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	"github.com/OmniFlix/omniflixhub/v6/x/medianode/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -28,6 +29,12 @@ func (m msgServer) RegisterMediaNode(goCtx context.Context, msg *types.MsgRegist
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return nil, err
+	}
+	minDeposit := m.Keeper.GetMinDeposit(ctx)
+	initialDepositPerc := m.Keeper.GetInitialDepositPercentage(ctx)
+	minInitialDeposit := sdk.NewCoin(minDeposit.Denom, sdkmath.LegacyNewDecFromInt(minDeposit.Amount).Mul(initialDepositPerc).TruncateInt())
+	if !msg.Deposit.IsGTE(minInitialDeposit) {
+		return nil, errorsmod.Wrapf(types.ErrInsufficientDeposit, "%s of initial deposit is reqquired", minInitialDeposit.String())
 	}
 
 	// Validate the media node registration details
@@ -85,7 +92,7 @@ func (m msgServer) LeaseMediaNode(goCtx context.Context, msg *types.MsgLeaseMedi
 	}
 
 	// Lease the media node
-	if err := m.Keeper.LeaseMediaNode(ctx, msg.MediaNodeId, msg.LeaseDays, sender); err != nil {
+	if err := m.Keeper.LeaseMediaNode(ctx, msg.MediaNodeId, msg.LeaseDays, sender, msg.Amount); err != nil {
 		return nil, err
 	}
 

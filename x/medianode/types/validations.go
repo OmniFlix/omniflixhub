@@ -94,7 +94,7 @@ func (l Lease) Validate() error {
 	}
 
 	// Validate lease expiry is after leased at time
-	if !l.Expiry.After(*l.StartTime) {
+	if !l.Expiry.After(l.StartTime) {
 		return fmt.Errorf("lease expiry must be after leased at time")
 	}
 
