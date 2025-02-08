@@ -116,6 +116,9 @@ import (
 	itckeeper "github.com/OmniFlix/omniflixhub/v6/x/itc/keeper"
 	itctypes "github.com/OmniFlix/omniflixhub/v6/x/itc/types"
 
+	medianodekeeper "github.com/OmniFlix/omniflixhub/v6/x/medianode/keeper"
+	medianodetypes "github.com/OmniFlix/omniflixhub/v6/x/medianode/types"
+
 	streampaykeeper "github.com/OmniFlix/streampay/v2/x/streampay/keeper"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 
@@ -184,6 +187,7 @@ type AppKeepers struct {
 	MarketplaceKeeper marketplacekeeper.Keeper
 	StreamPayKeeper   streampaykeeper.Keeper
 	ItcKeeper         itckeeper.Keeper
+	MedianodeKeeper   medianodekeeper.Keeper
 }
 
 func NewAppKeeper(
@@ -553,6 +557,14 @@ func NewAppKeeper(
 		govModAddress,
 	)
 
+	appKeepers.MedianodeKeeper = *medianodekeeper.NewKeeper(
+		appCodec,
+		appKeepers.keys[itctypes.StoreKey],
+		appKeepers.AccountKeeper,
+		appKeepers.BankKeeper,
+		govModAddress,
+	)
+
 	appKeepers.GovKeeper.SetLegacyRouter(govRouter)
 
 	var ibcTransferStack porttypes.IBCModule
@@ -661,6 +673,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(marketplacetypes.ModuleName)
 	paramsKeeper.Subspace(streampaytypes.ModuleName)
 	paramsKeeper.Subspace(itctypes.ModuleName)
+	paramsKeeper.Subspace(medianodetypes.ModuleName)
 
 	return paramsKeeper
 }

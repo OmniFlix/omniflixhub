@@ -44,7 +44,13 @@ func (m msgServer) RegisterMediaNode(goCtx context.Context, msg *types.MsgRegist
 
 	// Create and store the media node
 	mediaNode := types.NewMediaNode(msg.Url, sender.String(), msg.HardwareSpecs, msg.PricePerDay)
-	if err := m.Keeper.RegisterMediaNode(ctx, mediaNode); err != nil {
+
+	if msg.Deposit.Amount.GTE(minDeposit.Amount) {
+		mediaNode.RegisteredAt = ctx.BlockTime()
+		mediaNode.Status = types.STATUS_ACTIVE
+	}
+
+	if err := m.Keeper.RegisterMediaNode(ctx, mediaNode, *msg.Deposit); err != nil {
 		return nil, err
 	}
 

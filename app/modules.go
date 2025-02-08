@@ -102,6 +102,9 @@ import (
 	"github.com/OmniFlix/omniflixhub/v6/x/itc"
 	itctypes "github.com/OmniFlix/omniflixhub/v6/x/itc/types"
 
+	"github.com/OmniFlix/omniflixhub/v6/x/medianode"
+	medianodetypes "github.com/OmniFlix/omniflixhub/v6/x/medianode/types"
+
 	"github.com/OmniFlix/streampay/v2/x/streampay"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 )
@@ -147,6 +150,7 @@ var (
 		marketplace.AppModuleBasic{},
 		streampay.AppModuleBasic{},
 		itc.AppModuleBasic{},
+		medianode.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -170,6 +174,7 @@ var (
 		marketplacetypes.ModuleName:    nil,
 		streampaytypes.ModuleName:      nil,
 		itctypes.ModuleName:            nil,
+		medianodetypes.ModuleName:      nil,
 	}
 )
 
@@ -270,6 +275,7 @@ func appModules(
 		marketplace.NewAppModule(appCodec, app.MarketplaceKeeper, app.GetSubspace(marketplacetypes.ModuleName)),
 		streampay.NewAppModule(appCodec, app.StreamPayKeeper),
 		itc.NewAppModule(appCodec, app.ItcKeeper, app.GetSubspace(itctypes.ModuleName)),
+		medianode.NewAppModule(appCodec, app.MedianodeKeeper),
 	}
 }
 
@@ -352,6 +358,7 @@ func orderBeginBlockers() []string {
 		marketplacetypes.ModuleName,
 		streampaytypes.ModuleName,
 		itctypes.ModuleName,
+		medianodetypes.ModuleName,
 	}
 }
 
@@ -391,6 +398,7 @@ func orderEndBlockers() []string {
 		marketplacetypes.ModuleName,
 		streampaytypes.ModuleName,
 		itctypes.ModuleName,
+		medianodetypes.ModuleName,
 	}
 }
 
@@ -439,5 +447,6 @@ func orderInitGenesis() []string {
 		marketplacetypes.ModuleName,
 		streampaytypes.ModuleName,
 		itctypes.ModuleName,
+		medianodetypes.ModuleName,
 	}
 }
