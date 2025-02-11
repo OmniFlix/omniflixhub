@@ -58,7 +58,6 @@ func (k Keeper) GetModuleAccountAddress(ctx sdk.Context) sdk.AccAddress {
 
 // RegisterMediaNode creates a new media node entry
 func (k Keeper) RegisterMediaNode(ctx sdk.Context, mediaNode types.MediaNode, depositAmount sdk.Coin) error {
-
 	// Create a deposit object
 	deposit := types.Deposit{
 		Depositor:   mediaNode.Owner,

@@ -9,5 +9,8 @@ import (
 func EndBlock(ctx sdk.Context, k keeper.Keeper) ([]abcitypes.ValidatorUpdate, error) {
 	log := k.Logger(ctx)
 	log.Info(" Medianode payments settled.. ")
+	if err := k.SettleActiveLeases(ctx); err != nil {
+		panic(err)
+	}
 	return []abcitypes.ValidatorUpdate{}, nil
 }
