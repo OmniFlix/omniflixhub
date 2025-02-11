@@ -106,7 +106,7 @@ func GetCmdLeaseMediaNode() *cobra.Command {
 		Short: "leases a media node",
 		Long:  "leases a media node with the specified URL and lease days\n",
 		Example: fmt.Sprintf(
-			"$ %s tx medianode lease [medianode-id] --lease-days=<duration> --amount=<amount>"+
+			"$ %s tx medianode lease [medianode-id] --lease-days=<duration> --amount=<amount> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
@@ -123,16 +123,20 @@ func GetCmdLeaseMediaNode() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			leaseDaysStr, err := cmd.Flags().GetString(FlagLeaseDays)
+			leaseDays, err := cmd.Flags().GetUint64(FlagLeaseDays)
 			if err != nil {
 				return err
 			}
-			leaseDays, err := strconv.ParseUint(leaseDaysStr, 10, 64)
+			leaseAmountStr, err := cmd.Flags().GetString(FlagLeaseAmount)
+			if err != nil {
+				return err
+			}
+			leaseAmount, err := sdk.ParseCoinNormalized(leaseAmountStr)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgLeaseMediaNode(mediaNodeId, leaseDays, clientCtx.GetFromAddress().String())
+			msg := types.NewMsgLeaseMediaNode(mediaNodeId, leaseDays, leaseAmount, clientCtx.GetFromAddress().String())
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err

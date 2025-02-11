@@ -95,11 +95,12 @@ func (msg MsgUpdateMediaNode) GetSigners() []sdk.AccAddress {
 }
 
 // Lease Media Node
-func NewMsgLeaseMediaNode(mediaNodeId uint64, leaseDays uint64, sender string) *MsgLeaseMediaNode {
+func NewMsgLeaseMediaNode(mediaNodeId uint64, leaseDays uint64, leaseAmount sdk.Coin, sender string) *MsgLeaseMediaNode {
 	return &MsgLeaseMediaNode{
 		MediaNodeId: mediaNodeId,
 		LeaseDays:   leaseDays,
 		Sender:      sender,
+		Amount:      leaseAmount,
 	}
 }
 

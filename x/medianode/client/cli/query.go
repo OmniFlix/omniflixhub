@@ -27,6 +27,8 @@ func GetQueryCmd() *cobra.Command {
 		GetCmdQueryParams(),
 		GetCmdQueryMediaNodes(),
 		GetCmdQueryMediaNode(),
+		GetCmdQueryLease(),
+		GetCmdQueryLeasesByLessee(),
 	)
 
 	return cmd
@@ -126,6 +128,79 @@ func GetCmdQueryMediaNodes() *cobra.Command {
 	}
 	flags.AddQueryFlagsToCmd(cmd)
 	flags.AddPaginationFlagsToCmd(cmd, "medianodes")
+
+	return cmd
+}
+
+// GetCmdQueryLease implements the query lease command.
+func GetCmdQueryLease() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "lease [id]",
+		Long:    "Query a lease by its id.",
+		Example: fmt.Sprintf("$ %s query medianode lease <id>", version.AppName),
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			mediaNodeId, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.Lease(context.Background(), &types.QueryLeaseRequest{
+				MediaNodeId: mediaNodeId,
+			})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(&res.Lease)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdQueryLeasesByLessee implements the query all leases command.
+func GetCmdQueryLeasesByLessee() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "leases-by-lessee",
+		Long:    "Query leases by lessee.",
+		Example: fmt.Sprintf("$ %s query medianode leases-by-lessee", version.AppName),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+			resp, err := queryClient.LeasesByLessee(
+				context.Background(),
+				&types.QueryLeasesByLesseeRequest{
+					Pagination: pageReq,
+				},
+			)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(resp)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	flags.AddPaginationFlagsToCmd(cmd, "leases-by-lessee")
 
 	return cmd
 }
