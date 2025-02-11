@@ -129,7 +129,7 @@ func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
-	//TODO: register query server
+	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 
 // RegisterInvariants registers the itc module's invariants.
@@ -148,10 +148,10 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.Ra
 }
 
 // ExportGenesis returns the itc module's exported genesis state as raw JSON bytes.
-// func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.RawMessage {
-//	genState := ExportGenesis(ctx, am.keeper)
-//	return cdc.MustMarshalJSON(genState)
-//}
+func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.RawMessage {
+	genState := ExportGenesis(ctx, am.keeper)
+	return cdc.MustMarshalJSON(genState)
+}
 
 // ConsensusVersion implements ConsensusVersion.
 func (AppModule) ConsensusVersion() uint64 { return ConsensusVersion }
