@@ -559,7 +559,7 @@ func NewAppKeeper(
 
 	appKeepers.MedianodeKeeper = *medianodekeeper.NewKeeper(
 		appCodec,
-		appKeepers.keys[itctypes.StoreKey],
+		appKeepers.keys[medianodetypes.StoreKey],
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		govModAddress,
