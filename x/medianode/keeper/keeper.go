@@ -112,11 +112,13 @@ func (k Keeper) LeaseMediaNode(ctx sdk.Context, mediaNodeId uint64, leaseDays ui
 
 	// Create a new lease object
 	lease := types.Lease{
-		MediaNodeId: mediaNodeId,
-		Leasee:      lessee.String(),
-		PricePerDay: leaseAmount,
-		StartTime:   ctx.BlockTime(),
-		Status:      types.LEASE_STATUS_ACTIVE,
+		MediaNodeId:      mediaNodeId,
+		Leasee:           lessee.String(),
+		PricePerDay:      mediaNode.PricePerDay,
+		StartTime:        ctx.BlockTime(),
+		Status:           types.LEASE_STATUS_ACTIVE,
+		Owner:            mediaNode.Owner,
+		TotalLeaseAmount: leaseAmount,
 	}
 
 	// Set the lease using the SetLease method
