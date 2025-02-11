@@ -13,6 +13,11 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	if err := genState.ValidateGenesis(); err != nil {
 		panic(err.Error())
 	}
+
+	if err := k.SetParams(ctx, genState.Params); err != nil {
+		panic(err)
+	}
+
 	for _, mn := range genState.MediaNodes {
 		k.SetMediaNode(ctx, mn)
 	}
@@ -27,6 +32,18 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	if moduleAcc == nil {
 		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
 	}
+}
+
+// ExportGenesis exports state
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
+	medianodes := k.GetAllMediaNodes(ctx)
+	leases := k.GetAllLeases(ctx)
+	return types.NewGenesisState(
+		medianodes,
+		leases,
+		k.GetNextMediaNodeNumber(ctx),
+		k.GetParams(ctx),
+	)
 }
 
 // DefaultGenesisState returns default state

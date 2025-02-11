@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	storetypes "cosmossdk.io/store/types"
+
 	"github.com/OmniFlix/omniflixhub/v6/x/medianode/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
@@ -67,4 +69,32 @@ func (k Keeper) GetNextMediaNodeNumber(ctx sdk.Context) (nextNodeId uint64) {
 		nextNodeId = val.GetValue()
 	}
 	return nextNodeId
+}
+
+// GetAllMediaNodes returns all media nodes from the store
+func (k Keeper) GetAllMediaNodes(ctx sdk.Context) (mediaNodes []types.MediaNode) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := storetypes.KVStorePrefixIterator(store, types.PrefixMediaNode)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var mediaNode types.MediaNode
+		k.cdc.MustUnmarshal(iterator.Value(), &mediaNode)
+		mediaNodes = append(mediaNodes, mediaNode)
+	}
+	return mediaNodes
+}
+
+// GetAllLeases returns all leases from the store
+func (k Keeper) GetAllLeases(ctx sdk.Context) (leases []types.Lease) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := storetypes.KVStorePrefixIterator(store, types.PrefixLease)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var lease types.Lease
+		k.cdc.MustUnmarshal(iterator.Value(), &lease)
+		leases = append(leases, lease)
+	}
+	return leases
 }

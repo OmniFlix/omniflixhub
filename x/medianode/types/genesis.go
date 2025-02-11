@@ -4,14 +4,14 @@ import (
 	"fmt"
 )
 
-func NewGenesisState(campaigns []MediaNode,
-	claims []Lease,
+func NewGenesisState(medianodes []MediaNode,
+	leases []Lease,
 	nextMediaNodeNumber uint64,
 	params Params,
 ) *GenesisState {
 	return &GenesisState{
-		MediaNodes: campaigns,
-		Leases:     claims,
+		MediaNodes: medianodes,
+		Leases:     leases,
 		Params:     params,
 		LastNodeId: nextMediaNodeNumber,
 	}
