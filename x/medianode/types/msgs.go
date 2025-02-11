@@ -25,12 +25,13 @@ var (
 )
 
 // Register Media Node
-func NewMsgRegisterMediaNode(url string, hardwareSpecs HardwareSpecs, pricePerDay sdk.Coin, sender string) *MsgRegisterMediaNode {
+func NewMsgRegisterMediaNode(url string, hardwareSpecs HardwareSpecs, pricePerDay, deposit sdk.Coin, sender string) *MsgRegisterMediaNode {
 	return &MsgRegisterMediaNode{
 		Url:           url,
 		HardwareSpecs: hardwareSpecs,
 		PricePerDay:   pricePerDay,
 		Sender:        sender,
+		Deposit:       &deposit,
 	}
 }
 
