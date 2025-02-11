@@ -24,9 +24,36 @@ func GetQueryCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	cmd.AddCommand(
+		GetCmdQueryParams(),
 		GetCmdQueryMediaNodes(),
+		GetCmdQueryMediaNode(),
 	)
 
+	return cmd
+}
+
+// GetCmdQueryParams implements the query params command.
+func GetCmdQueryParams() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "params",
+		Args:  cobra.NoArgs,
+		Short: "Query medianode params",
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.Params(cmd.Context(), &types.QueryParamsRequest{})
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(&res.Params)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }
 
@@ -34,7 +61,7 @@ func GetQueryCmd() *cobra.Command {
 func GetCmdQueryMediaNode() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "medianode [id]",
-		Long:    "Query a campaign by it's id.",
+		Long:    "Query a medianode by it's id.",
 		Example: fmt.Sprintf("$ %s query medianode medianode <id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -98,7 +125,7 @@ func GetCmdQueryMediaNodes() *cobra.Command {
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
-	flags.AddPaginationFlagsToCmd(cmd, "media-nodes")
+	flags.AddPaginationFlagsToCmd(cmd, "medianodes")
 
 	return cmd
 }

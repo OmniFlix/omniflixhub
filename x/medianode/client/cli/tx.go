@@ -25,6 +25,10 @@ func GetTxCmd() *cobra.Command {
 	}
 	itcTxCmd.AddCommand(
 		GetCmdRegisterMediaNode(),
+		GetCmdLeaseMediaNode(),
+		GetCmdDepositMediaNode(),
+		GetCmdCancelLease(),
+		GetCmdCloseMediaNode(),
 	)
 
 	return itcTxCmd
@@ -37,7 +41,7 @@ func GetCmdRegisterMediaNode() *cobra.Command {
 		Short: "registers a new media node",
 		Long:  "register a new media node with the specified URL, hardware specifications, and lease price per day\n",
 		Example: fmt.Sprintf(
-			"$ %s tx itc register [url] --hardware-specs=<hardwarespecs> --amount=<amount> "+
+			"$ %s tx medianode register [url] --hardware-specs=<hardwarespecs> --price-per-day=<amount> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
@@ -67,8 +71,16 @@ func GetCmdRegisterMediaNode() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			depositAmountStr, err := cmd.Flags().GetString(FlagDeposit)
+			if err != nil {
+				return err
+			}
+			deposit, err := sdk.ParseCoinNormalized(depositAmountStr)
+			if err != nil {
+				return err
+			}
 
-			msg := types.NewMsgRegisterMediaNode(url, hardwareSpecs, price, clientCtx.GetFromAddress().String())
+			msg := types.NewMsgRegisterMediaNode(url, hardwareSpecs, price, deposit, clientCtx.GetFromAddress().String())
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -81,6 +93,188 @@ func GetCmdRegisterMediaNode() *cobra.Command {
 	cmd.Flags().AddFlagSet(FsRegisterMediaNode) // Assuming FsRegisterMediaNode is defined elsewhere
 	_ = cmd.MarkFlagRequired(FlagHardwareSpecs)
 	_ = cmd.MarkFlagRequired(FlagPricePerDay)
+	_ = cmd.MarkFlagRequired(FlagDeposit)
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdLeaseMediaNode implements the lease-media-node command
+func GetCmdLeaseMediaNode() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "lease",
+		Short: "leases a media node",
+		Long:  "leases a media node with the specified URL and lease days\n",
+		Example: fmt.Sprintf(
+			"$ %s tx medianode lease [medianode-id] --lease-days=<duration> --amount=<amount>"+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(1), // Expecting 1 positional argument
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			mediaNodeId, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+			leaseDaysStr, err := cmd.Flags().GetString(FlagLeaseDays)
+			if err != nil {
+				return err
+			}
+			leaseDays, err := strconv.ParseUint(leaseDaysStr, 10, 64)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgLeaseMediaNode(mediaNodeId, leaseDays, clientCtx.GetFromAddress().String())
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsLeaseMediaNode) // Assuming FsLeaseMediaNode is defined elsewhere
+	_ = cmd.MarkFlagRequired(FlagLeaseDays)
+	_ = cmd.MarkFlagRequired(FlagLeaseAmount)
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdDepositMediaNode implements the deposit-media-node command
+func GetCmdDepositMediaNode() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "deposit",
+		Short: "deposits an amount for a media node",
+		Long:  "deposits an amount for a media node with the specified URL and deposit amount\n",
+		Example: fmt.Sprintf(
+			"$ %s tx medianode deposit [medianode-id] --amount=<amount> "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(1), // Expecting 1 positional argument
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			medianodeId, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+			depositStr, err := cmd.Flags().GetString(FlagDeposit)
+			if err != nil {
+				return err
+			}
+
+			deposit, err := sdk.ParseCoinNormalized(depositStr)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgDepositMediaNode(medianodeId, deposit, clientCtx.GetFromAddress().String())
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsDepositMediaNode)
+	_ = cmd.MarkFlagRequired(FlagDeposit)
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdCancelLease implements the cancel-lease command
+func GetCmdCancelLease() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "cancel-lease",
+		Short: "cancels a lease for a media node",
+		Long:  "cancels an active lease for a media node with the specified ID\n",
+		Example: fmt.Sprintf(
+			"$ %s tx medianode cancel-lease [medianode-id] "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(1), // Expecting 1 positional argument
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			mediaNodeId, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgCancelLease(mediaNodeId, clientCtx.GetFromAddress().String())
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdCloseMediaNode implements the close-media-node command
+func GetCmdCloseMediaNode() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "close",
+		Short: "closes a media node",
+		Long:  "closes a media node with the specified ID\n",
+		Example: fmt.Sprintf(
+			"$ %s tx medianode close [medianode-id] "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(1), // Expecting 1 positional argument
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			mediaNodeId, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgCloseMediaNode(mediaNodeId, clientCtx.GetFromAddress().String())
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
