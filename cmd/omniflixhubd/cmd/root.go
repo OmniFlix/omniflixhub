@@ -163,6 +163,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, t
 	ac := appCreator{
 		encCfg: encodingConfig,
 	}
+
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(tempApp.ModuleBasics, app.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
@@ -170,7 +171,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, t
 			banktypes.GenesisBalancesIterator{},
 			app.DefaultNodeHome,
 			genutiltypes.DefaultMessageValidator,
-			encodingConfig.TxConfig.SigningContext().ValidatorAddressCodec(),
+			tempApp.StakingKeeper.ValidatorAddressCodec(),
 		),
 		genutilcli.MigrateGenesisCmd(genutilcli.MigrationMap),
 		genutilcli.GenTxCmd(
@@ -178,9 +179,10 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, t
 			encodingConfig.TxConfig,
 			banktypes.GenesisBalancesIterator{},
 			app.DefaultNodeHome,
-			encodingConfig.TxConfig.SigningContext().ValidatorAddressCodec(),
+			tempApp.StakingKeeper.ValidatorAddressCodec(),
 		),
 		genutilcli.ValidateGenesisCmd(tempApp.ModuleBasics),
+		genutilcli.AddGenesisAccountCmd(app.DefaultNodeHome, tempApp.AccountKeeper.AddressCodec()),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		addDebugCommands(debug.Cmd()),
 		pruning.Cmd(ac.newApp, app.DefaultNodeHome),
