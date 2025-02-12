@@ -200,7 +200,7 @@ func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId uint64, sender sdk.AccA
 	}
 
 	// Calculate remaining lease days and refund amount
-	remainingDays := uint64(ctx.BlockTime().Sub(lease.StartTime).Hours() / 24)
+	remainingDays := uint64(lease.LeasedDays) - uint64(ctx.BlockTime().Sub(lease.StartTime).Hours()/24)
 	if remainingDays > 0 {
 		refundAmount := sdk.NewCoin(
 			mediaNode.PricePerDay.Denom,
@@ -264,30 +264,86 @@ func (k Keeper) SettleActiveLeases(ctx sdk.Context) error {
 		if lease.Status == types.LEASE_STATUS_ACTIVE &&
 			ctx.BlockTime().Sub(lease.StartTime).Hours() >= 24 &&
 			ctx.BlockTime().Sub(lease.LastSettledAt).Hours() >= 24 {
+
 			// Calculate payment amount
 			paymentAmount := sdk.NewCoin(
 				lease.PricePerDay.Denom,
 				lease.PricePerDay.Amount,
 			)
 
-			// Transfer payment to media node owner
-			owner, err := sdk.AccAddressFromBech32(lease.Owner)
-			if err != nil {
-				return err
+			remainingAmount := lease.TotalLeaseAmount.Sub(*lease.SettledAmount)
+
+			if remainingAmount.Amount.GTE(paymentAmount.Amount) {
+
+				// Transfer payment to media node owner
+				owner, err := sdk.AccAddressFromBech32(lease.Owner)
+				if err != nil {
+					return err
+				}
+
+				if err := k.bankKeeper.SendCoinsFromModuleToAccount(
+					ctx,
+					types.ModuleName,
+					owner,
+					sdk.NewCoins(paymentAmount),
+				); err != nil {
+					return err
+				}
+
+				// Update last settled time
+				lease.LastSettledAt = ctx.BlockTime()
 			}
 
-			if err := k.bankKeeper.SendCoinsFromModuleToAccount(
-				ctx,
-				types.ModuleName,
-				owner,
-				sdk.NewCoins(paymentAmount),
-			); err != nil {
-				return err
+			if lease.Expiry.Before(ctx.BlockTime()) || remainingAmount.Amount.LT(paymentAmount.Amount) {
+				lease.Status = types.LEASE_STATUS_EXPIRED
+				lease.Expiry = ctx.BlockTime()
 			}
 
-			// Update last settled time
-			lease.LastSettledAt = ctx.BlockTime()
 			k.SetLease(ctx, lease) // Assuming this method exists to update the lease
+		}
+	}
+
+	return nil
+}
+
+// ReleaseDeposits iterates through CLOSED media nodes and returns deposits to depositors
+func (k Keeper) ReleaseDeposits(ctx sdk.Context) error {
+	store := ctx.KVStore(k.storeKey)
+	iterator := storetypes.KVStorePrefixIterator(store, types.PrefixMediaNode)
+
+	defer iterator.Close()
+
+	// Retrieve the deposit release period from params
+	params := k.GetParams(ctx) // Assuming this method exists to get the current parameters
+	depositReleasePeriod := params.DepositReleasePeriod
+
+	for ; iterator.Valid(); iterator.Next() {
+		var mediaNode types.MediaNode
+		k.cdc.MustUnmarshal(iterator.Value(), &mediaNode)
+
+		// Check if the media node is CLOSED
+		if mediaNode.Status == types.STATUS_CLOSED && len(mediaNode.Deposits) > 0 {
+			// Check if the time since closed exceeds the deposit release period
+			if ctx.BlockTime().Sub(mediaNode.ClosedAt) > depositReleasePeriod {
+				for _, deposit := range mediaNode.Deposits {
+					// Return deposit to the depositor
+					depositorAddr, err := sdk.AccAddressFromBech32(deposit.Depositor)
+					if err != nil {
+						return err
+					}
+
+					if err := k.bankKeeper.SendCoinsFromModuleToAccount(
+						ctx,
+						types.ModuleName,
+						depositorAddr,
+						sdk.NewCoins(deposit.Amount),
+					); err != nil {
+						return err
+					}
+				}
+			}
+			mediaNode.Deposits = []*types.Deposit{}
+			k.SetMediaNode(ctx, mediaNode)
 		}
 	}
 

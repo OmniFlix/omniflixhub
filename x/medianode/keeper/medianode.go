@@ -98,3 +98,15 @@ func (k Keeper) GetAllLeases(ctx sdk.Context) (leases []types.Lease) {
 	}
 	return leases
 }
+
+// RemoveMediaNode removes the media node from state
+func (k Keeper) RemoveMediaNode(ctx sdk.Context, id uint64) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(types.GetMediaNodeKey(id))
+}
+
+// RemoveLease removes the lease from state
+func (k Keeper) RemoveLease(ctx sdk.Context, mediaNodeId uint64) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(types.GetLeaseKey(mediaNodeId))
+}
