@@ -198,7 +198,7 @@ func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId uint64, sender sdk.AccA
 	}
 
 	// Calculate remaining lease days and refund amount //TODO: change to 24
-	remainingDays := uint64(lease.LeasedDays) - uint64(ctx.BlockTime().Sub(lease.StartTime).Hours()/24)
+	remainingDays := lease.LeasedDays - uint64(ctx.BlockTime().Sub(lease.StartTime).Hours()/24)
 	if remainingDays > 0 {
 		refundAmount := sdk.NewCoin(
 			mediaNode.PricePerDay.Denom,
