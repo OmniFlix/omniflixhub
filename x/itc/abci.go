@@ -1,7 +1,7 @@
 package itc
 
 import (
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/keeper"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/keeper"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

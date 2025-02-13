@@ -7,14 +7,14 @@ import (
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	onfttypes "github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 
 	errorsmod "cosmossdk.io/errors"
 
 	storetypes "cosmossdk.io/store/types"
 
 	"cosmossdk.io/log"
-	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/marketplace/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"

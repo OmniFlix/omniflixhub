@@ -2,10 +2,10 @@ package keepers
 
 import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	itctypes "github.com/OmniFlix/omniflixhub/v5/x/itc/types"
-	marketplacetypes "github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
-	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
-	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
+	itctypes "github.com/OmniFlix/omniflixhub/v6/x/itc/types"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/v6/x/marketplace/types"
+	onfttypes "github.com/OmniFlix/omniflixhub/v6/x/onft/types"
+	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"

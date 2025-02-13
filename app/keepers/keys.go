@@ -7,12 +7,13 @@ import (
 	"cosmossdk.io/x/feegrant"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	alloctypes "github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
-	globalfeetypes "github.com/OmniFlix/omniflixhub/v5/x/globalfee/types"
-	itctypes "github.com/OmniFlix/omniflixhub/v5/x/itc/types"
-	marketplacetypes "github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
-	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
-	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
+	alloctypes "github.com/OmniFlix/omniflixhub/v6/x/alloc/types"
+	globalfeetypes "github.com/OmniFlix/omniflixhub/v6/x/globalfee/types"
+	itctypes "github.com/OmniFlix/omniflixhub/v6/x/itc/types"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/v6/x/marketplace/types"
+	medianodetypes "github.com/OmniFlix/omniflixhub/v6/x/medianode/types"
+	onfttypes "github.com/OmniFlix/omniflixhub/v6/x/onft/types"
+	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -70,6 +71,7 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		marketplacetypes.StoreKey,
 		streampaytypes.StoreKey,
 		itctypes.StoreKey,
+		medianodetypes.StoreKey,
 	)
 	// Define transient store keys
 	appKeepers.tkeys = storetypes.NewTransientStoreKeys(paramstypes.TStoreKey)

@@ -15,9 +15,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/globalfee/client/cli"
-	"github.com/OmniFlix/omniflixhub/v5/x/globalfee/keeper"
-	"github.com/OmniFlix/omniflixhub/v5/x/globalfee/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/globalfee/client/cli"
+	"github.com/OmniFlix/omniflixhub/v6/x/globalfee/keeper"
+	"github.com/OmniFlix/omniflixhub/v6/x/globalfee/types"
 )
 
 var (

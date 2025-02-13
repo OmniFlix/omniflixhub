@@ -6,3 +6,4 @@ secret.yml
 /build
 /_build
 .vscode
+.omniflixhub-test/

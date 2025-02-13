@@ -3,11 +3,11 @@ package types_test
 import (
 	"testing"
 
-	"github.com/OmniFlix/omniflixhub/v5/app"
+	"github.com/OmniFlix/omniflixhub/v6/app"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/types"
 )
 
 func TestGenesisState_Validate(t *testing.T) {

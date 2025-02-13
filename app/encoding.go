@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/OmniFlix/omniflixhub/v5/app/params"
+	"github.com/OmniFlix/omniflixhub/v6/app/params"
 	"github.com/cosmos/cosmos-sdk/std"
 )
 

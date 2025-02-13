@@ -11,7 +11,7 @@ import "google/protobuf/duration.proto";
 import "OmniFlix/itc/v1/itc.proto";
 import "OmniFlix/itc/v1/params.proto";
 
-option go_package = "github.com/OmniFlix/omniflixhub/v5/x/itc/types";
+option go_package = "github.com/OmniFlix/omniflixhub/v6/x/itc/types";
 option (gogoproto.goproto_getters_all) = false;
 
 service Msg {

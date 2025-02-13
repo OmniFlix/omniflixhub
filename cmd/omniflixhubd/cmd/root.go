@@ -21,8 +21,8 @@ import (
 	"cosmossdk.io/log"
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	"github.com/OmniFlix/omniflixhub/v5/app"
-	"github.com/OmniFlix/omniflixhub/v5/app/params"
+	"github.com/OmniFlix/omniflixhub/v6/app"
+	"github.com/OmniFlix/omniflixhub/v6/app/params"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -163,6 +163,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, t
 	ac := appCreator{
 		encCfg: encodingConfig,
 	}
+
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(tempApp.ModuleBasics, app.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
@@ -170,7 +171,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, t
 			banktypes.GenesisBalancesIterator{},
 			app.DefaultNodeHome,
 			genutiltypes.DefaultMessageValidator,
-			encodingConfig.TxConfig.SigningContext().ValidatorAddressCodec(),
+			tempApp.StakingKeeper.ValidatorAddressCodec(),
 		),
 		genutilcli.MigrateGenesisCmd(genutilcli.MigrationMap),
 		genutilcli.GenTxCmd(
@@ -178,9 +179,10 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, t
 			encodingConfig.TxConfig,
 			banktypes.GenesisBalancesIterator{},
 			app.DefaultNodeHome,
-			encodingConfig.TxConfig.SigningContext().ValidatorAddressCodec(),
+			tempApp.StakingKeeper.ValidatorAddressCodec(),
 		),
 		genutilcli.ValidateGenesisCmd(tempApp.ModuleBasics),
+		genutilcli.AddGenesisAccountCmd(app.DefaultNodeHome, tempApp.AccountKeeper.AddressCodec()),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		addDebugCommands(debug.Cmd()),
 		pruning.Cmd(ac.newApp, app.DefaultNodeHome),

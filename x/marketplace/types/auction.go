@@ -5,7 +5,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/marketplace/exported"
+	"github.com/OmniFlix/omniflixhub/v6/x/marketplace/exported"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/gogoproto/proto"
 )

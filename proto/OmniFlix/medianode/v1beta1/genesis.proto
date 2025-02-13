@@ -1,0 +1,25 @@
+syntax = "proto3";
+package OmniFlix.medianode.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "OmniFlix/medianode/v1beta1/medianode.proto";
+import "OmniFlix/medianode/v1beta1/params.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/v6/x/medianode/types";
+
+// GenesisState defines the medianode module's genesis state
+message GenesisState {
+  // params defines all the parameters of the module
+  Params params                    = 1 [(gogoproto.nullable) = false];
+  
+  // media_nodes is the list of registered media nodes
+  repeated MediaNode media_nodes   = 2 [(gogoproto.nullable) = false];
+
+  repeated Deposit deposits        = 3 [(gogoproto.nullable) = false];
+  
+  // leases is the list of active leases
+  repeated Lease leases            = 4 [(gogoproto.nullable) = false];
+  
+  // next_medianode_id is the current usable media node ID
+  uint64 next_medianode_id         = 5;
+}

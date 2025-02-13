@@ -1,7 +1,7 @@
 package globalfee
 
 import (
-	"github.com/OmniFlix/omniflixhub/v5/x/globalfee/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/globalfee/types"
 )
 
 const (

@@ -13,8 +13,8 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
-	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
+	appparams "github.com/OmniFlix/omniflixhub/v6/app/params"
+	"github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/types"
 )
 
 // Simulation operation weights constants

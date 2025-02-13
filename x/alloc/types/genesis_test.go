@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/alloc/types"
 	"github.com/stretchr/testify/require"
 )
 

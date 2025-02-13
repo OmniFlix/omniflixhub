@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/alloc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

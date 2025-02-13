@@ -13,8 +13,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/testhelpers"
-	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/testhelpers"
+	"github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/types"
 )
 
 // Test authz serialize and de-serializes for tokenfactory msg.
