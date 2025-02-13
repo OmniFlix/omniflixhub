@@ -7,9 +7,7 @@ import (
 	"github.com/cosmos/gogoproto/proto"
 )
 
-var (
-	_ proto.Message = &Lease{}
-)
+var _ proto.Message = &Lease{}
 
 func NewLease(
 	id uint64,

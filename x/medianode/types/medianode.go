@@ -5,9 +5,7 @@ import (
 	"github.com/cosmos/gogoproto/proto"
 )
 
-var (
-	_ proto.Message = &MediaNode{}
-)
+var _ proto.Message = &MediaNode{}
 
 func NewMediaNode(
 	url string,

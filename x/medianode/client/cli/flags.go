@@ -42,5 +42,4 @@ func init() {
 
 	// Register flags for deposit media node
 	FsDepositMediaNode.String(FlagDeposit, "", "deposit amount")
-
 }

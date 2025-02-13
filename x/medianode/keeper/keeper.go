@@ -99,7 +99,6 @@ func (k Keeper) UpdateMediaNode(ctx sdk.Context, mediaNode types.MediaNode, owne
 
 // LeaseMediaNode creates a new lease for a media node
 func (k Keeper) LeaseMediaNode(ctx sdk.Context, mediaNode types.MediaNode, leaseDays uint64, lessee sdk.AccAddress, leaseAmount sdk.Coin) error {
-
 	// Create a new lease object
 	lease := types.Lease{
 		MediaNodeId:      mediaNode.Id,
@@ -250,7 +249,6 @@ func (k Keeper) CloseMediaNode(ctx sdk.Context, mediaNodeId uint64, owner sdk.Ac
 
 // SettleActiveLeases iterates through all active leases and settles payment if 24 hours have passed
 func (k Keeper) SettleActiveLeases(ctx sdk.Context) error {
-
 	store := ctx.KVStore(k.storeKey)
 	iterator := storetypes.KVStorePrefixIterator(store, types.PrefixLease)
 
