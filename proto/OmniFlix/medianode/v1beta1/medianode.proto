@@ -60,7 +60,7 @@ message Lease {
   string leasee                                 = 3;
   cosmos.base.v1beta1.Coin price_per_day        = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"price_per_day\""];
   cosmos.base.v1beta1.Coin total_lease_amount   = 5 [(gogoproto.nullable) = false];
-  cosmos.base.v1beta1.Coin settled_amount       = 6 [(gogoproto.moretags) = "yaml:\"settled_amount\""];
+  cosmos.base.v1beta1.Coin settled_amount       = 6 [(gogoproto.moretags) = "yaml:\"settled_amount\"", (gogoproto.nullable) = false];
   google.protobuf.Timestamp start_time          = 7 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"start_time\""];
   uint64 leased_days                            = 8 [(gogoproto.moretags) = "yaml:\"leased_days\""];
   google.protobuf.Timestamp expiry              = 9 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];

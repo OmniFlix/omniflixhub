@@ -44,9 +44,10 @@ func (m msgServer) RegisterMediaNode(goCtx context.Context, msg *types.MsgRegist
 
 	// Create and store the media node
 	mediaNode := types.NewMediaNode(msg.Url, sender.String(), msg.HardwareSpecs, msg.PricePerDay)
+	// default status on register
+	mediaNode.Status = types.STATUS_PENDING
 
 	if msg.Deposit.Amount.GTE(minDeposit.Amount) {
-		mediaNode.RegisteredAt = ctx.BlockTime()
 		mediaNode.Status = types.STATUS_ACTIVE
 	}
 
@@ -92,13 +93,38 @@ func (m msgServer) LeaseMediaNode(goCtx context.Context, msg *types.MsgLeaseMedi
 		return nil, err
 	}
 
+	params := m.Keeper.GetParams(ctx)
+	if msg.LeaseDays < params.MinimumLeaseDays {
+		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseDays, "minimum of %d lease days required", params.MinimumLeaseDays)
+	}
+	if msg.LeaseDays > params.MaximumLeaseDays {
+		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseDays, "maximum of %d lease days allowed", params.MaximumLeaseDays)
+	}
+
+	mediaNode, found := m.Keeper.GetMediaNode(ctx, msg.MediaNodeId)
+	if !found {
+		return nil, errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "not found")
+	}
+	if mediaNode.Status != types.STATUS_ACTIVE {
+		return nil, errorsmod.Wrapf(types.ErrLeaseNotAllowed, "only active medianodes are allowed to lease")
+	}
+
+	if mediaNode.IsLeased() {
+		return nil, errorsmod.Wrapf(types.ErrMediaNodeAlreadyLeased, "media node %d is already leased", mediaNode.Id)
+	}
+
+	expectedLeaseAmount := sdk.NewCoin(mediaNode.PricePerDay.Denom, mediaNode.PricePerDay.Amount.Mul(sdkmath.NewInt(int64(msg.LeaseDays))))
+	if !msg.Amount.IsEqual(expectedLeaseAmount) {
+		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseAmount, "lease amount must be equal to %s", expectedLeaseAmount.String())
+	}
+
 	// Validate the lease details
 	if err := msg.ValidateBasic(); err != nil {
 		return nil, err
 	}
 
 	// Lease the media node
-	if err := m.Keeper.LeaseMediaNode(ctx, msg.MediaNodeId, msg.LeaseDays, sender, msg.Amount); err != nil {
+	if err := m.Keeper.LeaseMediaNode(ctx, mediaNode, msg.LeaseDays, sender, msg.Amount); err != nil {
 		return nil, err
 	}
 

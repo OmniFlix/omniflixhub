@@ -20,6 +20,6 @@ message GenesisState {
   // leases is the list of active leases
   repeated Lease leases            = 4 [(gogoproto.nullable) = false];
   
-  // last_node_id is the last used media node ID
-  uint64 last_node_id              = 5;
+  // next_medianode_id is the current usable media node ID
+  uint64 next_medianode_id         = 5;
 }

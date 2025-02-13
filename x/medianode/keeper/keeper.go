@@ -65,11 +65,14 @@ func (k Keeper) RegisterMediaNode(ctx sdk.Context, mediaNode types.MediaNode, de
 		Amount:      depositAmount,
 	}
 
+	mediaNodeid := k.GetNextMediaNodeNumber(ctx)
+	mediaNode.Id = mediaNodeid
+	mediaNode.RegisteredAt = ctx.BlockTime()
 	// Update the media node's deposits
 	mediaNode.Deposits = append(mediaNode.Deposits, &deposit)
 
 	k.SetMediaNode(ctx, mediaNode)
-	k.SetNextMediaNodeNumber(ctx, mediaNode.Id+1)
+	k.SetNextMediaNodeNumber(ctx, mediaNodeid+1)
 	return nil
 }
 
@@ -95,34 +98,19 @@ func (k Keeper) UpdateMediaNode(ctx sdk.Context, mediaNode types.MediaNode, owne
 }
 
 // LeaseMediaNode creates a new lease for a media node
-func (k Keeper) LeaseMediaNode(ctx sdk.Context, mediaNodeId uint64, leaseDays uint64, lessee sdk.AccAddress, leaseAmount sdk.Coin) error {
-	mediaNode, found := k.GetMediaNode(ctx, mediaNodeId)
-	if !found {
-		return errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %d does not exist", mediaNodeId)
-	}
-
-	if mediaNode.IsLeased() {
-		return errorsmod.Wrapf(types.ErrMediaNodeAlreadyLeased, "media node %d is already leased", mediaNodeId)
-	}
-
-	// Allow leasing only if the media node status is ACTIVE
-	if mediaNode.Status != types.STATUS_ACTIVE {
-		return errorsmod.Wrapf(types.ErrInvalidMediaNodeStatus, "media node %d is not in ACTIVE status", mediaNodeId)
-	}
+func (k Keeper) LeaseMediaNode(ctx sdk.Context, mediaNode types.MediaNode, leaseDays uint64, lessee sdk.AccAddress, leaseAmount sdk.Coin) error {
 
 	// Create a new lease object
 	lease := types.Lease{
-		MediaNodeId:      mediaNodeId,
+		MediaNodeId:      mediaNode.Id,
 		Leasee:           lessee.String(),
+		LeasedDays:       leaseDays,
 		PricePerDay:      mediaNode.PricePerDay,
 		StartTime:        ctx.BlockTime(),
 		Status:           types.LEASE_STATUS_ACTIVE,
 		Owner:            mediaNode.Owner,
 		TotalLeaseAmount: leaseAmount,
 	}
-
-	// Set the lease using the SetLease method
-	k.SetLease(ctx, lease)
 
 	// Transfer tokens from lessee to module account
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(
@@ -133,6 +121,11 @@ func (k Keeper) LeaseMediaNode(ctx sdk.Context, mediaNodeId uint64, leaseDays ui
 	); err != nil {
 		return err
 	}
+
+	lease.LastSettledAt = ctx.BlockTime()
+	lease.SettledAmount = sdk.NewCoin(leaseAmount.Denom, sdkmath.ZeroInt())
+	// Set the lease using the SetLease method
+	k.SetLease(ctx, lease)
 
 	// Update media node lease details
 	mediaNode.Leased = true
@@ -153,6 +146,13 @@ func (k Keeper) DepositMediaNode(ctx sdk.Context, mediaNodeId uint64, amount sdk
 		return errorsmod.Wrapf(types.ErrInvalidMediaNodeStatus, "media node %d is not in PENDING status", mediaNodeId)
 	}
 
+	minDeposit := k.GetMinDeposit(ctx)
+	initialDepositPerc := k.GetInitialDepositPercentage(ctx)
+	minInitialDeposit := sdk.NewCoin(minDeposit.Denom, sdkmath.LegacyNewDecFromInt(minDeposit.Amount).Mul(initialDepositPerc).TruncateInt())
+	if !amount.IsGTE(minInitialDeposit) {
+		return errorsmod.Wrapf(types.ErrInsufficientDeposit, "%s of deposit is required", minInitialDeposit.String())
+	}
+
 	// Create a deposit object
 	deposit := types.Deposit{
 		Depositor:   sender.String(),
@@ -170,7 +170,6 @@ func (k Keeper) DepositMediaNode(ctx sdk.Context, mediaNodeId uint64, amount sdk
 	}
 
 	// Check if total deposits meet or exceed the required minimum deposit
-	minDeposit := k.GetMinDeposit(ctx) // Assuming this method exists
 	if totalDeposits.IsGTE(minDeposit) {
 		mediaNode.Status = types.STATUS_ACTIVE // Change status to ACTIVE
 	}
@@ -199,8 +198,8 @@ func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId uint64, sender sdk.AccA
 		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", sender.String())
 	}
 
-	// Calculate remaining lease days and refund amount
-	remainingDays := uint64(lease.LeasedDays) - uint64(ctx.BlockTime().Sub(lease.StartTime).Hours()/24)
+	// Calculate remaining lease days and refund amount //TODO: change to 24
+	remainingDays := uint64(lease.LeasedDays) - uint64(ctx.BlockTime().Sub(lease.StartTime).Minutes())
 	if remainingDays > 0 {
 		refundAmount := sdk.NewCoin(
 			mediaNode.PricePerDay.Denom,
@@ -220,9 +219,8 @@ func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId uint64, sender sdk.AccA
 
 	// Clear lease
 	mediaNode.Leased = false
-	lease.Status = types.LEASE_STATUS_CANCELLED
 	k.SetMediaNode(ctx, mediaNode)
-	k.SetLease(ctx, lease)
+	k.RemoveLease(ctx, lease.MediaNodeId)
 	return nil
 }
 
@@ -262,8 +260,8 @@ func (k Keeper) SettleActiveLeases(ctx sdk.Context) error {
 		var lease types.Lease
 		k.cdc.MustUnmarshal(iterator.Value(), &lease)
 		if lease.Status == types.LEASE_STATUS_ACTIVE &&
-			ctx.BlockTime().Sub(lease.StartTime).Hours() >= 24 &&
-			ctx.BlockTime().Sub(lease.LastSettledAt).Hours() >= 24 {
+			ctx.BlockTime().Sub(lease.StartTime).Minutes() >= 5 &&
+			ctx.BlockTime().Sub(lease.LastSettledAt).Minutes() >= 5 {
 
 			// Calculate payment amount
 			paymentAmount := sdk.NewCoin(
@@ -271,15 +269,16 @@ func (k Keeper) SettleActiveLeases(ctx sdk.Context) error {
 				lease.PricePerDay.Amount,
 			)
 
-			remainingAmount := lease.TotalLeaseAmount.Sub(*lease.SettledAmount)
+			owner, err := sdk.AccAddressFromBech32(lease.Owner)
+			if err != nil {
+				return err
+			}
 
-			if remainingAmount.Amount.GTE(paymentAmount.Amount) {
+			remainingAmount := lease.TotalLeaseAmount.Sub(lease.SettledAmount)
+
+			if remainingAmount.Amount.GT(paymentAmount.Amount) {
 
 				// Transfer payment to media node owner
-				owner, err := sdk.AccAddressFromBech32(lease.Owner)
-				if err != nil {
-					return err
-				}
 
 				if err := k.bankKeeper.SendCoinsFromModuleToAccount(
 					ctx,
@@ -291,15 +290,27 @@ func (k Keeper) SettleActiveLeases(ctx sdk.Context) error {
 				}
 
 				// Update last settled time
+				lease.SettledAmount = lease.SettledAmount.AddAmount(paymentAmount.Amount)
 				lease.LastSettledAt = ctx.BlockTime()
-			}
+				k.SetLease(ctx, lease)
+			} else {
+				// Transfer remaining amount to the medianode owner
 
-			if lease.Expiry.Before(ctx.BlockTime()) || remainingAmount.Amount.LT(paymentAmount.Amount) {
-				lease.Status = types.LEASE_STATUS_EXPIRED
-				lease.Expiry = ctx.BlockTime()
+				if err := k.bankKeeper.SendCoinsFromModuleToAccount(
+					ctx,
+					types.ModuleName,
+					owner,
+					sdk.NewCoins(remainingAmount),
+				); err != nil {
+					return err
+				}
+				mediaNode, found := k.GetMediaNode(ctx, lease.MediaNodeId)
+				if found {
+					mediaNode.Leased = false
+					k.SetMediaNode(ctx, mediaNode)
+				}
+				k.RemoveLease(ctx, lease.MediaNodeId)
 			}
-
-			k.SetLease(ctx, lease) // Assuming this method exists to update the lease
 		}
 	}
 
@@ -325,6 +336,7 @@ func (k Keeper) ReleaseDeposits(ctx sdk.Context) error {
 		if mediaNode.Status == types.STATUS_CLOSED && len(mediaNode.Deposits) > 0 {
 			// Check if the time since closed exceeds the deposit release period
 			if ctx.BlockTime().Sub(mediaNode.ClosedAt) > depositReleasePeriod {
+				k.Logger(ctx).Info("Releasing Deposits ..")
 				for _, deposit := range mediaNode.Deposits {
 					// Return deposit to the depositor
 					depositorAddr, err := sdk.AccAddressFromBech32(deposit.Depositor)
@@ -341,9 +353,9 @@ func (k Keeper) ReleaseDeposits(ctx sdk.Context) error {
 						return err
 					}
 				}
+				mediaNode.Deposits = []*types.Deposit{}
+				k.SetMediaNode(ctx, mediaNode)
 			}
-			mediaNode.Deposits = []*types.Deposit{}
-			k.SetMediaNode(ctx, mediaNode)
 		}
 	}
 
