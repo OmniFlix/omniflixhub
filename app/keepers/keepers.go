@@ -562,6 +562,7 @@ func NewAppKeeper(
 		appKeepers.keys[medianodetypes.StoreKey],
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
+		appKeepers.DistrKeeper,
 		govModAddress,
 	)
 

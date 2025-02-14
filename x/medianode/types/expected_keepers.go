@@ -20,3 +20,8 @@ type BankKeeper interface {
 	SendCoinsFromModuleToAccount(ctx context.Context, formModule string, toAddr sdk.AccAddress, amt sdk.Coins) error
 	SendCoinsFromAccountToModule(ctx context.Context, fromAddr sdk.AccAddress, toModule string, amt sdk.Coins) error
 }
+
+// DistributionKeeper defines the expected distribution keeper
+type DistributionKeeper interface {
+	FundCommunityPool(ctx context.Context, amount sdk.Coins, sender sdk.AccAddress) error
+}

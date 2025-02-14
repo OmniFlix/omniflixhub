@@ -51,7 +51,7 @@ func DefaultGenesisState() *types.GenesisState {
 	return types.NewGenesisState(
 		[]types.MediaNode{},
 		[]types.Lease{},
-		0,
+		1,
 		types.DefaultParams(),
 	)
 }
