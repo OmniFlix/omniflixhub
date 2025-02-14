@@ -61,12 +61,18 @@ func (k Keeper) GetModuleAccountAddress(ctx sdk.Context) sdk.AccAddress {
 }
 
 // RegisterMediaNode creates a new media node entry
-func (k Keeper) RegisterMediaNode(ctx sdk.Context, mediaNode types.MediaNode, depositAmount sdk.Coin) error {
+func (k Keeper) RegisterMediaNode(ctx sdk.Context, mediaNode types.MediaNode, depositAmount sdk.Coin, owner sdk.AccAddress) error {
 	// Create a deposit object
 	deposit := types.Deposit{
 		Depositor:   mediaNode.Owner,
 		DepositedAt: ctx.BlockTime(),
 		Amount:      depositAmount,
+	}
+
+	// transfer deposit to module
+	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, owner, types.ModuleName, sdk.NewCoins(depositAmount))
+	if err != nil {
+		return err
 	}
 
 	mediaNodeid := k.GetNextMediaNodeNumber(ctx)
@@ -142,7 +148,7 @@ func (k Keeper) LeaseMediaNode(ctx sdk.Context, mediaNode types.MediaNode, lease
 }
 
 // DepositMediaNode allows a user to deposit a media node
-func (k Keeper) DepositMediaNode(ctx sdk.Context, mediaNodeId uint64, amount sdk.Coin, sender sdk.AccAddress) error {
+func (k Keeper) DepositMediaNode(ctx sdk.Context, mediaNodeId uint64, amount sdk.Coin, depositor sdk.AccAddress) error {
 	mediaNode, found := k.GetMediaNode(ctx, mediaNodeId)
 	if !found {
 		return errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %d does not exist", mediaNodeId)
@@ -162,11 +168,15 @@ func (k Keeper) DepositMediaNode(ctx sdk.Context, mediaNodeId uint64, amount sdk
 
 	// Create a deposit object
 	deposit := types.Deposit{
-		Depositor:   sender.String(),
+		Depositor:   depositor.String(),
 		DepositedAt: ctx.BlockTime(),
 		Amount:      amount,
 	}
-
+	// transfer deposit to module
+	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, depositor, types.ModuleName, sdk.NewCoins(amount))
+	if err != nil {
+		return err
+	}
 	// Update the media node's deposits
 	mediaNode.Deposits = append(mediaNode.Deposits, &deposit)
 
@@ -207,7 +217,7 @@ func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId uint64, sender sdk.AccA
 	}
 
 	// Calculate remaining lease days and refund amount //TODO: change to 24
-	remainingDays := lease.LeasedDays - uint64(ctx.BlockTime().Sub(lease.StartTime).Minutes()/2)
+	remainingDays := lease.LeasedDays - uint64(ctx.BlockTime().Sub(lease.StartTime).Hours()/24)
 	if remainingDays > 0 {
 		refundAmount := sdk.NewCoin(
 			mediaNode.PricePerDay.Denom,
@@ -271,8 +281,8 @@ func (k Keeper) SettleActiveLeases(ctx sdk.Context) error {
 		var lease types.Lease
 		k.cdc.MustUnmarshal(iterator.Value(), &lease)
 		if lease.Status == types.LEASE_STATUS_ACTIVE &&
-			ctx.BlockTime().Sub(lease.StartTime).Minutes() >= 2 &&
-			ctx.BlockTime().Sub(lease.LastSettledAt).Minutes() >= 2 {
+			ctx.BlockTime().Sub(lease.StartTime).Hours() >= 24 &&
+			ctx.BlockTime().Sub(lease.LastSettledAt).Hours() >= 24 {
 
 			// Calculate payment amount
 			paymentAmount := sdk.NewCoin(

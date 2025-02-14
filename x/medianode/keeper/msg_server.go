@@ -51,7 +51,7 @@ func (m msgServer) RegisterMediaNode(goCtx context.Context, msg *types.MsgRegist
 		mediaNode.Status = types.STATUS_ACTIVE
 	}
 
-	if err := m.Keeper.RegisterMediaNode(ctx, mediaNode, *msg.Deposit); err != nil {
+	if err := m.Keeper.RegisterMediaNode(ctx, mediaNode, *msg.Deposit, sender); err != nil {
 		return nil, err
 	}
 
