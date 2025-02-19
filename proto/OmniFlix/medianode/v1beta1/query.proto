@@ -28,12 +28,12 @@ service Query {
 
   // LeasesByLessee returns all active leases for a lessee address
   rpc LeasesByLessee(QueryLeasesByLesseeRequest) returns (QueryLeasesByLesseeResponse) {
-    option (google.api.http).get = "/omniflix/medianode/v1beta1/leases/{lessee}";
+    option (google.api.http).get = "/omniflix/medianode/v1beta1/leases-by-lessee/{lessee}";
   }
 
-  // AvailableNodes returns all unlocked media nodes
+  // AvailableNodes returns all active media nodes
   rpc AvailableNodes(QueryAvailableNodesRequest) returns (QueryAvailableNodesResponse) {
-    option (google.api.http).get = "/omniflix/medianode/v1beta1/nodes/available";
+    option (google.api.http).get = "/omniflix/medianode/v1beta1/available-nodes";
   }
   // Params returns all parameters of media node module
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {

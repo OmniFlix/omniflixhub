@@ -21,6 +21,9 @@ service Msg {
   rpc LeaseMediaNode(MsgLeaseMediaNode) returns (MsgLeaseMediaNodeResponse);
   // CancelLease cancels an active lease
   rpc CancelLease(MsgCancelLease) returns (MsgCancelLeaseResponse);
+
+  // ExtendLease Extends lease with additional hours
+  rpc ExtendLease(MsgExtendLease) returns (MsgExtendLeaseResponse);
   // DepositMediaNode deposits funds for a media node
   rpc DepositMediaNode(MsgDepositMediaNode) returns (MsgDepositMediaNodeResponse);
   // CloseMediaNode closes a media node
@@ -35,16 +38,18 @@ message MsgRegisterMediaNode {
   option (amino.name) = "OmniFlix/register-medianode";
   option (cosmos.msg.v1.signer) = "sender";
 
-  string url = 1;
-  HardwareSpecs hardware_specs = 2 [(gogoproto.nullable) = false];
-  cosmos.base.v1beta1.Coin price_per_day = 3 [(gogoproto.nullable) = false];
-  cosmos.base.v1beta1.Coin deposit = 4;
-  string sender = 5;
+
+  string id  = 1;
+  string url = 2;
+  HardwareSpecs hardware_specs = 3 [(gogoproto.nullable) = false];
+  cosmos.base.v1beta1.Coin price_per_hour = 4 [(gogoproto.nullable) = false];
+  cosmos.base.v1beta1.Coin deposit = 5;
+  string sender = 6;
 }
 
 // MsgRegisterMediaNodeResponse defines the response for registering a media node
 message MsgRegisterMediaNodeResponse {
-  uint64 media_node_id = 1; // ID of the registered media node
+  string media_node_id = 1; // ID of the registered media node
   string status = 2;         // Status of the registration
 }
 
@@ -54,7 +59,7 @@ message MsgUpdateMediaNode {
   option (amino.name) = "OmniFlix/update-medianode";
   option (cosmos.msg.v1.signer) = "sender";
 
-  uint64 id = 1;
+  string id = 1;
   HardwareSpecs hardware_specs = 2 [(gogoproto.nullable) = false];
   cosmos.base.v1beta1.Coin price_per_day = 3 [(gogoproto.nullable) = false];
   string sender = 4;
@@ -69,8 +74,8 @@ message MsgLeaseMediaNode {
   option (amino.name) = "OmniFlix/lease-medianode";
   option (cosmos.msg.v1.signer) = "sender";
 
-  uint64 media_node_id             = 1;
-  uint64 lease_days                = 2;
+  string media_node_id             = 1;
+  uint64 lease_hours               = 2;
   cosmos.base.v1beta1.Coin amount  = 3 [(gogoproto.nullable) = false];
   string sender                    = 4;
 }
@@ -80,12 +85,27 @@ message MsgLeaseMediaNodeResponse {
   Lease lease = 1;
 }
 
+// MsgExtendLease represents a message to extend lease duration
+message MsgExtendLease {
+  option (amino.name) = "OmniFlix/extend-medianode-lease";
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string media_node_id             = 1;
+  uint64 lease_hours               = 2;
+  cosmos.base.v1beta1.Coin amount  = 3 [(gogoproto.nullable) = false];
+  string sender                    = 4;
+}
+
+message MsgExtendLeaseResponse {
+  Lease lease = 1;
+}
+
 // MsgCancelLease represents a message to cancel an active lease
 message MsgCancelLease {
   option (amino.name) = "OmniFlix/cancel-medianode-lease";
   option (cosmos.msg.v1.signer) = "sender";
 
-  uint64 media_node_id = 1;
+  string media_node_id = 1;
   string sender = 2;
 }
 
@@ -97,14 +117,14 @@ message MsgDepositMediaNode {
   option (amino.name) = "OmniFlix/deposit-medianode";
   option (cosmos.msg.v1.signer) = "sender";
 
-  uint64 media_node_id = 1;         // ID of the media node
+  string media_node_id = 1;         // ID of the media node
   cosmos.base.v1beta1.Coin amount = 2 [(gogoproto.nullable) = false]; // Amount to deposit
   string sender = 3;                // Address of the sender
 }
 
 // MsgDepositMediaNodeResponse defines the response for depositing funds for a media node
 message MsgDepositMediaNodeResponse {
-  uint64 medianode_id = 1;
+  string medianode_id = 1;
   cosmos.base.v1beta1.Coin total_deposit = 2;
   string medianode_status  = 3;
 }
@@ -114,7 +134,7 @@ message MsgCloseMediaNode {
   option (amino.name) = "Omni Flix/close-medianode";
   option (cosmos.msg.v1.signer) = "sender";
 
-  uint64 media_node_id = 1;         // ID of the media node
+  string media_node_id = 1;         // ID of the media node
   string sender = 2;                // Address of the sender
 }
 

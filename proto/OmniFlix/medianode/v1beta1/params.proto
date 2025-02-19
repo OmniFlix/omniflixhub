@@ -12,10 +12,10 @@ option go_package = "github.com/OmniFlix/omniflixhub/v6/x/medianode/types";
 // Params defines the parameters for the medianode module
 message Params {
   // minimum_lease_days defines the minimum number of days for a lease
-  uint64 minimum_lease_days = 1;
+  uint64 minimum_lease_hours = 1;
   
   // maximum_lease_days defines the maximum number of days for a lease
-  uint64 maximum_lease_days = 2;
+  uint64 maximum_lease_hours = 2;
 
   cosmos.base.v1beta1.Coin min_deposit       = 3 [
     (gogoproto.moretags)   = "yaml:\"min_deposit\"",
