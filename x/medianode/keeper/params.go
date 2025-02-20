@@ -29,16 +29,16 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) error {
 	return nil
 }
 
-// GetMinimumLeaseDays returns the minimum lease days parameter.
-func (k Keeper) GetMinimumLeaseDays(ctx sdk.Context) (minimumLeaseDays uint64) {
+// GetMinimumLeaseHours returns the minimum lease hours parameter.
+func (k Keeper) GetMinimumLeaseHours(ctx sdk.Context) (minimumLeaseDays uint64) {
 	params := k.GetParams(ctx)
-	return params.MinimumLeaseDays
+	return params.MinimumLeaseHours
 }
 
-// GetMaximumLeaseDays returns the maximum lease days parameter.
-func (k Keeper) GetMaximumLeaseDays(ctx sdk.Context) (maximumLeaseDays uint64) {
+// GetMaximumLeaseHours returns the maximum lease hours parameter.
+func (k Keeper) GetMaximumLeaseHours(ctx sdk.Context) (maximumLeaseDays uint64) {
 	params := k.GetParams(ctx)
-	return params.MaximumLeaseDays
+	return params.MaximumLeaseHours
 }
 
 // GetMinDeposit returns the minimum deposit parameter.

@@ -10,20 +10,18 @@ import (
 var _ proto.Message = &Lease{}
 
 func NewLease(
-	id uint64,
-	mediaNodeId uint64,
+	mediaNodeId string,
 	lessee string,
 	startTime time.Time,
-	leasedDays uint64,
+	leasedHours uint64,
 	totalAmount sdk.Coin,
 	active bool,
 	status LeaseStatus,
 ) Lease {
 	return Lease{
 		MediaNodeId: mediaNodeId,
-		Leasee:      lessee,
+		Lessee:      lessee,
 		StartTime:   startTime,
-		LeasedDays:  leasedDays,
-		Status:      status,
+		LeasedHours: leasedHours,
 	}
 }

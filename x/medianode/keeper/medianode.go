@@ -25,7 +25,7 @@ func (k Keeper) SetLease(ctx sdk.Context, lease types.Lease) {
 }
 
 // GetMediaNode returns media node by id
-func (k Keeper) GetMediaNode(ctx sdk.Context, id uint64) (mediaNode types.MediaNode, found bool) {
+func (k Keeper) GetMediaNode(ctx sdk.Context, id string) (mediaNode types.MediaNode, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.GetMediaNodeKey(id))
 	if bz == nil {
@@ -36,7 +36,7 @@ func (k Keeper) GetMediaNode(ctx sdk.Context, id uint64) (mediaNode types.MediaN
 }
 
 // GetMediaNode returns media node by id
-func (k Keeper) GetMediaNodeLease(ctx sdk.Context, id uint64) (lease types.Lease, found bool) {
+func (k Keeper) GetMediaNodeLease(ctx sdk.Context, id string) (lease types.Lease, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.GetLeaseKey(id))
 	if bz == nil {
@@ -100,13 +100,13 @@ func (k Keeper) GetAllLeases(ctx sdk.Context) (leases []types.Lease) {
 }
 
 // RemoveMediaNode removes the media node from state
-func (k Keeper) RemoveMediaNode(ctx sdk.Context, id uint64) {
+func (k Keeper) RemoveMediaNode(ctx sdk.Context, id string) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetMediaNodeKey(id))
 }
 
 // RemoveLease removes the lease from state
-func (k Keeper) RemoveLease(ctx sdk.Context, mediaNodeId uint64) {
+func (k Keeper) RemoveLease(ctx sdk.Context, mediaNodeId string) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetLeaseKey(mediaNodeId))
 }

@@ -1,9 +1,5 @@
 package types
 
-import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-)
-
 const (
 	ModuleName          = "medianode"
 	StoreKey     string = ModuleName
@@ -20,11 +16,11 @@ var (
 )
 
 // GetMediaNodeKey returns the store key to retrieve a MediaNode from the index fields
-func GetMediaNodeKey(id uint64) []byte {
-	return append(PrefixMediaNode, sdk.Uint64ToBigEndian(id)...)
+func GetMediaNodeKey(id string) []byte {
+	return append(PrefixMediaNode, []byte(id)...)
 }
 
 // GetLeaseKey returns the store key to retrieve a Lease from the index fields
-func GetLeaseKey(id uint64) []byte {
-	return append(PrefixLease, sdk.Uint64ToBigEndian(id)...)
+func GetLeaseKey(id string) []byte {
+	return append(PrefixLease, []byte(id)...)
 }

@@ -57,7 +57,7 @@ enum LeaseStatus {
 message Lease {
   string media_node_id                          = 1 [(gogoproto.moretags) = "yaml:\"media_node_id\""];
   string owner                                  = 2;
-  string leasee                                 = 3;
+  string lessee                                 = 3;
   cosmos.base.v1beta1.Coin price_per_hour       = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"price_per_hour\""];
   cosmos.base.v1beta1.Coin total_lease_amount   = 5 [(gogoproto.nullable) = false];
   cosmos.base.v1beta1.Coin settled_lease_amount = 6 [(gogoproto.moretags) = "yaml:\"settled_lease_amount\"", (gogoproto.nullable) = false];

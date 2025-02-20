@@ -6,14 +6,14 @@ import (
 
 func NewGenesisState(medianodes []MediaNode,
 	leases []Lease,
-	nextMediaNodeNumber uint64,
+	mediaNodeCounter uint64,
 	params Params,
 ) *GenesisState {
 	return &GenesisState{
-		MediaNodes:      medianodes,
-		Leases:          leases,
-		Params:          params,
-		NextMedianodeId: nextMediaNodeNumber,
+		MediaNodes:       medianodes,
+		Leases:           leases,
+		Params:           params,
+		MediaNodeCounter: mediaNodeCounter,
 	}
 }
 
@@ -21,10 +21,10 @@ func NewGenesisState(medianodes []MediaNode,
 // module.
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Params:          DefaultParams(),
-		MediaNodes:      []MediaNode{},
-		Leases:          []Lease{},
-		NextMedianodeId: 1,
+		Params:           DefaultParams(),
+		MediaNodes:       []MediaNode{},
+		Leases:           []Lease{},
+		MediaNodeCounter: 0,
 	}
 }
 
@@ -49,8 +49,8 @@ func (gs GenesisState) ValidateGenesis() error {
 	}
 
 	// Validate NextMedianodeId is non-negative and non-zero
-	if gs.NextMedianodeId < 1 {
-		return fmt.Errorf("last node ID cannot be negative or zero")
+	if gs.MediaNodeCounter < 0 {
+		return fmt.Errorf("media node counter cannot be negative")
 	}
 
 	return nil

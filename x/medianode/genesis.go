@@ -21,7 +21,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, mn := range genState.MediaNodes {
 		k.SetMediaNode(ctx, mn)
 	}
-	k.SetNextMediaNodeNumber(ctx, genState.NextMedianodeId)
+	k.SetNextMediaNodeNumber(ctx, genState.MediaNodeCounter)
 
 	for _, lease := range genState.Leases {
 		k.SetLease(ctx, lease)

@@ -12,6 +12,7 @@ const (
 	TypeMsgRegisterMediaNode = "register_media_node"
 	TypeMsgUpdateMediaNode   = "update_media_node"
 	TypeMsgLeaseMediaNode    = "lease_media_node"
+	TypeMsgExtendLease       = "extend_lease"
 	TypeMsgCancelLease       = "cancel_lease"
 	TypeMsgDepositMediaNode  = "deposit_media_node"
 	TypeMsgCloseMediaNode    = "close_media_node"
@@ -25,14 +26,19 @@ var (
 )
 
 // Register Media Node
-func NewMsgRegisterMediaNode(url string, hardwareSpecs HardwareSpecs, pricePerDay, deposit sdk.Coin, sender string) *MsgRegisterMediaNode {
+func NewMsgRegisterMediaNode(url string, hardwareSpecs HardwareSpecs, pricePerHour, deposit sdk.Coin, sender string) (*MsgRegisterMediaNode, error) {
+	mediaNodeId, err := GenUniqueID(MediaNodeIdPrefix)
+	if err != nil {
+		return nil, err
+	}
 	return &MsgRegisterMediaNode{
+		Id:            mediaNodeId,
 		Url:           url,
 		HardwareSpecs: hardwareSpecs,
-		PricePerDay:   pricePerDay,
+		PricePerHour:  pricePerHour,
 		Sender:        sender,
 		Deposit:       &deposit,
-	}
+	}, nil
 }
 
 func (msg MsgRegisterMediaNode) Route() string { return MsgRoute }
@@ -40,6 +46,11 @@ func (msg MsgRegisterMediaNode) Route() string { return MsgRoute }
 func (msg MsgRegisterMediaNode) Type() string { return TypeMsgRegisterMediaNode }
 
 func (msg MsgRegisterMediaNode) ValidateBasic() error {
+
+	if err := validateMediaNodeId(msg.Id); err != nil {
+		return err
+	}
+
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
@@ -47,8 +58,8 @@ func (msg MsgRegisterMediaNode) ValidateBasic() error {
 	if msg.Url == "" {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "url cannot be empty")
 	}
-	if err := msg.PricePerDay.Validate(); err != nil {
-		return errorsmod.Wrap(err, "invalid lease amount per day")
+	if err := msg.PricePerHour.Validate(); err != nil {
+		return errorsmod.Wrap(err, "invalid lease amount per hour")
 	}
 	return nil
 }
@@ -62,11 +73,11 @@ func (msg MsgRegisterMediaNode) GetSigners() []sdk.AccAddress {
 }
 
 // Update Media Node
-func NewMsgUpdateMediaNode(id uint64, hardwareSpecs HardwareSpecs, leaseAmountPerDay sdk.Coin, sender string) *MsgUpdateMediaNode {
+func NewMsgUpdateMediaNode(id string, hardwareSpecs HardwareSpecs, leaseAmountPerHour sdk.Coin, sender string) *MsgUpdateMediaNode {
 	return &MsgUpdateMediaNode{
 		Id:            id,
 		HardwareSpecs: hardwareSpecs,
-		PricePerDay:   leaseAmountPerDay,
+		PricePerHour:  leaseAmountPerHour,
 		Sender:        sender,
 	}
 }
@@ -80,7 +91,7 @@ func (msg MsgUpdateMediaNode) ValidateBasic() error {
 	if err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
-	if err := msg.PricePerDay.Validate(); err != nil {
+	if err := msg.PricePerHour.Validate(); err != nil {
 		return errorsmod.Wrap(err, "invalid lease amount per day")
 	}
 	return nil
@@ -95,10 +106,10 @@ func (msg MsgUpdateMediaNode) GetSigners() []sdk.AccAddress {
 }
 
 // Lease Media Node
-func NewMsgLeaseMediaNode(mediaNodeId uint64, leaseDays uint64, leaseAmount sdk.Coin, sender string) *MsgLeaseMediaNode {
+func NewMsgLeaseMediaNode(mediaNodeId string, leaseHours uint64, leaseAmount sdk.Coin, sender string) *MsgLeaseMediaNode {
 	return &MsgLeaseMediaNode{
 		MediaNodeId: mediaNodeId,
-		LeaseDays:   leaseDays,
+		LeaseHours:  leaseHours,
 		Sender:      sender,
 		Amount:      leaseAmount,
 	}
@@ -113,8 +124,8 @@ func (msg MsgLeaseMediaNode) ValidateBasic() error {
 	if err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
-	if msg.LeaseDays == 0 {
-		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "lease days must be greater than 0")
+	if msg.LeaseHours == 0 {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "lease hours must be greater than 0")
 	}
 	return nil
 }
@@ -127,8 +138,44 @@ func (msg MsgLeaseMediaNode) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
+// Extend Lease
+func NewMsgExtendLease(mediaNodeId string, leaseHours uint64, amount sdk.Coin, sender string) *MsgExtendLease {
+	return &MsgExtendLease{
+		MediaNodeId: mediaNodeId,
+		LeaseHours:  leaseHours,
+		Amount:      amount,
+		Sender:      sender,
+	}
+}
+
+func (msg MsgExtendLease) Route() string { return MsgRoute }
+
+func (msg MsgExtendLease) Type() string { return TypeMsgExtendLease }
+
+func (msg MsgExtendLease) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+	}
+	if msg.LeaseHours == 0 {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "lease hours must be greater than 0")
+	}
+	if err := msg.Amount.Validate(); err != nil {
+		return errorsmod.Wrap(err, "invalid lease amount")
+	}
+	return nil
+}
+
+func (msg MsgExtendLease) GetSigners() []sdk.AccAddress {
+	from, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
+}
+
 // Cancel Lease
-func NewMsgCancelLease(mediaNodeId uint64, sender string) *MsgCancelLease {
+func NewMsgCancelLease(mediaNodeId string, sender string) *MsgCancelLease {
 	return &MsgCancelLease{
 		MediaNodeId: mediaNodeId,
 		Sender:      sender,
@@ -156,7 +203,7 @@ func (msg MsgCancelLease) GetSigners() []sdk.AccAddress {
 }
 
 // Deposit Media Node
-func NewMsgDepositMediaNode(mediaNodeId uint64, amount sdk.Coin, sender string) *MsgDepositMediaNode {
+func NewMsgDepositMediaNode(mediaNodeId string, amount sdk.Coin, sender string) *MsgDepositMediaNode {
 	return &MsgDepositMediaNode{
 		MediaNodeId: mediaNodeId,
 		Amount:      amount,
@@ -187,7 +234,7 @@ func (msg MsgDepositMediaNode) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
-func NewMsgCloseMediaNode(mediaNodeId uint64, sender string) *MsgCloseMediaNode {
+func NewMsgCloseMediaNode(mediaNodeId string, sender string) *MsgCloseMediaNode {
 	return &MsgCloseMediaNode{
 		MediaNodeId: mediaNodeId,
 		Sender:      sender,

@@ -33,7 +33,7 @@ func (k Keeper) MediaNode(goCtx context.Context,
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	mediaNode, found := k.GetMediaNode(ctx, req.Id)
 	if !found {
-		return nil, status.Errorf(codes.NotFound, "media node %d not found", req.Id)
+		return nil, status.Errorf(codes.NotFound, "media node %s not found", req.Id)
 	}
 
 	return &types.QueryMediaNodeResponse{MediaNode: mediaNode}, nil
@@ -142,7 +142,7 @@ func (k Keeper) Lease(goCtx context.Context,
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	lease, found := k.GetMediaNodeLease(ctx, req.MediaNodeId) // Assuming GetLease is a method that retrieves the lease by media node ID
 	if !found {
-		return nil, status.Errorf(codes.NotFound, "lease for media node %d not found", req.MediaNodeId)
+		return nil, status.Errorf(codes.NotFound, "lease for media node %s not found", req.MediaNodeId)
 	}
 
 	return &types.QueryLeaseResponse{Lease: lease}, nil
@@ -157,17 +157,17 @@ func (k Keeper) LeasesByLessee(goCtx context.Context,
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	var leases []types.Lease // Assuming Lease is the type for lease
+	var leases []types.Lease
 	var pageRes *query.PageResponse
 	store := ctx.KVStore(k.storeKey)
-	leaseStore := prefix.NewStore(store, types.PrefixLease) // Assuming PrefixLease is defined for leases
+	leaseStore := prefix.NewStore(store, types.PrefixLease)
 	pageRes, err := query.FilteredPaginate(leaseStore,
 		req.Pagination, func(key []byte, value []byte, accumulate bool) (bool, error) {
 			var lease types.Lease
 			k.cdc.MustUnmarshal(value, &lease)
 
 			// Check if the lease is active and belongs to the leasee
-			if lease.Leasee == req.Lessee && lease.Status == types.LEASE_STATUS_ACTIVE { // Assuming STATUS_ACTIVE is defined
+			if lease.Lessee == req.Lessee {
 				if accumulate {
 					leases = append(leases, lease)
 				}

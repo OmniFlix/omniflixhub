@@ -8,15 +8,17 @@ import (
 var _ proto.Message = &MediaNode{}
 
 func NewMediaNode(
+	id string,
 	url string,
 	owner string,
 	hardwareSpecs HardwareSpecs,
-	leaseAmountPerDay sdk.Coin,
+	leaseAmountPerHour sdk.Coin,
 ) MediaNode {
 	return MediaNode{
+		Id:            id,
 		Url:           url,
 		HardwareSpecs: hardwareSpecs,
-		PricePerDay:   leaseAmountPerDay,
+		PricePerHour:  leaseAmountPerHour,
 		Leased:        false,
 		Owner:         owner,
 		Deposits:      []*Deposit{},

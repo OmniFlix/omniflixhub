@@ -61,7 +61,7 @@ message MsgUpdateMediaNode {
 
   string id = 1;
   HardwareSpecs hardware_specs = 2 [(gogoproto.nullable) = false];
-  cosmos.base.v1beta1.Coin price_per_day = 3 [(gogoproto.nullable) = false];
+  cosmos.base.v1beta1.Coin price_per_hour = 3 [(gogoproto.nullable) = false];
   string sender = 4;
 }
 

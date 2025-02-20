@@ -63,7 +63,7 @@ func GetCmdRegisterMediaNode() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			priceStr, err := cmd.Flags().GetString(FlagPricePerDay)
+			priceStr, err := cmd.Flags().GetString(FlagPricePerHour)
 			if err != nil {
 				return err
 			}
@@ -80,7 +80,10 @@ func GetCmdRegisterMediaNode() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgRegisterMediaNode(url, hardwareSpecs, price, deposit, clientCtx.GetFromAddress().String())
+			msg, err := types.NewMsgRegisterMediaNode(url, hardwareSpecs, price, deposit, clientCtx.GetFromAddress().String())
+			if err != nil {
+				return err
+			}
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -92,7 +95,7 @@ func GetCmdRegisterMediaNode() *cobra.Command {
 
 	cmd.Flags().AddFlagSet(FsRegisterMediaNode) // Assuming FsRegisterMediaNode is defined elsewhere
 	_ = cmd.MarkFlagRequired(FlagHardwareSpecs)
-	_ = cmd.MarkFlagRequired(FlagPricePerDay)
+	_ = cmd.MarkFlagRequired(FlagPricePerHour)
 	_ = cmd.MarkFlagRequired(FlagDeposit)
 	flags.AddTxFlagsToCmd(cmd)
 
@@ -104,9 +107,9 @@ func GetCmdLeaseMediaNode() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "lease",
 		Short: "leases a media node",
-		Long:  "leases a media node with the specified URL and lease days\n",
+		Long:  "leases a media node with the specified URL and lease hours\n",
 		Example: fmt.Sprintf(
-			"$ %s tx medianode lease [medianode-id] --lease-days=<duration> --amount=<amount> "+
+			"$ %s tx medianode lease [medianode-id] --lease-hours=<no-of-hours> --amount=<amount> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
@@ -119,11 +122,8 @@ func GetCmdLeaseMediaNode() *cobra.Command {
 				return err
 			}
 
-			mediaNodeId, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
-			leaseDays, err := cmd.Flags().GetUint64(FlagLeaseDays)
+			mediaNodeId := args[0]
+			leaseDays, err := cmd.Flags().GetUint64(FlagLeaseHours)
 			if err != nil {
 				return err
 			}
@@ -145,8 +145,8 @@ func GetCmdLeaseMediaNode() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FsLeaseMediaNode) // Assuming FsLeaseMediaNode is defined elsewhere
-	_ = cmd.MarkFlagRequired(FlagLeaseDays)
+	cmd.Flags().AddFlagSet(FsLeaseMediaNode)
+	_ = cmd.MarkFlagRequired(FlagLeaseHours)
 	_ = cmd.MarkFlagRequired(FlagLeaseAmount)
 	flags.AddTxFlagsToCmd(cmd)
 
@@ -173,10 +173,8 @@ func GetCmdDepositMediaNode() *cobra.Command {
 				return err
 			}
 
-			medianodeId, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
+			medianodeId := args[0]
+
 			depositStr, err := cmd.Flags().GetString(FlagDeposit)
 			if err != nil {
 				return err
@@ -217,17 +215,14 @@ func GetCmdCancelLease() *cobra.Command {
 				"--fees=<fee>",
 			version.AppName,
 		),
-		Args: cobra.ExactArgs(1), // Expecting 1 positional argument
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			mediaNodeId, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
+			mediaNodeId := args[0]
 
 			msg := types.NewMsgCancelLease(mediaNodeId, clientCtx.GetFromAddress().String())
 
@@ -257,17 +252,14 @@ func GetCmdCloseMediaNode() *cobra.Command {
 				"--fees=<fee>",
 			version.AppName,
 		),
-		Args: cobra.ExactArgs(1), // Expecting 1 positional argument
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			mediaNodeId, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
+			mediaNodeId := args[0]
 
 			msg := types.NewMsgCloseMediaNode(mediaNodeId, clientCtx.GetFromAddress().String())
 
@@ -305,14 +297,14 @@ func ParseHardwareSpecs(hardwareSpecsStr string) (types.HardwareSpecs, error) {
 	if err != nil {
 		return specs, fmt.Errorf("invalid RAM spec: %s", specsStr[1])
 	}
-	specs.Ram = ram
+	specs.RamInGb = ram
 
 	// Parse Storage
 	storage, err := strconv.ParseInt(strings.TrimSpace(specsStr[2]), 10, 64)
 	if err != nil {
 		return specs, fmt.Errorf("invalid Storage spec: %s", specsStr[2])
 	}
-	specs.Storage = storage
+	specs.StorageInGb = storage
 
 	return specs, nil
 }

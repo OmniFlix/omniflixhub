@@ -37,8 +37,8 @@ func ParamKeyTable() paramtypes.KeyTable {
 // DefaultParams returns default medianode parameters
 func DefaultParams() Params {
 	return Params{
-		MinimumLeaseDays:         1,                               // Default minimum lease of 1 day
-		MaximumLeaseDays:         365,                             // Default maximum lease of 1 year
+		MinimumLeaseHours:        1,                               // Default minimum lease of 1 hour
+		MaximumLeaseHours:        8760,                            // Default maximum lease of 1 year
 		MinDeposit:               defaultMinDeposit,               // Default min deposit
 		InitialDepositPercentage: defaultInitialDepositPercentage, // Default initial deposit percentage
 		LeaseCommission:          defaultLeaseCommission,          // Default lease commission
@@ -53,8 +53,8 @@ func DefaultParams() Params {
 // ParamSetPairs implements the ParamSet interface and returns all the key/value pairs
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(KeyMinimumLeaseDays, &p.MinimumLeaseDays, validateMinimumLeaseDays),
-		paramtypes.NewParamSetPair(KeyMaximumLeaseDays, &p.MaximumLeaseDays, validateMaximumLeaseDays),
+		paramtypes.NewParamSetPair(KeyMinimumLeaseDays, &p.MinimumLeaseHours, validateMinimumLeaseDays),
+		paramtypes.NewParamSetPair(KeyMaximumLeaseDays, &p.MaximumLeaseHours, validateMaximumLeaseDays),
 		paramtypes.NewParamSetPair(KeyMinDeposit, &p.MinDeposit, validateMinDeposit),
 		paramtypes.NewParamSetPair(KeyInitialDepositPercentage, &p.InitialDepositPercentage, validateInitialDepositPercentage),
 		paramtypes.NewParamSetPair(KeyLeaseCommission, &p.LeaseCommission, validateLeaseCommission),
@@ -64,15 +64,15 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 
 // Validate performs basic validation on medianode parameters
 func (p Params) Validate() error {
-	if err := validateMinimumLeaseDays(p.MinimumLeaseDays); err != nil {
+	if err := validateMinimumLeaseDays(p.MinimumLeaseHours); err != nil {
 		return err
 	}
-	if err := validateMaximumLeaseDays(p.MaximumLeaseDays); err != nil {
+	if err := validateMaximumLeaseDays(p.MaximumLeaseHours); err != nil {
 		return err
 	}
-	if p.MinimumLeaseDays >= p.MaximumLeaseDays {
-		return fmt.Errorf("minimum lease days must be less than maximum lease days: %d >= %d",
-			p.MinimumLeaseDays, p.MaximumLeaseDays)
+	if p.MinimumLeaseHours >= p.MaximumLeaseHours {
+		return fmt.Errorf("minimum lease hours must be less than maximum lease hours: %d >= %d",
+			p.MinimumLeaseHours, p.MaximumLeaseHours)
 	}
 	if err := validateMinDeposit(p.MinDeposit); err != nil {
 		return err

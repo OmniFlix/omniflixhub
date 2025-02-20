@@ -43,7 +43,7 @@ func (m msgServer) RegisterMediaNode(goCtx context.Context, msg *types.MsgRegist
 	}
 
 	// Create and store the media node
-	mediaNode := types.NewMediaNode(msg.Url, sender.String(), msg.HardwareSpecs, msg.PricePerDay)
+	mediaNode := types.NewMediaNode(msg.Id, msg.Url, sender.String(), msg.HardwareSpecs, msg.PricePerHour)
 	// default status on register
 	mediaNode.Status = types.STATUS_PENDING
 
@@ -78,7 +78,7 @@ func (m msgServer) UpdateMediaNode(goCtx context.Context, msg *types.MsgUpdateMe
 		return nil, errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "not found")
 	}
 	existingMediaNode.HardwareSpecs = msg.HardwareSpecs
-	existingMediaNode.PricePerDay = msg.PricePerDay
+	existingMediaNode.PricePerHour = msg.PricePerHour
 	m.Keeper.UpdateMediaNode(ctx, existingMediaNode, sender)
 
 	return &types.MsgUpdateMediaNodeResponse{}, nil
@@ -94,11 +94,11 @@ func (m msgServer) LeaseMediaNode(goCtx context.Context, msg *types.MsgLeaseMedi
 	}
 
 	params := m.Keeper.GetParams(ctx)
-	if msg.LeaseDays < params.MinimumLeaseDays {
-		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseDays, "minimum of %d lease days required", params.MinimumLeaseDays)
+	if msg.LeaseHours < params.MinimumLeaseHours {
+		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseDays, "minimum of %d lease hours required", params.MinimumLeaseHours)
 	}
-	if msg.LeaseDays > params.MaximumLeaseDays {
-		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseDays, "maximum of %d lease days allowed", params.MaximumLeaseDays)
+	if msg.LeaseHours > params.MaximumLeaseHours {
+		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseDays, "maximum of %d lease hours allowed", params.MaximumLeaseHours)
 	}
 
 	mediaNode, found := m.Keeper.GetMediaNode(ctx, msg.MediaNodeId)
@@ -113,7 +113,7 @@ func (m msgServer) LeaseMediaNode(goCtx context.Context, msg *types.MsgLeaseMedi
 		return nil, errorsmod.Wrapf(types.ErrMediaNodeAlreadyLeased, "media node %d is already leased", mediaNode.Id)
 	}
 
-	expectedLeaseAmount := sdk.NewCoin(mediaNode.PricePerDay.Denom, mediaNode.PricePerDay.Amount.Mul(sdkmath.NewInt(int64(msg.LeaseDays))))
+	expectedLeaseAmount := sdk.NewCoin(mediaNode.PricePerHour.Denom, mediaNode.PricePerHour.Amount.Mul(sdkmath.NewInt(int64(msg.LeaseHours))))
 	if !msg.Amount.IsEqual(expectedLeaseAmount) {
 		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseAmount, "lease amount must be equal to %s", expectedLeaseAmount.String())
 	}
@@ -124,11 +124,51 @@ func (m msgServer) LeaseMediaNode(goCtx context.Context, msg *types.MsgLeaseMedi
 	}
 
 	// Lease the media node
-	if err := m.Keeper.LeaseMediaNode(ctx, mediaNode, msg.LeaseDays, sender, msg.Amount); err != nil {
+	if err := m.Keeper.LeaseMediaNode(ctx, mediaNode, msg.LeaseHours, sender, msg.Amount); err != nil {
 		return nil, err
 	}
 
 	return &types.MsgLeaseMediaNodeResponse{}, nil
+}
+
+// LeaseMediaNode handles leasing a media node
+func (m msgServer) ExtendLease(goCtx context.Context, msg *types.MsgExtendLease) (*types.MsgExtendLeaseResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	params := m.Keeper.GetParams(ctx)
+	if msg.LeaseHours < params.MinimumLeaseHours {
+		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseDays, "minimum of %d lease hours required", params.MinimumLeaseHours)
+	}
+	if msg.LeaseHours > params.MaximumLeaseHours {
+		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseDays, "maximum of %d lease hours allowed", params.MaximumLeaseHours)
+	}
+
+	mediaNodeLease, found := m.Keeper.GetMediaNodeLease(ctx, msg.MediaNodeId)
+	if !found {
+		return nil, errorsmod.Wrapf(types.ErrLeaseNotFound, "not found")
+	}
+
+	expectedLeaseAmount := sdk.NewCoin(mediaNodeLease.PricePerHour.Denom, mediaNodeLease.PricePerHour.Amount.Mul(sdkmath.NewInt(int64(msg.LeaseHours))))
+	if !msg.Amount.IsEqual(expectedLeaseAmount) {
+		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseAmount, "lease amount must be equal to %s", expectedLeaseAmount.String())
+	}
+
+	// Validate the lease details
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
+	// Lease the media node
+	if err := m.Keeper.ExtendMediaNodeLease(ctx, mediaNodeLease, msg.LeaseHours, msg.Amount, sender); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgExtendLeaseResponse{}, nil
 }
 
 // CancelLease handles canceling a lease for a media node

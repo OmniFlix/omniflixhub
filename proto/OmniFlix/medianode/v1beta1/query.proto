@@ -43,7 +43,7 @@ service Query {
 
 // QueryMediaNodeRequest is the request type for querying a specific media node
 message QueryMediaNodeRequest {
-  uint64 id = 1;
+  string id = 1;
 }
 
 // QueryMediaNodeResponse is the response type for querying a specific media node
@@ -76,7 +76,7 @@ message QueryMediaNodesByOwnerResponse {
 
 // QueryLeaseRequest is the request type for querying a specific lease
 message QueryLeaseRequest {
-  uint64 media_node_id = 1;
+  string media_node_id = 1;
 }
 
 // QueryLeaseResponse is the response type for querying a specific lease

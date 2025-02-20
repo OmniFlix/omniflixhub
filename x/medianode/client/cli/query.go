@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -59,12 +58,11 @@ func GetCmdQueryParams() *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryCampaign implements the query campaign command.
 func GetCmdQueryMediaNode() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "medianode [id]",
+		Use:     "node [id]",
 		Long:    "Query a medianode by it's id.",
-		Example: fmt.Sprintf("$ %s query medianode medianode <id>", version.AppName),
+		Example: fmt.Sprintf("$ %s query medianode node <id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -73,10 +71,7 @@ func GetCmdQueryMediaNode() *cobra.Command {
 				return err
 			}
 
-			mediaNodeId, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
+			mediaNodeId := args[0]
 
 			queryClient := types.NewQueryClient(clientCtx)
 
@@ -95,12 +90,11 @@ func GetCmdQueryMediaNode() *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryAllCampaigns implements the query all campaigns command.
 func GetCmdQueryMediaNodes() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "medianodes",
+		Use:     "nodes",
 		Long:    "Query medianodes.",
-		Example: fmt.Sprintf("$ %s query medianode medianodes", version.AppName),
+		Example: fmt.Sprintf("$ %s query medianode nodes", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags())
@@ -127,7 +121,7 @@ func GetCmdQueryMediaNodes() *cobra.Command {
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
-	flags.AddPaginationFlagsToCmd(cmd, "medianodes")
+	flags.AddPaginationFlagsToCmd(cmd, "nodes")
 
 	return cmd
 }
@@ -146,10 +140,7 @@ func GetCmdQueryLease() *cobra.Command {
 				return err
 			}
 
-			mediaNodeId, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
+			mediaNodeId := args[0]
 
 			queryClient := types.NewQueryClient(clientCtx)
 

@@ -49,7 +49,7 @@ func request_Query_MediaNode_0(ctx context.Context, marshaler runtime.Marshaler,
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
 	}
 
-	protoReq.Id, err = runtime.Uint64(val)
+	protoReq.Id, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
@@ -76,7 +76,7 @@ func local_request_Query_MediaNode_0(ctx context.Context, marshaler runtime.Mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
 	}
 
-	protoReq.Id, err = runtime.Uint64(val)
+	protoReq.Id, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
@@ -139,7 +139,7 @@ func request_Query_Lease_0(ctx context.Context, marshaler runtime.Marshaler, cli
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "media_node_id")
 	}
 
-	protoReq.MediaNodeId, err = runtime.Uint64(val)
+	protoReq.MediaNodeId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "media_node_id", err)
@@ -166,7 +166,7 @@ func local_request_Query_Lease_0(ctx context.Context, marshaler runtime.Marshale
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "media_node_id")
 	}
 
-	protoReq.MediaNodeId, err = runtime.Uint64(val)
+	protoReq.MediaNodeId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "media_node_id", err)
@@ -618,9 +618,9 @@ var (
 
 	pattern_Query_Lease_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"omniflix", "medianode", "v1beta1", "lease", "media_node_id"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_LeasesByLessee_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"omniflix", "medianode", "v1beta1", "leases", "lessee"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_LeasesByLessee_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"omniflix", "medianode", "v1beta1", "leases-by-lessee", "lessee"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_AvailableNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"omniflix", "medianode", "v1beta1", "nodes", "available"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_AvailableNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"omniflix", "medianode", "v1beta1", "available-nodes"}, "", runtime.AssumeColonVerbOpt(false)))
 
 	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"omniflix", "medianode", "v1beta1", "params"}, "", runtime.AssumeColonVerbOpt(false)))
 )

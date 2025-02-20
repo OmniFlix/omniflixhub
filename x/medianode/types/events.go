@@ -4,6 +4,7 @@ const (
 	EventTypeRegisterMediaNode       = "register_medianode"
 	EventTypeUpdateMediaNode         = "update_medianode"
 	EventTypeLeaseMediaNode          = "lease_medianode"
+	EventTypeExtendLease             = "extend_medianode_lease"
 	EventTypeCalcelLease             = "cancel_medianode_lease"
 	EventTypeDepositMediaNode        = "deposit_medianode"
 	EventTypeCloseMediaNode          = "close_medianode"

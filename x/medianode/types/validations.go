@@ -9,8 +9,8 @@ import (
 
 // Validate performs basic validation of the MediaNode fields
 func (m MediaNode) Validate() error {
-	if m.Id == 0 {
-		return fmt.Errorf("media node ID cannot be 0")
+	if m.Id == "" {
+		return fmt.Errorf("media node ID cannot be empty")
 	}
 
 	if m.Url == "" {
@@ -37,11 +37,11 @@ func (m MediaNode) Validate() error {
 	}
 
 	// Validate lease amount
-	if !m.PricePerDay.IsValid() {
-		return fmt.Errorf("invalid lease amount per day")
+	if !m.PricePerHour.IsValid() {
+		return fmt.Errorf("invalid lease amount per hour")
 	}
-	if m.PricePerDay.IsZero() {
-		return fmt.Errorf("lease amount per day cannot be zero")
+	if m.PricePerHour.IsZero() {
+		return fmt.Errorf("lease amount per hour cannot be zero")
 	}
 
 	return nil
@@ -52,10 +52,10 @@ func (h HardwareSpecs) Validate() error {
 	if h.Cpus <= 0 {
 		return fmt.Errorf("CPUs must be greater than 0")
 	}
-	if h.Ram <= 0 {
+	if h.RamInGb <= 0 {
 		return fmt.Errorf("RAM must be greater than 0")
 	}
-	if h.Storage <= 0 {
+	if h.StorageInGb <= 0 {
 		return fmt.Errorf("storage must be greater than 0")
 	}
 	return nil
@@ -63,16 +63,16 @@ func (h HardwareSpecs) Validate() error {
 
 // Validate performs basic validation of the Lease fields
 func (l Lease) Validate() error {
-	if l.MediaNodeId == 0 {
-		return fmt.Errorf("media node ID cannot be 0")
+	if l.MediaNodeId == "" {
+		return fmt.Errorf("media node ID cannot be empty")
 	}
 
-	if l.Leasee == "" {
+	if l.Lessee == "" {
 		return fmt.Errorf("leased to address cannot be empty")
 	}
 
 	// Validate leasedTo address format
-	if _, err := sdk.AccAddressFromBech32(l.Leasee); err != nil {
+	if _, err := sdk.AccAddressFromBech32(l.Lessee); err != nil {
 		return fmt.Errorf("invalid leased to address: %w", err)
 	}
 
@@ -84,18 +84,8 @@ func (l Lease) Validate() error {
 		return fmt.Errorf("lease amount cannot be zero")
 	}
 
-	if l.LeasedDays == 0 {
+	if l.LeasedHours == 0 {
 		return fmt.Errorf("leased days cannot be 0")
-	}
-
-	// Validate lease status
-	if err := ValidateLeaseStatus(l.Status); err != nil {
-		return fmt.Errorf("invalid lease status: %w", err)
-	}
-
-	// Validate lease expiry is after leased at time
-	if !l.Expiry.After(l.StartTime) {
-		return fmt.Errorf("lease expiry must be after leased at time")
 	}
 
 	return nil
@@ -111,4 +101,12 @@ func ValidateLeaseStatus(status LeaseStatus) error {
 	default:
 		return fmt.Errorf("invalid lease status: %s", status)
 	}
+}
+
+func validateMediaNodeId(id string) error {
+	// Validate media node ID format
+	if len(id) != MediaNodeIdLength || id[:2] != MediaNodeIdPrefix {
+		return fmt.Errorf("media node ID must start with '%s' and be %d characters long", MediaNodeIdPrefix, MediaNodeIdLength)
+	}
+	return nil
 }
