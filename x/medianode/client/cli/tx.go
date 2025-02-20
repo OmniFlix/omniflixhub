@@ -29,6 +29,7 @@ func GetTxCmd() *cobra.Command {
 		GetCmdDepositMediaNode(),
 		GetCmdCancelLease(),
 		GetCmdCloseMediaNode(),
+		GetCmdExtendLease(),
 	)
 
 	return itcTxCmd
@@ -146,6 +147,57 @@ func GetCmdLeaseMediaNode() *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsLeaseMediaNode)
+	_ = cmd.MarkFlagRequired(FlagLeaseHours)
+	_ = cmd.MarkFlagRequired(FlagLeaseAmount)
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdExtendLease implements the extend-lease command
+func GetCmdExtendLease() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "extend-lease",
+		Short: "extends a lease for a media node",
+		Long:  "extends an active lease for a media node with the specified ID and additional lease hours\n",
+		Example: fmt.Sprintf(
+			"$ %s tx medianode extend-lease [medianode-id] --additional-hours=<no-of-hours> --amount=<amount> "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(1), // Expecting 1 positional argument
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			mediaNodeId := args[0]
+			additionalHours, err := cmd.Flags().GetUint64(FlagLeaseHours)
+			if err != nil {
+				return err
+			}
+			leaseAmountStr, err := cmd.Flags().GetString(FlagLeaseAmount)
+			if err != nil {
+				return err
+			}
+			leaseAmount, err := sdk.ParseCoinNormalized(leaseAmountStr)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgExtendLease(mediaNodeId, additionalHours, leaseAmount, clientCtx.GetFromAddress().String())
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsExtendLease)
 	_ = cmd.MarkFlagRequired(FlagLeaseHours)
 	_ = cmd.MarkFlagRequired(FlagLeaseAmount)
 	flags.AddTxFlagsToCmd(cmd)
