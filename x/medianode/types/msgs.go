@@ -46,7 +46,6 @@ func (msg MsgRegisterMediaNode) Route() string { return MsgRoute }
 func (msg MsgRegisterMediaNode) Type() string { return TypeMsgRegisterMediaNode }
 
 func (msg MsgRegisterMediaNode) ValidateBasic() error {
-
 	if err := validateMediaNodeId(msg.Id); err != nil {
 		return err
 	}

@@ -18,10 +18,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		panic(err)
 	}
 
-	for _, mn := range genState.MediaNodes {
+	for _, mn := range genState.Nodes {
 		k.SetMediaNode(ctx, mn)
 	}
-	k.SetNextMediaNodeNumber(ctx, genState.MediaNodeCounter)
+	k.SetNextMediaNodeNumber(ctx, genState.NodeCounter)
 
 	for _, lease := range genState.Leases {
 		k.SetLease(ctx, lease)

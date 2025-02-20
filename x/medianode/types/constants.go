@@ -1,6 +1,6 @@
 package types
 
 const (
-	MediaNodeIdLength = 36
+	MediaNodeIdLength = 34
 	MediaNodeIdPrefix = "mn"
 )

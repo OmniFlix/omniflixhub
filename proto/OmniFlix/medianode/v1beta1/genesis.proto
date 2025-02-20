@@ -13,11 +13,11 @@ message GenesisState {
   Params params                    = 1 [(gogoproto.nullable) = false];
   
   // media_nodes is the list of registered media nodes
-  repeated MediaNode media_nodes   = 2 [(gogoproto.nullable) = false];
+  repeated MediaNode nodes   = 2 [(gogoproto.nullable) = false];
   
   // leases is the list of active leases
   repeated Lease leases            = 3 [(gogoproto.nullable) = false];
   
   // next_medianode_id is the current usable media node ID
-  uint64 media_node_counter         = 4;
+  uint64 node_counter         = 4;
 }

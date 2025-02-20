@@ -10,10 +10,10 @@ func NewGenesisState(medianodes []MediaNode,
 	params Params,
 ) *GenesisState {
 	return &GenesisState{
-		MediaNodes:       medianodes,
-		Leases:           leases,
-		Params:           params,
-		MediaNodeCounter: mediaNodeCounter,
+		Nodes:       medianodes,
+		Leases:      leases,
+		Params:      params,
+		NodeCounter: mediaNodeCounter,
 	}
 }
 
@@ -21,10 +21,10 @@ func NewGenesisState(medianodes []MediaNode,
 // module.
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Params:           DefaultParams(),
-		MediaNodes:       []MediaNode{},
-		Leases:           []Lease{},
-		MediaNodeCounter: 0,
+		Params:      DefaultParams(),
+		Nodes:       []MediaNode{},
+		Leases:      []Lease{},
+		NodeCounter: 0,
 	}
 }
 
@@ -35,9 +35,9 @@ func (gs GenesisState) ValidateGenesis() error {
 	}
 
 	// Validate MediaNodes
-	for _, node := range gs.MediaNodes {
+	for _, node := range gs.Nodes {
 		if err := node.Validate(); err != nil {
-			return fmt.Errorf("invalid media node: %w", err)
+			return fmt.Errorf("invalid medianode: %w", err)
 		}
 	}
 
@@ -49,7 +49,7 @@ func (gs GenesisState) ValidateGenesis() error {
 	}
 
 	// Validate NextMedianodeId is non-negative and non-zero
-	if gs.MediaNodeCounter < 0 {
+	if gs.NodeCounter < 0 {
 		return fmt.Errorf("media node counter cannot be negative")
 	}
 

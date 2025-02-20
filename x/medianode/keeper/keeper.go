@@ -62,7 +62,6 @@ func (k Keeper) GetModuleAccountAddress(ctx sdk.Context) sdk.AccAddress {
 
 // RegisterMediaNode creates a new media node entry
 func (k Keeper) RegisterMediaNode(ctx sdk.Context, mediaNode types.MediaNode, depositAmount sdk.Coin, owner sdk.AccAddress) error {
-
 	// Create a deposit object
 	deposit := types.Deposit{
 		Depositor:   mediaNode.Owner,
@@ -447,7 +446,6 @@ func (k Keeper) DistributeLeaseCommission(ctx sdk.Context, leaseCommissionCoin s
 
 // ExtendMediaNodeLease extends the lease duration and amount for a media node
 func (k Keeper) ExtendMediaNodeLease(ctx sdk.Context, mediaNodeLease types.Lease, newLeaseHours uint64, newLeaseAmount sdk.Coin, sender sdk.AccAddress) error {
-
 	if sender.String() != mediaNodeLease.Lessee {
 		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", sender.String())
 	}
