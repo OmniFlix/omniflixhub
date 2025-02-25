@@ -8,9 +8,9 @@ const (
 )
 
 var (
-	PrefixMediaNode  = []byte{0x01}
-	PrefixLease      = []byte{0x02}
-	PrefixNextNodeId = []byte{0x03}
+	PrefixMediaNode      = []byte{0x01}
+	PrefixLease          = []byte{0x02}
+	PrefixMediaNodeCount = []byte{0x03}
 
 	ParamsKey = []byte{0x12}
 )

@@ -37,11 +37,6 @@ func (m msgServer) RegisterMediaNode(goCtx context.Context, msg *types.MsgRegist
 		return nil, errorsmod.Wrapf(types.ErrInsufficientDeposit, "%s of initial deposit is reqquired", minInitialDeposit.String())
 	}
 
-	// Validate the media node registration details
-	if err := msg.ValidateBasic(); err != nil {
-		return nil, err
-	}
-
 	// Create and store the media node
 	mediaNode := types.NewMediaNode(msg.Id, msg.Url, sender.String(), msg.HardwareSpecs, msg.PricePerHour)
 	// default status on register
@@ -66,12 +61,6 @@ func (m msgServer) UpdateMediaNode(goCtx context.Context, msg *types.MsgUpdateMe
 	if err != nil {
 		return nil, err
 	}
-
-	// Validate the media node update details
-	if err := msg.ValidateBasic(); err != nil {
-		return nil, err
-	}
-
 	// Retrieve the existing media node
 	existingMediaNode, found := m.Keeper.GetMediaNode(ctx, msg.Id)
 	if !found {
@@ -110,17 +99,12 @@ func (m msgServer) LeaseMediaNode(goCtx context.Context, msg *types.MsgLeaseMedi
 	}
 
 	if mediaNode.IsLeased() {
-		return nil, errorsmod.Wrapf(types.ErrMediaNodeAlreadyLeased, "media node %d is already leased", mediaNode.Id)
+		return nil, errorsmod.Wrapf(types.ErrMediaNodeAlreadyLeased, "media node %s is already leased", mediaNode.Id)
 	}
 
 	expectedLeaseAmount := sdk.NewCoin(mediaNode.PricePerHour.Denom, mediaNode.PricePerHour.Amount.Mul(sdkmath.NewInt(int64(msg.LeaseHours))))
 	if !msg.Amount.IsEqual(expectedLeaseAmount) {
 		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseAmount, "lease amount must be equal to %s", expectedLeaseAmount.String())
-	}
-
-	// Validate the lease details
-	if err := msg.ValidateBasic(); err != nil {
-		return nil, err
 	}
 
 	// Lease the media node
@@ -157,12 +141,6 @@ func (m msgServer) ExtendLease(goCtx context.Context, msg *types.MsgExtendLease)
 	if !msg.Amount.IsEqual(expectedLeaseAmount) {
 		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseAmount, "lease amount must be equal to %s", expectedLeaseAmount.String())
 	}
-
-	// Validate the lease details
-	if err := msg.ValidateBasic(); err != nil {
-		return nil, err
-	}
-
 	// Lease the media node
 	if err := m.Keeper.ExtendMediaNodeLease(ctx, mediaNodeLease, msg.LeaseHours, msg.Amount, sender); err != nil {
 		return nil, err
@@ -197,11 +175,6 @@ func (m msgServer) DepositMediaNode(goCtx context.Context, msg *types.MsgDeposit
 		return nil, err
 	}
 
-	// Validate the deposit details
-	if err := msg.ValidateBasic(); err != nil {
-		return nil, err
-	}
-
 	// Deposit to the media node
 	if err := m.Keeper.DepositMediaNode(ctx, msg.MediaNodeId, msg.Amount, sender); err != nil {
 		return nil, err
@@ -218,12 +191,6 @@ func (m msgServer) CloseMediaNode(goCtx context.Context, msg *types.MsgCloseMedi
 	if err != nil {
 		return nil, err
 	}
-
-	// Validate the close details
-	if err := msg.ValidateBasic(); err != nil {
-		return nil, err
-	}
-
 	// Close the media node
 	if err := m.Keeper.CloseMediaNode(ctx, msg.MediaNodeId, sender); err != nil {
 		return nil, err

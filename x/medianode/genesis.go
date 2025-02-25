@@ -21,11 +21,11 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, mn := range genState.Nodes {
 		k.SetMediaNode(ctx, mn)
 	}
-	k.SetNextMediaNodeNumber(ctx, genState.NodeCounter)
-
 	for _, lease := range genState.Leases {
 		k.SetLease(ctx, lease)
 	}
+
+	k.SetMediaNodeCount(ctx, genState.NodeCounter)
 
 	// check if the module account exists
 	moduleAcc := k.GetModuleAccountAddress(ctx)
@@ -41,17 +41,12 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	return types.NewGenesisState(
 		medianodes,
 		leases,
-		k.GetNextMediaNodeNumber(ctx),
+		k.GetMediaNodeCount(ctx),
 		k.GetParams(ctx),
 	)
 }
 
 // DefaultGenesisState returns default state
 func DefaultGenesisState() *types.GenesisState {
-	return types.NewGenesisState(
-		[]types.MediaNode{},
-		[]types.Lease{},
-		1,
-		types.DefaultParams(),
-	)
+	return types.DefaultGenesis()
 }

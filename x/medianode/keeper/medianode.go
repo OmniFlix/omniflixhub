@@ -46,19 +46,19 @@ func (k Keeper) GetMediaNodeLease(ctx sdk.Context, id string) (lease types.Lease
 	return lease, true
 }
 
-// SetNextMediaNodeNumber stores the next media node ID to be assigned
-func (k Keeper) SetNextMediaNodeNumber(ctx sdk.Context, number uint64) {
+// SetMediaNodeCount stores the  media node count
+func (k Keeper) SetMediaNodeCount(ctx sdk.Context, number uint64) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&gogotypes.UInt64Value{Value: number})
-	store.Set(types.PrefixNextNodeId, bz)
+	store.Set(types.PrefixMediaNodeCount, bz)
 }
 
-// GetNextMediaNodeNumber returns the next media node ID to be assigned
-func (k Keeper) GetNextMediaNodeNumber(ctx sdk.Context) (nextNodeId uint64) {
+// GetMediaNodeCount returns the current media node count
+func (k Keeper) GetMediaNodeCount(ctx sdk.Context) (nodesCount uint64) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.PrefixNextNodeId)
+	bz := store.Get(types.PrefixMediaNodeCount)
 	if bz == nil {
-		panic(fmt.Errorf("%s module not initialized -- Should have been done in InitGenesis", types.ModuleName))
+		panic(fmt.Errorf("%s module not initialized", types.ModuleName))
 	} else {
 		val := gogotypes.UInt64Value{}
 
@@ -66,9 +66,9 @@ func (k Keeper) GetNextMediaNodeNumber(ctx sdk.Context) (nextNodeId uint64) {
 		if err != nil {
 			panic(err)
 		}
-		nextNodeId = val.GetValue()
+		nodesCount = val.GetValue()
 	}
-	return nextNodeId
+	return nodesCount
 }
 
 // GetAllMediaNodes returns all media nodes from the store

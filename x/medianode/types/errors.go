@@ -27,4 +27,6 @@ var (
 	ErrLeaseNotActive         = errorsmod.Register(ModuleName, 18, "lease not in active state")
 	ErrInsufficientDeposit    = errorsmod.Register(ModuleName, 19, "insufficient deposit")
 	ErrLeaseNotAllowed        = errorsmod.Register(ModuleName, 20, "lease not allowed")
+	ErrCloseNotAllowed        = errorsmod.Register(ModuleName, 21, "medianode close not allowed")
+	ErrUpdateNotAllowed       = errorsmod.Register(ModuleName, 22, "medianode update not allowed")
 )

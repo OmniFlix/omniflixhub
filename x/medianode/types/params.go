@@ -11,8 +11,8 @@ import (
 
 // Parameter store keys
 var (
-	KeyMinimumLeaseDays         = []byte("MinimumLeaseDays")
-	KeyMaximumLeaseDays         = []byte("MaximumLeaseDays")
+	KeyMinimumLeaseHours        = []byte("MinimumLeaseHours")
+	KeyMaximumLeaseHours        = []byte("MaximumLeaseHours")
 	KeyMinDeposit               = []byte("MinDeposit")
 	KeyInitialDepositPercentage = []byte("InitialDepositPercentage")
 	KeyLeaseCommission          = []byte("LeaseCommission")
@@ -53,8 +53,8 @@ func DefaultParams() Params {
 // ParamSetPairs implements the ParamSet interface and returns all the key/value pairs
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(KeyMinimumLeaseDays, &p.MinimumLeaseHours, validateMinimumLeaseDays),
-		paramtypes.NewParamSetPair(KeyMaximumLeaseDays, &p.MaximumLeaseHours, validateMaximumLeaseDays),
+		paramtypes.NewParamSetPair(KeyMinimumLeaseHours, &p.MinimumLeaseHours, validateMinimumLeaseDays),
+		paramtypes.NewParamSetPair(KeyMaximumLeaseHours, &p.MaximumLeaseHours, validateMaximumLeaseDays),
 		paramtypes.NewParamSetPair(KeyMinDeposit, &p.MinDeposit, validateMinDeposit),
 		paramtypes.NewParamSetPair(KeyInitialDepositPercentage, &p.InitialDepositPercentage, validateInitialDepositPercentage),
 		paramtypes.NewParamSetPair(KeyLeaseCommission, &p.LeaseCommission, validateLeaseCommission),
