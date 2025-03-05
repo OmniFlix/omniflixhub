@@ -60,6 +60,7 @@ import (
 	v4 "github.com/OmniFlix/omniflixhub/v5/app/upgrades/v4"
 	v5 "github.com/OmniFlix/omniflixhub/v5/app/upgrades/v5"
 	v510 "github.com/OmniFlix/omniflixhub/v5/app/upgrades/v510"
+	v520 "github.com/OmniFlix/omniflixhub/v5/app/upgrades/v520"
 )
 
 const Name = "omniflixhub"
@@ -86,7 +87,7 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 var (
 	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome string
-	Upgrades        = []upgrades.Upgrade{v012.Upgrade, v2.Upgrade, v2_1.Upgrade, v3.Upgrade, v4.Upgrade, v5.Upgrade, v510.Upgrade}
+	Upgrades        = []upgrades.Upgrade{v012.Upgrade, v2.Upgrade, v2_1.Upgrade, v3.Upgrade, v4.Upgrade, v5.Upgrade, v510.Upgrade, v520.Upgrade}
 	Forks           []upgrades.Fork
 )
 
