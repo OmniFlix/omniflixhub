@@ -1,8 +1,6 @@
 module github.com/OmniFlix/omniflixhub/v5
 
-go 1.22.11
-
-toolchain go1.23.1
+go 1.22.12
 
 require (
 	cosmossdk.io/client/v2 v2.0.0-beta.3
