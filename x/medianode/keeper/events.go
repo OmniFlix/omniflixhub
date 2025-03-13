@@ -91,11 +91,12 @@ func (k *Keeper) closeMediaNodeEvent(ctx sdk.Context, owner string, mediaNodeId 
 	})
 }
 
-func (k *Keeper) createLeasePaymentTransferEvent(ctx sdk.Context, sender, recipient sdk.AccAddress, amount sdk.Coin) {
+func (k *Keeper) createLeasePaymentTransferEvent(ctx sdk.Context, mediaNodeId string, sender, recipient sdk.AccAddress, amount sdk.Coin) {
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeLeasePaymentTransfer,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(types.AttributeKeyMediaNodeId, mediaNodeId),
 			sdk.NewAttribute(sdk.AttributeKeySender, sender.String()),
 			sdk.NewAttribute(types.AttributeKeyRecipient, recipient.String()),
 			sdk.NewAttribute(types.AttributeKeyAmount, amount.String()),
@@ -103,11 +104,12 @@ func (k *Keeper) createLeasePaymentTransferEvent(ctx sdk.Context, sender, recipi
 	})
 }
 
-func (k *Keeper) createLeaseCommissionTransferEvent(ctx sdk.Context, sender, recipient sdk.AccAddress, amount sdk.Coin) {
+func (k *Keeper) createLeaseCommissionTransferEvent(ctx sdk.Context, mediaNodeId string, sender, recipient sdk.AccAddress, amount sdk.Coin) {
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeLeaseCommissionTransfer,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(types.AttributeKeyMediaNodeId, mediaNodeId),
 			sdk.NewAttribute(sdk.AttributeKeySender, sender.String()),
 			sdk.NewAttribute(types.AttributeKeyRecipient, recipient.String()),
 			sdk.NewAttribute(types.AttributeKeyAmount, amount.String()),
@@ -115,11 +117,12 @@ func (k *Keeper) createLeaseCommissionTransferEvent(ctx sdk.Context, sender, rec
 	})
 }
 
-func (k *Keeper) createMediaNodeDepositRefundEvent(ctx sdk.Context, sender, recipient sdk.AccAddress, amount sdk.Coin) {
+func (k *Keeper) createMediaNodeDepositRefundEvent(ctx sdk.Context, mediaNodeId string, sender, recipient sdk.AccAddress, amount sdk.Coin) {
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeRefundDeposit,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(types.AttributeKeyMediaNodeId, mediaNodeId),
 			sdk.NewAttribute(sdk.AttributeKeySender, sender.String()),
 			sdk.NewAttribute(types.AttributeKeyRecipient, recipient.String()),
 			sdk.NewAttribute(types.AttributeKeyAmount, amount.String()),
