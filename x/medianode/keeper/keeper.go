@@ -240,23 +240,60 @@ func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId string, sender sdk.AccA
 		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", sender.String())
 	}
 
-	// Calculate remaining lease days and refund amount //TODO: change to 24
-	remainingDays := lease.LeasedHours - uint64(ctx.BlockTime().Sub(lease.StartTime).Hours()/24)
-	if remainingDays > 0 {
-		refundAmount := sdk.NewCoin(
-			mediaNode.PricePerHour.Denom,
-			mediaNode.PricePerHour.Amount.MulRaw(int64(remainingDays)),
-		)
+	// Calculate remaining lease hours and refund amount
+	remainingHours := lease.LeasedHours - uint64(ctx.BlockTime().Sub(lease.StartTime).Hours())
+	refundAmount := mediaNode.PricePerHour.Amount.MulRaw(int64(remainingHours))
 
-		// Return remaining funds to lessee
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(
-			ctx,
-			types.ModuleName,
-			sender,
-			sdk.NewCoins(refundAmount),
-		); err != nil {
+	// Calculate extra minutes and and settle payment
+	extraMinutes := uint64(ctx.BlockTime().Sub(lease.LastSettledAt).Minutes())
+	pricePerMinute := lease.PricePerHour.Amount.Quo(sdkmath.NewInt(60))
+	extraMinutesAmount := pricePerMinute.Mul(sdkmath.NewIntFromUint64(extraMinutes))
+	amountToSettle := sdk.NewCoin(
+		lease.PricePerHour.Denom,
+		extraMinutesAmount,
+	)
+	refundAmountCoin := sdk.NewCoin(
+		lease.PricePerHour.Denom,
+		refundAmount,
+	)
+	if amountToSettle.Amount.GT(sdkmath.ZeroInt()) {
+		refundAmountCoin = refundAmountCoin.Sub(amountToSettle)
+
+		// Distribute commission for used payment
+		leaseCommissionCoin := k.GetProportions(amountToSettle, k.GetLeaseCommission(ctx))
+
+		// distribute lease commission
+		if leaseCommissionCoin.Amount.GT(sdkmath.ZeroInt()) {
+			err := k.DistributeLeaseCommission(ctx, leaseCommissionCoin)
+			if err != nil {
+				return err
+			}
+			k.createLeaseCommissionTransferEvent(ctx, lease.MediaNodeId, leaseCommissionCoin)
+		}
+
+		// Transfer remaining payment to media node owner
+		mediaNodeOwnerPayout := amountToSettle.Sub(leaseCommissionCoin)
+		mediaNodeOwner, err := sdk.AccAddressFromBech32(lease.Owner)
+		if err != nil {
 			return err
 		}
+
+		if mediaNodeOwnerPayout.Amount.GT(sdkmath.ZeroInt()) {
+			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, mediaNodeOwner, sdk.NewCoins(mediaNodeOwnerPayout)); err != nil {
+				return err
+			}
+			k.createLeasePaymentTransferEvent(ctx, lease.MediaNodeId, k.accountKeeper.GetModuleAddress(types.ModuleName), mediaNodeOwner, mediaNodeOwnerPayout)
+		}
+	}
+
+	// Return remaining funds to lessee
+	if err := k.bankKeeper.SendCoinsFromModuleToAccount(
+		ctx,
+		types.ModuleName,
+		sender,
+		sdk.NewCoins(refundAmountCoin),
+	); err != nil {
+		return err
 	}
 
 	// Clear lease
@@ -264,7 +301,7 @@ func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId string, sender sdk.AccA
 	k.SetMediaNode(ctx, mediaNode)
 	k.RemoveLease(ctx, lease.MediaNodeId)
 
-	k.cancelLeaseMediaNodeEvent(ctx, lease.Lessee, mediaNodeId)
+	k.cancelLeaseMediaNodeEvent(ctx, lease.Lessee, mediaNodeId, amountToSettle, refundAmountCoin)
 	return nil
 }
 
@@ -356,10 +393,12 @@ func (k Keeper) SettleActiveLeases(ctx sdk.Context) error {
 				leaseCommissionCoin := k.GetProportions(paymentAmount, leaseCommissionPercentage)
 
 				// distribute lease commission
-				err := k.DistributeLeaseCommission(ctx, lease.MediaNodeId, leaseCommissionCoin)
+				err := k.DistributeLeaseCommission(ctx, leaseCommissionCoin)
 				if err != nil {
 					return err
 				}
+
+				k.createLeaseCommissionTransferEvent(ctx, lease.MediaNodeId, leaseCommissionCoin)
 
 				// Transfer remaining payment to media node owner
 				mediaNodeOwnerAmount := paymentAmount.Sub(leaseCommissionCoin)
@@ -382,24 +421,28 @@ func (k Keeper) SettleActiveLeases(ctx sdk.Context) error {
 				leaseCommissionCoin := k.GetProportions(remainingAmount, leaseCommissionPercentage)
 
 				// distribute lease commission
-				err := k.DistributeLeaseCommission(ctx, lease.MediaNodeId, leaseCommissionCoin)
-				if err != nil {
-					return err
+				if leaseCommissionCoin.Amount.GT(sdkmath.ZeroInt()) {
+					err := k.DistributeLeaseCommission(ctx, leaseCommissionCoin)
+					if err != nil {
+						return err
+					}
+					k.createLeaseCommissionTransferEvent(ctx, lease.MediaNodeId, leaseCommissionCoin)
 				}
 
 				// Transfer remaining amount to the medianode owner
 				mediaNodeOwnerAmount := remainingAmount.Sub(leaseCommissionCoin)
+				if mediaNodeOwnerAmount.Amount.GT(sdkmath.ZeroInt()) {
+					if err := k.bankKeeper.SendCoinsFromModuleToAccount(
+						ctx,
+						types.ModuleName,
+						owner,
+						sdk.NewCoins(mediaNodeOwnerAmount),
+					); err != nil {
+						return err
+					}
 
-				if err := k.bankKeeper.SendCoinsFromModuleToAccount(
-					ctx,
-					types.ModuleName,
-					owner,
-					sdk.NewCoins(mediaNodeOwnerAmount),
-				); err != nil {
-					return err
+					k.createLeasePaymentTransferEvent(ctx, lease.MediaNodeId, k.accountKeeper.GetModuleAddress(types.ModuleName), owner, mediaNodeOwnerAmount)
 				}
-
-				k.createLeasePaymentTransferEvent(ctx, lease.MediaNodeId, k.accountKeeper.GetModuleAddress(types.ModuleName), owner, mediaNodeOwnerAmount)
 
 				mediaNode, found := k.GetMediaNode(ctx, lease.MediaNodeId)
 				if found {
@@ -407,7 +450,10 @@ func (k Keeper) SettleActiveLeases(ctx sdk.Context) error {
 					k.SetMediaNode(ctx, mediaNode)
 				}
 				k.RemoveLease(ctx, lease.MediaNodeId)
+				k.createMediaNodeLeaseExpiredEvent(ctx, lease.MediaNodeId, lease.Lessee)
 			}
+
+			k.createSettleLeasePaymentEvent(ctx, lease.MediaNodeId, lease.Lessee, paymentAmount)
 		}
 	}
 
@@ -464,7 +510,7 @@ func (k Keeper) GetProportions(totalCoin sdk.Coin, ratio sdkmath.LegacyDec) sdk.
 	return sdk.NewCoin(totalCoin.Denom, sdkmath.LegacyNewDecFromInt(totalCoin.Amount).Mul(ratio).TruncateInt())
 }
 
-func (k Keeper) DistributeLeaseCommission(ctx sdk.Context, mediaNodeId string, leaseCommissionCoin sdk.Coin) error {
+func (k Keeper) DistributeLeaseCommission(ctx sdk.Context, leaseCommissionCoin sdk.Coin) error {
 	distrParams := k.GetCommissionDistribution(ctx)
 	stakingCommissionCoin := k.GetProportions(leaseCommissionCoin, distrParams.Staking)
 	moduleAccAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
@@ -474,12 +520,6 @@ func (k Keeper) DistributeLeaseCommission(ctx sdk.Context, mediaNodeId string, l
 		if err != nil {
 			return err
 		}
-		k.createLeaseCommissionTransferEvent(ctx,
-			mediaNodeId,
-			moduleAccAddr,
-			feeCollectorAddr,
-			stakingCommissionCoin,
-		)
 		leaseCommissionCoin = leaseCommissionCoin.Sub(stakingCommissionCoin)
 	}
 	communityPoolCommissionCoin := leaseCommissionCoin
@@ -492,12 +532,5 @@ func (k Keeper) DistributeLeaseCommission(ctx sdk.Context, mediaNodeId string, l
 	if err != nil {
 		return err
 	}
-	k.createLeaseCommissionTransferEvent(ctx,
-		mediaNodeId,
-		moduleAccAddr,
-		k.accountKeeper.GetModuleAddress("distribution"),
-		communityPoolCommissionCoin,
-	)
-
 	return nil
 }
