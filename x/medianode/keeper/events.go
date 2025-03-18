@@ -56,13 +56,15 @@ func (k *Keeper) extendleaseEvent(ctx sdk.Context, lessee string, mediaNodeId st
 	})
 }
 
-func (k *Keeper) cancelLeaseMediaNodeEvent(ctx sdk.Context, lessee string, mediaNodeId string) {
+func (k *Keeper) cancelLeaseMediaNodeEvent(ctx sdk.Context, lessee string, mediaNodeId string, settledAmount, refundAmount sdk.Coin) {
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeCalcelLease,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 			sdk.NewAttribute(types.AttributeKeyLessee, lessee),
 			sdk.NewAttribute(types.AttributeKeyMediaNodeId, mediaNodeId),
+			sdk.NewAttribute(types.AttributeKeySettledAmount, settledAmount.String()),
+			sdk.NewAttribute(types.AttributeKeyRefundAmount, refundAmount.String()),
 		),
 	})
 }
@@ -104,14 +106,12 @@ func (k *Keeper) createLeasePaymentTransferEvent(ctx sdk.Context, mediaNodeId st
 	})
 }
 
-func (k *Keeper) createLeaseCommissionTransferEvent(ctx sdk.Context, mediaNodeId string, sender, recipient sdk.AccAddress, amount sdk.Coin) {
+func (k *Keeper) createLeaseCommissionTransferEvent(ctx sdk.Context, mediaNodeId string, amount sdk.Coin) {
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeLeaseCommissionTransfer,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 			sdk.NewAttribute(types.AttributeKeyMediaNodeId, mediaNodeId),
-			sdk.NewAttribute(sdk.AttributeKeySender, sender.String()),
-			sdk.NewAttribute(types.AttributeKeyRecipient, recipient.String()),
 			sdk.NewAttribute(types.AttributeKeyAmount, amount.String()),
 		),
 	})
@@ -137,6 +137,18 @@ func (k *Keeper) createMediaNodeLeaseExpiredEvent(ctx sdk.Context, mediaNodeId, 
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 			sdk.NewAttribute(types.AttributeKeyMediaNodeId, mediaNodeId),
 			sdk.NewAttribute(types.AttributeKeyLessee, lessee),
+		),
+	})
+}
+
+func (k *Keeper) createSettleLeasePaymentEvent(ctx sdk.Context, mediaNodeId, lessee string, amount sdk.Coin) {
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeSettleLeasePayment,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(types.AttributeKeyMediaNodeId, mediaNodeId),
+			sdk.NewAttribute(types.AttributeKeyLessee, lessee),
+			sdk.NewAttribute(types.AttributeKeyAmount, amount.String()),
 		),
 	})
 }
