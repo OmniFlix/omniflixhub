@@ -25,6 +25,7 @@ func GetTxCmd() *cobra.Command {
 	}
 	itcTxCmd.AddCommand(
 		GetCmdRegisterMediaNode(),
+		GetCmdUpdateMediaNode(),
 		GetCmdLeaseMediaNode(),
 		GetCmdDepositMediaNode(),
 		GetCmdCancelLease(),
@@ -40,22 +41,49 @@ func GetCmdRegisterMediaNode() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "register",
 		Short: "registers a new media node",
-		Long:  "register a new media node with the specified URL, hardware specifications, and lease price per day\n",
+		Long:  "register a new media node with the specified URL, node info, hardware specifications, and lease price per hour\n",
 		Example: fmt.Sprintf(
-			"$ %s tx medianode register [url] --hardware-specs=<hardwarespecs> --price-per-day=<amount> "+
+			"$ %s tx medianode register"+
+				"--url=https://mymedianode.com"+
+				"--moniker=my-node"+
+				"--description=mydescription"+
+				"--contact=contact@mynode.com"+
+				"--hardware-specs=<hardwarespecs>"+
+				"--price-per-hour=<amount> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
 			version.AppName,
 		),
-		Args: cobra.ExactArgs(1), // Expecting 1 positional argument
+		Args: cobra.ExactArgs(0), // Expecting no positional arguments
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			url := args[0]
+			nodeURL, err := cmd.Flags().GetString(FlagURL)
+			if err != nil {
+				return err
+			}
+			nodeMoniker, err := cmd.Flags().GetString(FlagNodeMoniker)
+			if err != nil {
+				return err
+			}
+			nodeDescription, err := cmd.Flags().GetString(FlagDescription)
+			if err != nil {
+				return err
+			}
+			nodeContact, err := cmd.Flags().GetString(FlagContact)
+			if err != nil {
+				return err
+			}
+			info := types.Info{
+				Moniker:     nodeMoniker,
+				Description: nodeDescription,
+				Contact:     nodeContact,
+			}
+
 			hardwareSpecsStr, err := cmd.Flags().GetString(FlagHardwareSpecs)
 			if err != nil {
 				return err
@@ -64,6 +92,7 @@ func GetCmdRegisterMediaNode() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
 			priceStr, err := cmd.Flags().GetString(FlagPricePerHour)
 			if err != nil {
 				return err
@@ -81,7 +110,7 @@ func GetCmdRegisterMediaNode() *cobra.Command {
 				return err
 			}
 
-			msg, err := types.NewMsgRegisterMediaNode(url, hardwareSpecs, price, deposit, clientCtx.GetFromAddress().String())
+			msg, err := types.NewMsgRegisterMediaNode(nodeURL, info, hardwareSpecs, price, deposit, clientCtx.GetFromAddress().String())
 			if err != nil {
 				return err
 			}
@@ -94,10 +123,103 @@ func GetCmdRegisterMediaNode() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FsRegisterMediaNode) // Assuming FsRegisterMediaNode is defined elsewhere
+	cmd.Flags().AddFlagSet(FsRegisterMediaNode)
+	_ = cmd.MarkFlagRequired(FlagURL)
+	_ = cmd.MarkFlagRequired(FlagNodeMoniker)
 	_ = cmd.MarkFlagRequired(FlagHardwareSpecs)
 	_ = cmd.MarkFlagRequired(FlagPricePerHour)
 	_ = cmd.MarkFlagRequired(FlagDeposit)
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdUpdateMediaNode implements the update-media-node command
+func GetCmdUpdateMediaNode() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update [medianode-id]",
+		Short: "Update a media node",
+		Long:  "Update an existing media node's information, hardware specs, and price\n",
+		Example: fmt.Sprintf(
+			"$ %s tx medianode update [medianode-id] "+
+				"--moniker=<name> "+
+				"--description=<description> "+
+				"--contact=<contact> "+
+				"--hardware-specs=<specs> "+
+				"--price-per-hour=<price> "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
+		),
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			mediaNodeId := args[0]
+
+			moniker, err := cmd.Flags().GetString(FlagNodeMoniker)
+			if err != nil {
+				return err
+			}
+			description, err := cmd.Flags().GetString(FlagDescription)
+			if err != nil {
+				return err
+			}
+			contact, err := cmd.Flags().GetString(FlagContact)
+			if err != nil {
+				return err
+			}
+
+			info := &types.Info{
+				Moniker:     moniker,
+				Description: description,
+				Contact:     contact,
+			}
+			if moniker == "" && description == "" && contact == "" {
+				info = nil
+			}
+
+			hardwareSpecsStr, err := cmd.Flags().GetString(FlagHardwareSpecs)
+			if err != nil {
+				return err
+			}
+			var hardwareSpecs *types.HardwareSpecs
+			if hardwareSpecsStr != "" {
+				hardwareSpecss, err := ParseHardwareSpecs(hardwareSpecsStr)
+				if err != nil {
+					return err
+				}
+				hardwareSpecs = &hardwareSpecss
+			}
+
+			priceStr, err := cmd.Flags().GetString(FlagPricePerHour)
+			if err != nil {
+				return err
+			}
+			var price *sdk.Coin
+			if priceStr != "" {
+				amount, err := sdk.ParseCoinNormalized(priceStr)
+				if err != nil {
+					return err
+				}
+				price = &amount
+			}
+
+			msg := types.NewMsgUpdateMediaNode(mediaNodeId, info, hardwareSpecs, price, clientCtx.GetFromAddress().String())
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsUpdateMediaNode)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd

@@ -13,6 +13,9 @@ const (
 	FlagHardwareSpecs = "hardware-specs"
 	FlagOwner         = "owner"
 	FlagStatus        = "status"
+	FlagNodeMoniker   = "node-moniker"
+	FlagDescription   = "description"
+	FlagContact       = "contact"
 )
 
 var (
@@ -31,11 +34,16 @@ func init() {
 	FsRegisterMediaNode.String(FlagHardwareSpecs, "", "Hardware specifications of the media node")
 	FsRegisterMediaNode.String(FlagPricePerHour, "", "Lease price per hour")
 	FsRegisterMediaNode.String(FlagDeposit, "", "initial deposit amount")
+	FsRegisterMediaNode.String(FlagNodeMoniker, "", "name of the medianode")
+	FsRegisterMediaNode.String(FlagDescription, "", "description of the medianode")
+	FsRegisterMediaNode.String(FlagContact, "", "contact details of medianode")
 
 	// Register flags for updating a media node
-	FsUpdateMediaNode.String(FlagURL, "", "New URL of the media node")
+	FsUpdateMediaNode.String(FlagNodeMoniker, "", "New Moniker of the media node")
+	FsUpdateMediaNode.String(FlagDescription, "", "update description of the media node")
+	FsUpdateMediaNode.String(FlagContact, "", "update contact of the media node")
 	FsUpdateMediaNode.String(FlagHardwareSpecs, "", "Updated hardware specifications")
-	FsUpdateMediaNode.String(FlagLeaseAmount, "", "Updated lease amount per day")
+	FsUpdateMediaNode.String(FlagPricePerHour, "", "Updated lease amount per our")
 
 	// Register flags for leasing a media node
 	FsLeaseMediaNode.Uint64(FlagLeaseHours, 0, "Number of hours to lease the media node")

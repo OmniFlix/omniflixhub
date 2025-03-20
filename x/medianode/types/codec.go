@@ -10,8 +10,10 @@ import (
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	legacy.RegisterAminoMsg(cdc, &MsgRegisterMediaNode{}, "OmniFlix/medianode/MsgRegisterMediaNode")
+	legacy.RegisterAminoMsg(cdc, &MsgDepositMediaNode{}, "OmniFlix/medianode/MsgDepositMediaNode")
 	legacy.RegisterAminoMsg(cdc, &MsgUpdateMediaNode{}, "OmniFlix/medianode/MsgUpdateMediaNode")
 	legacy.RegisterAminoMsg(cdc, &MsgLeaseMediaNode{}, "OmniFlix/medianode/MsgLeaseMediaNode")
+	legacy.RegisterAminoMsg(cdc, &MsgExtendLease{}, "OmniFlix/medianode/MsgExtendLease")
 	legacy.RegisterAminoMsg(cdc, &MsgCancelLease{}, "OmniFlix/medianode/MsgCancelLease")
 	legacy.RegisterAminoMsg(cdc, &MsgCloseMediaNode{}, "OmniFlix/medianode/MsgCloseMediaNode")
 
@@ -22,8 +24,10 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgRegisterMediaNode{},
+		&MsgDepositMediaNode{},
 		&MsgUpdateMediaNode{},
 		&MsgLeaseMediaNode{},
+		&MsgExtendLease{},
 		&MsgCancelLease{},
 		&MsgCloseMediaNode{},
 	)

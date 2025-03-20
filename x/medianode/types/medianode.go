@@ -12,6 +12,7 @@ func NewMediaNode(
 	url string,
 	owner string,
 	hardwareSpecs HardwareSpecs,
+	info Info,
 	leaseAmountPerHour sdk.Coin,
 ) MediaNode {
 	return MediaNode{
@@ -22,6 +23,7 @@ func NewMediaNode(
 		Leased:        false,
 		Owner:         owner,
 		Deposits:      []*Deposit{},
+		Info:          info,
 	}
 }
 

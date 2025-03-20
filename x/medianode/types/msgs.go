@@ -26,7 +26,7 @@ var (
 )
 
 // Register Media Node
-func NewMsgRegisterMediaNode(url string, hardwareSpecs HardwareSpecs, pricePerHour, deposit sdk.Coin, sender string) (*MsgRegisterMediaNode, error) {
+func NewMsgRegisterMediaNode(url string, info Info, hardwareSpecs HardwareSpecs, pricePerHour, deposit sdk.Coin, sender string) (*MsgRegisterMediaNode, error) {
 	mediaNodeId, err := GenUniqueID(MediaNodeIdPrefix)
 	if err != nil {
 		return nil, err
@@ -38,6 +38,7 @@ func NewMsgRegisterMediaNode(url string, hardwareSpecs HardwareSpecs, pricePerHo
 		PricePerHour:  pricePerHour,
 		Sender:        sender,
 		Deposit:       &deposit,
+		Info:          info,
 	}, nil
 }
 
@@ -55,10 +56,16 @@ func (msg MsgRegisterMediaNode) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	if msg.Url == "" {
-		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "url cannot be empty")
+		return errorsmod.Wrap(ErrInvalidURL, "url cannot be empty or invalied")
+	}
+	if err := msg.Info.Validate(); err != nil {
+		return errorsmod.Wrap(ErrInvalidInfo, "invalid medianode info")
 	}
 	if err := msg.PricePerHour.Validate(); err != nil {
-		return errorsmod.Wrap(err, "invalid lease amount per hour")
+		return errorsmod.Wrap(ErrInvalidLeaseAmount, "invalid lease amount per hour")
+	}
+	if msg.PricePerHour.Amount.IsZero() {
+		return errorsmod.Wrap(ErrInvalidLeaseAmount, "price per hour must be positive")
 	}
 	return nil
 }
@@ -72,11 +79,12 @@ func (msg MsgRegisterMediaNode) GetSigners() []sdk.AccAddress {
 }
 
 // Update Media Node
-func NewMsgUpdateMediaNode(id string, hardwareSpecs HardwareSpecs, leaseAmountPerHour sdk.Coin, sender string) *MsgUpdateMediaNode {
+func NewMsgUpdateMediaNode(id string, info *Info, hardwareSpecs *HardwareSpecs, leaseAmountPerHour *sdk.Coin, sender string) *MsgUpdateMediaNode {
 	return &MsgUpdateMediaNode{
 		Id:            id,
 		HardwareSpecs: hardwareSpecs,
 		PricePerHour:  leaseAmountPerHour,
+		Info:          info,
 		Sender:        sender,
 	}
 }
@@ -90,9 +98,28 @@ func (msg MsgUpdateMediaNode) ValidateBasic() error {
 	if err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
-	if err := msg.PricePerHour.Validate(); err != nil {
-		return errorsmod.Wrap(err, "invalid lease amount per day")
+	if msg.HardwareSpecs != nil {
+		if err := msg.HardwareSpecs.Validate(); err != nil {
+			return errorsmod.Wrap(ErrInvalidHardwareSpecs, "invalid medianode info")
+		}
 	}
+	if msg.Info != nil {
+		if err := msg.Info.Validate(); err != nil {
+			return errorsmod.Wrap(ErrInvalidInfo, "invalid medianode info")
+		}
+	}
+	if msg.PricePerHour != nil {
+		if err := msg.PricePerHour.Validate(); err != nil {
+			return errorsmod.Wrap(ErrInvalidLeaseAmount, "invalid lease amount per day")
+		}
+		if msg.PricePerHour.Amount.IsZero() {
+			return errorsmod.Wrap(ErrInvalidLeaseAmount, "price per hour amount must be positive")
+		}
+	}
+	if msg.HardwareSpecs == nil && msg.Info == nil && msg.PricePerHour == nil {
+		return errorsmod.Wrapf(ErrInvalidUpdateMsg, "no updates are present in message")
+	}
+
 	return nil
 }
 
@@ -126,6 +153,9 @@ func (msg MsgLeaseMediaNode) ValidateBasic() error {
 	if msg.LeaseHours == 0 {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "lease hours must be greater than 0")
 	}
+	if msg.Amount.Amount.IsNegative() || msg.Amount.Amount.IsZero() {
+		return errorsmod.Wrap(ErrInvalidLeaseAmount, "lease amount must be greater than 0")
+	}
 	return nil
 }
 
@@ -157,10 +187,13 @@ func (msg MsgExtendLease) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	if msg.LeaseHours == 0 {
-		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "lease hours must be greater than 0")
+		return errorsmod.Wrap(ErrInvalidLeaseHours, "lease hours must be greater than 0")
 	}
 	if err := msg.Amount.Validate(); err != nil {
-		return errorsmod.Wrap(err, "invalid lease amount")
+		return errorsmod.Wrap(ErrInvalidLeaseAmount, "invalid lease amount")
+	}
+	if msg.Amount.Amount.IsZero() {
+		return errorsmod.Wrap(ErrInvalidLeaseAmount, "amount must be possitive")
 	}
 	return nil
 }
@@ -220,7 +253,10 @@ func (msg MsgDepositMediaNode) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	if err := msg.Amount.Validate(); err != nil {
-		return errorsmod.Wrap(err, "invalid deposit amount")
+		return errorsmod.Wrap(ErrInvalidDeposit, "invalid deposit amount")
+	}
+	if msg.Amount.Amount.IsZero() {
+		return errorsmod.Wrap(ErrInvalidDeposit, "deposit amount must be greater than zero")
 	}
 	return nil
 }

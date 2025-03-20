@@ -10,6 +10,14 @@ option go_package = "github.com/OmniFlix/omniflixhub/v6/x/medianode/types";
 option (gogoproto.goproto_enum_prefix_all) = false;
 option (gogoproto.goproto_getters_all) = false;
 
+// Info defines the Info of the medianode
+message Info {
+  string moniker = 1;
+  string description = 2;
+  string contact = 3;
+}
+
+
 // HardwareSpecs defines the hardware specifications of a media node
 message HardwareSpecs {
   int64 cpus     = 1 [(gogoproto.jsontag) = "cpus"];          // Number of CPUs
@@ -42,8 +50,8 @@ message MediaNode {
   bool leased                                     = 7;
   google.protobuf.Timestamp registered_at         = 8 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
   repeated Deposit deposits                       = 9;
-  google.protobuf.Timestamp closed_at             = 10 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false]; 
-
+  google.protobuf.Timestamp closed_at             = 10 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  Info info                                       = 11 [(gogoproto.nullable) = false];
 }
 // LeaseStatus defines the status of a lease
 enum LeaseStatus {

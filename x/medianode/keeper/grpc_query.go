@@ -140,7 +140,7 @@ func (k Keeper) Lease(goCtx context.Context,
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	lease, found := k.GetMediaNodeLease(ctx, req.MediaNodeId) // Assuming GetLease is a method that retrieves the lease by media node ID
+	lease, found := k.GetMediaNodeLease(ctx, req.MediaNodeId)
 	if !found {
 		return nil, status.Errorf(codes.NotFound, "lease for media node %s not found", req.MediaNodeId)
 	}

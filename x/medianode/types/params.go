@@ -115,11 +115,6 @@ func validateMaximumLeaseDays(i interface{}) error {
 	if v == 0 {
 		return fmt.Errorf("maximum lease days cannot be 0")
 	}
-
-	if v > 3650 { // arbitrary upper limit of 10 years
-		return fmt.Errorf("maximum lease days too high: %d", v)
-	}
-
 	return nil
 }
 
@@ -128,12 +123,15 @@ func validateMinDeposit(i interface{}) error {
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
+	if err := v.Validate(); err != nil {
+		return err
+	}
 
 	if v.IsZero() {
 		return fmt.Errorf("min deposit cannot be zero")
 	}
-	if v.Denom != "uflix" {
-		return fmt.Errorf("min deposit must be in uflix denomination")
+	if v.Amount.IsZero() {
+		return fmt.Errorf("min deposit amount cannot be zero")
 	}
 	return nil
 }

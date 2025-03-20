@@ -38,7 +38,7 @@ func (m msgServer) RegisterMediaNode(goCtx context.Context, msg *types.MsgRegist
 	}
 
 	// Create and store the media node
-	mediaNode := types.NewMediaNode(msg.Id, msg.Url, sender.String(), msg.HardwareSpecs, msg.PricePerHour)
+	mediaNode := types.NewMediaNode(msg.Id, msg.Url, sender.String(), msg.HardwareSpecs, msg.Info, msg.PricePerHour)
 	// default status on register
 	mediaNode.Status = types.STATUS_PENDING
 
@@ -61,14 +61,10 @@ func (m msgServer) UpdateMediaNode(goCtx context.Context, msg *types.MsgUpdateMe
 	if err != nil {
 		return nil, err
 	}
-	// Retrieve the existing media node
-	existingMediaNode, found := m.Keeper.GetMediaNode(ctx, msg.Id)
-	if !found {
-		return nil, errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "not found")
+
+	if err := m.Keeper.UpdateMediaNode(ctx, msg.Id, msg.Info, msg.HardwareSpecs, msg.PricePerHour, sender); err != nil {
+		return nil, err
 	}
-	existingMediaNode.HardwareSpecs = msg.HardwareSpecs
-	existingMediaNode.PricePerHour = msg.PricePerHour
-	m.Keeper.UpdateMediaNode(ctx, existingMediaNode, sender)
 
 	return &types.MsgUpdateMediaNodeResponse{}, nil
 }
@@ -84,10 +80,10 @@ func (m msgServer) LeaseMediaNode(goCtx context.Context, msg *types.MsgLeaseMedi
 
 	params := m.Keeper.GetParams(ctx)
 	if msg.LeaseHours < params.MinimumLeaseHours {
-		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseDays, "minimum of %d lease hours required", params.MinimumLeaseHours)
+		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseHours, "minimum of %d lease hours required", params.MinimumLeaseHours)
 	}
 	if msg.LeaseHours > params.MaximumLeaseHours {
-		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseDays, "maximum of %d lease hours allowed", params.MaximumLeaseHours)
+		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseHours, "maximum of %d lease hours allowed", params.MaximumLeaseHours)
 	}
 
 	mediaNode, found := m.Keeper.GetMediaNode(ctx, msg.MediaNodeId)
@@ -126,10 +122,10 @@ func (m msgServer) ExtendLease(goCtx context.Context, msg *types.MsgExtendLease)
 
 	params := m.Keeper.GetParams(ctx)
 	if msg.LeaseHours < params.MinimumLeaseHours {
-		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseDays, "minimum of %d lease hours required", params.MinimumLeaseHours)
+		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseHours, "minimum of %d lease hours required", params.MinimumLeaseHours)
 	}
 	if msg.LeaseHours > params.MaximumLeaseHours {
-		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseDays, "maximum of %d lease hours allowed", params.MaximumLeaseHours)
+		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseHours, "maximum of %d lease hours allowed", params.MaximumLeaseHours)
 	}
 
 	mediaNodeLease, found := m.Keeper.GetMediaNodeLease(ctx, msg.MediaNodeId)

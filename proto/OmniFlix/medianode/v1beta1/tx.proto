@@ -45,6 +45,7 @@ message MsgRegisterMediaNode {
   cosmos.base.v1beta1.Coin price_per_hour = 4 [(gogoproto.nullable) = false];
   cosmos.base.v1beta1.Coin deposit = 5;
   string sender = 6;
+  Info info = 7 [(gogoproto.nullable) = false];
 }
 
 // MsgRegisterMediaNodeResponse defines the response for registering a media node
@@ -60,9 +61,10 @@ message MsgUpdateMediaNode {
   option (cosmos.msg.v1.signer) = "sender";
 
   string id = 1;
-  HardwareSpecs hardware_specs = 2 [(gogoproto.nullable) = false];
-  cosmos.base.v1beta1.Coin price_per_hour = 3 [(gogoproto.nullable) = false];
-  string sender = 4;
+  HardwareSpecs hardware_specs = 2;
+  cosmos.base.v1beta1.Coin price_per_hour = 3;
+  Info info = 4;
+  string sender = 5;
 }
 
 // MsgUpdateMediaNodeResponse defines the response for updating a media node

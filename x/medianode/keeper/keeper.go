@@ -88,23 +88,34 @@ func (k Keeper) RegisterMediaNode(ctx sdk.Context, mediaNode types.MediaNode, de
 }
 
 // UpdateMediaNode updates an existing media node
-func (k Keeper) UpdateMediaNode(ctx sdk.Context, mediaNode types.MediaNode, owner sdk.AccAddress) error {
-	existingNode, found := k.GetMediaNode(ctx, mediaNode.Id)
+func (k Keeper) UpdateMediaNode(
+	ctx sdk.Context, mediaNodeId string, info *types.Info, hardwareSpec *types.HardwareSpecs, pricePerHour *sdk.Coin, sender sdk.AccAddress) error {
+	mediaNode, found := k.GetMediaNode(ctx, mediaNodeId)
 	if !found {
-		return errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %s does not exist", mediaNode.Id)
+		return errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %s does not exist", mediaNodeId)
 	}
 
-	existingOwner, err := sdk.AccAddressFromBech32(existingNode.Owner)
+	owner, err := sdk.AccAddressFromBech32(mediaNode.Owner)
 	if err != nil {
 		return err
 	}
 
-	if !owner.Equals(existingOwner) {
-		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", owner.String())
+	if !sender.Equals(owner) {
+		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", sender.String())
 	}
 
-	if existingNode.Leased {
-		return errorsmod.Wrapf(types.ErrUpdateNotAllowed, "cannot update medianode %s with active lease", existingNode.Id)
+	if mediaNode.IsLeased() {
+		return errorsmod.Wrapf(types.ErrUpdateNotAllowed, "cannot update medianode %s with active lease", mediaNodeId)
+	}
+
+	if info != nil {
+		mediaNode.Info = *info
+	}
+	if hardwareSpec != nil {
+		mediaNode.HardwareSpecs = *hardwareSpec
+	}
+	if pricePerHour != nil {
+		mediaNode.PricePerHour = *pricePerHour
 	}
 
 	k.SetMediaNode(ctx, mediaNode)
@@ -240,25 +251,18 @@ func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId string, sender sdk.AccA
 		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", sender.String())
 	}
 
-	// Calculate remaining lease hours and refund amount
-	remainingHours := lease.LeasedHours - uint64(ctx.BlockTime().Sub(lease.StartTime).Hours())
-	refundAmount := mediaNode.PricePerHour.Amount.MulRaw(int64(remainingHours))
+	amountToRefund := lease.TotalLeaseAmount.Sub(lease.SettledLeaseAmount)
 
 	// Calculate extra minutes and and settle payment
-	extraMinutes := uint64(ctx.BlockTime().Sub(lease.LastSettledAt).Minutes())
-	pricePerMinute := lease.PricePerHour.Amount.Quo(sdkmath.NewInt(60))
-	extraMinutesAmount := pricePerMinute.Mul(sdkmath.NewIntFromUint64(extraMinutes))
+	extraMinutes := sdkmath.NewInt(int64(ctx.BlockTime().Sub(lease.LastSettledAt).Minutes()))
+	pricePerMinute := sdkmath.LegacyNewDecFromInt(lease.PricePerHour.Amount).Quo(sdkmath.LegacyNewDec(60))
+	extraMinutesAmount := pricePerMinute.Mul(extraMinutes.Abs().ToLegacyDec()).TruncateInt()
 	amountToSettle := sdk.NewCoin(
 		lease.PricePerHour.Denom,
 		extraMinutesAmount,
 	)
-	refundAmountCoin := sdk.NewCoin(
-		lease.PricePerHour.Denom,
-		refundAmount,
-	)
+	amountToRefund = amountToRefund.Sub(amountToSettle)
 	if amountToSettle.Amount.GT(sdkmath.ZeroInt()) {
-		refundAmountCoin = refundAmountCoin.Sub(amountToSettle)
-
 		// Distribute commission for used payment
 		leaseCommissionCoin := k.GetProportions(amountToSettle, k.GetLeaseCommission(ctx))
 
@@ -291,7 +295,7 @@ func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId string, sender sdk.AccA
 		ctx,
 		types.ModuleName,
 		sender,
-		sdk.NewCoins(refundAmountCoin),
+		sdk.NewCoins(amountToRefund),
 	); err != nil {
 		return err
 	}
@@ -301,7 +305,7 @@ func (k Keeper) CancelLease(ctx sdk.Context, mediaNodeId string, sender sdk.AccA
 	k.SetMediaNode(ctx, mediaNode)
 	k.RemoveLease(ctx, lease.MediaNodeId)
 
-	k.cancelLeaseMediaNodeEvent(ctx, lease.Lessee, mediaNodeId, amountToSettle, refundAmountCoin)
+	k.cancelLeaseMediaNodeEvent(ctx, lease.Lessee, mediaNodeId, amountToSettle, amountToRefund)
 	return nil
 }
 
@@ -371,15 +375,16 @@ func (k Keeper) SettleActiveLeases(ctx sdk.Context) error {
 			ctx.BlockTime().Sub(lease.LastSettledAt).Hours() >= 1 {
 			totalDuration := ctx.BlockTime().Sub(lease.LastSettledAt)
 			totalHoursToSettle := uint64(totalDuration.Hours())
-			extraMinutes := uint64(totalDuration.Minutes()) - (totalHoursToSettle * 60)
+			extraMinutes := sdkmath.NewIntFromUint64(uint64(totalDuration.Minutes()) - (totalHoursToSettle * 60))
 
 			// Calculate payment amount
 			paymentAmount := sdk.NewCoin(
 				lease.PricePerHour.Denom,
 				lease.PricePerHour.Amount.Mul(sdkmath.NewIntFromUint64(totalHoursToSettle)),
 			)
-			minutesAmount := extraMinutes * (lease.PricePerHour.Amount.Uint64() / 60)
-			paymentAmount = paymentAmount.AddAmount(sdkmath.NewIntFromUint64(minutesAmount))
+			pricePerMinute := sdkmath.LegacyNewDecFromInt(lease.PricePerHour.Amount).Quo(sdkmath.LegacyNewDec(60))
+			extraMinutesAmount := pricePerMinute.Mul(extraMinutes.Abs().ToLegacyDec()).TruncateInt()
+			paymentAmount = paymentAmount.AddAmount(extraMinutesAmount)
 
 			owner, err := sdk.AccAddressFromBech32(lease.Owner)
 			if err != nil {
@@ -468,7 +473,7 @@ func (k Keeper) ReleaseDeposits(ctx sdk.Context) error {
 	defer iterator.Close()
 
 	// Retrieve the deposit release period from params
-	params := k.GetParams(ctx) // Assuming this method exists to get the current parameters
+	params := k.GetParams(ctx)
 	depositReleasePeriod := params.DepositReleasePeriod
 
 	for ; iterator.Valid(); iterator.Next() {
