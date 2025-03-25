@@ -34,6 +34,8 @@ import (
 )
 
 var (
+	PrimaryDenom         = "uflix"
+	PrimaryAmount        = sdkmath.NewInt(10000000000)
 	SecondaryDenom       = "uxflx"
 	SecondaryAmount      = sdkmath.NewInt(100000000)
 	baseTestAccts        = []sdk.AccAddress{}

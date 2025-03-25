@@ -23,7 +23,7 @@ var (
 var (
 	defaultInitialDepositPercentage = sdkmath.LegacyMustNewDecFromStr("0.1")
 	defaultLeaseCommission          = sdkmath.LegacyMustNewDecFromStr("0.01")
-	defaultMinDeposit               = types.NewCoin("uflix", sdkmath.NewInt(1000))
+	defaultMinDeposit               = types.NewCoin("uflix", sdkmath.NewInt(10000000))
 	defaultStakingDistribtionPerc   = sdkmath.LegacyMustNewDecFromStr("0.5")
 	defaultCPDistributionPerc       = sdkmath.LegacyMustNewDecFromStr("0.5")
 	defaultDepositReleasePeriod     = time.Hour * 24 * 7
