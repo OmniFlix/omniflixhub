@@ -9,16 +9,16 @@ import (
 )
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	legacy.RegisterAminoMsg(cdc, &MsgRegisterMediaNode{}, "OmniFlix/medianode/MsgRegisterMediaNode")
-	legacy.RegisterAminoMsg(cdc, &MsgDepositMediaNode{}, "OmniFlix/medianode/MsgDepositMediaNode")
-	legacy.RegisterAminoMsg(cdc, &MsgUpdateMediaNode{}, "OmniFlix/medianode/MsgUpdateMediaNode")
-	legacy.RegisterAminoMsg(cdc, &MsgLeaseMediaNode{}, "OmniFlix/medianode/MsgLeaseMediaNode")
-	legacy.RegisterAminoMsg(cdc, &MsgExtendLease{}, "OmniFlix/medianode/MsgExtendLease")
-	legacy.RegisterAminoMsg(cdc, &MsgCancelLease{}, "OmniFlix/medianode/MsgCancelLease")
-	legacy.RegisterAminoMsg(cdc, &MsgCloseMediaNode{}, "OmniFlix/medianode/MsgCloseMediaNode")
+	legacy.RegisterAminoMsg(cdc, &MsgRegisterMediaNode{}, "OmniFlix/register-medianode")
+	legacy.RegisterAminoMsg(cdc, &MsgDepositMediaNode{}, "OmniFlix/deposit-medianode")
+	legacy.RegisterAminoMsg(cdc, &MsgUpdateMediaNode{}, "OmniFlix/update-medianode")
+	legacy.RegisterAminoMsg(cdc, &MsgLeaseMediaNode{}, "OmniFlix/lease-medianode")
+	legacy.RegisterAminoMsg(cdc, &MsgExtendLease{}, "OmniFlix/extend-medianode-lease")
+	legacy.RegisterAminoMsg(cdc, &MsgCancelLease{}, "OmniFlix/cancel-medianode-lease")
+	legacy.RegisterAminoMsg(cdc, &MsgCloseMediaNode{}, "OmniFlix/close-medianode")
 
-	cdc.RegisterConcrete(&MediaNode{}, "OmniFlix/medianode/MediaNode", nil)
-	cdc.RegisterConcrete(&Lease{}, "OmniFlix/medianode/Lease", nil)
+	cdc.RegisterConcrete(&MediaNode{}, "OmniFlix/medianode", nil)
+	cdc.RegisterConcrete(&Lease{}, "OmniFlix/medianode-lease", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
