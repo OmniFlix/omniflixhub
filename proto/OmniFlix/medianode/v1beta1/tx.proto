@@ -133,7 +133,7 @@ message MsgDepositMediaNodeResponse {
 
 // MsgCloseMediaNode represents a message to close a media node
 message MsgCloseMediaNode {
-  option (amino.name) = "Omni Flix/close-medianode";
+  option (amino.name) = "OmniFlix/close-medianode";
   option (cosmos.msg.v1.signer) = "sender";
 
   string media_node_id = 1;         // ID of the media node
