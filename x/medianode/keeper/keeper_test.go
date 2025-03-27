@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"testing"
+	"time"
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/OmniFlix/omniflixhub/v6/app/apptesting"
@@ -53,7 +54,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.msgServer = keeper.NewMsgServerImpl(suite.App.MedianodeKeeper)
 }
 
-func (suite *KeeperTestSuite) TestCreateMediaNode() {
+func (suite *KeeperTestSuite) TestRegisterMediaNode() {
 	suite.SetupTest()
 	keeper := suite.App.MedianodeKeeper
 
@@ -367,4 +368,94 @@ func (suite *KeeperTestSuite) TestCloseMediaNode() {
 	node, found := keeper.GetMediaNode(suite.Ctx, createMsg.Id)
 	suite.Require().True(found)
 	suite.Require().Equal(node.Status.String(), types.STATUS_CLOSED.String(), "closed media node status should be CLOSED")
+}
+
+func (suite *KeeperTestSuite) TestSettleActiveLeases() {
+	suite.SetupTest()
+	keeper := suite.App.MedianodeKeeper
+
+	// Register a new media node
+	createMsg, err := types.NewMsgRegisterMediaNode(
+		defaultMediaNodeURL,
+		defaultInfo,
+		defaultHardwareSpecs,
+		defaultPricePerHour,
+		defaultDepositAmount,
+		suite.TestAccs[0].String(),
+	)
+	suite.Require().NoError(err)
+	_, err = suite.msgServer.RegisterMediaNode(suite.Ctx, createMsg)
+	suite.Require().NoError(err)
+
+	// Manually create an active lease for the media node
+	lease := types.Lease{
+		MediaNodeId: createMsg.Id,
+		Lessee:      suite.TestAccs[1].String(),
+		Owner:       suite.TestAccs[0].String(),
+		LeasedHours: 2,
+		// Set the start and last settled time to 2 hours ago to simulate an ongoing lease
+		StartTime:          suite.Ctx.BlockTime().Add(-2 * time.Hour),
+		TotalLeaseAmount:   sdk.NewCoin(defaultPricePerHour.Denom, sdkmath.NewInt(20000000)),
+		SettledLeaseAmount: sdk.NewCoin(defaultPricePerHour.Denom, sdkmath.NewInt(0)),
+		LastSettledAt:      suite.Ctx.BlockTime().Add(-2 * time.Hour),
+	}
+	// Assume SetMediaNodeLease sets the lease record in the keeper's store.
+	keeper.SetLease(suite.Ctx, lease)
+
+	// Advance the block time to simulate passage of time for settlement calculation
+	newBlockTime := suite.Ctx.BlockTime().Add(1 * time.Hour)
+	suite.Ctx = suite.Ctx.WithBlockTime(newBlockTime)
+
+	// Call the SettleActiveLeases function (typically invoked in EndBlock)
+	err = keeper.SettleActiveLeases(suite.Ctx)
+	suite.Require().NoError(err)
+
+	// Retrieve the updated lease and verify that settlement has occurred
+	settledLease, found := keeper.GetMediaNodeLease(suite.Ctx, createMsg.Id)
+	suite.Require().True(found, "active lease record should exist after settlement")
+	suite.Require().Equal(newBlockTime, settledLease.LastSettledAt, "lease LastSettledAt should be updated to current block time")
+	suite.Require().True(settledLease.SettledLeaseAmount.Amount.GT(sdkmath.NewInt(0)), "settled lease amount should be greater than zero")
+}
+
+func (suite *KeeperTestSuite) TestReleaseDeposits() {
+	suite.SetupTest()
+	keeper := suite.App.MedianodeKeeper
+
+	// Register a new media node which includes a deposit
+	createMsg, err := types.NewMsgRegisterMediaNode(
+		defaultMediaNodeURL,
+		defaultInfo,
+		defaultHardwareSpecs,
+		defaultPricePerHour,
+		defaultDepositAmount,
+		suite.TestAccs[0].String(),
+	)
+	suite.Require().NoError(err)
+	_, err = suite.msgServer.RegisterMediaNode(suite.Ctx, createMsg)
+	suite.Require().NoError(err)
+
+	// Verify that the media node has deposits before release
+	node, found := keeper.GetMediaNode(suite.Ctx, createMsg.Id)
+	suite.Require().True(found, "media node should exist")
+	suite.Require().NotEmpty(node.Deposits, "media node should have deposits before release")
+
+	// Close the media node to make it eligible for deposit release
+	closeMsg := types.NewMsgCloseMediaNode(
+		createMsg.Id,
+		suite.TestAccs[0].String(),
+	)
+	_, err = suite.msgServer.CloseMediaNode(suite.Ctx, closeMsg)
+	suite.Require().NoError(err)
+
+	// Advance block time to simulate deposit lock expiry (if applicable)
+	suite.Ctx = suite.Ctx.WithBlockTime(suite.Ctx.BlockTime().Add(24 * time.Hour))
+
+	// Call the ReleaseDeposits function (typically invoked in EndBlock)
+	err = keeper.ReleaseDeposits(suite.Ctx)
+	suite.Require().NoError(err)
+
+	// Verify that the deposits have been released (cleared) from the media node record
+	node, found = keeper.GetMediaNode(suite.Ctx, createMsg.Id)
+	suite.Require().True(found, "media node should still exist")
+	suite.Require().Empty(node.Deposits, "media node deposits should be released after calling ReleaseDeposits")
 }

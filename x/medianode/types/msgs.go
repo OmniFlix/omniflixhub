@@ -23,6 +23,9 @@ var (
 	_ sdk.Msg = &MsgUpdateMediaNode{}
 	_ sdk.Msg = &MsgLeaseMediaNode{}
 	_ sdk.Msg = &MsgCancelLease{}
+	_ sdk.Msg = &MsgExtendLease{}
+	_ sdk.Msg = &MsgDepositMediaNode{}
+	_ sdk.Msg = &MsgCloseMediaNode{}
 )
 
 // Register Media Node
