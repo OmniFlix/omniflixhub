@@ -194,13 +194,19 @@ func (k Keeper) DepositMediaNode(ctx sdk.Context, mediaNodeId string, amount sdk
 	if err != nil {
 		return err
 	}
-	// Update the media node's deposits
-	mediaNode.Deposits = append(mediaNode.Deposits, &deposit)
-
-	// Calculate total deposits
+	// Update the media node's deposits and calculate total deposit
+	isDepositorExists := false
 	totalDeposits := sdk.NewCoin(mediaNode.PricePerHour.Denom, sdkmath.ZeroInt())
-	for _, d := range mediaNode.Deposits {
-		totalDeposits = totalDeposits.Add(d.Amount)
+	for i, existingDeposit := range mediaNode.Deposits {
+		if existingDeposit.Depositor == deposit.Depositor {
+			mediaNode.Deposits[i].Amount = mediaNode.Deposits[i].Amount.Add(deposit.Amount)
+			mediaNode.Deposits[i].DepositedAt = ctx.BlockTime()
+			isDepositorExists = true
+		}
+		totalDeposits = totalDeposits.Add(mediaNode.Deposits[i].Amount)
+	}
+	if !isDepositorExists {
+		mediaNode.Deposits = append(mediaNode.Deposits, &deposit)
 	}
 
 	// Check if total deposits meet or exceed the required minimum deposit
