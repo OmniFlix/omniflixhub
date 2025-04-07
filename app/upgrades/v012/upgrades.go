@@ -12,7 +12,6 @@ import (
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
 	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
 )
 
@@ -50,8 +49,9 @@ func CreateV012UpgradeHandler(
 
 		keepers.ICAHostKeeper.SetParams(ctx, hostParams)
 
+		// Removed in v6
 		// Packet Forward middleware initial params
-		keepers.PacketForwardKeeper.SetParams(ctx, packetforwardtypes.DefaultParams())
+		//keepers.PacketForwardKeeper.SetParams(ctx, packetforwardtypes.DefaultParams())
 
 		// itc campaigns migrations
 		campaigns := keepers.ItcKeeper.GetAllCampaigns(ctx)

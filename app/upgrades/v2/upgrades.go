@@ -69,8 +69,10 @@ func CreateV2UpgradeHandler(
 				keyTable = ibctransfertypes.ParamKeyTable()
 			case icahosttypes.SubModuleName:
 				keyTable = icahosttypes.ParamKeyTable()
-			case packetforwardtypes.ModuleName:
-				keyTable = packetforwardtypes.ParamKeyTable()
+			// this function has been removed in pfm v8.2.0
+			// commented out for legacy purposes
+			//case packetforwardtypes.ModuleName:
+			//	keyTable = packetforwardtypes.ParamKeyTable()
 
 			// omniflix
 			case alloctypes.ModuleName:
