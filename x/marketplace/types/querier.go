@@ -61,7 +61,7 @@ func NewQueryAuctionParams(id uint64) QueryAuctionParams {
 // QueryAllListingsParams is the query parameters for 'marketplace/auctions'
 type QueryAllAuctionsParams struct{}
 
-// NewQueryAllListingsParams
+// NewQueryAllAuctionsParams
 func NewQueryAllAuctionsParams() QueryAllAuctionsParams {
 	return QueryAllAuctionsParams{}
 }
@@ -93,7 +93,7 @@ func NewQueryBidParams(id uint64) QueryBidParams {
 // QueryAllBidsParams is the query parameters for 'marketplace/bids'
 type QueryAllBidsParams struct{}
 
-// NewQueryAllListingsParams
+// NewQueryAllBidsParams
 func NewQueryAllBidsParams() QueryAllBidsParams {
 	return QueryAllBidsParams{}
 }
