@@ -207,6 +207,7 @@ func (k Keeper) DepositMediaNode(ctx sdk.Context, mediaNodeId string, amount sdk
 	}
 	if !isDepositorExists {
 		mediaNode.Deposits = append(mediaNode.Deposits, &deposit)
+		totalDeposits = totalDeposits.Add(deposit.Amount)
 	}
 
 	// Check if total deposits meet or exceed the required minimum deposit
