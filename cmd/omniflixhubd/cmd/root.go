@@ -371,9 +371,5 @@ func autoCliOpts(initClientCtx client.Context, tempApp *app.OmniFlixApp) autocli
 		ValidatorAddressCodec: authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix()),
 		ConsensusAddressCodec: authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix()),
 		ClientCtx:             initClientCtx,
-		TxConfigOpts: tx.ConfigOptions{
-			EnabledSignModes:           tx.DefaultSignModes,
-			TextualCoinMetadataQueryFn: authtxconfig.NewGRPCCoinMetadataQueryFn(initClientCtx),
-		},
 	}
 }

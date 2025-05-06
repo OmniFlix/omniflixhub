@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"testing"
 
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -23,14 +24,16 @@ func (suite *CodecTestSuite) TestRegisterInterfaces() {
 	RegisterInterfaces(registry)
 
 	impls := registry.ListImplementations(sdk.MsgInterfaceProtoName)
-	suite.Require().Equal(7, len(impls))
+	fmt.Println(impls)
+	suite.Require().Equal(8, len(impls))
 	suite.Require().ElementsMatch([]string{
-		"/OmniFlix.medianode.v1.MsgRegisterMediaNode",
-		"/OmniFlix.medianode.v1.MsgDepositMediaNode",
-		"/OmniFlix.medianode.v1.MsgUpdateMediaNode",
-		"/OmniFlix.medianode.v1.MsgLeaseMediaNode",
-		"/OmniFlix.medianode.v1.MsgExtendLease",
-		"/OmniFlix.medianode.v1.MsgCancelLease",
-		"/OmniFlix.medianode.v1.MsgCloseMediaNode",
+		"/OmniFlix.medianode.v1beta1.MsgRegisterMediaNode",
+		"/OmniFlix.medianode.v1beta1.MsgDepositMediaNode",
+		"/OmniFlix.medianode.v1beta1.MsgUpdateMediaNode",
+		"/OmniFlix.medianode.v1beta1.MsgLeaseMediaNode",
+		"/OmniFlix.medianode.v1beta1.MsgExtendLease",
+		"/OmniFlix.medianode.v1beta1.MsgCancelLease",
+		"/OmniFlix.medianode.v1beta1.MsgCloseMediaNode",
+		"/OmniFlix.medianode.v1beta1.MsgUpdateParams",
 	}, impls)
 }
