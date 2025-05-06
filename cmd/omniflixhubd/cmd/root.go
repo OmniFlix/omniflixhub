@@ -173,6 +173,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, t
 			genutiltypes.DefaultMessageValidator,
 			tempApp.StakingKeeper.ValidatorAddressCodec(),
 		),
+		genutilcli.AddGenesisAccountCmd(app.DefaultNodeHome, tempApp.AccountKeeper.AddressCodec()),
 		genutilcli.MigrateGenesisCmd(genutilcli.MigrationMap),
 		genutilcli.GenTxCmd(
 			tempApp.ModuleBasics,
