@@ -61,10 +61,10 @@ func (k Keeper) GetModuleAccountAddress(ctx sdk.Context) sdk.AccAddress {
 }
 
 // RegisterMediaNode creates a new media node entry
-func (k Keeper) RegisterMediaNode(ctx sdk.Context, mediaNode types.MediaNode, depositAmount sdk.Coin, owner sdk.AccAddress) error {
+func (k Keeper) RegisterMediaNode(ctx sdk.Context, mediaNode types.MediaNode, depositAmount sdk.Coin, owner sdk.AccAddress) (types.MediaNode, error) {
 
 	if _, found := k.GetMediaNode(ctx, mediaNode.Id); found {
-		return errorsmod.Wrapf(types.ErrMediaNodeExists, "medianode id already exists")
+		return types.MediaNode{}, errorsmod.Wrapf(types.ErrMediaNodeExists, "medianode id already exists")
 	}
 	// Create a deposit object
 	deposit := types.Deposit{
@@ -76,7 +76,7 @@ func (k Keeper) RegisterMediaNode(ctx sdk.Context, mediaNode types.MediaNode, de
 	// transfer deposit to module
 	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, owner, types.ModuleName, sdk.NewCoins(depositAmount))
 	if err != nil {
-		return err
+		return types.MediaNode{}, err
 	}
 
 	mediaNodeCounter := k.GetMediaNodeCount(ctx)
@@ -88,28 +88,28 @@ func (k Keeper) RegisterMediaNode(ctx sdk.Context, mediaNode types.MediaNode, de
 	k.SetMediaNodeCount(ctx, mediaNodeCounter+1)
 
 	k.registerMediaNodeEvent(ctx, mediaNode.Owner, mediaNode.Id, mediaNode.Url, mediaNode.PricePerHour, mediaNode.Status)
-	return nil
+	return mediaNode, nil
 }
 
 // UpdateMediaNode updates an existing media node
 func (k Keeper) UpdateMediaNode(
-	ctx sdk.Context, mediaNodeId string, info *types.Info, hardwareSpec *types.HardwareSpecs, pricePerHour *sdk.Coin, sender sdk.AccAddress) error {
+	ctx sdk.Context, mediaNodeId string, info *types.Info, hardwareSpec *types.HardwareSpecs, pricePerHour *sdk.Coin, sender sdk.AccAddress) (types.MediaNode, error) {
 	mediaNode, found := k.GetMediaNode(ctx, mediaNodeId)
 	if !found {
-		return errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %s does not exist", mediaNodeId)
+		return types.MediaNode{}, errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %s does not exist", mediaNodeId)
 	}
 
 	owner, err := sdk.AccAddressFromBech32(mediaNode.Owner)
 	if err != nil {
-		return err
+		return types.MediaNode{}, err
 	}
 
 	if !sender.Equals(owner) {
-		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", sender.String())
+		return types.MediaNode{}, errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", sender.String())
 	}
 
 	if mediaNode.IsLeased() {
-		return errorsmod.Wrapf(types.ErrUpdateNotAllowed, "cannot update medianode %s with active lease", mediaNodeId)
+		return types.MediaNode{}, errorsmod.Wrapf(types.ErrUpdateNotAllowed, "cannot update medianode %s with active lease", mediaNodeId)
 	}
 
 	if info != nil {
@@ -124,11 +124,11 @@ func (k Keeper) UpdateMediaNode(
 
 	k.SetMediaNode(ctx, mediaNode)
 	k.updateMediaNodeEvent(ctx, mediaNode.Owner, mediaNode.Id)
-	return nil
+	return mediaNode, nil
 }
 
 // LeaseMediaNode creates a new lease for a media node
-func (k Keeper) LeaseMediaNode(ctx sdk.Context, mediaNode types.MediaNode, leaseHours uint64, lessee sdk.AccAddress, leaseAmount sdk.Coin) error {
+func (k Keeper) LeaseMediaNode(ctx sdk.Context, mediaNode types.MediaNode, leaseHours uint64, lessee sdk.AccAddress, leaseAmount sdk.Coin) (types.Lease, error) {
 	// Create a new lease object
 	lease := types.Lease{
 		MediaNodeId:      mediaNode.Id,
@@ -147,7 +147,7 @@ func (k Keeper) LeaseMediaNode(ctx sdk.Context, mediaNode types.MediaNode, lease
 		types.ModuleName,
 		sdk.NewCoins(leaseAmount),
 	); err != nil {
-		return err
+		return types.Lease{}, err
 	}
 
 	lease.LastSettledAt = ctx.BlockTime()
@@ -161,26 +161,26 @@ func (k Keeper) LeaseMediaNode(ctx sdk.Context, mediaNode types.MediaNode, lease
 
 	k.leaseMediaNodeEvent(ctx, lease.Lessee, lease.MediaNodeId, leaseAmount)
 
-	return nil
+	return lease, nil
 }
 
 // DepositMediaNode allows a user to deposit a media node
-func (k Keeper) DepositMediaNode(ctx sdk.Context, mediaNodeId string, amount sdk.Coin, depositor sdk.AccAddress) error {
+func (k Keeper) DepositMediaNode(ctx sdk.Context, mediaNodeId string, amount sdk.Coin, depositor sdk.AccAddress) (types.MediaNode, sdk.Coin, error) {
 	mediaNode, found := k.GetMediaNode(ctx, mediaNodeId)
 	if !found {
-		return errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %s does not exist", mediaNodeId)
+		return types.MediaNode{}, sdk.Coin{}, errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %s does not exist", mediaNodeId)
 	}
 
 	// Allow deposit only if the media node status is PENDING
 	if mediaNode.Status != types.STATUS_PENDING {
-		return errorsmod.Wrapf(types.ErrInvalidMediaNodeStatus, "media node %s is not in PENDING status", mediaNodeId)
+		return types.MediaNode{}, sdk.Coin{}, errorsmod.Wrapf(types.ErrInvalidMediaNodeStatus, "media node %s is not in PENDING status", mediaNodeId)
 	}
 
 	minDeposit := k.GetMinDeposit(ctx)
 	initialDepositPerc := k.GetInitialDepositPercentage(ctx)
 	minInitialDeposit := sdk.NewCoin(minDeposit.Denom, sdkmath.LegacyNewDecFromInt(minDeposit.Amount).Mul(initialDepositPerc).TruncateInt())
 	if !amount.IsGTE(minInitialDeposit) {
-		return errorsmod.Wrapf(types.ErrInsufficientDeposit, "%s of deposit is required", minInitialDeposit.String())
+		return types.MediaNode{}, sdk.Coin{}, errorsmod.Wrapf(types.ErrInsufficientDeposit, "%s of deposit is required", minInitialDeposit.String())
 	}
 
 	// Create a deposit object
@@ -192,7 +192,7 @@ func (k Keeper) DepositMediaNode(ctx sdk.Context, mediaNodeId string, amount sdk
 	// transfer deposit to module
 	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, depositor, types.ModuleName, sdk.NewCoins(amount))
 	if err != nil {
-		return err
+		return types.MediaNode{}, sdk.Coin{}, err
 	}
 	// Update the media node's deposits and calculate total deposit
 	isDepositorExists := false
@@ -218,13 +218,13 @@ func (k Keeper) DepositMediaNode(ctx sdk.Context, mediaNodeId string, amount sdk
 	k.SetMediaNode(ctx, mediaNode)
 	k.depositMediaNodeEvent(ctx, deposit.Depositor, mediaNodeId, deposit.Amount, mediaNode.Status)
 
-	return nil
+	return mediaNode, totalDeposits, nil
 }
 
 // ExtendMediaNodeLease extends the lease duration and amount for a media node
-func (k Keeper) ExtendMediaNodeLease(ctx sdk.Context, mediaNodeLease types.Lease, newLeaseHours uint64, newLeaseAmount sdk.Coin, sender sdk.AccAddress) error {
+func (k Keeper) ExtendMediaNodeLease(ctx sdk.Context, mediaNodeLease types.Lease, newLeaseHours uint64, newLeaseAmount sdk.Coin, sender sdk.AccAddress) (types.Lease, error) {
 	if sender.String() != mediaNodeLease.Lessee {
-		return errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", sender.String())
+		return types.Lease{}, errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "unauthorized address %s", sender.String())
 	}
 
 	// Update lease details
@@ -238,13 +238,13 @@ func (k Keeper) ExtendMediaNodeLease(ctx sdk.Context, mediaNodeLease types.Lease
 		types.ModuleName,
 		sdk.NewCoins(newLeaseAmount),
 	); err != nil {
-		return err
+		return types.Lease{}, err
 	}
 
 	k.SetLease(ctx, mediaNodeLease)
 	k.extendleaseEvent(ctx, mediaNodeLease.Lessee, mediaNodeLease.MediaNodeId, newLeaseAmount)
 
-	return nil
+	return mediaNodeLease, nil
 }
 
 // CancelLease cancels an existing lease for a media node

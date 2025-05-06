@@ -46,11 +46,15 @@ func (m msgServer) RegisterMediaNode(goCtx context.Context, msg *types.MsgRegist
 		mediaNode.Status = types.STATUS_ACTIVE
 	}
 
-	if err := m.Keeper.RegisterMediaNode(ctx, mediaNode, *msg.Deposit, sender); err != nil {
+	mediaNodeData, err := m.Keeper.RegisterMediaNode(ctx, mediaNode, *msg.Deposit, sender)
+	if err != nil {
 		return nil, err
 	}
 
-	return &types.MsgRegisterMediaNodeResponse{}, nil
+	return &types.MsgRegisterMediaNodeResponse{
+		MediaNodeId: mediaNodeData.Id,
+		Status:      mediaNodeData.Status.String(),
+	}, nil
 }
 
 // UpdateMediaNode handles the update of an existing media node
@@ -62,11 +66,14 @@ func (m msgServer) UpdateMediaNode(goCtx context.Context, msg *types.MsgUpdateMe
 		return nil, err
 	}
 
-	if err := m.Keeper.UpdateMediaNode(ctx, msg.Id, msg.Info, msg.HardwareSpecs, msg.PricePerHour, sender); err != nil {
+	mediaNode, err := m.Keeper.UpdateMediaNode(ctx, msg.Id, msg.Info, msg.HardwareSpecs, msg.PricePerHour, sender)
+	if err != nil {
 		return nil, err
 	}
 
-	return &types.MsgUpdateMediaNodeResponse{}, nil
+	return &types.MsgUpdateMediaNodeResponse{
+		MediaNode: &mediaNode,
+	}, nil
 }
 
 // LeaseMediaNode handles leasing a media node
@@ -104,11 +111,14 @@ func (m msgServer) LeaseMediaNode(goCtx context.Context, msg *types.MsgLeaseMedi
 	}
 
 	// Lease the media node
-	if err := m.Keeper.LeaseMediaNode(ctx, mediaNode, msg.LeaseHours, sender, msg.Amount); err != nil {
+	lease, err := m.Keeper.LeaseMediaNode(ctx, mediaNode, msg.LeaseHours, sender, msg.Amount)
+	if err != nil {
 		return nil, err
 	}
 
-	return &types.MsgLeaseMediaNodeResponse{}, nil
+	return &types.MsgLeaseMediaNodeResponse{
+		Lease: &lease,
+	}, nil
 }
 
 // LeaseMediaNode handles leasing a media node
@@ -138,11 +148,14 @@ func (m msgServer) ExtendLease(goCtx context.Context, msg *types.MsgExtendLease)
 		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseAmount, "lease amount must be equal to %s", expectedLeaseAmount.String())
 	}
 	// Lease the media node
-	if err := m.Keeper.ExtendMediaNodeLease(ctx, mediaNodeLease, msg.LeaseHours, msg.Amount, sender); err != nil {
+	lease, err := m.Keeper.ExtendMediaNodeLease(ctx, mediaNodeLease, msg.LeaseHours, msg.Amount, sender)
+	if err != nil {
 		return nil, err
 	}
 
-	return &types.MsgExtendLeaseResponse{}, nil
+	return &types.MsgExtendLeaseResponse{
+		Lease: &lease,
+	}, nil
 }
 
 // CancelLease handles canceling a lease for a media node
@@ -172,11 +185,16 @@ func (m msgServer) DepositMediaNode(goCtx context.Context, msg *types.MsgDeposit
 	}
 
 	// Deposit to the media node
-	if err := m.Keeper.DepositMediaNode(ctx, msg.MediaNodeId, msg.Amount, sender); err != nil {
+	mediaNode, totalDeposit, err := m.Keeper.DepositMediaNode(ctx, msg.MediaNodeId, msg.Amount, sender)
+	if err != nil {
 		return nil, err
 	}
 
-	return &types.MsgDepositMediaNodeResponse{}, nil
+	return &types.MsgDepositMediaNodeResponse{
+		MedianodeId:     mediaNode.Id,
+		TotalDeposit:    &totalDeposit,
+		MedianodeStatus: mediaNode.Status.String(),
+	}, nil
 }
 
 // CloseMediaNode handles closing a media node

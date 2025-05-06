@@ -69,6 +69,7 @@ message MsgUpdateMediaNode {
 
 // MsgUpdateMediaNodeResponse defines the response for updating a media node
 message MsgUpdateMediaNodeResponse {
+  MediaNode media_node = 1;
 }
 
 // MsgLeaseMediaNode represents a message to lease a media node
