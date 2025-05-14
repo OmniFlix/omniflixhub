@@ -25,7 +25,6 @@ linters:
     - thelper
     - unconvert
     - unused
-    - copyloopvar
 
 issues:
   exclude-rules:
@@ -86,5 +85,3 @@ linters-settings:
     require-explanation: false
     require-specific: false
 
-output:
-  formats: colored-line-number
