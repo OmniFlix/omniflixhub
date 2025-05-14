@@ -303,7 +303,6 @@ func (suite *KeeperTestSuite) TestGetClaims() {
 	}
 
 	for _, claimToSet := range claimsToSet {
-		claimToSet := claimToSet
 		keeper.SetClaim(sdkCtx, claimToSet)
 
 		got := keeper.GetClaims(sdkCtx, claimToSet.CampaignId)
@@ -377,7 +376,6 @@ func (suite *KeeperTestSuite) TestParams() {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 
 		suite.Run(tc.name, func() {
 			expected := suite.App.ItcKeeper.GetParams(suite.Ctx)

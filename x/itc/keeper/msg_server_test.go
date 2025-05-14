@@ -560,7 +560,6 @@ func (suite *KeeperTestSuite) TestUpdateParams() {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		suite.Run(tc.name, func() {
 			_, err := suite.msgServer.UpdateParams(suite.Ctx, tc.request)
 			if tc.expectErr {
