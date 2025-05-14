@@ -376,7 +376,6 @@ func (suite *KeeperTestSuite) TestParams() {
 	}
 
 	for _, tc := range testCases {
-
 		suite.Run(tc.name, func() {
 			expected := suite.App.ItcKeeper.GetParams(suite.Ctx)
 			err := suite.App.ItcKeeper.SetParams(suite.Ctx, tc.input)

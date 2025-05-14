@@ -70,7 +70,6 @@ func (suite *KeeperTestSuite) TestParams() {
 	}
 
 	for _, tc := range testCases {
-
 		suite.Run(tc.name, func() {
 			expected := suite.App.AllocKeeper.GetParams(suite.Ctx)
 			err := suite.App.AllocKeeper.SetParams(suite.Ctx, tc.input)
