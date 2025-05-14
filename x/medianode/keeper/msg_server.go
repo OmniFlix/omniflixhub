@@ -105,7 +105,7 @@ func (m msgServer) LeaseMediaNode(goCtx context.Context, msg *types.MsgLeaseMedi
 		return nil, errorsmod.Wrapf(types.ErrMediaNodeAlreadyLeased, "media node %s is already leased", mediaNode.Id)
 	}
 
-	expectedLeaseAmount := sdk.NewCoin(mediaNode.PricePerHour.Denom, mediaNode.PricePerHour.Amount.Mul(sdkmath.NewInt(int64(msg.LeaseHours))))
+	expectedLeaseAmount := sdk.NewCoin(mediaNode.PricePerHour.Denom, mediaNode.PricePerHour.Amount.Mul(sdkmath.NewIntFromUint64(msg.LeaseHours)))
 	if !msg.Amount.IsEqual(expectedLeaseAmount) {
 		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseAmount, "lease amount must be equal to %s", expectedLeaseAmount.String())
 	}
@@ -143,7 +143,7 @@ func (m msgServer) ExtendLease(goCtx context.Context, msg *types.MsgExtendLease)
 		return nil, errorsmod.Wrapf(types.ErrLeaseNotFound, "not found")
 	}
 
-	expectedLeaseAmount := sdk.NewCoin(mediaNodeLease.PricePerHour.Denom, mediaNodeLease.PricePerHour.Amount.Mul(sdkmath.NewInt(int64(msg.LeaseHours))))
+	expectedLeaseAmount := sdk.NewCoin(mediaNodeLease.PricePerHour.Denom, mediaNodeLease.PricePerHour.Amount.Mul(sdkmath.NewIntFromUint64((msg.LeaseHours))))
 	if !msg.Amount.IsEqual(expectedLeaseAmount) {
 		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseAmount, "lease amount must be equal to %s", expectedLeaseAmount.String())
 	}

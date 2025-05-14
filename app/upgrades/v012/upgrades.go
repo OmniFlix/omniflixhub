@@ -51,7 +51,7 @@ func CreateV012UpgradeHandler(
 
 		// Removed in v6
 		// Packet Forward middleware initial params
-		//keepers.PacketForwardKeeper.SetParams(ctx, packetforwardtypes.DefaultParams())
+		// keepers.PacketForwardKeeper.SetParams(ctx, packetforwardtypes.DefaultParams())
 
 		// itc campaigns migrations
 		campaigns := keepers.ItcKeeper.GetAllCampaigns(ctx)

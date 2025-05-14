@@ -48,10 +48,5 @@ func (gs GenesisState) ValidateGenesis() error {
 		}
 	}
 
-	// Validate NextMedianodeId is non-negative and non-zero
-	if gs.NodeCounter < 0 {
-		return fmt.Errorf("media node counter cannot be negative")
-	}
-
 	return nil
 }

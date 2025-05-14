@@ -1,6 +1,6 @@
 module github.com/OmniFlix/omniflixhub/v6
 
-go 1.23.7
+go 1.23.9
 
 require (
 	cosmossdk.io/client/v2 v2.0.0-beta.3
@@ -15,7 +15,7 @@ require (
 	cosmossdk.io/x/tx v0.13.7
 	cosmossdk.io/x/upgrade v0.1.4
 	github.com/CosmWasm/wasmd v0.53.0
-	github.com/CosmWasm/wasmvm/v2 v2.1.2
+	github.com/CosmWasm/wasmvm/v2 v2.1.6
 	github.com/OmniFlix/streampay/v2 v2.5.0
 	github.com/bianjieai/nft-transfer v1.1.3-ibc-v8.6.1
 	github.com/cometbft/cometbft v0.38.17

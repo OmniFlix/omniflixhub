@@ -62,7 +62,6 @@ func (k Keeper) GetModuleAccountAddress(ctx sdk.Context) sdk.AccAddress {
 
 // RegisterMediaNode creates a new media node entry
 func (k Keeper) RegisterMediaNode(ctx sdk.Context, mediaNode types.MediaNode, depositAmount sdk.Coin, owner sdk.AccAddress) (types.MediaNode, error) {
-
 	if _, found := k.GetMediaNode(ctx, mediaNode.Id); found {
 		return types.MediaNode{}, errorsmod.Wrapf(types.ErrMediaNodeExists, "medianode id already exists")
 	}
@@ -93,7 +92,8 @@ func (k Keeper) RegisterMediaNode(ctx sdk.Context, mediaNode types.MediaNode, de
 
 // UpdateMediaNode updates an existing media node
 func (k Keeper) UpdateMediaNode(
-	ctx sdk.Context, mediaNodeId string, info *types.Info, hardwareSpec *types.HardwareSpecs, pricePerHour *sdk.Coin, sender sdk.AccAddress) (types.MediaNode, error) {
+	ctx sdk.Context, mediaNodeId string, info *types.Info, hardwareSpec *types.HardwareSpecs, pricePerHour *sdk.Coin, sender sdk.AccAddress,
+) (types.MediaNode, error) {
 	mediaNode, found := k.GetMediaNode(ctx, mediaNodeId)
 	if !found {
 		return types.MediaNode{}, errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %s does not exist", mediaNodeId)
