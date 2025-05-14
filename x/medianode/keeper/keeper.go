@@ -494,7 +494,7 @@ func (k Keeper) ReleaseDeposits(ctx sdk.Context) error {
 		// Check if the media node is CLOSED
 		if mediaNode.Status == types.STATUS_CLOSED && len(mediaNode.Deposits) > 0 {
 			// Check if the time since closed exceeds the deposit release period
-			if ctx.BlockTime().Sub(mediaNode.ClosedAt) > depositReleasePeriod {
+			if ctx.BlockTime().Sub(mediaNode.ClosedAt) >= depositReleasePeriod {
 				k.Logger(ctx).Info("Releasing Deposits ..")
 				for _, deposit := range mediaNode.Deposits {
 					// Return deposit to the depositor

@@ -289,9 +289,8 @@ func (suite *KeeperTestSuite) TestDepositMediaNode() {
 		defaultDepositAmount.Denom,
 		initialDepositAmount.Amount.Add(additionalDeposit.Amount),
 	)
-	suite.Require().Equal(len(node.Deposits), 2)
-	totalDeposit := node.Deposits[0].Amount.Amount.Add(node.Deposits[1].Amount.Amount)
-	suite.Require().Equal(expectedDeposit.Amount, totalDeposit, "deposit should be updated after additional deposit")
+	suite.Require().Equal(len(node.Deposits), 1)
+	suite.Require().Equal(expectedDeposit.Amount, node.Deposits[0].Amount.Amount, "deposit should be updated after additional deposit")
 }
 
 func (suite *KeeperTestSuite) TestCancelLeaseMediaNode() {
@@ -389,22 +388,19 @@ func (suite *KeeperTestSuite) TestSettleActiveLeases() {
 
 	// Manually create an active lease for the media node
 	lease := types.Lease{
-		MediaNodeId: createMsg.Id,
-		Lessee:      suite.TestAccs[1].String(),
-		Owner:       suite.TestAccs[0].String(),
-		LeasedHours: 2,
-		// Set the start and last settled time to 2 hours ago to simulate an ongoing lease
-		StartTime:          suite.Ctx.BlockTime().Add(-2 * time.Hour),
-		TotalLeaseAmount:   sdk.NewCoin(defaultPricePerHour.Denom, sdkmath.NewInt(20000000)),
+		MediaNodeId:  createMsg.Id,
+		Lessee:       suite.TestAccs[1].String(),
+		Owner:        suite.TestAccs[0].String(),
+		LeasedHours:  2,
+		PricePerHour: defaultPricePerHour,
+		// Set the start and last settled time to 1 hours ago to simulate an ongoing lease
+		StartTime:          suite.Ctx.BlockTime().Add(-1 * time.Hour),
+		TotalLeaseAmount:   sdk.NewCoin(defaultPricePerHour.Denom, defaultPricePerHour.Amount.Mul(sdkmath.NewInt(2))),
 		SettledLeaseAmount: sdk.NewCoin(defaultPricePerHour.Denom, sdkmath.NewInt(0)),
-		LastSettledAt:      suite.Ctx.BlockTime().Add(-2 * time.Hour),
+		LastSettledAt:      suite.Ctx.BlockTime().Add(-1 * time.Hour),
 	}
 	// Assume SetMediaNodeLease sets the lease record in the keeper's store.
 	keeper.SetLease(suite.Ctx, lease)
-
-	// Advance the block time to simulate passage of time for settlement calculation
-	newBlockTime := suite.Ctx.BlockTime().Add(1 * time.Hour)
-	suite.Ctx = suite.Ctx.WithBlockTime(newBlockTime)
 
 	// Call the SettleActiveLeases function (typically invoked in EndBlock)
 	err = keeper.SettleActiveLeases(suite.Ctx)
@@ -413,8 +409,8 @@ func (suite *KeeperTestSuite) TestSettleActiveLeases() {
 	// Retrieve the updated lease and verify that settlement has occurred
 	settledLease, found := keeper.GetMediaNodeLease(suite.Ctx, createMsg.Id)
 	suite.Require().True(found, "active lease record should exist after settlement")
-	suite.Require().Equal(newBlockTime, settledLease.LastSettledAt, "lease LastSettledAt should be updated to current block time")
-	suite.Require().True(settledLease.SettledLeaseAmount.Amount.GT(sdkmath.NewInt(0)), "settled lease amount should be greater than zero")
+	suite.Require().Equal(suite.Ctx.BlockTime(), settledLease.LastSettledAt, "lease LastSettledAt should be updated to current block time")
+	suite.Require().True(settledLease.SettledLeaseAmount.Amount.Equal(defaultPricePerHour.Amount), "settled lease amount should be equal to pricePerHour")
 }
 
 func (suite *KeeperTestSuite) TestReleaseDeposits() {
@@ -448,7 +444,7 @@ func (suite *KeeperTestSuite) TestReleaseDeposits() {
 	suite.Require().NoError(err)
 
 	// Advance block time to simulate deposit lock expiry (if applicable)
-	suite.Ctx = suite.Ctx.WithBlockTime(suite.Ctx.BlockTime().Add(24 * time.Hour))
+	suite.Ctx = suite.Ctx.WithBlockTime(suite.Ctx.BlockTime().Add(7 * 24 * time.Hour))
 
 	// Call the ReleaseDeposits function (typically invoked in EndBlock)
 	err = keeper.ReleaseDeposits(suite.Ctx)
