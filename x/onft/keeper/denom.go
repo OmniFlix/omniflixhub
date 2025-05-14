@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 )
 
 // SaveDenom saves a denom
@@ -24,6 +24,7 @@ func (k Keeper) SaveDenom(
 	uriHash,
 	data string,
 	royaltyReceivers []*types.WeightedAddress,
+	updatableData bool,
 ) error {
 	denomMetadata := &types.DenomMetadata{
 		Creator:          creator.String(),
@@ -31,6 +32,7 @@ func (k Keeper) SaveDenom(
 		PreviewUri:       previewUri,
 		Data:             data,
 		RoyaltyReceivers: royaltyReceivers,
+		UpdatableData:    updatableData,
 	}
 	metadata, err := codectypes.NewAnyWithValue(denomMetadata)
 	if err != nil {
@@ -83,6 +85,7 @@ func (k Keeper) TransferDenomOwner(
 		PreviewUri:       denom.PreviewURI,
 		Data:             denom.Data,
 		RoyaltyReceivers: denom.RoyaltyReceivers,
+		UpdatableData:    denom.UpdatableData,
 	}
 	data, err := codectypes.NewAnyWithValue(denomMetadata)
 	if err != nil {
@@ -131,6 +134,7 @@ func (k Keeper) UpdateDenom(ctx sdk.Context, msg *types.MsgUpdateDenom) error {
 		PreviewUri:       denom.PreviewURI,
 		Data:             denom.Data,
 		RoyaltyReceivers: denom.RoyaltyReceivers,
+		UpdatableData:    denom.UpdatableData,
 	}
 	if msg.PreviewURI != types.DoNotModify {
 		denomMetadata.PreviewUri = msg.PreviewURI
@@ -208,6 +212,19 @@ func (k Keeper) HasPermissionToMint(ctx sdk.Context, denomID string, sender sdk.
 	return false
 }
 
+func (k Keeper) HasPermissionToUpdateData(ctx sdk.Context, denomID string, sender sdk.AccAddress) bool {
+	denom, err := k.GetDenomInfo(ctx, denomID)
+	if err != nil {
+		return false
+	}
+
+	if denom.UpdatableData && sender.String() == denom.Creator {
+		return true
+	}
+
+	return false
+}
+
 func (k Keeper) GetDenomInfo(ctx sdk.Context, denomID string) (*types.Denom, error) {
 	class, ok := k.nk.GetClass(ctx, denomID)
 	if !ok {
@@ -230,6 +247,7 @@ func (k Keeper) GetDenomInfo(ctx sdk.Context, denomID string) (*types.Denom, err
 		UriHash:          class.UriHash,
 		Data:             denomMetadata.Data,
 		RoyaltyReceivers: denomMetadata.RoyaltyReceivers,
+		UpdatableData:    denomMetadata.UpdatableData,
 	}, nil
 }
 

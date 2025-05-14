@@ -8,7 +8,6 @@ linters:
   disable-all: true
   enable:
     - dogsled
-    - exportloopref
     - goconst
     - gocritic
     - gofumpt
@@ -85,3 +84,4 @@ linters-settings:
     allow-leading-space: true
     require-explanation: false
     require-specific: false
+

@@ -8,9 +8,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/OmniFlix/omniflixhub/v5/app/apptesting"
-	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/keeper"
-	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
+	"github.com/OmniFlix/omniflixhub/v6/app/apptesting"
+	"github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/keeper"
+	"github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/types"
 )
 
 type KeeperTestSuite struct {

@@ -18,9 +18,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
-	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
-	globalfeekeeper "github.com/OmniFlix/omniflixhub/v5/x/globalfee/keeper"
-	"github.com/OmniFlix/omniflixhub/v5/x/globalfee/types"
+	appparams "github.com/OmniFlix/omniflixhub/v6/app/params"
+	globalfeekeeper "github.com/OmniFlix/omniflixhub/v6/x/globalfee/keeper"
+	"github.com/OmniFlix/omniflixhub/v6/x/globalfee/types"
 )
 
 func TestDefaultGenesis(t *testing.T) {

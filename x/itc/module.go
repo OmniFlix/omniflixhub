@@ -7,9 +7,9 @@ import (
 
 	"cosmossdk.io/core/appmodule"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/exported"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/exported"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/client/cli"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/client/cli"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/spf13/cobra"
 
@@ -18,8 +18,8 @@ import (
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/keeper"
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/keeper"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"

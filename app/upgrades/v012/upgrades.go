@@ -4,8 +4,8 @@ import (
 	"context"
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
-	"github.com/OmniFlix/omniflixhub/v5/app/keepers"
-	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
+	"github.com/OmniFlix/omniflixhub/v6/app/keepers"
+	"github.com/OmniFlix/omniflixhub/v6/app/upgrades"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -48,6 +48,10 @@ func CreateV012UpgradeHandler(
 		}
 
 		keepers.ICAHostKeeper.SetParams(ctx, hostParams)
+
+		// Removed in v6
+		// Packet Forward middleware initial params
+		// keepers.PacketForwardKeeper.SetParams(ctx, packetforwardtypes.DefaultParams())
 
 		// itc campaigns migrations
 		campaigns := keepers.ItcKeeper.GetAllCampaigns(ctx)

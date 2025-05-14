@@ -7,12 +7,12 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 
-	onftkeeper "github.com/OmniFlix/omniflixhub/v5/x/onft/keeper"
-	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	onftkeeper "github.com/OmniFlix/omniflixhub/v6/x/onft/keeper"
+	onfttypes "github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 
-	"github.com/OmniFlix/omniflixhub/v5/app/apptesting"
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/keeper"
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v6/app/apptesting"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/keeper"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 )
@@ -149,6 +149,7 @@ func (suite *KeeperTestSuite) createDefaultNftDenom() {
 				Weight:  sdkmath.LegacyOneDec(),
 			},
 		},
+		false,
 	)
 	createDenomMsg.Id = defaultNftDenomId
 
@@ -171,6 +172,7 @@ func (suite *KeeperTestSuite) createSecondaryNftDenom() {
 		suite.TestAccs[0].String(),
 		onfttypes.DefaultDenomCreationFee,
 		nil,
+		false,
 	)
 	createDenomMsg.Id = secondaryNftDenomId
 
@@ -198,6 +200,7 @@ func (suite *KeeperTestSuite) createDefaultMintNftDenom() {
 				Weight:  sdkmath.LegacyOneDec(),
 			},
 		},
+		false,
 	)
 	createDenomMsg.Id = defaultNftMintDenomId
 
@@ -300,7 +303,6 @@ func (suite *KeeperTestSuite) TestGetClaims() {
 	}
 
 	for _, claimToSet := range claimsToSet {
-		claimToSet := claimToSet
 		keeper.SetClaim(sdkCtx, claimToSet)
 
 		got := keeper.GetClaims(sdkCtx, claimToSet.CampaignId)
@@ -374,8 +376,6 @@ func (suite *KeeperTestSuite) TestParams() {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
-
 		suite.Run(tc.name, func() {
 			expected := suite.App.ItcKeeper.GetParams(suite.Ctx)
 			err := suite.App.ItcKeeper.SetParams(suite.Ctx, tc.input)

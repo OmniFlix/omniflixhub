@@ -9,7 +9,7 @@ import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
 import "OmniFlix/onft/v1beta1/onft.proto";
 
-option go_package = "github.com/OmniFlix/omniflixhub/v5/x/onft/types";
+option go_package = "github.com/OmniFlix/omniflixhub/v6/x/onft/types";
 option (gogoproto.goproto_getters_all) = false;
 
 service Msg {
@@ -28,6 +28,8 @@ service Msg {
   rpc TransferONFT(MsgTransferONFT) returns (MsgTransferONFTResponse);
 
   rpc BurnONFT(MsgBurnONFT) returns (MsgBurnONFTResponse);
+
+  rpc UpdateONFTData(MsgUpdateONFTData) returns (MsgUpdateONFTDataResponse);
 
   // UpdateParams defines a governance operation for updating the onft module
   // parameters. The authority is hard-coded to the onft module account.
@@ -62,6 +64,7 @@ message MsgCreateDenom {
   repeated WeightedAddress royalty_receivers = 12 [
     (gogoproto.moretags) = "yaml:\"royalty_receivers\""
   ];
+  bool updatable_data = 13;
 }
 
 message MsgCreateDenomResponse {}
@@ -156,6 +159,20 @@ message MsgBurnONFT {
 }
 
 message MsgBurnONFTResponse {}
+
+message MsgUpdateONFTData {
+  option (cosmos.msg.v1.signer) = "sender";
+  option (amino.name)           = "OmniFlix/onft/MsgUpdateONFTData";
+  option (gogoproto.equal)      = false;
+
+  string id           = 1;
+  string denom_id     = 2 [(gogoproto.moretags) = "yaml:\"denom_id\""];
+  string data         = 3;
+  string sender       = 4;
+}
+
+message MsgUpdateONFTDataResponse {}
+
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
 //

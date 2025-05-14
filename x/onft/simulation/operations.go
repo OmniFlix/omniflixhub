@@ -7,9 +7,9 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 
-	appparams "github.com/OmniFlix/omniflixhub/v5/app/params"
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/keeper"
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	appparams "github.com/OmniFlix/omniflixhub/v6/app/params"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/keeper"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -141,6 +141,7 @@ func SimulateMsgCreateDenom(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 			sender.Address.String(),
 			creationFee,
 			nil,
+			false,
 		)
 		msg.Id = denomId
 		denom, _ := k.GetDenomInfo(ctx, msg.Id)

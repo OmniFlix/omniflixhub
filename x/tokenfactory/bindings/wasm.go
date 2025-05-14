@@ -2,7 +2,7 @@ package bindings
 
 import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	tokenfactorykeeper "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/keeper"
+	tokenfactorykeeper "github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 )
 

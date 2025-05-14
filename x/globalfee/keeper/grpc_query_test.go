@@ -10,8 +10,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	globalfeekeeper "github.com/OmniFlix/omniflixhub/v5/x/globalfee/keeper"
-	"github.com/OmniFlix/omniflixhub/v5/x/globalfee/types"
+	globalfeekeeper "github.com/OmniFlix/omniflixhub/v6/x/globalfee/keeper"
+	"github.com/OmniFlix/omniflixhub/v6/x/globalfee/types"
 )
 
 func TestQueryGlobalFeeParamMinGasPrices(t *testing.T) {

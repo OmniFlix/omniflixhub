@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/alloc/keeper"
-	"github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/alloc/keeper"
+	"github.com/OmniFlix/omniflixhub/v6/x/alloc/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

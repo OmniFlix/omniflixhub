@@ -3,14 +3,14 @@ package v2_test
 import (
 	"testing"
 
-	"github.com/OmniFlix/omniflixhub/v5/app/apptesting"
+	"github.com/OmniFlix/omniflixhub/v6/app/apptesting"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/exported"
-	v2 "github.com/OmniFlix/omniflixhub/v5/x/onft/migrations/v2"
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/exported"
+	v2 "github.com/OmniFlix/omniflixhub/v6/x/onft/migrations/v2"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

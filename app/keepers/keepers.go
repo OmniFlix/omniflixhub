@@ -14,7 +14,7 @@ import (
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	"github.com/OmniFlix/omniflixhub/v5/x/ics721nft"
+	"github.com/OmniFlix/omniflixhub/v6/x/ics721nft"
 	nfttransfer "github.com/bianjieai/nft-transfer"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -60,9 +60,9 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/globalfee"
-	globalfeekeeper "github.com/OmniFlix/omniflixhub/v5/x/globalfee/keeper"
-	globalfeetypes "github.com/OmniFlix/omniflixhub/v5/x/globalfee/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/globalfee"
+	globalfeekeeper "github.com/OmniFlix/omniflixhub/v6/x/globalfee/keeper"
+	globalfeetypes "github.com/OmniFlix/omniflixhub/v6/x/globalfee/types"
 
 	"github.com/cosmos/cosmos-sdk/x/group"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
@@ -80,8 +80,8 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	tokenfactorykeeper "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/keeper"
-	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
+	tokenfactorykeeper "github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/keeper"
+	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/types"
 
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
@@ -104,17 +104,20 @@ import (
 	ibchookskeeper "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8/keeper"
 	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8/types"
 
-	allockeeper "github.com/OmniFlix/omniflixhub/v5/x/alloc/keeper"
-	alloctypes "github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
+	allockeeper "github.com/OmniFlix/omniflixhub/v6/x/alloc/keeper"
+	alloctypes "github.com/OmniFlix/omniflixhub/v6/x/alloc/types"
 
-	onftkeeper "github.com/OmniFlix/omniflixhub/v5/x/onft/keeper"
-	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	onftkeeper "github.com/OmniFlix/omniflixhub/v6/x/onft/keeper"
+	onfttypes "github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 
-	marketplacekeeper "github.com/OmniFlix/omniflixhub/v5/x/marketplace/keeper"
-	marketplacetypes "github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
+	marketplacekeeper "github.com/OmniFlix/omniflixhub/v6/x/marketplace/keeper"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/v6/x/marketplace/types"
 
-	itckeeper "github.com/OmniFlix/omniflixhub/v5/x/itc/keeper"
-	itctypes "github.com/OmniFlix/omniflixhub/v5/x/itc/types"
+	itckeeper "github.com/OmniFlix/omniflixhub/v6/x/itc/keeper"
+	itctypes "github.com/OmniFlix/omniflixhub/v6/x/itc/types"
+
+	medianodekeeper "github.com/OmniFlix/omniflixhub/v6/x/medianode/keeper"
+	medianodetypes "github.com/OmniFlix/omniflixhub/v6/x/medianode/types"
 
 	streampaykeeper "github.com/OmniFlix/streampay/v2/x/streampay/keeper"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
@@ -122,7 +125,7 @@ import (
 	ibcnfttransferkeeper "github.com/bianjieai/nft-transfer/keeper"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
-	tfbindings "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/bindings"
+	tfbindings "github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/bindings"
 )
 
 var tokenFactoryCapabilities = []string{
@@ -184,6 +187,7 @@ type AppKeepers struct {
 	MarketplaceKeeper marketplacekeeper.Keeper
 	StreamPayKeeper   streampaykeeper.Keeper
 	ItcKeeper         itckeeper.Keeper
+	MedianodeKeeper   medianodekeeper.Keeper
 }
 
 func NewAppKeeper(
@@ -552,6 +556,15 @@ func NewAppKeeper(
 		govModAddress,
 	)
 
+	appKeepers.MedianodeKeeper = *medianodekeeper.NewKeeper(
+		appCodec,
+		appKeepers.keys[medianodetypes.StoreKey],
+		appKeepers.AccountKeeper,
+		appKeepers.BankKeeper,
+		appKeepers.DistrKeeper,
+		govModAddress,
+	)
+
 	appKeepers.GovKeeper.SetLegacyRouter(govRouter)
 
 	var ibcTransferStack porttypes.IBCModule
@@ -650,7 +663,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibcexported.ModuleName).WithKeyTable(keyTable)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName).WithKeyTable(icahosttypes.ParamKeyTable())
 	paramsKeeper.Subspace(icqtypes.ModuleName)
-	paramsKeeper.Subspace(packetforwardtypes.ModuleName)
 	paramsKeeper.Subspace(globalfee.ModuleName)
 	paramsKeeper.Subspace(tokenfactorytypes.ModuleName)
 	paramsKeeper.Subspace(wasmtypes.ModuleName)
@@ -659,6 +671,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(marketplacetypes.ModuleName)
 	paramsKeeper.Subspace(streampaytypes.ModuleName)
 	paramsKeeper.Subspace(itctypes.ModuleName)
+	paramsKeeper.Subspace(medianodetypes.ModuleName)
 
 	return paramsKeeper
 }

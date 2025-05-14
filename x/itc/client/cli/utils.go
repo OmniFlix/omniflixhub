@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/pflag"
 )

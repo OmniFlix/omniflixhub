@@ -8,7 +8,7 @@ import (
 
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
-	"github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/alloc/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"

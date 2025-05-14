@@ -8,7 +8,7 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	errorsmod "cosmossdk.io/errors"
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -94,6 +94,7 @@ func (m msgServer) CreateDenom(goCtx context.Context, msg *types.MsgCreateDenom)
 		msg.UriHash,
 		msg.Data,
 		msg.RoyaltyReceivers,
+		msg.UpdatableData,
 	); err != nil {
 		return nil, err
 	}
@@ -186,6 +187,30 @@ func (m msgServer) MintONFT(goCtx context.Context, msg *types.MsgMintONFT) (*typ
 	}
 
 	return &types.MsgMintONFTResponse{}, nil
+}
+
+func (m msgServer) UpdateONFTData(goCtx context.Context, msg *types.MsgUpdateONFTData) (*types.MsgUpdateONFTDataResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	if !m.Keeper.HasPermissionToUpdateData(ctx, msg.DenomId, sender) {
+		return nil, errorsmod.Wrapf(
+			sdkerrors.ErrUnauthorized,
+			"%s is not allowed to update nft data for this nft %s",
+			sender.String(),
+			msg.Id,
+		)
+	}
+
+	if err := m.Keeper.UpdateONFTData(ctx, msg.DenomId, msg.Id, msg.Data); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateONFTDataResponse{}, nil
 }
 
 func (m msgServer) TransferONFT(goCtx context.Context,

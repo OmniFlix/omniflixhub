@@ -2,7 +2,7 @@ package v4
 
 import (
 	store "cosmossdk.io/store/types"
-	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
+	"github.com/OmniFlix/omniflixhub/v6/app/upgrades"
 	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8/types"
 )
 

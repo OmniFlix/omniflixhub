@@ -2,8 +2,8 @@ package v2
 
 import (
 	storetypes "cosmossdk.io/store/types"
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/exported"
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/exported"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

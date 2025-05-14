@@ -11,7 +11,7 @@ import (
 	coreheader "cosmossdk.io/core/header"
 	sdkmath "cosmossdk.io/math"
 
-	"github.com/OmniFlix/omniflixhub/v5/app"
+	"github.com/OmniFlix/omniflixhub/v6/app"
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/store/rootmulti"
@@ -34,6 +34,8 @@ import (
 )
 
 var (
+	PrimaryDenom         = "uflix"
+	PrimaryAmount        = sdkmath.NewInt(10000000000)
 	SecondaryDenom       = "uxflx"
 	SecondaryAmount      = sdkmath.NewInt(100000000)
 	baseTestAccts        = []sdk.AccAddress{}

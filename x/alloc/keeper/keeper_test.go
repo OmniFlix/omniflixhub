@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
-	"github.com/OmniFlix/omniflixhub/v5/app/apptesting"
-	"github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
+	"github.com/OmniFlix/omniflixhub/v6/app/apptesting"
+	"github.com/OmniFlix/omniflixhub/v6/x/alloc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -70,8 +70,6 @@ func (suite *KeeperTestSuite) TestParams() {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
-
 		suite.Run(tc.name, func() {
 			expected := suite.App.AllocKeeper.GetParams(suite.Ctx)
 			err := suite.App.AllocKeeper.SetParams(suite.Ctx, tc.input)

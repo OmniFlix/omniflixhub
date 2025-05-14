@@ -3,8 +3,8 @@ package types
 import (
 	"context"
 
-	nft "github.com/OmniFlix/omniflixhub/v5/x/onft/exported"
-	nftypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	nft "github.com/OmniFlix/omniflixhub/v6/x/onft/exported"
+	nftypes "github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

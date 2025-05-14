@@ -16,9 +16,10 @@ const (
 	TypeMsgUpdateDenom   = "update_denom"
 	TypeMsgTransferDenom = "transfer_denom"
 
-	TypeMsgMintONFT     = "mint_onft"
-	TypeMsgTransferONFT = "transfer_onft"
-	TypeMsgBurnONFT     = "burn_onft"
+	TypeMsgMintONFT       = "mint_onft"
+	TypeMsgTransferONFT   = "transfer_onft"
+	TypeMsgBurnONFT       = "burn_onft"
+	TypeMsgUpdateONFTData = "update_onft_data"
 )
 
 var (
@@ -38,6 +39,7 @@ func NewMsgCreateDenom(
 	name, schema, description, uri, uriHash, previewUri, data, sender string,
 	creationFee sdk.Coin,
 	royaltyReceivers []*WeightedAddress,
+	updatableData bool,
 ) *MsgCreateDenom {
 	return &MsgCreateDenom{
 		Sender:           sender,
@@ -52,6 +54,7 @@ func NewMsgCreateDenom(
 		Data:             data,
 		CreationFee:      creationFee,
 		RoyaltyReceivers: royaltyReceivers,
+		UpdatableData:    updatableData,
 	}
 }
 
@@ -353,4 +356,39 @@ func (m *MsgUpdateParams) ValidateBasic() error {
 	}
 
 	return m.Params.ValidateBasic()
+}
+
+func NewMsgUpdateONFTData(denomId, id, data, sender string) *MsgUpdateONFTData {
+	return &MsgUpdateONFTData{
+		Id:      id,
+		DenomId: denomId,
+		Data:    data,
+		Sender:  sender,
+	}
+}
+
+func (msg MsgUpdateONFTData) Route() string { return RouterKey }
+
+func (msg MsgUpdateONFTData) Type() string { return TypeMsgUpdateONFTData }
+
+func (msg MsgUpdateONFTData) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address; %s", err)
+	}
+
+	if len(msg.Data) == 0 {
+		return errorsmod.Wrap(ErrInvalidData, "data cannot be empty")
+	}
+	if err := ValidateJSONString(msg.Data); err != nil {
+		return errorsmod.Wrap(ErrInvalidData, err.Error())
+	}
+	return nil
+}
+
+func (msg MsgUpdateONFTData) GetSigners() []sdk.AccAddress {
+	from, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }

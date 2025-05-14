@@ -7,7 +7,7 @@ import (
 
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
-	"github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

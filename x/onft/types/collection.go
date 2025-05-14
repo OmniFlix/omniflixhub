@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/OmniFlix/omniflixhub/v5/x/onft/exported"
+	"github.com/OmniFlix/omniflixhub/v6/x/onft/exported"
 )
 
 func NewCollection(denom Denom, onfts []exported.ONFTI) (c Collection) {

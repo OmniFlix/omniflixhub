@@ -3,7 +3,7 @@ package types
 import (
 	"time"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/exported"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/exported"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/gogoproto/proto"
 )

@@ -5,13 +5,13 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
-	"github.com/OmniFlix/omniflixhub/v5/app/keepers"
-	"github.com/OmniFlix/omniflixhub/v5/app/upgrades"
-	alloctypes "github.com/OmniFlix/omniflixhub/v5/x/alloc/types"
-	itctypes "github.com/OmniFlix/omniflixhub/v5/x/itc/types"
-	marketplacetypes "github.com/OmniFlix/omniflixhub/v5/x/marketplace/types"
-	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
-	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/types"
+	"github.com/OmniFlix/omniflixhub/v6/app/keepers"
+	"github.com/OmniFlix/omniflixhub/v6/app/upgrades"
+	alloctypes "github.com/OmniFlix/omniflixhub/v6/x/alloc/types"
+	itctypes "github.com/OmniFlix/omniflixhub/v6/x/itc/types"
+	marketplacetypes "github.com/OmniFlix/omniflixhub/v6/x/marketplace/types"
+	onfttypes "github.com/OmniFlix/omniflixhub/v6/x/onft/types"
+	tokenfactorytypes "github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -43,7 +43,6 @@ func CreateV2UpgradeHandler(
 		// https://github.com/cosmos/cosmos-sdk/pull/12363/files
 		// Set param key table for params module migration
 		for _, subspace := range keepers.ParamsKeeper.GetSubspaces() {
-			subspace := subspace
 
 			var keyTable paramstypes.KeyTable
 			switch subspace.Name() {
@@ -69,6 +68,10 @@ func CreateV2UpgradeHandler(
 				keyTable = ibctransfertypes.ParamKeyTable()
 			case icahosttypes.SubModuleName:
 				keyTable = icahosttypes.ParamKeyTable()
+			// this function has been removed in pfm v8.2.0
+			// commented out for legacy purposes
+			// case packetforwardtypes.ModuleName:
+			//	keyTable = packetforwardtypes.ParamKeyTable()
 
 			// omniflix
 			case alloctypes.ModuleName:

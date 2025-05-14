@@ -6,10 +6,10 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 
-	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	onfttypes "github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/OmniFlix/omniflixhub/v5/x/itc/types"
+	"github.com/OmniFlix/omniflixhub/v6/x/itc/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -560,7 +560,6 @@ func (suite *KeeperTestSuite) TestUpdateParams() {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		suite.Run(tc.name, func() {
 			_, err := suite.msgServer.UpdateParams(suite.Ctx, tc.request)
 			if tc.expectErr {

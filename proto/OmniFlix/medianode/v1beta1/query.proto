@@ -1,0 +1,117 @@
+syntax = "proto3";
+package OmniFlix.medianode.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "OmniFlix/medianode/v1beta1/medianode.proto";
+import "OmniFlix/medianode/v1beta1/params.proto";
+
+option go_package = "github.com/OmniFlix/omniflixhub/v6/x/medianode/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // MediaNode returns media node details based on id
+  rpc MediaNode(QueryMediaNodeRequest) returns (QueryMediaNodeResponse) {
+    option (google.api.http).get = "/omniflix/medianode/v1beta1/nodes/{id}";
+  }
+
+  // MediaNodes returns all media nodes with optional pagination
+  rpc MediaNodes(QueryMediaNodesRequest) returns (QueryMediaNodesResponse) {
+    option (google.api.http).get = "/omniflix/medianode/v1beta1/nodes";
+  }
+
+  // Lease returns lease details for a media node
+  rpc Lease(QueryLeaseRequest) returns (QueryLeaseResponse) {
+    option (google.api.http).get = "/omniflix/medianode/v1beta1/lease/{media_node_id}";
+  }
+
+  // LeasesByLessee returns all active leases for a lessee address
+  rpc LeasesByLessee(QueryLeasesByLesseeRequest) returns (QueryLeasesByLesseeResponse) {
+    option (google.api.http).get = "/omniflix/medianode/v1beta1/leases-by-lessee/{lessee}";
+  }
+
+  // AvailableNodes returns all active media nodes
+  rpc AvailableNodes(QueryAvailableNodesRequest) returns (QueryAvailableNodesResponse) {
+    option (google.api.http).get = "/omniflix/medianode/v1beta1/available-nodes";
+  }
+  // Params returns all parameters of media node module
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/omniflix/medianode/v1beta1/params";
+  }
+}
+
+// QueryMediaNodeRequest is the request type for querying a specific media node
+message QueryMediaNodeRequest {
+  string id = 1;
+}
+
+// QueryMediaNodeResponse is the response type for querying a specific media node
+message QueryMediaNodeResponse {
+  MediaNode media_node = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryMediaNodesRequest is the request type for querying all media nodes
+message QueryMediaNodesRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryMediaNodesResponse is the response type for querying all media nodes
+message QueryMediaNodesResponse {
+  repeated MediaNode media_nodes = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryMediaNodesByOwnerRequest is the request type for querying media nodes by owner
+message QueryMediaNodesByOwnerRequest {
+  string owner = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryMediaNodesByOwnerResponse is the response type for querying media nodes by owner
+message QueryMediaNodesByOwnerResponse {
+  repeated MediaNode media_nodes = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryLeaseRequest is the request type for querying a specific lease
+message QueryLeaseRequest {
+  string media_node_id = 1;
+}
+
+// QueryLeaseResponse is the response type for querying a specific lease
+message QueryLeaseResponse {
+  Lease lease = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryLeasesByLesseeRequest is the request type for querying leases by lessee
+message QueryLeasesByLesseeRequest {
+  string lessee = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryLeasesByLesseeResponse is the response type for querying leases by lessee
+message QueryLeasesByLesseeResponse {
+  repeated Lease leases = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryAvailableNodesRequest is the request type for querying available nodes
+message QueryAvailableNodesRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAvailableNodesResponse is the response type for querying available nodes
+message QueryAvailableNodesResponse {
+  repeated MediaNode media_nodes = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryParamsRequest is the request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is the response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params defines the parameters of the module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}

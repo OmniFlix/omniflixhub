@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	wasmbinding "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/bindings"
+	wasmbinding "github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/bindings"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

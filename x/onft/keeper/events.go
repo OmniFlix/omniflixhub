@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	onfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	onfttypes "github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

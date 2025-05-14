@@ -4,7 +4,7 @@ package OmniFlix.onft.v1beta1;
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/OmniFlix/omniflixhub/v5/x/onft/types";
+option go_package = "github.com/OmniFlix/omniflixhub/v6/x/onft/types";
 option (gogoproto.goproto_getters_all) = false;
 
 // Collection
@@ -35,6 +35,7 @@ message Denom {
   repeated WeightedAddress royalty_receivers        = 11 [
     (gogoproto.moretags) = "yaml:\"royalty_receivers\""
   ];
+  bool updatable_data                               = 12;
 }
 
 message DenomMetadata {
@@ -47,6 +48,7 @@ message DenomMetadata {
   repeated WeightedAddress royalty_receivers       = 7 [
     (gogoproto.moretags) = "yaml:\"royalty_receivers\""
   ];
+  bool updatable_data = 8;
 }
 
 //ASSET or ONFT

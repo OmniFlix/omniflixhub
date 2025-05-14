@@ -6,7 +6,7 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
-	bindingstypes "github.com/OmniFlix/omniflixhub/v5/x/tokenfactory/bindings/types"
+	bindingstypes "github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/bindings/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

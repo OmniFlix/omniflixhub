@@ -1,10 +1,10 @@
 version: v1
 name: buf.build/OmniFlix/omniflixhub
 deps:
-  - buf.build/cosmos/cosmos-sdk:v0.47.0
+  - buf.build/cosmos/cosmos-sdk:v0.50.0
   - buf.build/cosmos/cosmos-proto:1935555c206d4afb9e94615dfd0fad31
-  - buf.build/cosmos/gogo-proto:34d970b699f84aa382f3c29773a60836
-  - buf.build/googleapis/googleapis:75b4300737fb4efca0831636be94e517
+  - buf.build/cosmos/gogo-proto:a14993478f40695898ed8a86931094b6656e8a5d
+  - buf.build/googleapis/googleapis:8d7204855ec14631a499bd7393ce1970
 breaking:
   use:
     - FILE

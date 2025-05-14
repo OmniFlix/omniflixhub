@@ -6,8 +6,8 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 
-	nft "github.com/OmniFlix/omniflixhub/v5/x/onft/exported"
-	nfttypes "github.com/OmniFlix/omniflixhub/v5/x/onft/types"
+	nft "github.com/OmniFlix/omniflixhub/v6/x/onft/exported"
+	nfttypes "github.com/OmniFlix/omniflixhub/v6/x/onft/types"
 	streampaytypes "github.com/OmniFlix/streampay/v2/x/streampay/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

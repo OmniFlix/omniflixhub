@@ -9,7 +9,7 @@ import (
 
 	"cosmossdk.io/log"
 	sdkmath "cosmossdk.io/math"
-	apphelpers "github.com/OmniFlix/omniflixhub/v5/app/helpers"
+	apphelpers "github.com/OmniFlix/omniflixhub/v6/app/helpers"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/crypto"
 	"github.com/cometbft/cometbft/crypto/ed25519"
