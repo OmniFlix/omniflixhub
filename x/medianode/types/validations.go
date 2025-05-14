@@ -111,19 +111,19 @@ func validateMediaNodeId(id string) error {
 	return nil
 }
 
-func validateMediaNodeURL(Url string) error {
-	if len(Url) == 0 {
-		return fmt.Errorf("medianode URL cannot be empty")
+func validateMediaNodeURL(_url string) error {
+	if len(_url) == 0 {
+		return fmt.Errorf("medianode url cannot be empty")
 	}
-	if len(Url) > MaxURLLength {
-		return fmt.Errorf("medianode Url exceeds %d characters", MaxURLLength)
+	if len(_url) > MaxURLLength {
+		return fmt.Errorf("medianode url exceeds %d characters", MaxURLLength)
 	}
-	u, err := url.Parse(Url)
+	u, err := url.Parse(_url)
 	if err != nil || u.Scheme == "" || u.Host == "" {
-		return fmt.Errorf("medianode Url must be a valid Url (e.g., https://example.com)")
+		return fmt.Errorf("medianode url must be a valid url (e.g., https://example.com)")
 	}
 	if u.Scheme != "http" && u.Scheme != "https" {
-		return fmt.Errorf("medianode Url must use http or https")
+		return fmt.Errorf("medianode url must use http or https")
 	}
 	return nil
 }

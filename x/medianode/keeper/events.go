@@ -7,14 +7,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k *Keeper) registerMediaNodeEvent(ctx sdk.Context, owner string, mediaNodeId string, Url string, pricePerHour sdk.Coin, status types.Status) {
+func (k *Keeper) registerMediaNodeEvent(ctx sdk.Context, owner string, mediaNodeId string, url string, pricePerHour sdk.Coin, status types.Status) {
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeRegisterMediaNode,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 			sdk.NewAttribute(types.AttributeKeyOwner, owner),
 			sdk.NewAttribute(types.AttributeKeyMediaNodeId, mediaNodeId),
-			sdk.NewAttribute(types.AttributeKeyMediaNodeURL, Url),
+			sdk.NewAttribute(types.AttributeKeyMediaNodeURL, url),
 			sdk.NewAttribute(types.AttributeKeyStatus, status.String()),
 			sdk.NewAttribute(types.AttributeKeyPricePerDay, pricePerHour.String()),
 		),
