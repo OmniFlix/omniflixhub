@@ -8,7 +8,6 @@ linters:
   disable-all: true
   enable:
     - dogsled
-    - exportloopref
     - goconst
     - gocritic
     - gofumpt
@@ -26,6 +25,7 @@ linters:
     - thelper
     - unconvert
     - unused
+    - copyloopvar
 
 issues:
   exclude-rules:
@@ -85,3 +85,6 @@ linters-settings:
     allow-leading-space: true
     require-explanation: false
     require-specific: false
+
+output:
+  format: colored-line-number
