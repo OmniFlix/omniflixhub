@@ -92,7 +92,6 @@ func (suite *KeeperTestSuite) TestRegisterMediaNode() {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		suite.Run(tc.name, func() {
 			_, err := suite.msgServer.RegisterMediaNode(suite.Ctx, tc.msg)
 			if tc.expectErr {
