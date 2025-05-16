@@ -28,7 +28,6 @@ type AuctionListingI interface {
 	GetIncrementPercentage() sdkmath.LegacyDec
 	GetOwner() sdk.AccAddress
 	GetSplitShares() interface{}
-	GetStatus() string
 }
 
 type BidI interface {
