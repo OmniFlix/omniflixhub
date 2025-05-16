@@ -65,13 +65,6 @@ func (al AuctionListing) GetSplitShares() interface{} {
 	return al.SplitShares
 }
 
-func (al AuctionListing) GetStatus() string {
-	if al.StartTime.Before(time.Now()) {
-		return AUCTION_STATUS_ACTIVE.String()
-	}
-	return AUCTION_STATUS_INACTIVE.String()
-}
-
 func ValidAuctionStatus(status AuctionStatus) bool {
 	if status == AUCTION_STATUS_INACTIVE ||
 		status == AUCTION_STATUS_ACTIVE {
