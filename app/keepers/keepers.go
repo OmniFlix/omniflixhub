@@ -60,10 +60,6 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
-	"github.com/OmniFlix/omniflixhub/v6/x/globalfee"
-	globalfeekeeper "github.com/OmniFlix/omniflixhub/v6/x/globalfee/keeper"
-	globalfeetypes "github.com/OmniFlix/omniflixhub/v6/x/globalfee/types"
-
 	"github.com/cosmos/cosmos-sdk/x/group"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
@@ -126,6 +122,9 @@ import (
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
 	tfbindings "github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/bindings"
+
+	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
 var tokenFactoryCapabilities = []string{
@@ -163,12 +162,12 @@ type AppKeepers struct {
 	AuthzKeeper           authzkeeper.Keeper
 	CircuitKeeper         circuitkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
-	GlobalFeeKeeper       globalfeekeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	TokenFactoryKeeper    tokenfactorykeeper.Keeper
 	IBCNFTTransferKeeper  ibcnfttransferkeeper.Keeper
 	WasmKeeper            wasmkeeper.Keeper
 	ContractKeeper        *wasmkeeper.PermissionedKeeper
+	FeeMarketKeeper       *feemarketkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -278,6 +277,14 @@ func NewAppKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[feegrant.StoreKey]),
 		appKeepers.AccountKeeper,
+	)
+
+	appKeepers.FeeMarketKeeper = feemarketkeeper.NewKeeper(
+		appCodec,
+		appKeepers.keys[feemarkettypes.StoreKey],
+		appKeepers.AccountKeeper,
+		&DefaultFeemarketDenomResolver{},
+		govModAddress,
 	)
 
 	appKeepers.CircuitKeeper = circuitkeeper.NewKeeper(
@@ -474,12 +481,6 @@ func NewAppKeeper(
 	)
 	icqModule := icq.NewIBCModule(appKeepers.ICQKeeper)
 
-	appKeepers.GlobalFeeKeeper = globalfeekeeper.NewKeeper(
-		appCodec,
-		keys[globalfeetypes.StoreKey],
-		govModAddress,
-	)
-
 	// Create the TokenFactory Keeper
 	appKeepers.TokenFactoryKeeper = tokenfactorykeeper.NewKeeper(
 		appCodec,
@@ -663,7 +664,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibcexported.ModuleName).WithKeyTable(keyTable)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName).WithKeyTable(icahosttypes.ParamKeyTable())
 	paramsKeeper.Subspace(icqtypes.ModuleName)
-	paramsKeeper.Subspace(globalfee.ModuleName)
 	paramsKeeper.Subspace(tokenfactorytypes.ModuleName)
 	paramsKeeper.Subspace(wasmtypes.ModuleName)
 	paramsKeeper.Subspace(alloctypes.ModuleName)

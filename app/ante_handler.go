@@ -1,15 +1,20 @@
 package app
 
 import (
+	feemarketante "github.com/skip-mev/feemarket/x/feemarket/ante"
+	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
+
+	corestoretypes "cosmossdk.io/core/store"
 	errorsmod "cosmossdk.io/errors"
 	storetypes "cosmossdk.io/store/types"
+	txsigning "cosmossdk.io/x/tx/signing"
+	"github.com/cosmos/cosmos-sdk/types/tx/signing"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+
 	circuitante "cosmossdk.io/x/circuit/ante"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	globalfeeante "github.com/OmniFlix/omniflixhub/v6/x/globalfee/ante"
-	globalfeekeeper "github.com/OmniFlix/omniflixhub/v6/x/globalfee/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -19,25 +24,29 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 )
 
-// Lower back to 1 mil after https://github.com/cosmos/relayer/issues/1255
-const maxBypassMinFeeMsgGasUsage = 2_000_000
+// UseFeeMarketDecorator to make the integration testing easier: we can switch off its ante and post decorators with this flag
+var UseFeeMarketDecorator = true
 
 // HandlerOptions extend the SDK's AnteHandler options by requiring the IBC
 // channel keeper.
 type HandlerOptions struct {
-	ante.HandlerOptions
+	ExtensionOptionChecker ante.ExtensionOptionChecker
+	Codec                  codec.BinaryCodec
+	SignModeHandler        *txsigning.HandlerMap
+	SigGasConsumer         func(meter storetypes.GasMeter, sig signing.SignatureV2, params authtypes.Params) error
+	TXCounterStoreService  corestoretypes.KVStoreService
+	TXFeeChecker           ante.TxFeeChecker
 
-	GovKeeper         govkeeper.Keeper
-	IBCKeeper         *ibckeeper.Keeper
-	TxCounterStoreKey *storetypes.KVStoreKey
-	WasmConfig        wasmtypes.WasmConfig
-	Codec             codec.BinaryCodec
-
-	BypassMinFeeMsgTypes []string
-
-	GlobalFeeKeeper globalfeekeeper.Keeper
-	StakingKeeper   stakingkeeper.Keeper
+	AccountKeeper   feemarketante.AccountKeeper
+	BankKeeper      feemarketante.BankKeeper
 	CircuitKeeper   circuitante.CircuitBreaker
+	FeegrantKeeper  ante.FeegrantKeeper
+	FeeMarketKeeper *feemarketkeeper.Keeper
+	GovKeeper       govkeeper.Keeper
+	IBCKeeper       *ibckeeper.Keeper
+	StakingKeeper   stakingkeeper.Keeper
+
+	WasmConfig wasmtypes.WasmConfig
 }
 
 func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
@@ -50,6 +59,9 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	if options.SignModeHandler == nil {
 		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
 	}
+	if options.FeeMarketKeeper == nil {
+		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, "FeeMarket keeper is required for AnteHandler")
+	}
 
 	sigGasConsumer := options.SigGasConsumer
 	if sigGasConsumer == nil {
@@ -59,24 +71,12 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(), // Outermost AnteDecorator, SetUpContext must be called first
 		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit),
-		wasmkeeper.NewCountTXDecorator(runtime.NewKVStoreService(options.TxCounterStoreKey)),
+		wasmkeeper.NewCountTXDecorator(options.TXCounterStoreService),
 		ante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
 		ante.NewValidateBasicDecorator(),
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		globalfeeante.NewFeeDecorator(
-			options.BypassMinFeeMsgTypes,
-			options.GlobalFeeKeeper,
-			options.StakingKeeper,
-			maxBypassMinFeeMsgGasUsage,
-		),
-		ante.NewDeductFeeDecorator(
-			options.AccountKeeper,
-			options.BankKeeper,
-			options.FeegrantKeeper,
-			options.TxFeeChecker,
-		),
 		circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
 		// SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewSetPubKeyDecorator(options.AccountKeeper),
@@ -85,6 +85,20 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
+	}
+
+	if UseFeeMarketDecorator {
+		anteDecorators = append(anteDecorators,
+			feemarketante.NewFeeMarketCheckDecorator(
+				options.AccountKeeper,
+				options.BankKeeper,
+				options.FeegrantKeeper,
+				options.FeeMarketKeeper,
+				ante.NewDeductFeeDecorator(
+					options.AccountKeeper,
+					options.BankKeeper,
+					options.FeegrantKeeper,
+					options.TXFeeChecker)))
 	}
 
 	return sdk.ChainAnteDecorators(anteDecorators...), nil

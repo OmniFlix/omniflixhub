@@ -6,7 +6,10 @@ import (
 	medianodetypes "github.com/OmniFlix/omniflixhub/v6/x/medianode/types"
 )
 
-const UpgradeName = "v6"
+const (
+	UpgradeName         = "v6"
+	GlobalFeeModuleName = "globalfee"
+)
 
 var Upgrade = upgrades.Upgrade{
 	UpgradeName:          UpgradeName,
@@ -14,6 +17,9 @@ var Upgrade = upgrades.Upgrade{
 	StoreUpgrades: store.StoreUpgrades{
 		Added: []string{
 			medianodetypes.StoreKey,
+		},
+		Deleted: []string{
+			GlobalFeeModuleName,
 		},
 	},
 }

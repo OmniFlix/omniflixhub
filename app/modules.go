@@ -8,7 +8,6 @@ import (
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	appparams "github.com/OmniFlix/omniflixhub/v6/app/params"
-	"github.com/OmniFlix/omniflixhub/v6/x/globalfee"
 	nfttransfer "github.com/bianjieai/nft-transfer"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
@@ -43,6 +42,9 @@ import (
 
 	"cosmossdk.io/x/feegrant"
 	feegrantmodule "cosmossdk.io/x/feegrant/module"
+
+	"github.com/skip-mev/feemarket/x/feemarket"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 
 	"cosmossdk.io/x/circuit"
 
@@ -141,7 +143,7 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		globalfee.AppModuleBasic{},
+		feemarket.AppModuleBasic{},
 		tokenfactory.AppModuleBasic{},
 		nfttransfer.AppModuleBasic{},
 
@@ -156,25 +158,26 @@ var (
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		distrtypes.ModuleName:          nil,
-		minttypes.ModuleName:           {authtypes.Minter},
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		ibcnfttransfertypes.ModuleName: nil,
-		icatypes.ModuleName:            nil,
-		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
-		globalfee.ModuleName:           nil,
-		wasmtypes.ModuleName:           {authtypes.Burner},
-		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
-		nft.ModuleName:                 nil,
-		onfttypes.ModuleName:           nil,
-		marketplacetypes.ModuleName:    nil,
-		streampaytypes.ModuleName:      nil,
-		itctypes.ModuleName:            nil,
-		medianodetypes.ModuleName:      nil,
+		authtypes.FeeCollectorName:      nil,
+		distrtypes.ModuleName:           nil,
+		minttypes.ModuleName:            {authtypes.Minter},
+		stakingtypes.BondedPoolName:     {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName:  {authtypes.Burner, authtypes.Staking},
+		govtypes.ModuleName:             {authtypes.Burner},
+		ibctransfertypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
+		ibcnfttransfertypes.ModuleName:  nil,
+		icatypes.ModuleName:             nil,
+		tokenfactorytypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		feemarkettypes.ModuleName:       nil,
+		feemarkettypes.FeeCollectorName: nil,
+		wasmtypes.ModuleName:            {authtypes.Burner},
+		alloctypes.ModuleName:           {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		nft.ModuleName:                  nil,
+		onfttypes.ModuleName:            nil,
+		marketplacetypes.ModuleName:     nil,
+		streampaytypes.ModuleName:       nil,
+		itctypes.ModuleName:             nil,
+		medianodetypes.ModuleName:       nil,
 	}
 )
 
@@ -184,7 +187,6 @@ func appModules(
 	skipGenesisInvariants bool,
 ) []module.AppModule {
 	appCodec := encodingConfig.Marshaler
-	bondDenom := app.GetChainBondDenom()
 	return []module.AppModule{
 		genutil.NewAppModule(
 			app.AccountKeeper, app.StakingKeeper, app.BaseApp,
@@ -262,7 +264,7 @@ func appModules(
 		nfttransfer.NewAppModule(app.IBCNFTTransferKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
 		ibchooks.NewAppModule(app.AccountKeeper),
-		globalfee.NewAppModule(appCodec, app.GlobalFeeKeeper, bondDenom),
+		feemarket.NewAppModule(appCodec, *app.FeeMarketKeeper),
 		alloc.NewAppModule(appCodec, app.AllocKeeper, app.GetSubspace(alloctypes.ModuleName)),
 		onft.NewAppModule(
 			appCodec,
@@ -351,7 +353,7 @@ func orderBeginBlockers() []string {
 		crisistypes.ModuleName,
 		feegrant.ModuleName,
 		circuittypes.ModuleName,
-		globalfee.ModuleName,
+		feemarkettypes.ModuleName,
 		tokenfactorytypes.ModuleName,
 		group.ModuleName,
 		onfttypes.ModuleName,
@@ -389,7 +391,7 @@ func orderEndBlockers() []string {
 		ibcexported.ModuleName,
 		feegrant.ModuleName,
 		circuittypes.ModuleName,
-		globalfee.ModuleName,
+		feemarkettypes.ModuleName,
 		group.ModuleName,
 		tokenfactorytypes.ModuleName,
 		authz.ModuleName,
@@ -433,7 +435,7 @@ func orderInitGenesis() []string {
 		circuittypes.ModuleName,
 		ibchookstypes.ModuleName,
 		wasmtypes.ModuleName,
-		globalfee.ModuleName,
+		feemarkettypes.ModuleName,
 		group.ModuleName,
 		tokenfactorytypes.ModuleName,
 		ibcexported.ModuleName,
