@@ -8,7 +8,6 @@ import (
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	appparams "github.com/OmniFlix/omniflixhub/v6/app/params"
-	"github.com/OmniFlix/omniflixhub/v6/x/globalfee"
 	nfttransfer "github.com/bianjieai/nft-transfer"
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
@@ -141,7 +140,6 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		globalfee.AppModuleBasic{},
 		tokenfactory.AppModuleBasic{},
 		nfttransfer.AppModuleBasic{},
 
@@ -166,7 +164,6 @@ var (
 		ibcnfttransfertypes.ModuleName: nil,
 		icatypes.ModuleName:            nil,
 		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
-		globalfee.ModuleName:           nil,
 		wasmtypes.ModuleName:           {authtypes.Burner},
 		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		nft.ModuleName:                 nil,
@@ -184,7 +181,6 @@ func appModules(
 	skipGenesisInvariants bool,
 ) []module.AppModule {
 	appCodec := encodingConfig.Marshaler
-	bondDenom := app.GetChainBondDenom()
 	return []module.AppModule{
 		genutil.NewAppModule(
 			app.AccountKeeper, app.StakingKeeper, app.BaseApp,
@@ -262,7 +258,6 @@ func appModules(
 		nfttransfer.NewAppModule(app.IBCNFTTransferKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
 		ibchooks.NewAppModule(app.AccountKeeper),
-		globalfee.NewAppModule(appCodec, app.GlobalFeeKeeper, bondDenom),
 		alloc.NewAppModule(appCodec, app.AllocKeeper, app.GetSubspace(alloctypes.ModuleName)),
 		onft.NewAppModule(
 			appCodec,
@@ -351,7 +346,6 @@ func orderBeginBlockers() []string {
 		crisistypes.ModuleName,
 		feegrant.ModuleName,
 		circuittypes.ModuleName,
-		globalfee.ModuleName,
 		tokenfactorytypes.ModuleName,
 		group.ModuleName,
 		onfttypes.ModuleName,
@@ -389,7 +383,6 @@ func orderEndBlockers() []string {
 		ibcexported.ModuleName,
 		feegrant.ModuleName,
 		circuittypes.ModuleName,
-		globalfee.ModuleName,
 		group.ModuleName,
 		tokenfactorytypes.ModuleName,
 		authz.ModuleName,
@@ -433,7 +426,6 @@ func orderInitGenesis() []string {
 		circuittypes.ModuleName,
 		ibchookstypes.ModuleName,
 		wasmtypes.ModuleName,
-		globalfee.ModuleName,
 		group.ModuleName,
 		tokenfactorytypes.ModuleName,
 		ibcexported.ModuleName,

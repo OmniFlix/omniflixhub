@@ -6,8 +6,6 @@ import (
 	circuitante "cosmossdk.io/x/circuit/ante"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	globalfeeante "github.com/OmniFlix/omniflixhub/v6/x/globalfee/ante"
-	globalfeekeeper "github.com/OmniFlix/omniflixhub/v6/x/globalfee/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -35,9 +33,8 @@ type HandlerOptions struct {
 
 	BypassMinFeeMsgTypes []string
 
-	GlobalFeeKeeper globalfeekeeper.Keeper
-	StakingKeeper   stakingkeeper.Keeper
-	CircuitKeeper   circuitante.CircuitBreaker
+	StakingKeeper stakingkeeper.Keeper
+	CircuitKeeper circuitante.CircuitBreaker
 }
 
 func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
@@ -65,12 +62,6 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		globalfeeante.NewFeeDecorator(
-			options.BypassMinFeeMsgTypes,
-			options.GlobalFeeKeeper,
-			options.StakingKeeper,
-			maxBypassMinFeeMsgGasUsage,
-		),
 		ante.NewDeductFeeDecorator(
 			options.AccountKeeper,
 			options.BankKeeper,

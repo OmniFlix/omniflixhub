@@ -272,7 +272,6 @@ func NewOmniFlixApp(
 			TxCounterStoreKey: app.AppKeepers.GetKey(wasmtypes.StoreKey),
 
 			BypassMinFeeMsgTypes: GetDefaultBypassFeeMessages(),
-			GlobalFeeKeeper:      app.GlobalFeeKeeper,
 			StakingKeeper:        *app.StakingKeeper,
 			CircuitKeeper:        &app.CircuitKeeper,
 		},

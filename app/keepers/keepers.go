@@ -60,10 +60,6 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
-	"github.com/OmniFlix/omniflixhub/v6/x/globalfee"
-	globalfeekeeper "github.com/OmniFlix/omniflixhub/v6/x/globalfee/keeper"
-	globalfeetypes "github.com/OmniFlix/omniflixhub/v6/x/globalfee/types"
-
 	"github.com/cosmos/cosmos-sdk/x/group"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
@@ -163,7 +159,6 @@ type AppKeepers struct {
 	AuthzKeeper           authzkeeper.Keeper
 	CircuitKeeper         circuitkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
-	GlobalFeeKeeper       globalfeekeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	TokenFactoryKeeper    tokenfactorykeeper.Keeper
 	IBCNFTTransferKeeper  ibcnfttransferkeeper.Keeper
@@ -474,11 +469,6 @@ func NewAppKeeper(
 	)
 	icqModule := icq.NewIBCModule(appKeepers.ICQKeeper)
 
-	appKeepers.GlobalFeeKeeper = globalfeekeeper.NewKeeper(
-		appCodec,
-		keys[globalfeetypes.StoreKey],
-		govModAddress,
-	)
 
 	// Create the TokenFactory Keeper
 	appKeepers.TokenFactoryKeeper = tokenfactorykeeper.NewKeeper(
@@ -663,7 +653,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibcexported.ModuleName).WithKeyTable(keyTable)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName).WithKeyTable(icahosttypes.ParamKeyTable())
 	paramsKeeper.Subspace(icqtypes.ModuleName)
-	paramsKeeper.Subspace(globalfee.ModuleName)
 	paramsKeeper.Subspace(tokenfactorytypes.ModuleName)
 	paramsKeeper.Subspace(wasmtypes.ModuleName)
 	paramsKeeper.Subspace(alloctypes.ModuleName)

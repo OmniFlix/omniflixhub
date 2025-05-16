@@ -8,7 +8,6 @@ import (
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	alloctypes "github.com/OmniFlix/omniflixhub/v6/x/alloc/types"
-	globalfeetypes "github.com/OmniFlix/omniflixhub/v6/x/globalfee/types"
 	itctypes "github.com/OmniFlix/omniflixhub/v6/x/itc/types"
 	marketplacetypes "github.com/OmniFlix/omniflixhub/v6/x/marketplace/types"
 	medianodetypes "github.com/OmniFlix/omniflixhub/v6/x/medianode/types"
@@ -62,7 +61,6 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		feegrant.StoreKey,
 		circuittypes.StoreKey,
 		wasmtypes.StoreKey,
-		globalfeetypes.StoreKey,
 		group.StoreKey,
 		tokenfactorytypes.StoreKey,
 		authzkeeper.StoreKey,
