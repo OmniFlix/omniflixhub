@@ -43,6 +43,9 @@ import (
 	"cosmossdk.io/x/feegrant"
 	feegrantmodule "cosmossdk.io/x/feegrant/module"
 
+	"github.com/skip-mev/feemarket/x/feemarket"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
+
 	"cosmossdk.io/x/circuit"
 
 	"github.com/cosmos/cosmos-sdk/x/genutil"
@@ -140,6 +143,7 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		feemarket.AppModuleBasic{},
 		tokenfactory.AppModuleBasic{},
 		nfttransfer.AppModuleBasic{},
 
@@ -154,24 +158,26 @@ var (
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		distrtypes.ModuleName:          nil,
-		minttypes.ModuleName:           {authtypes.Minter},
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		ibcnfttransfertypes.ModuleName: nil,
-		icatypes.ModuleName:            nil,
-		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
-		wasmtypes.ModuleName:           {authtypes.Burner},
-		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner, authtypes.Staking},
-		nft.ModuleName:                 nil,
-		onfttypes.ModuleName:           nil,
-		marketplacetypes.ModuleName:    nil,
-		streampaytypes.ModuleName:      nil,
-		itctypes.ModuleName:            nil,
-		medianodetypes.ModuleName:      nil,
+		authtypes.FeeCollectorName:      nil,
+		distrtypes.ModuleName:           nil,
+		minttypes.ModuleName:            {authtypes.Minter},
+		stakingtypes.BondedPoolName:     {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName:  {authtypes.Burner, authtypes.Staking},
+		govtypes.ModuleName:             {authtypes.Burner},
+		ibctransfertypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
+		ibcnfttransfertypes.ModuleName:  nil,
+		icatypes.ModuleName:             nil,
+		tokenfactorytypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		feemarkettypes.ModuleName:       nil,
+		feemarkettypes.FeeCollectorName: nil,
+		wasmtypes.ModuleName:            {authtypes.Burner},
+		alloctypes.ModuleName:           {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		nft.ModuleName:                  nil,
+		onfttypes.ModuleName:            nil,
+		marketplacetypes.ModuleName:     nil,
+		streampaytypes.ModuleName:       nil,
+		itctypes.ModuleName:             nil,
+		medianodetypes.ModuleName:       nil,
 	}
 )
 
@@ -258,6 +264,7 @@ func appModules(
 		nfttransfer.NewAppModule(app.IBCNFTTransferKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
 		ibchooks.NewAppModule(app.AccountKeeper),
+		feemarket.NewAppModule(appCodec, *app.FeeMarketKeeper),
 		alloc.NewAppModule(appCodec, app.AllocKeeper, app.GetSubspace(alloctypes.ModuleName)),
 		onft.NewAppModule(
 			appCodec,
@@ -346,6 +353,7 @@ func orderBeginBlockers() []string {
 		crisistypes.ModuleName,
 		feegrant.ModuleName,
 		circuittypes.ModuleName,
+		feemarkettypes.ModuleName,
 		tokenfactorytypes.ModuleName,
 		group.ModuleName,
 		onfttypes.ModuleName,
@@ -383,6 +391,7 @@ func orderEndBlockers() []string {
 		ibcexported.ModuleName,
 		feegrant.ModuleName,
 		circuittypes.ModuleName,
+		feemarkettypes.ModuleName,
 		group.ModuleName,
 		tokenfactorytypes.ModuleName,
 		authz.ModuleName,
@@ -426,6 +435,7 @@ func orderInitGenesis() []string {
 		circuittypes.ModuleName,
 		ibchookstypes.ModuleName,
 		wasmtypes.ModuleName,
+		feemarkettypes.ModuleName,
 		group.ModuleName,
 		tokenfactorytypes.ModuleName,
 		ibcexported.ModuleName,

@@ -122,6 +122,9 @@ import (
 	ibcnfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
 	tfbindings "github.com/OmniFlix/omniflixhub/v6/x/tokenfactory/bindings"
+
+	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
 var tokenFactoryCapabilities = []string{
@@ -164,6 +167,7 @@ type AppKeepers struct {
 	IBCNFTTransferKeeper  ibcnfttransferkeeper.Keeper
 	WasmKeeper            wasmkeeper.Keeper
 	ContractKeeper        *wasmkeeper.PermissionedKeeper
+	FeeMarketKeeper       *feemarketkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -273,6 +277,14 @@ func NewAppKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[feegrant.StoreKey]),
 		appKeepers.AccountKeeper,
+	)
+
+	appKeepers.FeeMarketKeeper = feemarketkeeper.NewKeeper(
+		appCodec,
+		appKeepers.keys[feemarkettypes.StoreKey],
+		appKeepers.AccountKeeper,
+		&DefaultFeemarketDenomResolver{},
+		govModAddress,
 	)
 
 	appKeepers.CircuitKeeper = circuitkeeper.NewKeeper(
@@ -468,7 +480,6 @@ func NewAppKeeper(
 		govModAddress,
 	)
 	icqModule := icq.NewIBCModule(appKeepers.ICQKeeper)
-
 
 	// Create the TokenFactory Keeper
 	appKeepers.TokenFactoryKeeper = tokenfactorykeeper.NewKeeper(
