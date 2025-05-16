@@ -24,9 +24,6 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 )
 
-// Lower back to 1 mil after https://github.com/cosmos/relayer/issues/1255
-const maxBypassMinFeeMsgGasUsage = 2_000_000
-
 // UseFeeMarketDecorator to make the integration testing easier: we can switch off its ante and post decorators with this flag
 var UseFeeMarketDecorator = true
 
