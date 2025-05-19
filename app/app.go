@@ -9,7 +9,9 @@ import (
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/posthandler"
+
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
@@ -34,6 +36,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -49,6 +52,9 @@ import (
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	ibcchanneltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
+
+	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/OmniFlix/omniflixhub/v6/app/keepers"
@@ -256,36 +262,45 @@ func NewOmniFlixApp(
 	app.SetPrepareProposal(baseapp.NoOpPrepareProposal())
 	app.SetProcessProposal(baseapp.NoOpProcessProposal())
 
+	// set denom resolver to test variant.
+	app.FeeMarketKeeper.SetDenomResolver(&feemarkettypes.TestDenomResolver{})
+
 	anteHandler, err := NewAnteHandler(
 		HandlerOptions{
-			HandlerOptions: ante.HandlerOptions{
-				AccountKeeper:   app.AccountKeeper,
-				BankKeeper:      app.BankKeeper,
-				FeegrantKeeper:  app.FeeGrantKeeper,
-				SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
+			Codec:                 appCodec,
+			SignModeHandler:       encodingConfig.TxConfig.SignModeHandler(),
+			SigGasConsumer:        ante.DefaultSigVerificationGasConsumer,
+			TXCounterStoreService: runtime.NewKVStoreService(app.GetKey(wasmtypes.StoreKey)),
+			TXFeeChecker: func(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, error) {
+				return minTxFeesChecker(ctx, tx, *app.FeeMarketKeeper)
 			},
-			GovKeeper:         app.GovKeeper,
-			IBCKeeper:         app.IBCKeeper,
-			Codec:             appCodec,
-			WasmConfig:        wasmConfig,
-			TxCounterStoreKey: app.AppKeepers.GetKey(wasmtypes.StoreKey),
 
-			BypassMinFeeMsgTypes: GetDefaultBypassFeeMessages(),
-			GlobalFeeKeeper:      app.GlobalFeeKeeper,
-			StakingKeeper:        *app.StakingKeeper,
-			CircuitKeeper:        &app.CircuitKeeper,
+			AccountKeeper:   app.AppKeepers.AccountKeeper,
+			BankKeeper:      app.BankKeeper,
+			CircuitKeeper:   &app.CircuitKeeper,
+			FeegrantKeeper:  app.FeeGrantKeeper,
+			FeeMarketKeeper: app.FeeMarketKeeper,
+			GovKeeper:       app.GovKeeper,
+			IBCKeeper:       app.IBCKeeper,
+			StakingKeeper:   *app.StakingKeeper,
+
+			WasmConfig: wasmConfig,
 		},
 	)
 	if err != nil {
 		panic(fmt.Errorf("failed to create AnteHandler: %s", err))
 	}
-	postHandler, err := posthandler.NewPostHandler(
-		posthandler.HandlerOptions{},
-	)
+
+	postHandlerOptions := PostHandlerOptions{
+		AccountKeeper:   app.AccountKeeper,
+		BankKeeper:      app.BankKeeper,
+		FeeMarketKeeper: app.FeeMarketKeeper,
+	}
+	postHandler, err := NewPostHandler(postHandlerOptions)
 	if err != nil {
 		panic(err)
 	}
+
 	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
 	app.SetPreBlocker(app.PreBlocker)
@@ -519,4 +534,43 @@ func GetDefaultBypassFeeMessages() []string {
 
 func (app *OmniFlixApp) GetChainBondDenom() string {
 	return "uflix"
+}
+
+// minTxFeesChecker will be executed only if the feemarket module is disabled.
+// In this case, the auth module's DeductFeeDecorator is executed, and
+// we use the minTxFeesChecker to enforce the minimum transaction fees.
+// Min tx fees are calculated as gas_limit * feemarket_min_base_gas_price
+func minTxFeesChecker(ctx sdk.Context, tx sdk.Tx, feemarketKp feemarketkeeper.Keeper) (sdk.Coins, int64, error) {
+	feeTx, ok := tx.(sdk.FeeTx)
+	if !ok {
+		return nil, 0, errorsmod.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
+	}
+
+	// To keep the gentxs with zero fees, we need to skip the validation in the first block
+	if ctx.BlockHeight() == 0 {
+		return feeTx.GetFee(), 0, nil
+	}
+
+	feeMarketParams, err := feemarketKp.GetParams(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	feeRequired := sdk.NewCoins(
+		sdk.NewCoin(
+			feeMarketParams.FeeDenom,
+			feeMarketParams.MinBaseGasPrice.MulInt(math.NewIntFromUint64(feeTx.GetGas())).Ceil().RoundInt()))
+
+	feeCoins := feeTx.GetFee()
+	if len(feeCoins) != 1 {
+		return nil, 0, fmt.Errorf(
+			"expected exactly one fee coin; got %s, required: %s", feeCoins.String(), feeRequired.String())
+	}
+
+	if !feeCoins.IsAnyGTE(feeRequired) {
+		return nil, 0, fmt.Errorf(
+			"not enough fees provided; got %s, required: %s", feeCoins.String(), feeRequired.String())
+	}
+
+	return feeTx.GetFee(), 0, nil
 }
