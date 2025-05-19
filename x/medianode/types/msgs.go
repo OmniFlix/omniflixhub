@@ -2,6 +2,7 @@ package types
 
 import (
 	errorsmod "cosmossdk.io/errors"
+	"github.com/OmniFlix/omniflixhub/v6/app/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -67,6 +68,9 @@ func (msg MsgRegisterMediaNode) ValidateBasic() error {
 	if err := msg.PricePerHour.Validate(); err != nil {
 		return errorsmod.Wrap(ErrInvalidLeaseAmount, "invalid lease amount per hour")
 	}
+	if msg.PricePerHour.Denom != params.BondDenom {
+		return errorsmod.Wrap(ErrInvalidLeaseAmount, "invalid denom for price per hour only uflix is supported")
+	}
 	if msg.PricePerHour.Amount.IsZero() {
 		return errorsmod.Wrap(ErrInvalidLeaseAmount, "price per hour must be positive")
 	}
@@ -117,6 +121,9 @@ func (msg MsgUpdateMediaNode) ValidateBasic() error {
 		}
 		if msg.PricePerHour.Amount.IsZero() {
 			return errorsmod.Wrap(ErrInvalidLeaseAmount, "price per hour amount must be positive")
+		}
+		if msg.PricePerHour.Denom != params.BondDenom {
+			return errorsmod.Wrap(ErrInvalidLeaseAmount, "invalid denom for price per hour, only uflix is supported")
 		}
 	}
 	if msg.HardwareSpecs == nil && msg.Info == nil && msg.PricePerHour == nil {
