@@ -67,6 +67,7 @@ import (
 	v5 "github.com/OmniFlix/omniflixhub/v6/app/upgrades/v5"
 	v510 "github.com/OmniFlix/omniflixhub/v6/app/upgrades/v510"
 	v6 "github.com/OmniFlix/omniflixhub/v6/app/upgrades/v6"
+	v6dev2 "github.com/OmniFlix/omniflixhub/v6/app/upgrades/v6dev2"
 )
 
 const Name = "omniflixhub"
@@ -102,6 +103,7 @@ var (
 		v5.Upgrade,
 		v510.Upgrade,
 		v6.Upgrade,
+		v6dev2.Upgrade,
 	}
 	Forks []upgrades.Fork
 )

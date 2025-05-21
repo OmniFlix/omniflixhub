@@ -18,8 +18,5 @@ var Upgrade = upgrades.Upgrade{
 		Added: []string{
 			medianodetypes.StoreKey,
 		},
-		Deleted: []string{
-			GlobalFeeModuleName,
-		},
 	},
 }
