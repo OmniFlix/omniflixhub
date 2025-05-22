@@ -143,7 +143,7 @@ func GetCmdUpdateMediaNode() *cobra.Command {
 		Long:  "Update an existing media node's information, hardware specs, and price\n",
 		Example: fmt.Sprintf(
 			"$ %s tx medianode update [medianode-id] "+
-				"--node-oniker=<name> "+
+				"--node-moniker=<name> "+
 				"--description=<description> "+
 				"--contact=<contact> "+
 				"--hardware-specs=<specs> "+
