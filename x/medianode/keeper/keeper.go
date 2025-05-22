@@ -179,8 +179,12 @@ func (k Keeper) DepositMediaNode(ctx sdk.Context, mediaNodeId string, amount sdk
 	minDeposit := k.GetMinDeposit(ctx)
 	initialDepositPerc := k.GetInitialDepositPercentage(ctx)
 	minInitialDeposit := sdk.NewCoin(minDeposit.Denom, sdkmath.LegacyNewDecFromInt(minDeposit.Amount).Mul(initialDepositPerc).TruncateInt())
+
+	if amount.Denom != minDeposit.Denom {
+		return types.MediaNode{}, sdk.Coin{}, errorsmod.Wrapf(types.ErrInvalidDeposit, "invalid deposit denom; expected %s, got %s", minDeposit.Denom, amount.Denom)
+	}
 	if !amount.IsGTE(minInitialDeposit) {
-		return types.MediaNode{}, sdk.Coin{}, errorsmod.Wrapf(types.ErrInsufficientDeposit, "%s of deposit is required", minInitialDeposit.String())
+		return types.MediaNode{}, sdk.Coin{}, errorsmod.Wrapf(types.ErrInsufficientDeposit, "deposit must be at least %s", minInitialDeposit.String())
 	}
 
 	// Create a deposit object

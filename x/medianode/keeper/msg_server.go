@@ -33,8 +33,11 @@ func (m msgServer) RegisterMediaNode(goCtx context.Context, msg *types.MsgRegist
 	minDeposit := m.Keeper.GetMinDeposit(ctx)
 	initialDepositPerc := m.Keeper.GetInitialDepositPercentage(ctx)
 	minInitialDeposit := sdk.NewCoin(minDeposit.Denom, sdkmath.LegacyNewDecFromInt(minDeposit.Amount).Mul(initialDepositPerc).TruncateInt())
+	if msg.Deposit.Denom != minDeposit.Denom {
+		return nil, errorsmod.Wrapf(types.ErrInvalidDeposit, "invalid deposit denom; expected %s, got %s", minDeposit.Denom, msg.Deposit.Denom)
+	}
 	if !msg.Deposit.IsGTE(minInitialDeposit) {
-		return nil, errorsmod.Wrapf(types.ErrInsufficientDeposit, "%s of initial deposit is reqquired", minInitialDeposit.String())
+		return nil, errorsmod.Wrapf(types.ErrInsufficientDeposit, "initial deposit must be at least %s", minInitialDeposit.String())
 	}
 
 	// Create and store the media node
@@ -86,16 +89,13 @@ func (m msgServer) LeaseMediaNode(goCtx context.Context, msg *types.MsgLeaseMedi
 	}
 
 	params := m.Keeper.GetParams(ctx)
-	if msg.LeaseHours < params.MinimumLeaseHours {
-		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseHours, "minimum of %d lease hours required", params.MinimumLeaseHours)
-	}
-	if msg.LeaseHours > params.MaximumLeaseHours {
-		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseHours, "maximum of %d lease hours allowed", params.MaximumLeaseHours)
+	if msg.LeaseHours < params.MinimumLeaseHours || msg.LeaseHours > params.MaximumLeaseHours {
+		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseHours, "lease hours must be between %d and %d", params.MinimumLeaseHours, params.MaximumLeaseHours)
 	}
 
 	mediaNode, found := m.Keeper.GetMediaNode(ctx, msg.MediaNodeId)
 	if !found {
-		return nil, errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "not found")
+		return nil, errorsmod.Wrapf(types.ErrMediaNodeDoesNotExist, "media node %s does not exist", msg.MediaNodeId)
 	}
 	if mediaNode.Status != types.STATUS_ACTIVE {
 		return nil, errorsmod.Wrapf(types.ErrLeaseNotAllowed, "only active medianodes are allowed to lease")
@@ -131,16 +131,13 @@ func (m msgServer) ExtendLease(goCtx context.Context, msg *types.MsgExtendLease)
 	}
 
 	params := m.Keeper.GetParams(ctx)
-	if msg.LeaseHours < params.MinimumLeaseHours {
-		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseHours, "minimum of %d lease hours required", params.MinimumLeaseHours)
-	}
-	if msg.LeaseHours > params.MaximumLeaseHours {
-		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseHours, "maximum of %d lease hours allowed", params.MaximumLeaseHours)
+	if msg.LeaseHours < params.MinimumLeaseHours || msg.LeaseHours > params.MaximumLeaseHours {
+		return nil, errorsmod.Wrapf(types.ErrInvalidLeaseHours, "lease hours must be between %d and %d", params.MinimumLeaseHours, params.MaximumLeaseHours)
 	}
 
 	mediaNodeLease, found := m.Keeper.GetMediaNodeLease(ctx, msg.MediaNodeId)
 	if !found {
-		return nil, errorsmod.Wrapf(types.ErrLeaseNotFound, "not found")
+		return nil, errorsmod.Wrapf(types.ErrLeaseNotFound, "lease not found")
 	}
 
 	expectedLeaseAmount := sdk.NewCoin(mediaNodeLease.PricePerHour.Denom, mediaNodeLease.PricePerHour.Amount.Mul(sdkmath.NewIntFromUint64((msg.LeaseHours))))

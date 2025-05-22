@@ -71,6 +71,9 @@ func (msg MsgRegisterMediaNode) ValidateBasic() error {
 	if msg.PricePerHour.Denom != params.BondDenom {
 		return errorsmod.Wrap(ErrInvalidLeaseAmount, "invalid denom for price per hour only uflix is supported")
 	}
+	if err := msg.Deposit.Validate(); err != nil {
+		return errorsmod.Wrap(ErrInvalidDeposit, "invalid deposit amount")
+	}
 	if msg.PricePerHour.Amount.IsZero() {
 		return errorsmod.Wrap(ErrInvalidLeaseAmount, "price per hour must be positive")
 	}
