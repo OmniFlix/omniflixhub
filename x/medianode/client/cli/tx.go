@@ -45,11 +45,12 @@ func GetCmdRegisterMediaNode() *cobra.Command {
 		Example: fmt.Sprintf(
 			"$ %s tx medianode register"+
 				"--url=https://mymedianode.com"+
-				"--moniker=my-node"+
+				"--node-moniker=my-node"+
 				"--description=mydescription"+
 				"--contact=contact@mynode.com"+
 				"--hardware-specs=<hardwarespecs>"+
 				"--price-per-hour=<amount> "+
+				"--deposit=<amount> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
@@ -142,7 +143,7 @@ func GetCmdUpdateMediaNode() *cobra.Command {
 		Long:  "Update an existing media node's information, hardware specs, and price\n",
 		Example: fmt.Sprintf(
 			"$ %s tx medianode update [medianode-id] "+
-				"--moniker=<name> "+
+				"--node-oniker=<name> "+
 				"--description=<description> "+
 				"--contact=<contact> "+
 				"--hardware-specs=<specs> "+
@@ -232,7 +233,7 @@ func GetCmdLeaseMediaNode() *cobra.Command {
 		Short: "leases a media node",
 		Long:  "leases a media node with the specified URL and lease hours\n",
 		Example: fmt.Sprintf(
-			"$ %s tx medianode lease [medianode-id] --lease-hours=<no-of-hours> --amount=<amount> "+
+			"$ %s tx medianode lease [medianode-id] --lease-hours=<no-of-hours> --lease-amount=<amount> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
@@ -283,7 +284,7 @@ func GetCmdExtendLease() *cobra.Command {
 		Short: "extends a lease for a media node",
 		Long:  "extends an active lease for a media node with the specified ID and additional lease hours\n",
 		Example: fmt.Sprintf(
-			"$ %s tx medianode extend-lease [medianode-id] --additional-hours=<no-of-hours> --amount=<amount> "+
+			"$ %s tx medianode extend-lease [medianode-id] --additional-hours=<no-of-hours> --lease-amount=<amount> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
@@ -334,7 +335,7 @@ func GetCmdDepositMediaNode() *cobra.Command {
 		Short: "deposits an amount for a media node",
 		Long:  "deposits an amount for a media node with the specified URL and deposit amount\n",
 		Example: fmt.Sprintf(
-			"$ %s tx medianode deposit [medianode-id] --amount=<amount> "+
+			"$ %s tx medianode deposit [medianode-id] --deposit=<amount> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
