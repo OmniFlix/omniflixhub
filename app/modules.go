@@ -1,7 +1,5 @@
 package app
 
-// sdk v.50.x migration TODO:Eventually should get rid of this in favor of NewBasicManagerFromManager
-
 import (
 	circuittypes "cosmossdk.io/x/circuit/types"
 	"cosmossdk.io/x/nft"

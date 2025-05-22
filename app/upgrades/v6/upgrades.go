@@ -2,6 +2,7 @@ package v6
 
 import (
 	"context"
+	"time"
 
 	sdkmath "cosmossdk.io/math"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
@@ -29,11 +30,10 @@ func CreateV6UpgradeHandler(
 			return nil, err
 		}
 
-		// Set Default Params
-
-		err = keepers.MedianodeKeeper.SetParams(ctx, medianodetypes.DefaultParams())
+		// Configure Medianode Module
+		err = ConfigureMedianodeModule(ctx, keepers)
 		if err != nil {
-			return nil, err
+			return versionMap, err
 		}
 
 		err = ConfigureFeeMarketModule(ctx, keepers)
@@ -44,6 +44,27 @@ func CreateV6UpgradeHandler(
 		ctx.Logger().Info("Upgrade complete")
 		return versionMap, nil
 	}
+}
+
+func ConfigureMedianodeModule(ctx sdk.Context, keepers *keepers.AppKeepers) error {
+	params := medianodetypes.DefaultParams()
+
+	params.MinDeposit = sdk.NewCoin("uflix", sdkmath.NewInt(1000_000_000)) // 1000 FLIX
+	params.InitialDepositPercentage = sdkmath.LegacyNewDecWithPrec(10, 2)
+	params.MinimumLeaseHours = 3                                // 3 hours
+	params.MaximumLeaseHours = 8760                             // 1 year
+	params.DepositReleasePeriod = time.Hour * 24 * 7            // 1 week
+	params.LeaseCommission = sdkmath.LegacyNewDecWithPrec(1, 2) // 1%
+	params.CommissionDistribution = medianodetypes.Distribution{
+		Staking:       sdkmath.LegacyNewDecWithPrec(50, 2), // 50%
+		CommunityPool: sdkmath.LegacyNewDecWithPrec(50, 2), // 50%
+	}
+
+	if err := keepers.MedianodeKeeper.SetParams(ctx, params); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func ConfigureFeeMarketModule(ctx sdk.Context, keepers *keepers.AppKeepers) error {
