@@ -40,8 +40,10 @@ for f in $files; do
 
   if [[ "$f" =~ "cosmos" ]]; then
     cp $f ./tmp-swagger-gen/_all/cosmos-$counter.json
-  elif [[ "$f" =~ "omniflix" ]]; then
-    cp $f ./tmp-swagger-gen/_all/omniflix-$counter.json
+  elif [[ "$f" =~ "OmniFlix" ]]; then
+    cp $f ./tmp-swagger-gen/_all/OmniFlix-$counter.json
+  elif [[ "$f" =~ "ibc" ]]; then
+    cp $f ./tmp-swagger-gen/_all/ibc-$counter.json
   elif [[ "$f" =~ "streampay" ]]; then
     cp $f ./tmp-swagger-gen/_all/streampay-$counter.json
   else
@@ -53,14 +55,16 @@ done
 # merges all the above into FINAL.json
 python3 ./scripts/merge_protoc.py
 
+jq '.definitions |= with_entries(select(.key | startswith("cosmos.autocli.") | not))' ./tmp-swagger-gen/_all/FINAL.json > ./tmp-swagger-gen/_all/FINAL-cleaned.json
 # Makes a swagger temp file with reference pointers
-swagger-combine ./tmp-swagger-gen/_all/FINAL.json -o ./docs/_tmp_swagger.yaml -f yaml --continueOnConflictingPaths --includeDefinitions
+swagger-combine ./tmp-swagger-gen/_all/FINAL-cleaned.json -o ./docs/_tmp_swagger.yaml -f yaml --continueOnConflictingPaths --includeDefinitions
 
 # extends out the *ref instances to their full value
-swagger-merger --input ./docs/_tmp_swagger.yaml -o ./docs/swagger.yaml
+go-swagger-merger -o ./docs/swagger.yaml ./docs/_tmp_swagger.yaml
 
 # Derive openapi from swagger docs
 swagger2openapi --patch ./docs/swagger.yaml --outfile ./docs/static/openapi.yml --yaml
+
 
 # clean swagger tmp files
 rm ./docs/_tmp_swagger.yaml
