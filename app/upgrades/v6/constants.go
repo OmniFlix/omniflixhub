@@ -4,6 +4,7 @@ import (
 	store "cosmossdk.io/store/types"
 	"github.com/OmniFlix/omniflixhub/v6/app/upgrades"
 	medianodetypes "github.com/OmniFlix/omniflixhub/v6/x/medianode/types"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
 const (
@@ -17,6 +18,7 @@ var Upgrade = upgrades.Upgrade{
 	StoreUpgrades: store.StoreUpgrades{
 		Added: []string{
 			medianodetypes.StoreKey,
+			feemarkettypes.StoreKey,
 		},
 		Deleted: []string{
 			GlobalFeeModuleName,
