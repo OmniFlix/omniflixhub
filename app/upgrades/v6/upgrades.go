@@ -49,7 +49,7 @@ func CreateV6UpgradeHandler(
 func ConfigureMedianodeModule(ctx sdk.Context, keepers *keepers.AppKeepers) error {
 	params := medianodetypes.DefaultParams()
 
-	params.MinDeposit = sdk.NewCoin("uflix", sdkmath.NewInt(1000_000_000)) // 1000 FLIX
+	params.MinDeposit = sdk.NewCoin("uflix", sdkmath.NewInt(5000_000_000)) // 5000 FLIX
 	params.InitialDepositPercentage = sdkmath.LegacyNewDecWithPrec(10, 2)
 	params.MinimumLeaseHours = 3                                // 3 hours
 	params.MaximumLeaseHours = 8760                             // 1 year
@@ -87,7 +87,7 @@ func ConfigureFeeMarketModule(ctx sdk.Context, keepers *keepers.AppKeepers) erro
 		return err
 	}
 
-	state.BaseGasPrice = sdkmath.LegacyMustNewDecFromStr("0.001")
+	state.BaseGasPrice = sdkmath.LegacyMustNewDecFromStr("0.005")
 
 	return keepers.FeeMarketKeeper.SetState(ctx, state)
 }
