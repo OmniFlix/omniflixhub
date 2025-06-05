@@ -104,7 +104,7 @@ func NewMsgBurn(sender string, amount sdk.Coin) *MsgBurn {
 	}
 }
 
-// NewMsgBurn creates a message to burn tokens
+// NewMsgBurnFrom creates a message to burn tokens
 func NewMsgBurnFrom(sender string, amount sdk.Coin, burnFromAddress string) *MsgBurn {
 	return &MsgBurn{
 		Sender:          sender,
@@ -220,7 +220,7 @@ func (m MsgChangeAdmin) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgSetDenomMetadata{}
 
-// NewMsgChangeAdmin creates a message to burn tokens
+// NewMsgSetDenomMetadata creates a message to set denom metadata
 func NewMsgSetDenomMetadata(sender string, metadata banktypes.Metadata) *MsgSetDenomMetadata {
 	return &MsgSetDenomMetadata{
 		Sender:   sender,
