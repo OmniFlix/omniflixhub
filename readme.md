@@ -14,7 +14,7 @@ OmniFlix Hub blockchain is built using Cosmos-SDK and CometBFT
 ```
 sudo rm -rf /usr/local/go
 wget -q -O - https://git.io/vQhTU | bash -s -- --remove
-wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.22.12
+wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.24.3
  ```
 
 ### Installation
@@ -24,7 +24,9 @@ wget -q -O - https://git.io/vQhTU | bash -s -- --version 1.22.12
 ```
 git clone https://github.com/Omniflix/omniflixhub.git
 cd omniflixhub
-git checkout v5.2.0
+
+# v6.0.0 for v6 upgrade and after
+git checkout v5.2.2 
 go mod tidy
 make install
 ```
@@ -58,6 +60,7 @@ curl https://raw.githubusercontent.com/OmniFlix/mainnet/main/omniflixhub-1/genes
 - [Marketplace](https://github.com/OmniFlix/omniflixhub/tree/main/marketplace)
 - [ITC](https://github.com/OmniFlix/omniflixhub/tree/main/itc)
 - [StreamPay](https://github.com/OmniFlix/streampay)
+- [MediaNode](https://github.com/OmniFlix/omniflixhub/tree/main/medianode)
  
 ### Documentation
 
@@ -80,6 +83,7 @@ curl https://raw.githubusercontent.com/OmniFlix/mainnet/main/omniflixhub-1/genes
  - [v5](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v5-upgrade.md) at block 13986200
  - [v5.1.0](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v5.1.0-upgrade.md) at block `15777200`
  - [v5.2.0](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v5.2.0-upgrade.md) at block `16516000`
+  - [v6](https://github.com/OmniFlix/docs/blob/main/guides/mainnet/omniflixhub-1/upgrades/v6-upgrade.md) at block `18004800`
 
 ### Testnets
 
