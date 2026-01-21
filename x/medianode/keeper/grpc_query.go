@@ -148,7 +148,7 @@ func (k Keeper) Lease(goCtx context.Context,
 	return &types.QueryLeaseResponse{Lease: lease}, nil
 }
 
-// LeasesByLeasee returns all active leases for a specific leasee
+// LeasesByLessee returns all active leases for a specific leasee
 func (k Keeper) LeasesByLessee(goCtx context.Context,
 	req *types.QueryLeasesByLesseeRequest,
 ) (*types.QueryLeasesByLesseeResponse, error) {

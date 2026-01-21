@@ -53,7 +53,7 @@ func (k Keeper) GetListing(ctx sdk.Context, id string) (val types.Listing, found
 	return val, true
 }
 
-// GetListing returns a listing from its nft id
+// GetListingIdByNftId returns a listing from its nft id
 func (k Keeper) GetListingIdByNftId(ctx sdk.Context, nftId string) (val string, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PrefixListingNFTID)
 	b := store.Get(types.KeyListingNFTIDPrefix(nftId))

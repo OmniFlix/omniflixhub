@@ -204,7 +204,7 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	simulation.RandomizedGenState(simState)
 }
 
-// GenerateGenesisState creates a randomized GenState of the bank module.
+// ProposalContents creates a randomized GenState of the bank module.
 func (am AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalMsg {
 	return nil
 }
