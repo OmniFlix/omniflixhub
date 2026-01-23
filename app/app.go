@@ -67,6 +67,7 @@ import (
 	v5 "github.com/OmniFlix/omniflixhub/v6/app/upgrades/v5"
 	v510 "github.com/OmniFlix/omniflixhub/v6/app/upgrades/v510"
 	v6 "github.com/OmniFlix/omniflixhub/v6/app/upgrades/v6"
+	v6_1 "github.com/OmniFlix/omniflixhub/v6/app/upgrades/v6.1"
 )
 
 const Name = "omniflixhub"
@@ -102,6 +103,7 @@ var (
 		v5.Upgrade,
 		v510.Upgrade,
 		v6.Upgrade,
+		v6_1.Upgrade,
 	}
 	Forks []upgrades.Fork
 )
@@ -340,6 +342,10 @@ func (app *OmniFlixApp) PreBlocker(ctx sdk.Context, _ *abci.RequestFinalizeBlock
 
 // BeginBlocker application updates every begin block
 func (app *OmniFlixApp) BeginBlocker(ctx sdk.Context) (sdk.BeginBlock, error) {
+	// Halt chain at block 21,488,000 - chain shutdown after v6.1 upgrade
+	if ctx.BlockHeight() >= 21_488_000 {
+		panic("CHAIN SHUTDOWN: The chain has been halted at block 21,488,000. The chain will no longer produce blocks.")
+	}
 	BeginBlockForks(ctx, app)
 	return app.mm.BeginBlock(ctx)
 }
